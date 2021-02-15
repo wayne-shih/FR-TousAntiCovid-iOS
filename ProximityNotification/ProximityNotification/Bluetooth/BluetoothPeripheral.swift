@@ -10,11 +10,13 @@
 
 import Foundation
 
-struct BluetoothScannedPeripheral: Hashable {
+struct BluetoothPeripheral: Hashable {
     
     let peripheralIdentifier: UUID
     
     let timestamp: Date
     
     let rssi: Int?
+
+    let isRSSIFromPayload: Bool
 }
