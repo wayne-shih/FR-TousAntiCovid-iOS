@@ -15,14 +15,16 @@ public struct RBStatusResponse {
     let message: String?
     let tuples: String
     let declarationToken: String?
+    let analyticsToken: String?
     
-    public init(riskLevel: Double, lastContactDate: String?, lastRiskScoringDate: String?, message: String?, tuples: String, declarationToken: String?) {
+    public init(riskLevel: Double, lastContactDate: String?, lastRiskScoringDate: String?, message: String?, tuples: String, declarationToken: String?, analyticsToken: String?) {
         self.riskLevel = riskLevel
         self.lastContactDate = lastContactDate
         self.lastRiskScoringDate = lastRiskScoringDate
         self.message = message
         self.tuples = tuples
         self.declarationToken = declarationToken
+        self.analyticsToken = analyticsToken
     }
 
 }

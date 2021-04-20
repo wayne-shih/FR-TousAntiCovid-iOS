@@ -72,6 +72,10 @@ final class HomeCoordinator: WindowedCoordinator {
             self?.showIsolationForm()
         }, didTouchVaccination: { [weak self] in
             self?.showVaccination()
+        }, didTouchSanitaryCertificates: { [weak self] url in
+            self?.showSanitaryCertificates(url)
+        }, didTouchVerifyWalletCertificate: { [weak self] in
+            self?.showWalletCertificateVerification()
         }, deinitBlock: { [weak self] in
             self?.didDeinit()
         }))
@@ -108,11 +112,29 @@ final class HomeCoordinator: WindowedCoordinator {
     private func showAttestations() {
         let attestationsCoordinator: AttestationsCoordinator = AttestationsCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
         addChild(coordinator: attestationsCoordinator)
+        AnalyticsManager.shared.reportAppEvent(.e11)
+    }
+    
+    private func showSanitaryCertificates(_ url: URL?) {
+        if let controller = DeepLinkingManager.shared.walletController {
+            guard let url = url else { return }
+            controller.processExternalUrl(url)
+        } else {
+            let sanitaryCertificatesCoordinator: WalletCoordinator = WalletCoordinator(presentingController: navigationController?.topPresentedController,
+                                                                                       url: url,
+                                                                                       parent: self)
+            addChild(coordinator: sanitaryCertificatesCoordinator)
+        }
     }
 
     private func showVenueRecordingConfirmation(url: URL) {
         let venuesRecordingCoordinator: VenuesRecordingCoordinator = VenuesRecordingCoordinator(presentingController: navigationController?.topPresentedController, parent: self, showOnlyConfirmation: true, openingUrl: url)
         addChild(coordinator: venuesRecordingCoordinator)
+    }
+    
+    private func showWalletCertificateVerification() {
+        let verificationCoordinator: WalletCertificateVerificationCoordinator = WalletCertificateVerificationCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
+        addChild(coordinator: verificationCoordinator)
     }
     
     private func requestVenueScanAuthorization(_ completion: @escaping (_ granted: Bool) -> ()) {
@@ -139,11 +161,13 @@ final class HomeCoordinator: WindowedCoordinator {
     private func showMyHealth() {
         let sickCoordinator: MyHealthCoordinator = MyHealthCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
         addChild(coordinator: sickCoordinator)
+        AnalyticsManager.shared.reportAppEvent(.e5)
     }
     
     private func showInfo() {
         let infoCenterCoordinator: InfoCenterCoordinator = InfoCenterCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
         addChild(coordinator: infoCenterCoordinator)
+        AnalyticsManager.shared.reportAppEvent(.e10)
     }
     
     private func showDeclare() {
@@ -154,6 +178,7 @@ final class HomeCoordinator: WindowedCoordinator {
     private func showRecordVenues() {
         let venuesRecordingCoordinator: VenuesRecordingCoordinator = VenuesRecordingCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
         addChild(coordinator: venuesRecordingCoordinator)
+        AnalyticsManager.shared.reportAppEvent(.e12)
     }
     
     private func showPrivateEvents() {
@@ -183,6 +208,7 @@ final class HomeCoordinator: WindowedCoordinator {
     private func showIsolationForm() {
         let isolationFormCoordinator: IsolationFormCoordinator = IsolationFormCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
         addChild(coordinator: isolationFormCoordinator)
+        AnalyticsManager.shared.reportAppEvent(.e6)
     }
     
     private func showCaptchaChallenge(captcha: Captcha, didEnterCaptcha: @escaping (_ id: String, _ answer: String) -> (), didCancelCaptcha: @escaping () -> ()) {
@@ -209,6 +235,7 @@ final class HomeCoordinator: WindowedCoordinator {
     private func showKeyFigures() {
         let keyFiguresCoordinator: KeyFiguresCoordinator = KeyFiguresCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
         addChild(coordinator: keyFiguresCoordinator)
+        AnalyticsManager.shared.reportAppEvent(.e8)
     }
     
     private func showKeyFigureDetailFor(keyFigure: KeyFigure) {
@@ -219,6 +246,7 @@ final class HomeCoordinator: WindowedCoordinator {
     private func showVaccination() {
         let vaccinationCoordinator: VaccinationCoordinator = VaccinationCoordinator(presentingController: navigationController?.topViewController, parent: self)
         addChild(coordinator: vaccinationCoordinator)
+        AnalyticsManager.shared.reportAppEvent(.e7)
     }
     
     private func loadLaunchScreen() {

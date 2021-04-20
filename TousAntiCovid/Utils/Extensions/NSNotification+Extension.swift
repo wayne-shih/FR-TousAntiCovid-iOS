@@ -21,4 +21,5 @@ extension NSNotification.Name {
     static var dismissAllAndShowRecommandations: NSNotification.Name = NSNotification.Name(rawValue: "dismissAllAndShowRecommandations")
     static var newVenueRecordingFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newVenueRecordingFromDeeplink")
     static var openFullVenueRecordingFlowFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "openFullVenueRecordingFlowFromDeeplink")
+    static var newWalletCertificateFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newWalletCertificateFromDeeplink")
 }

@@ -22,12 +22,12 @@ final class InfoCell: CVTableViewCell {
     
     override func setup(with row: CVRow) {
         super.setup(with: row)
-        setupUI()
+        setupUI(row: row)
         setupContent(row: row)
         setupAccessibility(row: row)
     }
     
-    private func setupUI() {
+    private func setupUI(row: CVRow) {
         containerView.backgroundColor = backgroundColor
         backgroundColor = .clear
         dateLabel.font = Appearance.Cell.Text.captionTitleFont
@@ -48,6 +48,15 @@ final class InfoCell: CVTableViewCell {
         containerView.layer.masksToBounds = true
         sharingImageView.tintColor = Appearance.tintColor
         sharingImageView.image = Asset.Images.shareIcon.image
+
+        if let subtitle = row.subtitle, subtitle.contains("\n\n")  {
+            let range: NSRange = (subtitle as NSString).range(of: "\n\n")
+            let boldRange: NSRange = NSRange(location: 0, length: range.location)
+            let attributedText: NSMutableAttributedString = NSMutableAttributedString(string: subtitle, attributes: [.foregroundColor: row.theme.subtitleColor,
+                                                                                                                     .font: row.theme.subtitleFont()])
+            attributedText.addAttributes([.foregroundColor: row.theme.titleHighlightColor, .font: row.theme.titleHighlightFont()], range: boldRange)
+            cvSubtitleLabel?.attributedText = attributedText
+        }
     }
 
     override func capture() -> UIImage? {

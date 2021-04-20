@@ -8,7 +8,7 @@
 //  Created by Lunabee Studio / Date - 23/02/2021 - for the TousAntiCovid project.
 //
 
-import Foundation
+import CoreGraphics
 
 struct RisksUILevel: Codable {
     
@@ -26,5 +26,14 @@ struct RisksUILevel: Codable {
     let sections: [RisksUILevelSection]
     
     var contactDateFormatType: ContactDateFormat { contactDateFormat ?? .none }
-    
+    var effectAlpha: CGFloat {
+        switch riskLevel {
+        case 0:
+            return 0.3
+        case 4:
+            return 0.22
+        default:
+            return 0.2
+        }
+    }
 }

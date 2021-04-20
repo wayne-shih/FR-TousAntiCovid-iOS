@@ -54,7 +54,8 @@ final class VenuesRecordingOnboardingController: CVTableViewController {
                                    xibName: .textCell,
                                    theme: CVRow.Theme(topInset: 40.0,
                                                       bottomInset: 20.0,
-                                                      textAlignment: .center))
+                                                      textAlignment: .center,
+                                                      titleFont: { Appearance.Cell.Text.smallHeadTitleFont }))
         rows.append(textRow)
         return rows
     }

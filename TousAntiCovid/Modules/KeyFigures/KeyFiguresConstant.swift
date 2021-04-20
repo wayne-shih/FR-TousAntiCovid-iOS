@@ -13,11 +13,11 @@ import Foundation
 enum KeyFiguresConstant {
     
     #if DEBUG
-    static let jsonUrl: URL = URL(string: "https://app.stopcovid.gouv.fr/json/version-\(Constant.Server.jsonVersion)/InfoCenter-Plus/key-figures.json")!
+    static let jsonUrl: URL = URL(string: "https://\(Constant.Server.resourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/InfoCenter-Plus/key-figures.json")!
     #elseif PROD
-    static let jsonUrl: URL = URL(string: "https://app.stopcovid.gouv.fr/infos/key-figures.json")!
+    static let jsonUrl: URL = URL(string: "https://\(Constant.Server.resourcesRootDomain)/infos/key-figures.json")!
     #elseif PROD_PLUS
-    static let jsonUrl: URL = URL(string: "https://app.stopcovid.gouv.fr/infos-plus/key-figures.json")!
+    static let jsonUrl: URL = URL(string: "https://\(Constant.Server.resourcesRootDomain)/infos-plus/key-figures.json")!
     #endif
     
 }

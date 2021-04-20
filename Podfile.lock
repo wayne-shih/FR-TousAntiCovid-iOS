@@ -13,6 +13,9 @@ PODS:
   - SwCrypt (5.1.3)
   - SwiftGen (6.3.0)
   - TagListView (1.4.1)
+  - ZXingObjC (3.6.5):
+    - ZXingObjC/All (= 3.6.5)
+  - ZXingObjC/All (3.6.5)
 
 DEPENDENCIES:
   - Charts
@@ -23,6 +26,7 @@ DEPENDENCIES:
   - SwCrypt
   - SwiftGen
   - TagListView
+  - ZXingObjC
 
 SPEC REPOS:
   trunk:
@@ -35,6 +39,7 @@ SPEC REPOS:
     - SwCrypt
     - SwiftGen
     - TagListView
+    - ZXingObjC
 
 SPEC CHECKSUMS:
   Charts: b1e3a1f5a1c9ba5394438ca3b91bd8c9076310af
@@ -46,7 +51,8 @@ SPEC CHECKSUMS:
   SwCrypt: 0d1f951b8a993d6e107f4776ee0d72c1adafd1df
   SwiftGen: 3d5024a47ea79e408cded20763d7a17d18a4548c
   TagListView: a1c236d17960a0cf64156725a76ce6d73ebce2be
+  ZXingObjC: fdbb269f25dd2032da343e06f10224d62f537bdb
 
-PODFILE CHECKSUM: 4ca46ac5d99f665b313be9179b06deae609473f4
+PODFILE CHECKSUM: b526bc6a063d66cc843bc50cfc0539dd2269c1ee
 
 COCOAPODS: 1.10.1

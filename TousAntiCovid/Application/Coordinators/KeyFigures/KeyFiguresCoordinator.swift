@@ -44,6 +44,7 @@ final class KeyFiguresCoordinator: Coordinator {
     private func showKeyFigureDetailFor(keyFigure: KeyFigure) {
         let detailCoordinator: KeyFigureDetailCoordinator = KeyFigureDetailCoordinator(presentingController: navigationController, parent: self, keyFigure: keyFigure)
         addChild(coordinator: detailCoordinator)
+        AnalyticsManager.shared.reportAppEvent(.e9)
     }
 
 }

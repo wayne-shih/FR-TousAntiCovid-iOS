@@ -13,6 +13,7 @@ import UIKit
 enum Appearance {
     
     static let tintColor: UIColor = Asset.Colors.tint.color
+    static let sickEffectAlpha: CGFloat = 0.2
     
     enum NavigationBar {
         static let titleFont: UIFont = .marianneExtraBold(size: 17.0)
@@ -66,6 +67,7 @@ enum Appearance {
     
     enum Tag {
         static var font: UIFont { UIFontMetrics(forTextStyle: .caption2).scaledFont(for: .regular(size: 11.0)) }
+        static var font2: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .medium(size: 15.0)) }
         static var textColor: UIColor {
             if #available(iOS 13.0, *) {
                 return .label
@@ -125,6 +127,7 @@ enum Appearance {
             static var headTitleFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .marianneExtraBold(size: 24.0)) }
             static var headTitleFont2: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .marianneExtraBold(size: 50.0)) }
             static var headTitleFont3: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .marianneBold(size: 50.0)) }
+            static var headTitleFont4: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .regular(size: 35.0)) }
             static var titleFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .marianneBold(size: 17.0)) }
             static var titleFontExtraBold: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .marianneExtraBold(size: 17.0)) }
             static var titleHighlightFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .medium(size: 17.0)) }
@@ -152,9 +155,10 @@ enum Appearance {
             }
             static var captionTitleColor: UIColor { Asset.Colors.captionTitle.color }
             static var accessoryFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .regular(size: 12.0)) }
+            static var subtitleBoldFont: UIFont { UIFontMetrics(forTextStyle: .caption1).scaledFont(for: .bold(size: 15.0)) }
             static var subtitleFont: UIFont { UIFontMetrics(forTextStyle: .caption1).scaledFont(for: .regular(size: 15.0)) }
             static var standardFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .regular(size: 17.0)) }
-            static var standardBigFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .bold(size: 17.0)) }
+            static var body2: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .regular(size: 19.0)) }
             
             static var headerTitleColor: UIColor { Asset.Colors.tint.color }
             static var valueTitleFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .semibold(size: 12.0)) }

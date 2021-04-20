@@ -2,28 +2,31 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
-//  AttestationFullScreenViewController.swift
+//  CodeFullScreenViewController.swift
 //  TousAntiCovid
 //
 //  Created by Lunabee Studio / Date - 29/10/2020 - for the TousAntiCovid project.
 //
 import UIKit
 
-final class AttestationFullScreenViewController: UIViewController {
+final class CodeFullScreenViewController: UIViewController {
     
     @IBOutlet private var imageView: UIImageView!
+    @IBOutlet private var codeBottomLabel: UILabel!
     @IBOutlet private var label: UILabel!
     @IBOutlet private var closeButton: UIButton!
     
-    private var qrCode: UIImage!
+    private var codeImage: UIImage!
+    private var codeBottomText: String?
     private var text: String!
     private var lastBrightness: CGFloat = 0.0
     private var isFirstLoad: Bool = true
     
-    static func controller(qrCode: UIImage, text: String) -> UIViewController {
-        let fullscreenController: AttestationFullScreenViewController = StoryboardScene.Attestation.attestationFullScreenViewController.instantiate()
-        fullscreenController.qrCode = qrCode
+    static func controller(codeImage: UIImage, text: String, codeBottomText: String? = nil) -> UIViewController {
+        let fullscreenController: CodeFullScreenViewController = StoryboardScene.CodeFullScreen.codeFullScreenViewController.instantiate()
+        fullscreenController.codeImage = codeImage
         fullscreenController.text = text
+        fullscreenController.codeBottomText = codeBottomText
         return fullscreenController
     }
     
@@ -52,10 +55,13 @@ final class AttestationFullScreenViewController: UIViewController {
     }
     
     private func setupUI() {
-        imageView.image = qrCode
+        imageView.image = codeImage
         label.text = text
         closeButton.setTitle("common.close".localized, for: .normal)
         label.font = .regular(size: 20.0)
+        codeBottomLabel.text = codeBottomText
+        codeBottomLabel.font = Appearance.Cell.Text.headTitleFont4
+        codeBottomLabel.isHidden = codeBottomText == nil
     }
     
     private func addObservers() {

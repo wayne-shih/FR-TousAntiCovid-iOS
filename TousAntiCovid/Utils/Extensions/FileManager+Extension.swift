@@ -12,6 +12,10 @@ import UIKit
 
 extension FileManager {
     
+    class func documentsDirectory() -> URL {
+        return try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+    }
+    
     class func libraryDirectory() -> URL {
         return try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
     }

@@ -40,6 +40,7 @@ public final class StorageManager: RBStorage {
         case lastRobertRiskStatusLevel
         case lastWarningRiskStatusLevel
         case declarationToken
+        case analyticsToken
 
         case isolationState
         case isolationLastContactDate
@@ -391,9 +392,22 @@ public final class StorageManager: RBStorage {
         keychain.getBool(KeychainKey.isolationIsFeverReminderScheduled.rawValue)
     }
     
-    // MARK: - Status: DeclarationToken -
+    // MARK: - Status: Declaration token -
     public func saveDeclarationToken(_ token: String?) {
         saveString(token, key: .declarationToken, notify: false)
+    }
+    
+    public func declarationToken() -> String? {
+        getString(key: .declarationToken)
+    }
+    
+    // MARK: - Status: Analytics token -
+    public func saveAnalyticsToken(_ token: String?) {
+        saveString(token, key: .analyticsToken, notify: false)
+    }
+    
+    public func analyticsToken() -> String? {
+        getString(key: .analyticsToken)
     }
     
     // MARK: - Status: Current risk level -
@@ -439,10 +453,6 @@ public final class StorageManager: RBStorage {
     public func lastWarningStatusRiskLevel() -> RBStatusRiskLevelInfo? {
         guard let data = keychain.getData(KeychainKey.lastWarningRiskStatusLevel.rawValue) else { return nil }
         return try? JSONDecoder().decode(RBStatusRiskLevelInfo.self, from: data)
-    }
-    
-    public func declarationToken() -> String? {
-        getString(key: .declarationToken)
     }
     
     private func saveDate(_ date: Date?, key: KeychainKey, notify: Bool = true) {
@@ -588,20 +598,29 @@ public extension StorageManager {
         notifyAttestationDataChanged()
     }
     
-    func saveAttestationFieldValueForKey(_ key: String, value: String?) {
-        let keychainKey: String = "attestation-\(key)"
+    func saveAttestationFieldValueForKey(_ key: String, dataKey: String, value: String?) {
+        let keychainKey: String = "attestation-\(dataKey)-\(key)"
         if let value = value {
             keychain.set(value, forKey: keychainKey, withAccess: .accessibleAfterFirstUnlockThisDeviceOnly)
         } else {
             keychain.delete(keychainKey)
         }
     }
-    
-    func getAttestationFieldValues() -> [String: String] {
-        var fieldValues: [String: String] = [:]
+
+    func getAttestationFieldValues() -> [String: [String: String]] {
+        var fieldValues: [String: [String: String]] = [:]
         keychain.allKeys.forEach { key in
             if key.hasPrefix("SCattestation-") {
-                fieldValues[key.replacingOccurrences(of: "SCattestation-", with: "")] = keychain.get(key.replacingOccurrences(of: "SC", with: ""))
+                let composedKey: String = key.replacingOccurrences(of: "SCattestation-", with: "")
+                let dataKey: String = composedKey.components(separatedBy: "-").filter { !$0.isEmpty }[0]
+                var fieldKey: String?
+                if let range = composedKey.range(of: "\(dataKey)-") {
+                    fieldKey = composedKey.replacingCharacters(in: range, with: "")
+                }
+                guard let fieldValue = keychain.get(key.replacingOccurrences(of: "SC", with: "")) else { return }
+                var dict: [String: String] = fieldValues[dataKey] ?? [:]
+                dict[fieldKey ?? dataKey] = fieldValue
+                fieldValues[dataKey] = dict
             }
         }
         return fieldValues
@@ -669,6 +688,42 @@ public extension StorageManager {
 
 }
 
+public extension StorageManager {
+    
+    func saveWalletCertificate(_  certificate: RawWalletCertificate) {
+        guard let realm = realm else { return }
+        let realmRawWalletCertificate: RealmRawWalletCertificate = RealmRawWalletCertificate.from(rawCertificate: certificate)
+        try! realm.write {
+            realm.add(realmRawWalletCertificate, update: .all)
+        }
+        notifyWalletCertificateDataChanged()
+    }
+    
+    func walletCertificates() -> [RawWalletCertificate] {
+        guard let realm = realm else { return [] }
+        return realm.objects(RealmRawWalletCertificate.self).map { $0.toRawWalletCertificate() }
+    }
+    
+    func deleteWalletCertificate(id: String) {
+        guard let realm = realm else { return }
+        if let realmRawWalletCertificate = realm.object(ofType: RealmRawWalletCertificate.self, forPrimaryKey: id) {
+            try! realm.write {
+                realm.delete(realmRawWalletCertificate)
+            }
+        }
+        notifyWalletCertificateDataChanged()
+    }
+    
+    func deleteWalletCertificates() {
+        guard let realm = realm else { return }
+        try! realm.write {
+            realm.delete(realm.objects(RealmRawWalletCertificate.self))
+        }
+        notifyWalletCertificateDataChanged()
+    }
+    
+}
+
 private extension StorageManager {
     
     func notifyStatusDataChanged() {
@@ -685,6 +740,10 @@ private extension StorageManager {
 
     func notifyVenueQrCodeDataChanged() {
         NotificationCenter.default.post(name: .venueQrCodeDataDidChange, object: nil)
+    }
+    
+    func notifyWalletCertificateDataChanged() {
+        NotificationCenter.default.post(name: .walletCertificateDataDidChange, object: nil)
     }
     
 }
@@ -723,11 +782,12 @@ private extension Realm {
                                       RealmLocalProximity.self,
                                       RealmAttestation.self,
                                       RealmVenueQrCode.self,
+                                      RealmRawWalletCertificate.self,
                                       Permission.self,
                                       PermissionRole.self,
                                       PermissionUser.self]
         let databaseUrl: URL = dbsDirectoryUrl().appendingPathComponent("db.realm")
-        let userConfig: Realm.Configuration = Realm.Configuration(fileURL: databaseUrl, encryptionKey: key, schemaVersion: 14, migrationBlock: { _, _ in }, objectTypes: classes)
+        let userConfig: Realm.Configuration = Realm.Configuration(fileURL: databaseUrl, encryptionKey: key, schemaVersion: 18, migrationBlock: { _, _ in }, objectTypes: classes)
         return userConfig
     }
     

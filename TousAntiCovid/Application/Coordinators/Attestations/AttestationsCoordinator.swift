@@ -59,7 +59,7 @@ final class AttestationsCoordinator: Coordinator {
     }
     
     private func showAttestationQRCodeFullscreen(_ qrCode: UIImage, text: String) {
-        let controller: UIViewController = AttestationFullScreenViewController.controller(qrCode: qrCode, text: text)
+        let controller: UIViewController = CodeFullScreenViewController.controller(codeImage: qrCode, text: text)
         controller.modalTransitionStyle = .crossDissolve
         controller.modalPresentationStyle = .fullScreen
         navigationController?.present(controller, animated: true)

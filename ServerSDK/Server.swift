@@ -93,7 +93,8 @@ public final class Server: NSObject, RBServer {
                                                                                              lastRiskScoringDate: response.lastRiskScoringDate,
                                                                                              message: response.message,
                                                                                              tuples: response.tuples,
-                                                                                             declarationToken: response.declarationToken)
+                                                                                             declarationToken: response.declarationToken,
+                                                                                             analyticsToken: response.analyticsToken)
                                 completion(.success(transformedResponse))
                             } catch {
                                 completion(.failure(error))

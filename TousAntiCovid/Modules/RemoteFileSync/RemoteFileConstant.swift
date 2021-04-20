@@ -13,7 +13,7 @@ import Foundation
 
 enum RemoteFileConstant {
 
-    static let baseUrl: String = "https://app.stopcovid.gouv.fr/json/version-\(Constant.Server.jsonVersion)/Strings"
+    static let baseUrl: String = "https://\(Constant.Server.resourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/Strings"
     static let stringsFilePrefix: String = "strings"
     
     static let useOnlyLocalStrings: Bool = ProcessInfo.processInfo.environment["LOCAL_STRINGS"] == "YES"

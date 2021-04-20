@@ -14,7 +14,7 @@
         "links": [
 	        {
                 "label": "Trouver où se faire dépister",
-                "url": "https://sante.fr/recherche/trouver/DepistageCovid"
+                "url": "https://www.sante.fr/covid19/external/depistage?source=TousAntiCovid"
             }
         ]
     },
@@ -30,7 +30,7 @@
     },
     {
         "section": "l'Assurance Maladie",
-        "description": "Voici plusieurs informations utiles fournies par Ameli.fr.",
+        "description": "Voici plusieurs informations utiles fournies par Ameli.fr, au sujet du contact tracing et sur les personnes contact.",
         "links": [
 	        {
                 "label": "Contact tracing",
@@ -40,21 +40,27 @@
 				"label": "Vous êtes une personne contact ?",
                 "url": "https://www.ameli.fr/assure/covid-19/en-cas-de-contact-avec-une-personne-malade-du-covid-19/en-cas-de-contact-avec-une-personne-malade-de-la-covid-19"
 
-            },
-            {
-               	"label": "Arrêt de travail",
-                "url": "https://www.ameli.fr/assure/covid-19/arret-de-travail/covid-19-dispositif-dindemnisation-des-interruptions-de-travail"
             }
             
         ]
     },
     {
         "section": "Cnam.BriserLaChaine.org",
-        "description" : "En collaboration avec l'Assurance Maladie, le site internet Cnam.BriserLaChaine.org peut vous aider à vous souvenir de toutes les personnes que vous avez croisées",
+        "description" : "En collaboration avec l'Assurance Maladie, le site internet Cnam.BriserLaChaine.org peut vous aider à vous souvenir de toutes les personnes que vous avez croisées.",
         "links": [
 	        {
                 "label": "Aller sur Cnam.BriserLaChaine.org",
                 "url": "https://cnam.briserlachaine.org/accueil"
+            }
+        ]
+    },
+    {
+        "section": "Isolement",
+        "description" : "Le Ministère des Solidarités et de la Santé a mis à disposition des informations sur l'isolement.",
+        "links": [
+	        {
+                "label": "Les consignes d’isolement",
+                "url": "https://solidarites-sante.gouv.fr/soins-et-maladies/maladies/maladies-infectieuses/coronavirus/professionnels-de-sante/article/ressources-documentaires-a-destination-des-professionnels-de-sante"
             }
         ]
     }

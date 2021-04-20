@@ -25,8 +25,8 @@ final class NewAttestationCoordinator: Coordinator {
     }
     
     private func start() {
-        let navigationController: CVNavigationController = CVNavigationController(rootViewController: NewAttestationViewController(didTouchSelectFieldItem: { [weak self] items, selectedItem, didSelectItem in
-            self?.showFieldItemPicker(items: items, selectedItem: selectedItem, didSelectFieldItem: didSelectItem)
+        let navigationController: CVNavigationController = CVNavigationController(rootViewController: NewAttestationViewController(didTouchSelectFieldItem: { [weak self] items, selectedItem, choiceKey, didSelectItem in
+            self?.showFieldItemPicker(items: items, selectedItem: selectedItem, choiceKey: choiceKey, didSelectFieldItem: didSelectItem)
         }) { [weak self] in
             self?.didDeinit()
         })
@@ -34,8 +34,8 @@ final class NewAttestationCoordinator: Coordinator {
         presentingController?.present(navigationController, animated: true)
     }
     
-    private func showFieldItemPicker(items: [AttestationFormFieldItem], selectedItem: AttestationFormFieldItem?, didSelectFieldItem: @escaping (_ fieldValue: AttestationFormFieldItem) -> ()) {
-        let controller: AttestationFieldValueChoiceViewController = AttestationFieldValueChoiceViewController(items: items, selectedItem: selectedItem, didSelectFieldItem: { [weak self] selectedItem in
+    private func showFieldItemPicker(items: [AttestationFormFieldItem], selectedItem: AttestationFormFieldItem?, choiceKey: String, didSelectFieldItem: @escaping (_ fieldValue: AttestationFormFieldItem) -> ()) {
+        let controller: AttestationFieldValueChoiceViewController = AttestationFieldValueChoiceViewController(items: items, selectedItem: selectedItem, choiceKey: choiceKey, didSelectFieldItem: { [weak self] selectedItem in
             self?.navigationController?.popToRootViewController(animated: true)
             didSelectFieldItem(selectedItem)
         })

@@ -18,10 +18,15 @@ public final class ParametersManager: NSObject {
     
     public enum ApiVersion: String {
         case v5
+        case v6
     }
     
     public enum WarningApiVersion: String {
         case v2
+    }
+    
+    public enum AnalyticsApiVersion: String {
+        case v1
     }
     
     public static let shared: ParametersManager = ParametersManager()
@@ -41,10 +46,15 @@ public final class ParametersManager: NSObject {
     public var displayPrivateEvent: Bool { valueFor(name: "app.displayPrivateEvent") as? Bool ?? false }
     public var privateEventVenueType: String { valueFor(name: "app.privateEventVenueType") as? String ?? "NA" }
     public var displayAttestation: Bool { valueFor(name: "app.displayAttestation") as? Bool ?? false }
+    public var displaySanitaryCertificatesWallet: Bool { valueFor(name: "app.displaySanitaryCertificatesWallet") as? Bool ?? false }
+    public var displaySanitaryCertificatesValidation: Bool { valueFor(name: "app.displaySanitaryCertificatesValidation") as? Bool ?? false }
+    public var isAnalyticsOn: Bool { valueFor(name: "app.isAnalyticsOn") as? Bool ?? false }
+    public var walletTestCertificateValidityThresholdInHours: Int { valueFor(name: "app.wallet.testCertificateValidityThresholdInHours") as? Int ?? 72 }
     
     public var displayIsolation: Bool { valueFor(name: "app.displayIsolation") as? Bool ?? false }
     public var isolationMinRiskLevel: Double { valueFor(name: "app.isolationMinRiskLevel") as? Double ?? 4.0 }
     public var ameliUrl: String { valueFor(name: "app.ameliUrl") as? String ?? "https://declare.ameli.fr/tousanticovid/t/%@/" }
+    public var contagiousSpan: Int { valueFor(name: "app.contagiousSpan") as? Int ?? 10 }
     public var displayVaccination: Bool { valueFor(name: "app.displayVaccination") as? Bool ?? false }
     public var vaccinationCentersCount: Int { valueFor(name: "app.vaccinationCentersCount") as? Int ?? 5 }
     public var isolationDuration: Double { valueFor(name: "app.isolation.duration") as? Double ?? 604800.0 }
@@ -123,6 +133,7 @@ public final class ParametersManager: NSObject {
     
     public var apiVersion: ApiVersion { ApiVersion(rawValue: valueFor(name: "app.apiVersion") as? String ?? "") ?? .v5 }
     public var warningApiVersion: WarningApiVersion { WarningApiVersion(rawValue: valueFor(name: "app.warningApiVersion") as? String ?? "") ?? .v2 }
+    public var analyticsApiVersion: AnalyticsApiVersion { AnalyticsApiVersion(rawValue: valueFor(name: "app.analyticsApiVersion") as? String ?? "") ?? .v1 }
     
     private var config: [[String: Any]] = [] {
         didSet { distributeUpdatedConfig() }
@@ -162,6 +173,19 @@ public final class ParametersManager: NSObject {
         }
     }
     
+    public func walletOldCertificateThresholdInDays(certificateType: String) -> Int {
+        let defaultValue: Int = 7
+        guard let dict = valueFor(name: "app.wallet.oldCertificateThresholdInDays") as? [String: Int] else { return defaultValue }
+        guard let thresholdValue = dict[certificateType.lowercased()] else { return defaultValue }
+        return thresholdValue
+    }
+    public func walletPublicKey(authority: String, certificateId: String) -> String? {
+        guard let allPubKeys = valueFor(name: "app.walletPubKeys") as? [[String: Any]] else { return nil }
+        guard let authPubKeysDict = allPubKeys.first(where: { $0["auth"] as? String == authority }) else { return nil }
+        guard let authPubKeys = authPubKeysDict["pubKeys"] as? [String: String] else { return nil }
+        return authPubKeys[certificateId]
+    }
+    
     public func fetchConfig(_ completion: @escaping (_ result: Result<Double, Error>) -> ()) {
         let requestId: String = UUID().uuidString
         completions[requestId] = completion
@@ -184,6 +208,7 @@ public final class ParametersManager: NSObject {
         RBManager.shared.proximitiesRetentionDurationInDays = dataRetentionPeriod
         RBManager.shared.preSymptomsSpan = preSymptomsSpan
         RBManager.shared.positiveSampleSpan = positiveSampleSpan
+        RBManager.shared.contagiousSpan = contagiousSpan
         if RBManager.shared.isProximityActivated {
             RBManager.shared.stopProximityDetection()
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {

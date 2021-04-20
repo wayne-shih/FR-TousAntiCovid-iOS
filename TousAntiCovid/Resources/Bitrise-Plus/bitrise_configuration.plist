@@ -2,13 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>SchemeUserState</key>
-	<dict>
-		<key>ProximityNotification.xcscheme_^#shared#^_</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>5</integer>
-		</dict>
-	</dict>
+    <key>APM_COLLECTOR_TOKEN</key>
+    <string>3c861dcb-8b8d-4dd2-ba8a-dd3b3c52e412</string>
 </dict>
 </plist>
+    

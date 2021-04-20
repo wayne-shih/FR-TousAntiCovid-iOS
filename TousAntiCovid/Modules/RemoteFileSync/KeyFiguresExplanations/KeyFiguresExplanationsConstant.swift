@@ -12,6 +12,6 @@ import Foundation
 
 enum KeyFiguresExplanationsConstant {
 
-    static let baseUrl: String = "https://app.stopcovid.gouv.fr/json/version-\(Constant.Server.jsonVersion)/MoreKeyFigures"
+    static let baseUrl: String = "https://\(Constant.Server.resourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/MoreKeyFigures"
     
 }

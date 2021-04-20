@@ -59,7 +59,8 @@ final class VenuesScanAuthorizationController: CVTableViewController {
                                           xibName: .textCell,
                                           theme: CVRow.Theme(topInset: 40.0,
                                                              bottomInset: 10.0,
-                                                             textAlignment: .center))
+                                                             textAlignment: .center,
+                                                             titleFont: { Appearance.Cell.Text.standardFont }))
         rows.append(explanationRow)
         let questionRow: CVRow = CVRow(title: "confirmVenueQrCodeController.explanation.subtitle".localized,
                                        xibName: .textCell,

@@ -42,35 +42,52 @@
          "type":"datetime"
       },
       {
-         "key":"reason",
+         "key":"reason_curfew",
+         "dataKey": "reason",
          "type":"list",
          "items":[
             {
-               "code":"travail"
+               "code":"reason_curfew.travail"
             },
             {
-               "code":"achats"
+               "code":"reason_curfew.sante"
             },
             {
-               "code":"sante"
+               "code":"reason_curfew.famille"
             },
             {
-               "code":"famille"
+               "code":"reason_curfew.convocation_demarches"
             },
             {
-	            "code":"handicap"
+                "code":"reason_curfew.animaux"
+            }
+         ]
+      },
+      {
+         "key":"reason_lockdown",
+         "dataKey": "reason",
+         "type":"list",
+         "items":[
+            {
+               "code":"reason_lockdown.travail"
             },
             {
-               "code":"convocation"
+               "code":"reason_lockdown.sante"
             },
             {
-	            "code":"sport_animaux"
+               "code":"reason_lockdown.famille"
             },
             {
-               "code":"missions"
+                "code":"reason_lockdown.convocation_demarches"
             },
             {
-	            "code":"enfants"
+                "code":"reason_lockdown.demenagement"
+            },
+            {
+                "code":"reason_lockdown.achats_culte_culturel"
+            },
+            {
+                "code":"reason_lockdown.sport"
             }
          ]
       }

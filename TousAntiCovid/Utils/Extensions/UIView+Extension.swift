@@ -42,3 +42,15 @@ extension UIView {
     }
     
 }
+
+extension UIView {
+    func configureParallax(intensity: CGFloat) {
+        let horizontalMove = UIInterpolatingMotionEffect(keyPath: "center.x", type: .tiltAlongHorizontalAxis)
+        horizontalMove.minimumRelativeValue = -intensity
+        horizontalMove.maximumRelativeValue = intensity
+        
+        let group = UIMotionEffectGroup()
+        group.motionEffects = [horizontalMove]
+        self.addMotionEffect(group)
+    }
+}

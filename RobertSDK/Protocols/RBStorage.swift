@@ -89,6 +89,10 @@ public protocol RBStorage {
     func saveDeclarationToken(_ token: String?)
     func declarationToken() -> String?
     
+    // MARK: - Status: Analytics token -
+    func saveAnalyticsToken(_ token: String?)
+    func analyticsToken() -> String?
+    
     // MARK: - Status: Current risk level -
     func saveCurrentStatusRiskLevel(_ statusRiskLevelInfo: RBStatusRiskLevelInfo?)
     func currentStatusRiskLevel() -> RBStatusRiskLevelInfo?

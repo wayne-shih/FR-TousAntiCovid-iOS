@@ -1,4 +1,3 @@
-import Foundation
 import UIKit
 import AVFoundation
 
@@ -16,6 +15,8 @@ class QRScannerView: UIView {
     /// capture settion which allows us to start and stop scanning.
     var captureSession: AVCaptureSession?
     
+    var objectTypes: [AVMetadataObject.ObjectType] { [.qr] }
+    
     // Init methods..
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -30,9 +31,11 @@ class QRScannerView: UIView {
     override class var layerClass: AnyClass  {
         return AVCaptureVideoPreviewLayer.self
     }
+    
     override var layer: AVCaptureVideoPreviewLayer {
         return super.layer as! AVCaptureVideoPreviewLayer
     }
+    
 }
 extension QRScannerView {
     
@@ -75,7 +78,7 @@ extension QRScannerView {
             captureSession?.addOutput(metadataOutput)
             
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-            metadataOutput.metadataObjectTypes = [.qr, .ean8, .ean13, .pdf417]
+            metadataOutput.metadataObjectTypes = objectTypes
         } else {
             scanningDidFail()
             return

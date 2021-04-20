@@ -34,10 +34,10 @@ final class VenuesManager: NSObject {
     static let shared: VenuesManager = VenuesManager()
     
     var isVenuesRecordingActivated: Bool {
-        return ParametersManager.shared.displayRecordVenues
+        ParametersManager.shared.displayRecordVenues
     }
     var isPrivateEventsActivated: Bool {
-        return ParametersManager.shared.displayPrivateEvent
+        ParametersManager.shared.displayPrivateEvent
     }
     var venuesQrCodes: [VenueQrCode] { storageManager?.venuesQrCodes() ?? [] }
     var needPrivateEventQrCodeGeneration: Bool {
@@ -163,6 +163,7 @@ extension VenuesManager {
                                                    venueCapacity: urlComponents.venueCapacity > 0 ? urlComponents.venueCapacity : nil,
                                                    payload: payload)
         storageManager.saveVenueQrCode(venueQrCode)
+        AnalyticsManager.shared.reportAppEvent(.e14)
         return true
     }
     
@@ -230,6 +231,7 @@ extension VenuesManager {
         let filteredQrCodes: [VenueQrCode] = qrCodes.filter { $0.ntpTimestamp >= origin.timeIntervalSince1900 }
         WarningServer.shared.wreport(token: token, visits: filteredQrCodes.map { $0.toWarningServerVisit() }) { error in
             if let error = error {
+                AnalyticsManager.shared.reportError(serviceName: "wreport", apiVersion: ParametersManager.shared.warningApiVersion, code: (error as NSError).code)
                 guard (error as NSError).code != 403 else {
                     self.didAlreadyRetryReport = false
                     self.storageManager.deleteVenuesQrCodeData()

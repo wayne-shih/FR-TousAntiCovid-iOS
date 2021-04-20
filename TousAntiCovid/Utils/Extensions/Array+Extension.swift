@@ -25,3 +25,41 @@ extension Array {
     }
     
 }
+
+extension Array where Element == UInt8 {
+    
+    func encodeAsInteger() -> [UInt8] {
+        var tlvTriplet: [UInt8] = []
+        tlvTriplet.append(0x02)
+        tlvTriplet.append(contentsOf: lengthField())
+        tlvTriplet.append(contentsOf: self)
+        return tlvTriplet
+    }
+    
+    func encodeAsSequence() -> [UInt8] {
+        var tlvTriplet: [UInt8] = []
+        tlvTriplet.append(0x30)
+        tlvTriplet.append(contentsOf: lengthField())
+        tlvTriplet.append(contentsOf: self)
+        return tlvTriplet
+    }
+
+    private func lengthField() -> [UInt8] {
+        var bytesCount: Int = count
+        guard bytesCount >= 128 else { return [UInt8(bytesCount)] }
+        
+        let lengthBytesCount: Int = Int((log2(Double(bytesCount)) / 8) + 1)
+        let firstLengthFieldByte: UInt8 = UInt8(128 + lengthBytesCount)
+        
+        var lengthField: [UInt8] = []
+        (0..<lengthBytesCount).forEach { _ in
+            let lengthByte: UInt8 = UInt8(bytesCount & 0xff)
+            lengthField.insert(lengthByte, at: 0)
+            bytesCount = bytesCount >> 8
+        }
+        lengthField.insert(firstLengthFieldByte, at: 0)
+        
+        return lengthField
+    }
+    
+}

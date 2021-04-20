@@ -12,8 +12,11 @@ import UIKit
 
 final class ContactStatusCell: CVTableViewCell {
     
+    private var isParallaxConfigurated: Bool = false
+    
     @IBOutlet private var containerView: UIView!
     @IBOutlet private var gradientView: GradientView!
+    @IBOutlet private weak var effectView: UIImageView!
     
     override func setup(with row: CVRow) {
         super.setup(with: row)
@@ -28,12 +31,21 @@ final class ContactStatusCell: CVTableViewCell {
         cvAccessoryLabel?.textColor = .white
         containerView.layer.cornerRadius = 10.0
         containerView.layer.masksToBounds = true
+        
+        setupParallaxEffect()
+    }
+    
+    private func setupParallaxEffect() {
+        guard !isParallaxConfigurated else { return }
+        isParallaxConfigurated = true
+        effectView.configureParallax(intensity: -400)
     }
     
     private func setupContent(row: CVRow) {
-        guard let gradientColors = row.associatedValue as? (startColor: UIColor, endColor: UIColor) else { return }
+        guard let gradientColors = row.associatedValue as? (startColor: UIColor, endColor: UIColor, effectAlpha: CGFloat) else { return }
         gradientView.startColor = gradientColors.startColor
         gradientView.endColor = gradientColors.endColor
+        effectView.alpha = gradientColors.effectAlpha
     }
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {

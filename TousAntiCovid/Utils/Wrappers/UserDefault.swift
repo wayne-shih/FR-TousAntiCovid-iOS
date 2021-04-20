@@ -68,12 +68,14 @@ extension UserDefault {
         case currentVaccinationReferenceDepartmentCode
         case currentVaccinationReferenceLatitude
         case currentVaccinationReferenceLongitude
-        
         case lastNotificationTimestamp
         case showNewInfoNotification
         case hideStatus
         case currentStatusModelVersion
-        case migrationDone
+        case zipGeolocVersion
+        case installationUuid
+        case lastProximityActivationStartTimestamp
+        
     }
     
 }

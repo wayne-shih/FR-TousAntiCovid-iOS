@@ -17,7 +17,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="495" height="161"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7aM-RZ-DOj">
+                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7aM-RZ-DOj">
                         <rect key="frame" x="20" y="20" width="455" height="121"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ojh-8H-hln" customClass="GradientView" customModule="TAC_Multi_" customModuleProvider="target">
@@ -33,6 +33,9 @@
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="horizontalMode" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                             </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" verticalHuggingPriority="1" verticalCompressionResistancePriority="1" image="parallaxEffect" translatesAutoresizingMaskIntoConstraints="NO" id="4Y6-z8-ezu">
+                                <rect key="frame" x="-114" y="0.0" width="683" height="121"/>
+                            </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Sn1-qh-5vk">
                                 <rect key="frame" x="0.0" y="11" width="100" height="110"/>
                                 <constraints>
@@ -66,12 +69,16 @@
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="4Y6-z8-ezu" firstAttribute="centerY" secondItem="7aM-RZ-DOj" secondAttribute="centerY" id="0lE-Sq-zyY"/>
                             <constraint firstItem="Ojh-8H-hln" firstAttribute="top" secondItem="7aM-RZ-DOj" secondAttribute="top" id="1se-hH-Qig"/>
+                            <constraint firstItem="4Y6-z8-ezu" firstAttribute="width" secondItem="7aM-RZ-DOj" secondAttribute="width" multiplier="1.5" id="26N-lu-fqB"/>
                             <constraint firstAttribute="bottom" secondItem="Ojh-8H-hln" secondAttribute="bottom" id="3uy-So-fh2"/>
                             <constraint firstAttribute="trailing" secondItem="9W7-JN-HAt" secondAttribute="trailing" constant="16" id="6us-gV-6wu"/>
                             <constraint firstAttribute="trailing" secondItem="Ojh-8H-hln" secondAttribute="trailing" id="BAt-SQ-b68"/>
+                            <constraint firstItem="4Y6-z8-ezu" firstAttribute="centerX" secondItem="Ojh-8H-hln" secondAttribute="centerX" id="Gy2-pY-la0"/>
                             <constraint firstAttribute="bottom" secondItem="Sn1-qh-5vk" secondAttribute="bottom" id="QZ5-1m-pq3"/>
                             <constraint firstItem="9W7-JN-HAt" firstAttribute="centerY" secondItem="7aM-RZ-DOj" secondAttribute="centerY" id="X0K-Gz-WJK"/>
+                            <constraint firstItem="4Y6-z8-ezu" firstAttribute="top" secondItem="7aM-RZ-DOj" secondAttribute="top" id="ePE-mE-DyC"/>
                             <constraint firstItem="9W7-JN-HAt" firstAttribute="top" relation="greaterThanOrEqual" secondItem="7aM-RZ-DOj" secondAttribute="top" constant="8" id="fOc-Td-Sb9"/>
                             <constraint firstItem="Ojh-8H-hln" firstAttribute="leading" secondItem="7aM-RZ-DOj" secondAttribute="leading" id="qpk-cg-Gb3"/>
                             <constraint firstItem="Sn1-qh-5vk" firstAttribute="top" relation="greaterThanOrEqual" secondItem="7aM-RZ-DOj" secondAttribute="top" id="uSq-gp-Ecj"/>
@@ -95,6 +102,7 @@
                 <outlet property="cvImageView" destination="Sn1-qh-5vk" id="o0N-wg-Gpv"/>
                 <outlet property="cvSubtitleLabel" destination="igW-jL-2N1" id="DnU-ux-WsT"/>
                 <outlet property="cvTitleLabel" destination="t2i-Gt-V10" id="8AW-xc-yxB"/>
+                <outlet property="effectView" destination="4Y6-z8-ezu" id="0cs-bb-FmK"/>
                 <outlet property="gradientView" destination="Ojh-8H-hln" id="sWZ-Sr-v2F"/>
                 <outlet property="leadingConstraint" destination="IEw-ZF-5wc" id="HUo-iA-tiU"/>
                 <outlet property="topConstraint" destination="1Sd-Yn-Bbr" id="k15-zP-HpW"/>
@@ -104,6 +112,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="parallaxEffect" width="1068" height="278"/>
         <namedColor name="gradientEndRed">
             <color red="0.88200002908706665" green="0.0" blue="0.059000000357627869" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

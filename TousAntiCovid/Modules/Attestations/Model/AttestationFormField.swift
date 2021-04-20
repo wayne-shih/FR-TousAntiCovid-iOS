@@ -58,10 +58,13 @@ struct AttestationFormField: Codable {
         
     }
     
+    private let dataKey: String?
     let key: String
     let type: FieldType
     let contentType: FieldContentType?
     let items: [AttestationFormFieldItem]?
+    
+    var dataKeyValue: String { dataKey ?? key }
     
     var name: String { "attestation.form.\(key).label".localized }
     var placeholder: String { "attestation.form.\(key).placeholder".localized }

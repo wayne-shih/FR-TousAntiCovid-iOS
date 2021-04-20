@@ -14,14 +14,14 @@ import PKHUD
 
 final class NewAttestationViewController: CVTableViewController {
     
-    private let didTouchSelectFieldItem: (_ items: [AttestationFormFieldItem], _ selectedItem: AttestationFormFieldItem?, _ didSelectedFieldItem: @escaping (_ fieldValue: AttestationFormFieldItem) -> ()) -> ()
+    private let didTouchSelectFieldItem: (_ items: [AttestationFormFieldItem], _ selectedItem: AttestationFormFieldItem?, _ choiceKey: String, _ didSelectedFieldItem: @escaping (_ fieldValue: AttestationFormFieldItem) -> ()) -> ()
     private let deinitBlock: () -> ()
     
     private let groupedFields: [[AttestationFormField]] = AttestationsManager.shared.formFields
     private var isFirstLoad: Bool = true
     private weak var firstTextField: UITextField?
-    private var fieldValues: [String: String] = [:]
-    private var fieldSelectedItems: [String: AttestationFormFieldItem] = [:]
+    private var fieldValues: [String: [String: String]] = [:]
+    private var fieldSelectedItems: [String: [String: AttestationFormFieldItem]] = [:]
     private var dobDate: Date = Date().dateByAddingYears(-18)
     private var outingDate: Date = Date()
     private var currentSaveMyData: Bool = false
@@ -29,7 +29,7 @@ final class NewAttestationViewController: CVTableViewController {
     @UserDefault(key: .saveAttestationFieldsData)
     private var saveMyData: Bool = false
     
-    init(didTouchSelectFieldItem: @escaping (_ items: [AttestationFormFieldItem], _ selectedItem: AttestationFormFieldItem?, _ didSelectedFieldItem: @escaping (_ fieldValue: AttestationFormFieldItem) -> ()) -> (),
+    init(didTouchSelectFieldItem: @escaping (_ items: [AttestationFormFieldItem], _ selectedItem: AttestationFormFieldItem?, _ choiceKey: String, _ didSelectedFieldItem: @escaping (_ fieldValue: AttestationFormFieldItem) -> ()) -> (),
          deinitBlock: @escaping () -> ()) {
         self.didTouchSelectFieldItem = didTouchSelectFieldItem
         self.deinitBlock = deinitBlock
@@ -98,10 +98,10 @@ final class NewAttestationViewController: CVTableViewController {
         let now: Date = Date()
         let day: String = now.dayMonthYearFormatted()
         let hour: String = now.shortTimeFormatted()
-        fieldValues["datetime"] = "\(day), \(hour)"
-        fieldValues["datetime-day"] = day
-        fieldValues["datetime-hour"] = hour
-        if let dobTimestampString = fieldValues["dob-timestamp"], let dobTimestamp = Double(dobTimestampString) {
+        fieldValues["datetime"] = ["datetime": "\(day), \(hour)"]
+        fieldValues["datetime-day"] = ["datetime-day": day]
+        fieldValues["datetime-hour"] = ["datetime-hour": hour]
+        if let dobTimestampString = fieldValues["dob-timestamp"]?["dob-timestamp"], let dobTimestamp = Double(dobTimestampString) {
             dobDate = Date(timeIntervalSince1970: Double(dobTimestamp))
         }
         currentSaveMyData = saveMyData
@@ -110,7 +110,7 @@ final class NewAttestationViewController: CVTableViewController {
     private func areFieldsValid() -> Bool {
         var areAllFieldsFilledIn: Bool = true
         groupedFields.joined().forEach { field in
-            if fieldValues[field.key] == nil {
+            if fieldValues[field.dataKeyValue] == nil {
                 areAllFieldsFilledIn = false
             }
         }
@@ -130,8 +130,22 @@ final class NewAttestationViewController: CVTableViewController {
         HUD.show(.progress)
         DispatchQueue.main.async {
             let now: Date = Date()
-            self.fieldValues["creationDate"] = now.dayMonthYearFormatted()
-            self.fieldValues["creationHour"] = now.shortTimeFormatted()
+            self.fieldValues["creationDate"] = ["creationDate": now.dayMonthYearFormatted()]
+            self.fieldValues["creationHour"] = ["creationHour": now.shortTimeFormatted()]
+            
+            let reasonDict: [String: String] = self.fieldValues["reason"] ?? [:]
+            var reasonCode: String = ""
+            var shortLabel: String?
+            reasonDict.forEach { key, value in
+                if key.hasSuffix("-code") {
+                    reasonCode = value.components(separatedBy: ".")[safe: 1] ?? ""
+                } else if key.hasSuffix("-shortlabel") {
+                    shortLabel = value
+                }
+            }
+            self.fieldValues["reason"]?["reason-code"] = reasonCode
+            self.fieldValues["reason"]?["reason-shortlabel"] = shortLabel
+            
             guard let qrCodeString = AttestationsManager.shared.generateQRCode(for: self.fieldValues) else {
                 self.showGenerationErrorAlert()
                 return
@@ -154,7 +168,8 @@ final class NewAttestationViewController: CVTableViewController {
                 self.showGenerationErrorAlert()
                 return
             }
-            AttestationsManager.shared.saveAttestation(timestamp: Int(self.outingDate.timeIntervalSince1970), qrCode: qrCodeData, footer: qrCodeFooter, qrCodeString: qrCodeDisplayableString, reason: self.fieldValues["reason-code"] ?? "")
+
+            AttestationsManager.shared.saveAttestation(timestamp: Int(self.outingDate.timeIntervalSince1970), qrCode: qrCodeData, footer: qrCodeFooter, qrCodeString: qrCodeDisplayableString, reason: reasonCode)
             self.saveFieldValuesIfNeeded()
             HUD.hide()
             self.dismiss(animated: true)
@@ -170,9 +185,11 @@ final class NewAttestationViewController: CVTableViewController {
     private func saveFieldValuesIfNeeded() {
         guard currentSaveMyData else { return }
         saveMyData = currentSaveMyData
-        fieldValues.forEach { key, value in
-            guard !key.contains("datetime") && !key.contains("reason") && !key.contains("creationDate") && !key.contains("creationHour") else { return }
-            AttestationsManager.shared.saveAttestationFieldValueForKey(key, value: value)
+        fieldValues.forEach { dataKey, value in
+            guard !dataKey.contains("datetime") && !dataKey.contains("reason") && !dataKey.contains("creationDate") && !dataKey.contains("creationHour") else { return }
+            value.forEach { key, value in
+                AttestationsManager.shared.saveAttestationFieldValueForKey(key, dataKey: dataKey, value: value)
+            }
         }
     }
     
@@ -212,7 +229,7 @@ final class NewAttestationViewController: CVTableViewController {
                 switch field.type {
                 case .date:
                     row = CVRow(title: field.name,
-                                subtitle: fieldValues[field.key],
+                                subtitle: fieldValues[field.dataKeyValue]?[field.key],
                                 placeholder: field.placeholder,
                                 xibName: .dateCell,
                                 theme: self.defaultRowTheme(),
@@ -223,19 +240,19 @@ final class NewAttestationViewController: CVTableViewController {
                                 willDisplay: { [weak self] cell in
                                     guard let self = self else { return }
                                     (cell as? DateCell)?.datePicker.date = self.dobDate
-                                    (cell as? DateCell)?.cvSubtitleLabel?.text = self.fieldValues[field.key]
+                                    (cell as? DateCell)?.cvSubtitleLabel?.text = self.fieldValues[field.dataKeyValue]?[field.key]
                                 },
                                 valueChanged: { [weak self] value in
                                     guard let value = value as? Date else { return }
-                                    self?.fieldValues["\(field.key)-timestamp"] = "\(value.timeIntervalSince1970)"
-                                    self?.fieldValues[field.key] = value.dayMonthYearFormatted()
+                                    self?.fieldValues[field.key] = [field.key: value.dayMonthYearFormatted()]
+                                    self?.fieldValues["\(field.key)-timestamp"] = ["\(field.key)-timestamp": "\(value.timeIntervalSince1970)"]
                                 }, displayValueForValue: { value -> String? in
                                     guard let value = value as? Date else { return nil }
                                     return value.dayMonthYearFormatted()
                                 })
                 case .dateTime:
                     row = CVRow(title: field.name,
-                                subtitle: fieldValues[field.key],
+                                subtitle: fieldValues[field.dataKeyValue]?[field.key],
                                 placeholder: field.placeholder,
                                 xibName: .dateCell,
                                 theme: self.defaultRowTheme(),
@@ -246,7 +263,7 @@ final class NewAttestationViewController: CVTableViewController {
                                 willDisplay: { [weak self] cell in
                                     guard let self = self else { return }
                                     (cell as? DateCell)?.datePicker.date = self.outingDate
-                                    (cell as? DateCell)?.cvSubtitleLabel?.text = self.fieldValues[field.key]
+                                    (cell as? DateCell)?.cvSubtitleLabel?.text = self.fieldValues[field.dataKeyValue]?[field.key]
                                 },
                                 valueChanged: { [weak self] value in
                                     guard let value = value as? Date else { return }
@@ -255,32 +272,34 @@ final class NewAttestationViewController: CVTableViewController {
                                     }
                                     let day: String = value.dayMonthYearFormatted()
                                     let hour: String = value.shortTimeFormatted()
-                                    self?.fieldValues["\(field.key)-timestamp"] = "\(value.timeIntervalSince1970)"
-                                    self?.fieldValues["\(field.key)"] = "\(day), \(hour)"
-                                    self?.fieldValues["\(field.key)-day"] = day
-                                    self?.fieldValues["\(field.key)-hour"] = hour
+                                    self?.fieldValues[field.key] = [field.key: "\(day), \(hour)"]
+                                    self?.fieldValues["\(field.key)-timestamp"] = ["\(field.key)-timestamp": "\(value.timeIntervalSince1970)"]
+                                    self?.fieldValues["\(field.key)-day"] = ["\(field.key)-day": day]
+                                    self?.fieldValues["\(field.key)-hour"] = ["\(field.key)-hour": hour]
                                 }, displayValueForValue: { value -> String? in
                                     guard let value = value as? Date else { return nil }
                                     return "\(value.dayMonthYearFormatted()), \(value.shortTimeFormatted())"
                                 })
                 case .list:
-                    let selectedListItem: AttestationFormFieldItem? = fieldSelectedItems[field.key]
+                    let selectedListItem: AttestationFormFieldItem? = fieldSelectedItems[field.dataKeyValue]?[field.key]
                     row = CVRow(title: field.name,
                                 subtitle: selectedListItem?.shortLabel ?? "-",
                                 xibName: .textCell,
-                                theme: self.listRowTheme(fieldKey: field.key),
+                                theme: self.listRowTheme(fieldDataKey: field.dataKeyValue),
                                 selectionAction: { [weak self] in
-                                    self?.didTouchSelectFieldItem(field.items ?? [], self?.fieldSelectedItems[field.key]) { selectedItem in
-                                        self?.fieldSelectedItems[field.key] = selectedItem
-                                        self?.fieldValues["\(field.key)"] = selectedItem.code
-                                        self?.fieldValues["\(field.key)-code"] = selectedItem.code
-                                        self?.fieldValues["\(field.key)-shortlabel"] = selectedItem.shortLabel
+                                    self?.didTouchSelectFieldItem(field.items ?? [], self?.fieldSelectedItems[field.dataKeyValue]?[field.key], field.key) { selectedItem in
+                                        self?.fieldSelectedItems[field.dataKeyValue] = [field.key: selectedItem]
+                                        self?.fieldValues[field.dataKeyValue] = ["\(field.key)": selectedItem.code,
+                                                                                 "\(field.key)-code": selectedItem.code,
+                                                                                 "\(field.key)-shortlabel": selectedItem.shortLabel]
                                         self?.reloadUI()
                                     }
+                                }, willDisplay: { [weak self] cell in
+                                    cell.cvSubtitleLabel?.textColor = self?.fieldSelectedItems[field.dataKeyValue]?[field.key] == nil ? Appearance.Cell.Text.placeholderColor : Appearance.Cell.Text.subtitleColor
                                 })
                 default:
                     row = CVRow(title: field.name,
-                                subtitle: fieldValues[field.key],
+                                subtitle: fieldValues[field.dataKeyValue]?[field.key],
                                 placeholder: field.placeholder,
                                 xibName: .standardTextFieldCell,
                                 theme: self.defaultRowTheme(),
@@ -294,10 +313,13 @@ final class NewAttestationViewController: CVTableViewController {
                                     if self.firstTextField == nil {
                                         self.firstTextField = (cell as? StandardTextFieldCell)?.cvTextField
                                     }
-                                    (cell as? StandardTextFieldCell)?.cvTextField.text = self.fieldValues[field.key]
+                                    (cell as? StandardTextFieldCell)?.cvTextField.text = self.fieldValues[field.dataKeyValue]?[field.key]
                                 }, valueChanged: { [weak self] value in
-                                    let valueString: String = value as? String ?? ""
-                                    self?.fieldValues[field.key] = valueString.isEmpty ? nil : valueString
+                                    if let value = value as? String, !value.isEmpty {
+                                        self?.fieldValues[field.dataKeyValue] = [field.key: value]
+                                    } else {
+                                        self?.fieldValues[field.dataKeyValue] = nil
+                                    }
                                 }, didValidateValue: { [weak self] _, cell in
                                     guard let fieldTag = (cell as? StandardTextFieldCell)?.cvTextField.tag else { return }
                                     self?.tableView.viewWithTag(fieldTag + 1)?.becomeFirstResponder()
@@ -359,7 +381,7 @@ final class NewAttestationViewController: CVTableViewController {
                            separatorLeftInset: Appearance.Cell.leftMargin)
     }
     
-    private func listRowTheme(fieldKey: String) -> CVRow.Theme {
+    private func listRowTheme(fieldDataKey: String) -> CVRow.Theme {
         return CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                            topInset: 10.0,
                            bottomInset: 10.0,
@@ -367,7 +389,7 @@ final class NewAttestationViewController: CVTableViewController {
                            titleFont: { .regular(size: 12.0) },
                            titleColor: Appearance.Cell.Text.subtitleColor,
                            subtitleFont: { .regular(size: 17.0) },
-                           subtitleColor: fieldSelectedItems[fieldKey] == nil ? Appearance.Cell.Text.placeholderColor : Appearance.Cell.Text.subtitleColor,
+                           subtitleColor: Appearance.Cell.Text.placeholderColor,
                            separatorLeftInset: Appearance.Cell.leftMargin)
     }
     

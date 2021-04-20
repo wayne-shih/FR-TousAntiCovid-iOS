@@ -12,11 +12,6 @@ import UIKit
 
 // swiftlint:disable explicit_type_interface identifier_name line_length type_body_length type_name
 internal enum StoryboardScene {
-  internal enum Attestation: StoryboardType {
-    internal static let storyboardName = "Attestation"
-
-    internal static let attestationFullScreenViewController = SceneType<TousAntiCovid.AttestationFullScreenViewController>(storyboard: Attestation.self, identifier: "AttestationFullScreenViewController")
-  }
   internal enum BottomButtonContainer: StoryboardType {
     internal static let storyboardName = "BottomButtonContainer"
 
@@ -32,6 +27,11 @@ internal enum StoryboardScene {
 
     internal static let cvNavigationChildController = SceneType<TousAntiCovid.CVNavigationChildController>(storyboard: CVNavigationChild.self, identifier: "CVNavigationChildController")
   }
+  internal enum CodeFullScreen: StoryboardType {
+    internal static let storyboardName = "CodeFullScreen"
+
+    internal static let codeFullScreenViewController = SceneType<TousAntiCovid.CodeFullScreenViewController>(storyboard: CodeFullScreen.self, identifier: "CodeFullScreenViewController")
+  }
   internal enum FlashReportCode: StoryboardType {
     internal static let storyboardName = "FlashReportCode"
 
@@ -42,10 +42,25 @@ internal enum StoryboardScene {
 
     internal static let flashCodeController = SceneType<TousAntiCovid.FlashVenueCodeController>(storyboard: FlashVenueCode.self, identifier: "FlashCodeController")
   }
+  internal enum FlashWallet2DDoc: StoryboardType {
+    internal static let storyboardName = "FlashWallet2DDoc"
+
+    internal static let flashWallet2DDocController = SceneType<TousAntiCovid.FlashWallet2DDocController>(storyboard: FlashWallet2DDoc.self, identifier: "FlashWallet2DDocController")
+  }
+  internal enum FlashWalletCode: StoryboardType {
+    internal static let storyboardName = "FlashWalletCode"
+
+    internal static let flashWalletCodeController = SceneType<TousAntiCovid.FlashWalletCodeController>(storyboard: FlashWalletCode.self, identifier: "FlashWalletCodeController")
+  }
   internal enum ModalContainer: StoryboardType {
     internal static let storyboardName = "ModalContainer"
 
     internal static let modalContainerViewController = SceneType<TousAntiCovid.ModalContainerViewController>(storyboard: ModalContainer.self, identifier: "ModalContainerViewController")
+  }
+  internal enum WalletCertificateVerified: StoryboardType {
+    internal static let storyboardName = "WalletCertificateVerified"
+
+    internal static let walletCertificateVerifiedController = SceneType<TousAntiCovid.WalletCertificateVerifiedController>(storyboard: WalletCertificateVerified.self, identifier: "WalletCertificateVerifiedController")
   }
 }
 // swiftlint:enable explicit_type_interface identifier_name line_length type_body_length type_name

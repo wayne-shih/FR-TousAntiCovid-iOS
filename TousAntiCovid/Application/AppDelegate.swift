@@ -38,6 +38,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         RisksUIManager.shared.start()
         let storageManager: StorageManager = StorageManager()
         AttestationsManager.shared.start(storageManager: storageManager)
+        WalletManager.shared.start(storageManager: storageManager)
         VenuesManager.shared.start(storageManager: storageManager)
         IsolationManager.shared.start(storageManager: storageManager)
         PrivacyManager.shared.start()
@@ -50,7 +51,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         
         WarningServer.shared.start(baseUrl: { Constant.Server.warningBaseUrl },
                                    certificateFile: Constant.Server.warningCertificate,
-                                   requestLoggingHandler: { task, responseData, error in })
+                                   requestLoggingHandler: { _, _, _ in })
         
         RBManager.shared.start(isFirstInstall: !isAppAlreadyInstalled,
                                server: Server(baseUrl: { Constant.Server.baseUrl },
@@ -62,7 +63,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                                 if UIApplication.shared.applicationState != .active {
                                                     NotificationsManager.shared.triggerDeviceTimeErrorNotification()
                                                 }
-                                              }, requestLoggingHandler: { task, responseData, error in }),
+                                              }, requestLoggingHandler: { _, _, _ in }),
                                storage: storageManager,
                                bluetooth: BluetoothManager(),
                                filter: FilteringManager(),
@@ -71,8 +72,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                     NotificationsManager.shared.triggerRestartNotification()
                                }, didReceiveProximityHandler: {
                                     StatusManager.shared.status()
-                               }, didSaveProximity: { proximity in })
+                               }, didSaveProximity: { _ in })
         ParametersManager.shared.start()
+        AnalyticsManager.shared.start()
         if #available(iOS 14.0, *) {
             WidgetManager.shared.start()
         }
@@ -98,6 +100,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         UIApplication.shared.clearBadge()
         RBManager.shared.clearOldLocalProximities()
+        AnalyticsManager.shared.reportAppEvent(.e3)
     }
     
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -110,6 +113,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationWillTerminate(_ application: UIApplication) {
         RBManager.shared.stopProximityDetection()
+        AnalyticsManager.shared.proximityDidStop()
     }
     
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
@@ -141,6 +145,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         InfoCenterManager.shared.fetchInfo()
         KeyFiguresManager.shared.fetchKeyFigures()
+        AnalyticsManager.shared.reportAppEvent(.e1)
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {

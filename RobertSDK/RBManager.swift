@@ -58,6 +58,10 @@ public final class RBManager {
         get { storage.declarationToken() }
         set { storage.saveDeclarationToken(newValue) }
     }
+    public var analyticsToken: String? {
+        get { storage.analyticsToken() }
+        set { storage.saveAnalyticsToken(newValue) }
+    }
     
     public var lastStatusRequestDate: Date? {
         get { storage.lastStatusRequestDate() }
@@ -108,6 +112,7 @@ public final class RBManager {
     public var proximitiesRetentionDurationInDays: Int?
     public var preSymptomsSpan: Int?
     public var positiveSampleSpan: Int?
+    public var contagiousSpan: Int?
     
     private var didStopProximityDueToLackOfEpochsHandler: (() -> ())?
     private var didReceiveProximityHandler: (() -> ())?
@@ -257,10 +262,13 @@ extension RBManager {
     }
     
     public func report(code: String, symptomsOrigin: Date?, positiveTestDate: Date?, completion: @escaping (_ error: Error?) -> ()) {
-        let originSymptoms: Date? = symptomsOrigin?.rbDateByAddingDays(-(preSymptomsSpan ?? 0))
-        let originPositiveTest: Date? = positiveTestDate?.rbDateByAddingDays(-(positiveSampleSpan ?? 0))
-        let origin: Date = originSymptoms ?? originPositiveTest ?? .distantPast
-        let localHelloMessages: [RBLocalProximity] = storage.getLocalProximityList(from: origin, to: Date())
+        let symptomsOriginStartDate: Date? = symptomsOrigin?.rbDateByAddingDays(-(preSymptomsSpan ?? 0))
+        let symptomsOriginEndDate: Date? = symptomsOrigin?.rbDateByAddingDays(contagiousSpan ?? 0)
+        let positiveTestDateStartDate: Date? = positiveTestDate?.rbDateByAddingDays(-(positiveSampleSpan ?? 0))
+        let positiveTestDateEndDate: Date? = positiveTestDate?.rbDateByAddingDays(contagiousSpan ?? 0)
+        let startDate: Date = symptomsOriginStartDate ?? positiveTestDateStartDate ?? .distantPast
+        let endDate: Date = min((symptomsOriginEndDate ?? positiveTestDateEndDate ?? Date()), Date())
+        let localHelloMessages: [RBLocalProximity] = storage.getLocalProximityList(from: startDate, to: endDate)
         do {
             let filteredProximities: [RBLocalProximity] = try filter.filter(proximities: localHelloMessages)
             server.report(code: code, helloMessages: filteredProximities) { result in
@@ -268,7 +276,7 @@ extension RBManager {
                 case let .success(token):
                     self.reportToken = token
                     self.reportDate = symptomsOrigin ?? positiveTestDate ?? Date()
-                    self.reportDataOriginDate = origin
+                    self.reportDataOriginDate = startDate
                     self.reportSymptomsStartDate = symptomsOrigin
                     self.reportPositiveTestDate = positiveTestDate
                     self.clearLocalProximityList()
@@ -405,6 +413,7 @@ extension RBManager {
         lastStatusReceivedDate = now
         lastStatusErrorDate = nil
         declarationToken = response.declarationToken
+        analyticsToken = response.analyticsToken
         if !epochs.isEmpty {
             clearLocalEpochs()
             storage.save(epochs: epochs)

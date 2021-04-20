@@ -10,6 +10,9 @@
 
 import UIKit
 import CommonCrypto
+#if !PROXIMITY
+import ZXingObjC
+#endif
 
 extension String {
     
@@ -39,6 +42,28 @@ extension String {
         guard let regex = try? NSRegularExpression(pattern: rhs) else { return false }
         let range: NSRange = NSRange(location: 0, length: lhs.utf16.count)
         return regex.firstMatch(in: lhs, options: [], range: range) != nil
+    }
+
+    subscript(_ range: ClosedRange<Int>) -> String {
+        let startIndex: Index = index(self.startIndex, offsetBy: range.lowerBound)
+        return String(self[startIndex..<index(startIndex, offsetBy: range.count)])
+    }
+    
+    subscript(_ range: Range<Int>) -> String {
+        let startIndex: Index = index(self.startIndex, offsetBy: range.lowerBound)
+        return String(self[startIndex..<index(startIndex, offsetBy: range.count)])
+    }
+    
+    subscript(safe range: ClosedRange<Int>) -> String? {
+        guard count > range.upperBound else { return nil }
+        let startIndex: Index = index(self.startIndex, offsetBy: range.lowerBound)
+        return String(self[startIndex..<index(startIndex, offsetBy: range.count)])
+    }
+    
+    subscript(safe range: Range<Int>) -> String? {
+        guard count > range.upperBound else { return nil }
+        let startIndex: Index = index(self.startIndex, offsetBy: range.lowerBound)
+        return String(self[startIndex..<index(startIndex, offsetBy: range.count)])
     }
     
     func removingEmojis() -> String {
@@ -111,6 +136,19 @@ extension String {
         }
         return nil
     }
+    #if !PROXIMITY
+    func dataMatrix() -> UIImage? {
+        let writer: ZXMultiFormatWriter = ZXMultiFormatWriter()
+        do {
+            let result: ZXBitMatrix = try writer.encode(self, format: kBarcodeFormatDataMatrix, width: 500, height: 500)
+            guard let cgImage = ZXImage(matrix: result)?.cgimage else { return nil }
+            return UIImage(cgImage: cgImage)
+        } catch {
+            print(error)
+            return nil
+        }
+    }
+    #endif
     
     func sha256() -> String {
         if let stringData = self.data(using: String.Encoding.utf8) {
@@ -136,6 +174,16 @@ extension String {
         }
         
         return hexString
+    }
+    
+    func cleaningPEMStrings() -> String {
+        replacingOccurrences(of: "\n", with: "")
+            .replacingOccurrences(of: "-----BEGIN EC PRIVATE KEY-----", with: "")
+            .replacingOccurrences(of: "-----END EC PRIVATE KEY-----", with: "")
+            .replacingOccurrences(of: "-----BEGIN PUBLIC KEY-----", with: "")
+            .replacingOccurrences(of: "-----END PUBLIC KEY-----", with: "")
+            .replacingOccurrences(of: "-----BEGIN CERTIFICATE-----", with: "")
+            .replacingOccurrences(of: "-----END CERTIFICATE-----", with: "")
     }
     
 }

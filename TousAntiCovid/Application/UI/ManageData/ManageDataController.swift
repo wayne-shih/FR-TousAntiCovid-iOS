@@ -59,6 +59,13 @@ final class ManageDataController: CVTableViewController {
         }
         rows.append(contentsOf: attestationRows)
         rows.append(blockSeparatorRow())
+        if WalletManager.shared.isWalletActivated {
+            let walletRows: [CVRow] = rowsBlock(textPrefix: "manageDataController.walletData") { [weak self] in
+                self?.eraseWalletDataButtonPressed()
+            }
+            rows.append(contentsOf: walletRows)
+            rows.append(blockSeparatorRow())
+        }
         if ConfigManager.shared.venuesFeaturedWasActivatedAtLeastOneTime || !VenuesManager.shared.venuesQrCodes.isEmpty {
             let venuesRows: [CVRow] = rowsBlock(textPrefix: "manageDataController.venuesData") { [weak self] in
                 self?.eraseVenuesDataButtonPressed()
@@ -219,6 +226,17 @@ final class ManageDataController: CVTableViewController {
                   })
     }
     
+    private func eraseWalletDataButtonPressed() {
+        showAlert(title: "manageDataController.walletData.confirmationDialog.title".localized,
+                  message: "manageDataController.walletData.confirmationDialog.message".localized,
+                  okTitle: "common.yes".localized,
+                  isOkDestructive: true,
+                  cancelTitle: "common.no".localized, handler:  { [weak self] in
+                    WalletManager.shared.clearAllData()
+                    self?.showFlash()
+                  })
+    }
+    
     private func eraseContactsButtonPressed() {
         showAlert(title: "manageDataController.eraseRemoteContact.confirmationDialog.title".localized,
                   message: "manageDataController.eraseRemoteContact.confirmationDialog.message".localized,
@@ -230,6 +248,7 @@ final class ManageDataController: CVTableViewController {
                         RBManager.shared.deleteExposureHistory { error in
                             HUD.hide()
                             if let error = error {
+                                AnalyticsManager.shared.reportError(serviceName: "deleteExposureHistory", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
                                 if (error as NSError).code == -1 {
                                     self?.showAlert(title: "common.error.clockNotAligned.title".localized,
                                                     message: "common.error.clockNotAligned.message".localized,
@@ -256,10 +275,13 @@ final class ManageDataController: CVTableViewController {
                   isOkDestructive: true,
                   cancelTitle: "common.no".localized, handler:  {
                     switch ParametersManager.shared.apiVersion {
-                    case .v5:
+                    case .v5, .v6:
                         HUD.show(.progress)
                         RBManager.shared.unregister { [weak self] error, isErrorBlocking in
                             HUD.hide()
+                            if let error = error {
+                                AnalyticsManager.shared.reportError(serviceName: "unregister", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
+                            }
                             self?.processPostUnregisterActions(error, isErrorBlocking: isErrorBlocking)
                         }
                     }
@@ -280,6 +302,8 @@ final class ManageDataController: CVTableViewController {
             AttestationsManager.shared.clearAllData()
             VenuesManager.shared.clearAllData()
             VaccinationCenterManager.shared.clearAllData()
+            WalletManager.shared.clearAllData()
+            AnalyticsManager.shared.reset()
             NotificationCenter.default.post(name: .changeAppState, object: RootCoordinator.State.onboarding, userInfo: nil)
         }
     }

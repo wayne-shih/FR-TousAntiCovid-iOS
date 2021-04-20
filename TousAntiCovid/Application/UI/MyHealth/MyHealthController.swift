@@ -50,15 +50,25 @@ final class MyHealthController: CVTableViewController {
     }
     
     override func createRows() -> [CVRow] {
-        guard !RBManager.shared.isSick else {
-            return sickRows()
-        }
-        var rows: [CVRow] = [headerRow()]
-        if !RBManager.shared.isRegistered {
-            rows.append(contentsOf: notRegisteredRows())
+        var rows: [CVRow] = []
+        let ameliUrl: String = ParametersManager.shared.ameliUrl
+        if RBManager.shared.isSick {
+            rows = sickHeaderRows()
+            if let declarationToken = RBManager.shared.declarationToken, !declarationToken.isEmpty, !ameliUrl.isEmpty {
+                let ameliWithDeclarationUrl: String = String(format: ameliUrl, declarationToken)
+                rows.append(contentsOf: workStoppingSection(with: ameliWithDeclarationUrl))
+            }
+            rows.append(contentsOf: sickActionsRows())
+        } else if !RBManager.shared.isRegistered {
+            rows = [headerRow()] + notRegisteredRows()
         } else if let currentRiskLevel = RisksUIManager.shared.currentLevel {
+            rows = [headerRow()]
             if RBManager.shared.lastStatusReceivedDate != nil  {
                 rows.append(riskRow(for: currentRiskLevel))
+            }
+            if let declarationToken = RBManager.shared.declarationToken, !declarationToken.isEmpty, !ameliUrl.isEmpty {
+                let ameliWithDeclarationUrl: String = String(format: ameliUrl, declarationToken)
+                rows.append(contentsOf: workStoppingSection(with: ameliWithDeclarationUrl))
             }
             rows.append(contentsOf: sectionRows(for: currentRiskLevel))
         }
@@ -89,7 +99,7 @@ final class MyHealthController: CVTableViewController {
         return stateRow
     }
     
-    private func sickRows() -> [CVRow] {
+    private func sickHeaderRows() -> [CVRow] {
         var rows: [CVRow] = []
         let imageRow: CVRow = CVRow(image: Asset.Images.sick.image,
                                     xibName: .onboardingImageCell,
@@ -100,6 +110,12 @@ final class MyHealthController: CVTableViewController {
                                               xibName: .textCell,
                                               theme: CVRow.Theme(topInset: 40.0, bottomInset: 40.0))
         rows.append(declarationTextRow)
+        return rows
+    }
+
+    private func sickActionsRows() -> [CVRow] {
+        var rows: [CVRow] = []
+
         let recommendationsButton: CVRow = CVRow(title: "myHealthController.button.recommendations".localized,
                                         xibName: .buttonCell,
                                         theme: CVRow.Theme(topInset: 10.0, bottomInset: 10.0),
@@ -131,7 +147,7 @@ final class MyHealthController: CVTableViewController {
               theme: CVRow.Theme(topInset: 20.0,
                                  imageRatio: 375.0 / 233.0))
     }
-    
+
     private func notRegisteredRows() -> [CVRow] {
         let textRow: CVRow = CVRow(title: "myHealthController.notRegistered.mainMessage.title".localized,
                                    subtitle: "myHealthController.notRegistered.mainMessage.subtitle".localized,
@@ -155,6 +171,72 @@ final class MyHealthController: CVTableViewController {
                     self?.didTouchRisksUILevelSectionLink(section.link)
                   })
         }
+    }
+
+    private func workStoppingSection(with ameliWithDeclarationUrl: String) -> [CVRow] {
+        var rows: [CVRow] = [workStoppingTopRow()]
+        let workStoppingLinkRow: CVRow = actionRow(title: "myHealthController.workStopping.link".localized, isLastAction: false) {
+            URL(string: ameliWithDeclarationUrl)?.openInSafari()
+        }
+        rows.append(workStoppingLinkRow)
+
+        let workStoppingShareRow: CVRow = actionRow(title: "myHealthController.workStopping.share".localized, isLastAction: true) { [weak self] in
+            self?.didTouchSharing(sharingText: ameliWithDeclarationUrl)
+        }
+        rows.append(workStoppingShareRow)
+        return rows
+    }
+
+    private func workStoppingTopRow() -> CVRow {
+        let backgroundColor: UIColor = Appearance.tintColor
+        let row: CVRow = CVRow(title: "myHealthController.workStopping.title".localized,
+                               subtitle: "myHealthController.workStopping.message".localized,
+                               image: Asset.Images.hand.image,
+                               xibName: .isolationTopCell,
+                               theme:  CVRow.Theme(backgroundColor: backgroundColor,
+                                                   topInset: 0.0,
+                                                   bottomInset: 0.0,
+                                                   textAlignment: .natural,
+                                                   titleColor: Appearance.Button.Primary.titleColor,
+                                                   subtitleColor: Appearance.Button.Primary.titleColor,
+                                                   imageTintColor: Appearance.Button.Primary.titleColor,
+                                                   separatorLeftInset: Appearance.Cell.leftMargin,
+                                                   separatorRightInset: Appearance.Cell.leftMargin,
+                                                   maskedCorners: .top),
+                               willDisplay: { cell in
+                                    cell.selectionStyle = .none
+                                    cell.accessoryType = .none
+                               })
+        return row
+    }
+
+    private func actionRow(title: String, isLastAction: Bool, actionBlock: @escaping () -> ()) -> CVRow {
+        let row: CVRow = CVRow(title: title,
+                               xibName: .standardCardCell,
+                               theme:  CVRow.Theme(backgroundColor: Appearance.Cell.Isolation.actionBackgroundColor,
+                                                   topInset: 0.0,
+                                                   bottomInset: isLastAction ? Appearance.Cell.leftMargin : 0.0,
+                                                   textAlignment: .natural,
+                                                   titleFont: { Appearance.Cell.Text.actionTitleFont },
+                                                   titleColor: Appearance.Button.Primary.titleColor,
+                                                   separatorLeftInset: isLastAction ? nil : Appearance.Cell.leftMargin,
+                                                   separatorRightInset: isLastAction ? nil : Appearance.Cell.leftMargin,
+                                                   maskedCorners: isLastAction ? .bottom : .none),
+                               selectionAction: {
+                                actionBlock()
+                               },
+                               willDisplay: { cell in
+                                cell.selectionStyle = .none
+                                cell.accessoryType = .none
+                               })
+        return row
+    }
+
+    private func didTouchSharing(sharingText: String) {
+        let activityItems: [Any?] = [sharingText]
+        let controller: UIActivityViewController = UIActivityViewController(activityItems: activityItems.compactMap { $0 }, applicationActivities: nil)
+        controller.excludedActivityTypes = [.saveToCameraRoll, .print]
+        present(controller, animated: true, completion: nil)
     }
 
     private func initUI() {

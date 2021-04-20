@@ -12,9 +12,10 @@ import Foundation
 
 enum VaccinationCentersConstant {
     
-    static let jsonBaseUrl: URL = URL(string: "https://app.stopcovid.gouv.fr/infos/dep/")!
+    static let jsonBaseUrl: URL = URL(string: "https://\(Constant.Server.resourcesRootDomain)/infos/dep/")!
     
     static let vaccinationCentersFileName: String = "centres-vaccination.json"
     static let vaccinationCentersLastUpdateFileName: String = "lastUpdate.json"
     static let postalCodesDetailsFileUrl: URL = Bundle.main.url(forResource: "zip-geoloc", withExtension: "json")!
+    static let zipGeolocVersion: Int = 1
 }

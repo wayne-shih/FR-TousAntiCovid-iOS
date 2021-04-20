@@ -32,6 +32,9 @@ final class VaccinationCenterManager: NSObject {
     
     static let shared: VaccinationCenterManager = VaccinationCenterManager()
     
+    @UserDefault(key: .zipGeolocVersion)
+    private var currentZipGeolocVersion: Int = 0
+    
     var vaccinationCentersToDisplay: [VaccinationCenter]? {
         guard let vaccinationCenters = vaccinationCenters else { return nil }
         guard let currentLocation = currentLocation else { return vaccinationCenters }
@@ -93,7 +96,8 @@ final class VaccinationCenterManager: NSObject {
     }
     
     private func initializeCurrentDepartmentIfNeeded() {
-        guard currentDepartmentCode == nil else { return }
+        guard currentDepartmentCode == nil || currentZipGeolocVersion < VaccinationCentersConstant.zipGeolocVersion else { return }
+        currentZipGeolocVersion = VaccinationCentersConstant.zipGeolocVersion
         guard let postalCode = KeyFiguresManager.shared.currentPostalCode else { return }
         postalCodeDidUpdate(postalCode)
     }

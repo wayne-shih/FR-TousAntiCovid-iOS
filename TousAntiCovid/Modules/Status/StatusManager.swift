@@ -165,16 +165,19 @@ extension StatusManager {
             let nowTimestamp: Double = Date().timeIntervalSince1970
             if (nowTimestamp - mostRecentResponseTimestamp >= ParametersManager.shared.minStatusRetryTimeInterval && nowTimestamp - lastStatusSuccessTimestamp >= ParametersManager.shared.statusTimeInterval) || force {
                 switch ParametersManager.shared.apiVersion {
-                case .v5:
+                case .v5, .v6:
                     RBManager.shared.status { result in
                         switch result {
                         case let .success(info):
                             if showNotifications {
                                 self.processStatusResponseNotification(error: nil)
                             }
+                            AnalyticsManager.shared.statusDidSucceed()
+                            AnalyticsManager.shared.sendAnalytics()
                             NotificationsManager.shared.scheduleUltimateNotification(minHour: ParametersManager.shared.minHourContactNotif, maxHour: ParametersManager.shared.maxHourContactNotif)
                             completion?(.success(info))
                         case let .failure(error):
+                            AnalyticsManager.shared.reportError(serviceName: "status", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
                             if showNotifications {
                                 self.processStatusResponseNotification(error: error)
                             }
@@ -211,6 +214,7 @@ extension StatusManager {
             case let .success(info):
                 completion?(.success(info))
             case let .failure(error):
+                AnalyticsManager.shared.reportError(serviceName: "wStatus", apiVersion: ParametersManager.shared.warningApiVersion, code: (error as NSError).code)
                 completion?(.failure(error))
             }
         }
@@ -253,12 +257,11 @@ extension StatusManager {
         if RisksUIManager.shared.level(for: newRiskLevelInfo.riskLevel) == nil {
             newRiskLevelInfo.riskLevel = 0.0
         }
-
+        
         if !RBManager.shared.isSick {
             mustNotifyLastRiskLevelChange = (newRiskLevelInfo.riskLevel > currentStatusRiskLevel?.riskLevel ?? 0.0) || (newRiskLevelInfo.riskLevel != 0.0 && newRiskLevelInfo.riskLevel == currentStatusRiskLevel?.riskLevel && newRiskLevelInfo.lastRiskScoringDate ?? .distantPast > currentStatusRiskLevel?.lastRiskScoringDate ?? .distantPast)
             mustShowAlertAboutLastRiskLevelChange = newRiskLevelInfo.lastRiskScoringDate != currentStatusRiskLevel?.lastRiskScoringDate
         }
-
         currentStatusRiskLevel = newRiskLevelInfo
         showRiskLevelUpdateNotificationIfNeeded()
         if UIApplication.shared.applicationState == .active {
@@ -286,18 +289,22 @@ extension StatusManager {
         guard !RBManager.shared.isSick else { return }
         guard mustNotifyLastRiskLevelChange else { return }
         mustNotifyLastRiskLevelChange = false
+        NotificationsManager.shared.cancelNotificationForIdentifier(NotificationsContant.Identifier.atRisk)
         NotificationsManager.shared.scheduleNotification(minHour: ParametersManager.shared.minHourContactNotif,
                                                          maxHour: ParametersManager.shared.maxHourContactNotif,
                                                          title: RisksUIManager.shared.currentLevel?.labels.notifTitle?.localized ?? "",
                                                          body: RisksUIManager.shared.currentLevel?.labels.notifBody?.localizedOrEmpty ?? "",
                                                          identifier: NotificationsContant.Identifier.atRisk,
                                                          badge: 1)
+        AnalyticsManager.shared.reportAppEvent(.e2)
+        AnalyticsManager.shared.reportHealthEvent(.eh2)
     }
     
     private func showRiskLevelUpdateAlertIfNeeded() {
         guard !RBManager.shared.isSick else { return }
         guard mustShowAlertAboutLastRiskLevelChange else { return }
         mustShowAlertAboutLastRiskLevelChange = false
+        NotificationsManager.shared.cancelNotificationForIdentifier(NotificationsContant.Identifier.atRisk)
         guard let title = RisksUIManager.shared.currentLevel?.labels.notifTitle else { return }
         guard let message = RisksUIManager.shared.currentLevel?.labels.notifBody else { return }
         UIApplication.shared.keyWindow?.rootViewController?.topPresentedController.showAlert(title: title.localized,

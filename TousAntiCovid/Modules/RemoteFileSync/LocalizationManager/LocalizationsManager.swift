@@ -108,5 +108,6 @@ extension String {
     
     var localized: String { LocalizationsManager.shared.strings[self] ?? self }
     var localizedOrEmpty: String { LocalizationsManager.shared.strings[self] ?? "" }
+    var localizedOrNil: String? { LocalizationsManager.shared.strings[self] }
     
 }

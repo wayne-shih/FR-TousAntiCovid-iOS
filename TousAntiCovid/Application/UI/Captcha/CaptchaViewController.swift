@@ -43,6 +43,7 @@ final class CaptchaViewController: CVTableViewController {
         super.viewDidLoad()
         title = "captchaController.title".localized
         initUI()
+        navigationController?.presentationController?.delegate = self
         try? AVAudioSession.sharedInstance().setCategory(.playback)
         try? AVAudioSession.sharedInstance().setActive(true)
         if !captcha.isImage {
@@ -277,4 +278,10 @@ extension CaptchaViewController: AVAudioPlayerDelegate {
         stopPlayingCaptcha()
     }
     
+}
+
+extension CaptchaViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        didTouchCloseButton()
+    }
 }

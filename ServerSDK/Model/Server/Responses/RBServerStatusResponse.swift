@@ -18,5 +18,6 @@ struct RBServerStatusResponse: RBServerResponse {
     let message: String?
     let tuples: String
     let declarationToken: String?
+    let analyticsToken: String?
     
 }

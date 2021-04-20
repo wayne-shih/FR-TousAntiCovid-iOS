@@ -24,6 +24,7 @@ struct TousAntiCovidWidget: Widget {
         .description("Soyez alertés et alertez les autres en cas d’exposition à la COVID-19")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
+
 }
 
 struct Provider: TimelineProvider {

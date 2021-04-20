@@ -70,22 +70,24 @@ final class AttestationsManager: NSObject {
         storageManager.deleteExpiredAttestationsData(durationInHours: durationInHours)
     }
     
-    func generateQRCode(for values: [String: String]) -> String? {
+    func generateQRCode(for values: [String: [String: String]]) -> String? {
         generateQRCodeAssociatedText(for: values, templateString: ParametersManager.shared.qrCodeFormattedString)
     }
     
-    func generateQRCodeDisplayableString(for values: [String: String]) -> String? {
+    func generateQRCodeDisplayableString(for values: [String: [String: String]]) -> String? {
         generateQRCodeAssociatedText(for: values, templateString: ParametersManager.shared.qrCodeFormattedStringDisplayed)
     }
     
-    func generateQRCodeFooter(for values: [String: String]) -> String? {
+    func generateQRCodeFooter(for values: [String: [String: String]]) -> String? {
         generateQRCodeAssociatedText(for: values, templateString: ParametersManager.shared.qrCodeFooterString)
     }
     
-    private func generateQRCodeAssociatedText(for values: [String: String], templateString: String) -> String? {
+    private func generateQRCodeAssociatedText(for values: [String: [String: String]], templateString: String) -> String? {
         var qrCodeString: String = templateString
-        values.forEach { key, value in
-            qrCodeString = qrCodeString.replacingOccurrences(of: "<\(key)>", with: value)
+        values.forEach { dataKey, value in
+            value.forEach { key, value in
+                qrCodeString = qrCodeString.replacingOccurrences(of: "<\(key)>", with: value)
+            }
         }
         do {
             let regex: NSRegularExpression = try NSRegularExpression(pattern: "<[a-zA-Z0-9\\-]+>")
@@ -105,11 +107,11 @@ final class AttestationsManager: NSObject {
         storageManager.deleteAttestation(attestation)
     }
     
-    func saveAttestationFieldValueForKey(_ key: String, value: String?) {
-        storageManager.saveAttestationFieldValueForKey(key, value: value)
+    func saveAttestationFieldValueForKey(_ key: String, dataKey: String, value: String?) {
+        storageManager.saveAttestationFieldValueForKey(key, dataKey: dataKey, value: value)
     }
     
-    func getAttestationFieldValues() -> [String: String] {
+    func getAttestationFieldValues() -> [String: [String: String]] {
         return storageManager.getAttestationFieldValues()
     }
     

@@ -77,19 +77,36 @@ final class CaptchaManager: NSObject {
                     completion(.failure(error))
                 }
             case let .failure(error):
+                AnalyticsManager.shared.reportError(serviceName: "captcha", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
                 completion(.failure(error))
             }
         }
     }
     
     private func getCaptchaImage(id: String, completion: @escaping (_ result: Result<Data, Error>) -> ()) {
-        processRequest(url: CaptchaConstant.Url.getImage(id: id), method: .get, completion: completion)
+        processRequest(url: CaptchaConstant.Url.getImage(id: id), method: .get) { result in
+            switch result {
+            case let .success(data):
+                completion(.success(data))
+            case let .failure(error):
+                AnalyticsManager.shared.reportError(serviceName: "captchaImage", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
+                completion(.failure(error))
+            }
+        }
     }
     
     private func getCaptchaAudio(id: String, completion: @escaping (_ result: Result<Data, Error>) -> ()) {
-        processRequest(url: CaptchaConstant.Url.getAudio(id: id), method: .get, completion: completion)
+        processRequest(url: CaptchaConstant.Url.getAudio(id: id), method: .get) { result in
+            switch result {
+            case let .success(data):
+                completion(.success(data))
+            case let .failure(error):
+                AnalyticsManager.shared.reportError(serviceName: "captchaAudio", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
+                completion(.failure(error))
+            }
+        }
     }
-    
+
     private func processRequest(url: URL, method: Method, body: CaptchaServerBody? = nil, completion: @escaping (_ result: Result<Data, Error>) -> ()) {
         do {
             var request: URLRequest = URLRequest(url: url)
@@ -118,13 +135,13 @@ final class CaptchaManager: NSObject {
             completion(.failure(error))
         }
     }
-    
+
 }
 
 extension CaptchaManager: URLSessionDelegate {
-    
+
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
     }
-    
+
 }

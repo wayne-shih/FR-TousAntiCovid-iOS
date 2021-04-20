@@ -14,11 +14,13 @@ final class AttestationFieldValueChoiceViewController: CVTableViewController {
     
     private let items: [AttestationFormFieldItem]
     private var selectedItem: AttestationFormFieldItem?
+    private let choiceKey: String
     private let didSelectFieldItem: (_ fieldValue: AttestationFormFieldItem) -> ()
     
-    init(items: [AttestationFormFieldItem], selectedItem: AttestationFormFieldItem?, didSelectFieldItem: @escaping (_ fieldValue: AttestationFormFieldItem) -> ()) {
+    init(items: [AttestationFormFieldItem], selectedItem: AttestationFormFieldItem?, choiceKey: String, didSelectFieldItem: @escaping (_ fieldValue: AttestationFormFieldItem) -> ()) {
         self.items = items
         self.selectedItem = selectedItem
+        self.choiceKey = choiceKey
         self.didSelectFieldItem = didSelectFieldItem
         super.init(style: .plain)
     }
@@ -29,13 +31,13 @@ final class AttestationFieldValueChoiceViewController: CVTableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "attestationFieldItemChoiceController.title".localized
+        title = "attestation.form.\(choiceKey).title".localized
         initUI()
         reloadUI()
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 0.0))
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.estimatedRowHeight = UITableView.automaticDimension
         tableView.rowHeight = UITableView.automaticDimension
@@ -55,12 +57,28 @@ final class AttestationFieldValueChoiceViewController: CVTableViewController {
     }
     
     override func createRows() -> [CVRow] {
+        var rows: [CVRow] = []
         let theme: CVRow.Theme = CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                              topInset: 10.0,
                                              bottomInset: 10.0,
                                              textAlignment: .natural,
                                              separatorLeftInset: Appearance.Cell.leftMargin)
-        var rows: [CVRow] = items.map { item in
+        let headerText: String = "attestation.form.\(choiceKey).header".localizedOrEmpty
+        if headerText.isEmpty {
+            rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: true))
+        } else {
+            let headerRow: CVRow = CVRow(title: headerText,
+                                         xibName: .textCell,
+                                         theme:  CVRow.Theme(topInset: 20.0,
+                                                             bottomInset: 20.0,
+                                                             textAlignment: .natural,
+                                                             titleFont: { Appearance.Cell.Text.footerFont },
+                                                             titleColor: Appearance.Cell.Text.captionTitleColor,
+                                                             separatorLeftInset: 0.0,
+                                                             separatorRightInset: 0.0))
+            rows.append(headerRow)
+        }
+        rows.append(contentsOf: items.map { item in
             CVRow(title: item.shortLabel,
                   subtitle: item.longLabel,
                   xibName: .textWithoutStackCell,
@@ -70,8 +88,8 @@ final class AttestationFieldValueChoiceViewController: CVTableViewController {
                   }, willDisplay: { [weak self] cell in
                     cell.accessoryType = item.code == self?.selectedItem?.code ? .checkmark : .none
                   })
-        }
-        let footerText: String = "attestationFieldItemChoiceController.footer".localizedOrEmpty
+        })
+        let footerText: String = "attestation.form.\(choiceKey).footer".localizedOrEmpty
         if footerText.isEmpty {
             if let lastRow = rows.last {
                 var theme: CVRow.Theme = theme

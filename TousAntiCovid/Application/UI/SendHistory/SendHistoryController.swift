@@ -73,10 +73,13 @@ final class SendHistoryController: CVTableViewController {
     private func sendButtonPressed() {
         HUD.show(.progress)
         switch ParametersManager.shared.apiVersion {
-        case .v5:
+        case .v5, .v6:
             RBManager.shared.report(code: symptomsParams.code,
                                     symptomsOrigin: symptomsParams.symptomsDate,
                                     positiveTestDate: symptomsParams.positiveTestDate) { error in
+                if let error = error {
+                    AnalyticsManager.shared.reportError(serviceName: "report", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
+                }
                 VenuesManager.shared.report { _ in
                     HUD.hide()
                     self.processPostReport(error: error)
@@ -111,8 +114,10 @@ final class SendHistoryController: CVTableViewController {
         } else {
             RBManager.shared.isProximityActivated = false
             RBManager.shared.stopProximityDetection()
+            AnalyticsManager.shared.proximityDidStop()
             NotificationsManager.shared.cancelProximityReactivationNotification()
             showSuccessAlert()
+            AnalyticsManager.shared.reportHealthEvent(.eh1)
         }
     }
     

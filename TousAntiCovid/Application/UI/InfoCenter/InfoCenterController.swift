@@ -88,7 +88,11 @@ final class InfoCenterController: CVTableViewController {
                                      topInset: 10.0,
                                      bottomInset: 10.0,
                                      textAlignment: .natural,
-                                     titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                     titleFont: { Appearance.Cell.Text.headTitleFont },
+                                     titleHighlightFont: { Appearance.Cell.Text.subtitleBoldFont },
+                                     titleHighlightColor: Appearance.Cell.Text.subtitleColor,
+                                     subtitleFont: { Appearance.Cell.Text.subtitleFont },
+                                     subtitleColor: Appearance.Cell.Text.subtitleColor),
                   associatedValue: info,
                   selectionActionWithCell: { [weak self] cell in
                     self?.didTouchSharingFor(cell: cell, info: info)

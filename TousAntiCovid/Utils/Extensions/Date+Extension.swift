@@ -68,10 +68,10 @@ extension Date {
         return formatter.string(from: self)
     }
 
-    func fullDateTimeFormatted() -> String {
+    func fullDateTimeFormatted(withSeconds: Bool = true) -> String {
         let formatter: DateFormatter = DateFormatter()
         formatter.dateStyle = .short
-        formatter.timeStyle = .medium
+        formatter.timeStyle = withSeconds ? .medium : .short
         return formatter.string(from: self)
     }
 
@@ -101,6 +101,12 @@ extension Date {
         let formatter: DateFormatter = DateFormatter()
         formatter.dateFormat = "dd_MM_yyyy"
         return formatter.string(from: self).uppercased()
+    }
+    
+    func universalDateFormatted() -> String {
+        let formatter: DateFormatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        return formatter.string(from: self)
     }
     
     #if !WIDGET

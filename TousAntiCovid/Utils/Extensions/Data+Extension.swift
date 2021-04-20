@@ -13,6 +13,8 @@ import Foundation
 
 extension Data {
     
+    var bytes: [UInt8] { [UInt8](self) }
+    
     mutating func wipe() {
         guard let range = Range(NSMakeRange(0, count)) else { return }
         resetBytes(in: range)
@@ -28,6 +30,23 @@ extension Data {
         } else {
             try write(to: fileURL, options: .atomic)
         }
+    }
+    
+    func derEncodedSignature() throws -> Data {
+        guard count != 0 && count % 2 == 0 else { throw NSError.localizedError(message: "Invalid signature", code: 0) }
+        var rBytes: [UInt8] = [UInt8](self[..<(count / 2)])
+        var sBytes: [UInt8] = [UInt8](self[(count / 2)...])
+
+        if rBytes.first! >= 0x80 {
+            rBytes.insert(0x00, at: 0)
+        }
+        if sBytes.first! >= 0x80 {
+            sBytes.insert(0x00, at: 0)
+        }
+
+        let bytes: [UInt8] = (rBytes.encodeAsInteger() + sBytes.encodeAsInteger()).encodeAsSequence()
+        
+        return Data(bytes)
     }
     
 }

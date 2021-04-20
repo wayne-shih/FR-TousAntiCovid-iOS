@@ -16,4 +16,5 @@ public extension NSNotification.Name {
     static var localProximityDataDidChange: NSNotification.Name = NSNotification.Name(rawValue: "localProximityDataDidChange")
     static var attestationDataDidChange: NSNotification.Name = NSNotification.Name(rawValue: "attestationDataDidChange")
     static var venueQrCodeDataDidChange: NSNotification.Name = NSNotification.Name(rawValue: "venueQrCodeDataDidChange")
+    static var walletCertificateDataDidChange: NSNotification.Name = NSNotification.Name(rawValue: "walletCertificateDataDidChange")
 }

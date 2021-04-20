@@ -19,6 +19,7 @@ final class DeepLinkingManager {
     weak var attestationController: AttestationsViewController?
     weak var venuesRecordingOnboardingController: VenuesRecordingOnboardingController?
     weak var flashVenueCodeController: FlashVenueCodeController?
+    weak var walletController: WalletViewController?
     
     private var waitingNotification: Notification?
     
@@ -68,6 +69,8 @@ final class DeepLinkingManager {
             processCodeUrl(url)
         } else if url.path.hasPrefix("/app/attestation") {
             processAttestationUrl()
+        } else if url.path.hasPrefix("/app/wallet") {
+            processWalletUrl(url)
         }
     }
     
@@ -103,4 +106,14 @@ final class DeepLinkingManager {
         NotificationCenter.default.post(notification)
     }
     
+    private func processWalletUrl(_ url: URL) {
+        guard WalletManager.shared.isWalletActivated else { return }
+        let notification: Notification = Notification(name: .newWalletCertificateFromDeeplink, object: url)
+        guard UIApplication.shared.applicationState == .active else {
+            waitingNotification = notification
+            return
+        }
+        NotificationCenter.default.post(notification)
+    }
+
 }

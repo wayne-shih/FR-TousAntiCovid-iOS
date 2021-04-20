@@ -148,6 +148,7 @@ final class WidgetManager {
         } else if !RBManager.shared.isProximityActivated {
             RBManager.shared.isProximityActivated = true
             RBManager.shared.startProximityDetection()
+            AnalyticsManager.shared.proximityDidStart()
         }
     }
     

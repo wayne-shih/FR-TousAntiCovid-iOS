@@ -258,6 +258,11 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         }
     }
     
+    func cancelNotificationForIdentifier(_ identifier: String) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [identifier])
+    }
+    
     func cancelProximityReactivationNotification() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [NotificationsContant.Identifier.proximityReactivation])
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NotificationsContant.Identifier.proximityReactivation])

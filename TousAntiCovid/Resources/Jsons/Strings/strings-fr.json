@@ -1,5 +1,5 @@
 {
-   "app.name":"TousAntiCovid", 
+      "app.name":"TousAntiCovid", 
    "onboarding.welcomeController.title":"Bienvenue",
    "onboarding.welcomeController.mainMessage.title":"Soyez alertés et alertez les autres en cas d’exposition à la COVID-19",
    "onboarding.welcomeController.mainMessage.subtitle":"Avec TousAntiCovid, participez à la lutte contre l’épidémie en réduisant les risques de transmission.\n\n\nCette application a été réalisée en collaboration avec le Ministère des Solidarités et de la Santé et Santé Publique France.",
@@ -19,7 +19,7 @@
    "onboarding.proximityController.mainMessage.subtitle":"TousAntiCovid a besoin d'utiliser le Bluetooth de votre téléphone pour fonctionner.\nAucune donnée de géolocalisation n'est échangée ou enregistrée.",
    "onboarding.proximityController.allowProximity":"Autoriser",
    "onboarding.beAwareController.title":"Notification",
-   "onboarding.beAwareController.mainMessage.title":"Recevez une notification en cas  d’exposition à risque ",
+   "onboarding.beAwareController.mainMessage.title":"Recevez une notification en cas d’exposition à risque",
    "onboarding.beAwareController.mainMessage.subtitle":"Si vous avez été à proximité d'un utilisateur testé positif et contagieux, et qui se déclare positif dans l’appli, vous serez averti.\n\nTousAntiCovid vous donnera alors les recommandations du ministère des Solidarités et de la Santé.",
    "onboarding.beAwareController.allowNotifications":"Autoriser les notifications",
    "onboarding.gesturesController.title":"N'oubliez pas !",
@@ -34,9 +34,9 @@
    "onboarding.batteryController.mainMessage.subtitle":"Pour que TousAntiCovid fonctionne de manière continue en arrière-plan, acceptez de désactiver l’optimisation de la batterie pour TousAntiCovid seulement.",
    "onboarding.batteryController.accept":"Accepter",
    "declareController.message.testedPositive.title":"Vous avez été testé positif et vous souhaitez vous déclarer dans l'appli ?",
-   "declareController.message.testedPositive.subtitle":"Vous devriez avoir reçu par e-mail, SMS et/ou courrier postal un QR code envoyé par la plateforme SI-DEP (et non de votre laboratoire) si vos coordonnées ont été correctement saisies au moment du prélèvement.\nCe QR code peut être soit rentré directement en cliquant sur le lien, soit scanné dans l'application, ou rentré manuellement en saisissant le code à 32 caractères situé sous le QR code.",
+   "declareController.message.testedPositive.subtitle":"Vous devriez avoir reçu par e-mail, SMS et/ou courrier postal un QR Code envoyé par la plateforme SI-DEP (et non de votre laboratoire) si vos coordonnées ont été correctement saisies au moment du prélèvement.\nCe QR Code peut être soit rentré directement en cliquant sur le lien, soit scanné dans l'application, ou rentré manuellement en saisissant le code à 32 caractères situé sous le QR Code.",
    "myHealthController.message.youHaveSymptoms.subtitle":"Vous souhaitez savoir quel comportement adopter ?\nCe questionnaire est là pour vous orienter.",
-   "declareController.button.flash":"Scanner le QR code",
+   "declareController.button.flash":"Scanner le QR Code",
    "declareController.button.tap":"Saisir le code",
    "myHealthController.button.myConditionInformation":"M’informer sur mon état de santé",
    "myHealthController.button.myConditionInformation.url":"https://orientation.covid19.etalab.gouv.fr/",
@@ -91,12 +91,12 @@
    "myHealthController.step.appointment.subtitle":"Pour savoir quel jour serait le plus adéquat pour vous faire tester en fonction de votre situation, actualisez votre état dans le module \"Recommandation isolement\". Vous bénéficiez d’un accès prioritaire au test.\n\nContactez votre médecin traitant en cas de doute. Si vous n’avez pas de médecin, appelez le numéro suivant afin d’être orienté vers un médecin (service gratuit + appel gratuit)",
    "myHealthController.step.appointment.buttonTitle":"Appeler le 0 800 130 000",
    "enterCodeController.title":"Votre code",
-   "enterCodeController.mainMessage.title":"Veuillez utiliser le code que vous avez reçu via SI-DEP avec votre résultat de test (sous votre QR code) ou par la personne ayant réalisé le test (code à 6 caractères valable 1h).",
+   "enterCodeController.mainMessage.title":"Veuillez utiliser le code que vous avez reçu via SI-DEP avec votre résultat de test (sous votre QR Code) ou par la personne ayant réalisé le test (code à 6 caractères valable 1h).",
    "enterCodeController.mainMessage.subtitle":"Ces codes sont aléatoires et ne contiennent aucune information personnelle.",
    "enterCodeController.button.validate":"Valider",
    "enterCodeController.textField.placeholder":"Saisir le code ici",
    "enterCodeController.noCodeEnteredAlert.message":"Vous devez saisir le code pour pouvoir continuer",
-   "scanCodeController.explanation":"Approchez votre téléphone du QR code qui figure sur votre document SI-DEP (code anonyme sans information personnelle)",
+   "scanCodeController.explanation":"Approchez votre téléphone du QR Code qui figure sur votre document SI-DEP (code anonyme sans information personnelle)",
    "common.about":"À propos",
    "common.delete":"Supprimer",
    "common.keep":"Conserver",
@@ -191,7 +191,7 @@
    "proximityController.button.activateProximity":"J’active TousAntiCovid",
    "proximityController.button.deactivateProximity":"Je désactive TousAntiCovid",
    "scanCodeController.camera.authorizationNeeded.title":"Autorisation nécessaire",
-   "scanCodeController.camera.authorizationNeeded.message":"Vous avez refusé les permissions pour utiliser la caméra. Pour scanner un QR code, il faut autoriser cette permission dans les réglages de l’iPhone.",
+   "scanCodeController.camera.authorizationNeeded.message":"Vous avez refusé les permissions pour utiliser la caméra. Pour scanner un QR Code, il faut autoriser cette permission dans les réglages de l’iPhone.",
    "notification.channel.error.title":"Erreur détectée",
    "notification.error.title":"TousAntiCovid a besoin de vous",
    "notification.error.message":"Relancez TousAntiCovid dès que possible pour assurer son bon fonctionnement. Merci !",
@@ -207,7 +207,7 @@
    "onboarding.noBleController.mainMessage.subtitle":"Vous pouvez tout de même agir contre la COVID-19 en partageant cette application. Plus elle est utilisée largement, plus elle est efficace.\nInformez vos proches et vos connaissances !",
    "onboarding.noBleController.accept":"Partager l'application",
    "onboarding.noBleController.infos":"Smartphones compatibles",
-   "onboarding.noBleController.infosUrl":"https://app.stopcovid.gouv.fr/json/version-26/devices.html",
+   "onboarding.noBleController.infosUrl":"https://app.tousanticovid.gouv.fr/json/version-29/devices.html",
    "common.error.unauthorized":"Vous n'avez pas les permissions requises pour effectuer cette action.",
    "common.error.unknown":"Une erreur est survenue.",
    "common.error.proximityUnknown":"Une erreur Bluetooth est survenue.",
@@ -297,7 +297,7 @@
    "home.infoSection.readAll":"Lire toutes les actualités",
    "home.infoSection.keyFigures":"Chiffres clés",
    "home.infoSection.figures.registered":"Enregistrés",
-   "home.infoSection.figures.qrCodes":"QR codes",
+   "home.infoSection.figures.qrCodes":"QR Codes",
    "home.infoSection.figures.notified":"Notifiés",
    "home.infoSection.seeAll":"Voir tous les chiffres",
    "home.declareSection.title":"Me déclarer",
@@ -316,6 +316,7 @@
    "home.healthSection.noContact.cellSubtitle":"Appuyez pour avoir des conseils, savoir où se faire dépister, et plus",
    "home.healthSection.contact.cellTitle":"Alerte : exposition à risque détectée",
    "home.healthSection.contact.cellSubtitle":"Consultez nos recommandations",
+   
    "keyfigure.registered.label":"Enregistrements nets",
    "keyfigure.registered.description":"Le nombre de personnes qui ont téléchargé et activé l’application depuis le 2 juin 2020.",
    "keyfigure.notification.label":"Notifiés par l’application",
@@ -372,6 +373,7 @@
    "keyFiguresController.title":"Chiffres clés",
    "keyFiguresController.section.health":"Situation sanitaire",
    "keyFiguresController.section.app":"Appli TousAntiCovid",
+   
    "common.thousandsSeparator":" ",
    "home.moreSection.testingSites":"Où me faire dépister ?",
    "common.justNow":"À l'instant",
@@ -401,7 +403,7 @@
    "onboarding.runWithoutBleController.mainMessage.title":"TousAntiCovid ne pourra pas détecter vos \"contacts Bluetooth\"",
    "onboarding.runWithoutBleController.mainMessage.subtitle":"Malheureusement, votre téléphone ne supporte pas intégralement le Bluetooth Low Energy, utilisé pour détecter vos \"contacts Bluetooth\". Vous pouvez néanmoins accéder au reste de l'application.",
    "onboarding.runWithoutBleController.infos":"Smartphones compatibles",
-   "onboarding.runWithoutBleController.infosUrl":"https://app.stopcovid.gouv.fr/json/version-26/devices.html",
+   "onboarding.runWithoutBleController.infosUrl":"https://app.tousanticovid.gouv.fr/json/version-29/devices.html",
    "keyFigures.update":"Donnée du : %@",
    "declareController.codeNotReceived.buttonTitle":"J'ai besoin d'aide",
    "declareController.codeNotReceived.alert.title":"J'ai besoin d'aide",
@@ -427,58 +429,6 @@
    "attestation.form.datetime.placeholder":"-",
    "attestation.form.reason.label":"Motif de déplacement",
    "attestation.form.reason.placeholder":"-",
-   
-   "attestation.form.travail.shortLabel":"1. Activité professionnelle enseignement et formation",
-   "attestation.form.travail.longLabel":"Déplacements entre le domicile et le lieu d’exercice de l’activité professionnelle ou le lieu d’enseignement et de formation, déplacements professionnels ne pouvant être différés",
-   
-   "attestation.form.achats_culturel_cultuel.shortLabel":"2. Etablissement culturel, lieu de culte, achats",
-   "attestation.form.achats_culturel_cultuel.longLabel":"Déplacements pour se rendre dans un établissement culturel autorisé ou un lieu de culte ; déplacements pour effectuer des achats de biens, pour des services dont la fourniture est autorisée, pour les retraits de commandes et les livraisons à domicile",
-   
-   "attestation.form.sante.shortLabel":"2. Consultations et soins",
-   "attestation.form.sante.longLabel":"Déplacements pour des consultations, examens, actes de prévention (dont vaccination) et soins ne pouvant être assurés à distance ou pour l’achat de produits de santé",
-   
-   "attestation.form.famille.shortLabel":"3. Motif familial impérieux, personnes vulnérables ou précaires ou gardes d'enfants",
-   "attestation.form.famille.longLabel":"Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou précaires ou pour la garde d’enfants",
-   
-   "attestation.form.handicap.shortLabel":"4. Situation de handicap",
-   "attestation.form.handicap.longLabel":"Déplacements des personnes en situation de handicap et de leur accompagnant",
-   
-   "attestation.form.sport_animaux.shortLabel":"Déplacements 3h, 20km",
-   "attestation.form.sport_animaux.longLabel":"Déplacements en plein air ou vers un lieu de plein air, sans changement du lieu de résidence, dans la limite de trois heures quotidiennes et dans un rayon maximal de vingt kilomètres autour du domicile, liés soit à l’activité physique ou aux loisirs individuels, à l’exclusion de toute pratique sportive collective et de toute proximité avec d’autres personnes, soit à la promenade avec les seules personnes regroupées dans un même domicile, soit aux besoins des animaux de compagnie",
-   
-   "attestation.form.convocation.shortLabel":"5. Convocation judiciaire ou administrative",
-   "attestation.form.convocation.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative",
-   
-   "attestation.form.judiciaire.shortLabel":"5. Convocation judiciaire ou administrative",
-   "attestation.form.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative",
-   
-   "attestation.form.missions.shortLabel":"6. Missions d'intérêt général",
-   "attestation.form.missions.longLabel":"Déplacements pour participer à des missions d’intérêt général sur demande de l’autorité administrative",
-   
-   "attestation.form.transits.shortLabel":"7. Déplacements de transit et longue distance",
-   "attestation.form.transits.longLabel":"Déplacements liés à des transits ferroviaires, aériens ou en bus pour des déplacements de longues distances",
-   "attestation.form.transit.shortLabel":"7. Déplacements de transit et longue distance",
-   "attestation.form.transit.longLabel":"Déplacements liés à des transits ferroviaires, aériens ou en bus pour des déplacements de longues distances",
-   
-   
-   "attestation.form.animaux.shortLabel":"8. Animaux de compagnie",
-   "attestation.form.animaux.longLabel":"Déplacements brefs autour du domicile pour les besoins des animaux de compagnie [2]",
-   
-   "attestation.form.enfants.shortLabel":"Enfants à l’école",
-   "attestation.form.enfants.longLabel":"Déplacements pour chercher les enfants à l’école et à l’occasion de leurs activités périscolaires",
-  
-   "attestation.form.courses.shortLabel":"9. Achats",
-   "attestation.form.courses.longLabel":"Déplacements pour effectuer des achats de fournitures nécessaires à l'activité professionnelle, des achats de première nécessité, des retraits de commandes, des livraisons à domicile, ainsi que pour les déménagements\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
-   
-   "attestation.form.sport.shortLabel":"10. Activités physiques",
-   "attestation.form.sport.longLabel":"Déplacements brefs, dans la limite d'une heure quotidienne et dans un rayon maximal de cinq kilomètres autour du domicile, liés soit à l'activité physique individuelle des personnes, à l'exclusion de toute pratique sportive collective et de toute proximité avec d'autres personnes, soit à la promenade avec les seules personnes regroupées dans un même domicile [3]\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
-  
-   "attestation.form.rassemblement.shortLabel":"11. Participation à des rassemblements autorisés",
-   "attestation.form.rassemblement.longLabel":"Déplacements à destination ou en provenance d'un lieu de culte, participation à des rassemblements, réunions ou activités sur la voie publique ou dans un lieu ouvert au public qui ne sont pas interdits en application de l'article 3\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
-   
-   "attestation.form.demarche.shortLabel":"12. Démarches administratives ou juridiques",
-   "attestation.form.demarche.longLabel":"Déplacements pour se rendre dans un service public ou chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance.\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
-  
      
    "accessibility.keyFigures.noValueAvailable":"Information non disponible",
    "accessibility.hint.keyFigure.share":"Partager le chiffre clé",
@@ -513,18 +463,18 @@
    "newAttestationController.generate.alert.validate":"Je certifie",
    "newAttestationController.missingInfo.alert.title":"Attention",
    "newAttestationController.missingInfo.alert.message":"Vous devez remplir tous les champs pour pouvoir générer une attestation.",
-   "attestationController.footer":"Ou vous pouvez également utiliser le site web du Ministère de l’Intérieur pour générer l’attestation PDF :",
+   "attestationController.footer":"Vous pouvez également utiliser l'attestation sur le site web du Ministère de l’Intérieur :",
    "attestationsController.validAttestationsSection.title":"Mes attestations",
-   "attestationsController.validAttestationsSection.subtitle":"En cas de contrôle, vous pouvez appuyer sur un QR code pour l'afficher en plein écran, avec les détails.",
+   "attestationsController.validAttestationsSection.subtitle":"En cas de contrôle, vous pouvez appuyer sur un QR Code pour l'afficher en plein écran, avec les détails.",
    "attestationsController.expiredSection.title":"Expirées",
    "attestationsController.expiredSection.subtitle":"Ces attestations seront supprimées automatiquement (dans 24h minimum, à la prochaine ouverture). Vous pouvez supprimer entièrement ces données à tout moment dans la section \"Paramètres\" de l'application.",
    "attestationsController.menu.share":"Partager l'attestation",
    "attestationsController.menu.share.text":"Voici une attestation de déplacement de #TousAntiCovid",
-   "newAttestationController.header":"En application du décret n°2020-1310 du 29 octobre 2020 prescrivant les mesures générales nécessaires pour faire face à l'épidémie de Covid19 dans le cadre de l'état d'urgence sanitaire",
+   "newAttestationController.header":"En application de l’article 4 du décret n°2020-1310 du 29 octobre 2020 prescrivant les mesures générales nécessaires pour faire face à l’épidémie de COVID-19 dans le cadre de l’état d’urgence sanitaire",
    "newAttestationController.generate.error.alert.title":"Attention",
    "newAttestationController.generate.error.alert.message":"Il y a eu une erreur lors de la génération de l'attestation",
    "accessibility.hint.otherActions":"Autres actions",
-   "attestationFieldItemChoiceController.footer":"Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.\n\n[1] Motifs supplémentaires applicables uniquement de 6h à 18h dans les territoires soumis à un confinement le week-end\n\n[2] La distance autorisée pour ces déplacements peut varier.\n\n[3] La distance et la durée autorisées peuvent varier en fonction des mesures locales.",
+   "attestationFieldItemChoiceController.footer":"Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.",
    
    "keyFiguresController.explanation":"Plus d'infos",
    "keyFiguresController.explanation.alert.title":"Les chiffres clés",
@@ -536,8 +486,8 @@
    "home.healthSection.isSick.title":"Prenez soin de vous",
    "home.healthSection.isSick.subtitle":"En savoir plus",
    "myHealthController.sick.title":"Recommandations sanitaires",
-   "home.attestationSection.title":"Attestation",
-   "home.attestationSection.cell.title":"Vos attestations (couvre-feu et confinement week-end)",
+   "home.attestationSection.title":"Attestations & Carnet",
+   "home.attestationSection.cell.title":"Mes attestations",
    "home.attestationSection.cell.subtitle.noAttestations":"Appuyez ici",
    "home.attestationSection.cell.subtitle.oneAttestation":"1 attestation",
    "home.attestationSection.cell.subtitle.multipleAttestations":"%d attestations",
@@ -566,48 +516,48 @@
    "sendHistoryController.successAlert.button.learnMore": "En savoir plus",
    
    "keyFiguresExplanationsController.title": "Explication des chiffres",
-   "keyFiguresController.section.health.subtitle": "Appuyez sur \"en savoir plus\" pour découvrir la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
+   "keyFiguresController.section.health.subtitle": "⚠️ A partir d’aujourd’hui, la semaine glissante d’étude n’inclut pas le lundi de pâques, et sa comparaison avec les 7 jours précédents, qui inclut le lundi de pâques, est à faire avec prudence et n’est pas à considérer comme une hausse exceptionnelle du nombre de cas.\n\nAppuyez sur \"en savoir plus\" pour découvrir la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
    "keyFiguresController.section.health.button": "En savoir plus",
 
    "home.activation.sick.alert.title": "Informations",
    "home.activation.sick.alert.message": "Vous ne pouvez pas activer l’alerte en cas d’exposition à la COVID-19 pendant 2 mois après votre déclaration de positivité au COVID-19.\n\nEn effet, pendant les 2 mois suivant un test positif à la COVID-19, vous ne serez pas considéré comme \"à risque de contamination\".",
    "common.error.secretKey": "Échec de décryption de la base. Essayez à nouveau ou redémarrez votre téléphone.",
    
-   "home.venuesSection.title": "Lieux",
-   "home.venuesSection.recordCell.title": "Scanner un QR code lieu",
-   "home.venuesSection.recordCell.subtitle": "Soyez alerté en cas d'exposition dans un lieu (en cours de déploiement)",
+   "home.venuesSection.title": "TousAntiCovid Signal",
+   "home.venuesSection.recordCell.title": "Scanner un QR Code lieu",
+   "home.venuesSection.recordCell.subtitle": "Soyez alerté en cas d'exposition dans un lieu (en cours d'expérimentation)",
    "home.venuesSection.privateCell.title": "Vous organisez un événement privé ?",
    "home.venuesSection.privateCell.subtitle": "Créez votre propre code, permettant de protéger vos invités",
-   "home.moreSection.venuesHistory": "Historique des lieux",
-   "venuesRecording.onboardingController.title": "Lieux",
-   "venuesRecording.onboardingController.mainMessage.title": "Pour être informé et informer les autres en cas d’exposition à la COVID-19 dans un lieu, nous avons besoin de vous",
-   "venuesRecording.onboardingController.mainMessage.message": "En scannant les QR Codes affichés dans les lieux lorsque vous y rentrez, vous pourrez être informé si quelqu’un a été testé positif et se déclare positif dans l’appli et qu’il a fréquenté le même lieu que vous lorsqu’il était contagieux.\n\nEt si vous vous déclarez positif dans l'appli, vous informerez anonymement toutes les personnes qui étaient dans ce lieu en même temps que vous quand vous étiez contagieux.\n\n👉🏻 En phase de pré-lancement, seulement un nombre limité de lieux présente ces QR Codes pour l'instant, pour accompagner la réouverture des lieux en fonction de la situation sanitaire et des mesures prises par les autorités.",
+   "home.moreSection.venuesHistory": "Journal des visites de lieux",
+   "venuesRecording.onboardingController.title": "TousAntiCovid Signal",
+   "venuesRecording.onboardingController.mainMessage.title": "Rompre les chaînes de transmission dans les lieux recevant du public et lors d’événements",
+   "venuesRecording.onboardingController.mainMessage.message": "TousAntiCovid Signal permet d’être alerté et d’alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\nPour cela vous devez scanner le QR Code affiché à l’entrée des lieux qui ont mis en place ce dispositif. Si vous êtes testé positif à la COVID-19, n’oubliez pas de vous déclarer positif dans l’application pour informer les autres utilisateurs.\n\nCe dispositif est anonyme, aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes présentes. Le nom et l’adresse du lieu ne sont pas contenus dans le QR Code.\n\n👉 Cette nouvelle fonctionnalité est en phase d'expérimentation dans un nombre limité de lieux pour l’instant.",
    "venuesRecording.onboardingController.button.participate": "Je participe",
-   "venuesRecording.confirmationController.title": "Lieu enregistré",
+   "venuesRecording.confirmationController.title": "Ajouté",
    "erp.confirmationMessage.default.title": "Merci !",
-   "erp.confirmationMessage.default.message": "Merci d'avoir ajouté ce lieu à votre historique, vous serez prévenu si vous avez été en contact avec une personne positive dans ce lieu.",
-   "manageDataController.venuesData.title":"Mes données \"lieux\"",
-   "manageDataController.venuesData.subtitle":"Cette opération effacera toutes les données de votre téléphone liées aux lieux pour lesquels vous avez scanné des QR codes.",
-   "manageDataController.venuesData.button":"Effacer l'historique des lieux",
+   "erp.confirmationMessage.default.message": "Vous avez bien ajouté ce lieu dans votre journal.\n\nVous serez alerté et pourrez alerter les autres de manière anonyme en cas d’exposition possible à la COVID-19 lors de votre visite dans ce lieu.",
+   "manageDataController.venuesData.title":"Mes données \"visites de lieux\"",
+   "manageDataController.venuesData.subtitle":"Cette opération effacera toutes les données de votre téléphone liées aux visites de lieux.",
+   "manageDataController.venuesData.button":"Effacer le journal",
    "manageDataController.venuesData.confirmationDialog.title":"Confirmation",
-   "manageDataController.venuesData.confirmationDialog.message":"Confirmez-vous vouloir supprimer l'historique des lieux que vous avez visités ? Cette action est irréversible.",
+   "manageDataController.venuesData.confirmationDialog.message":"Confirmez-vous vouloir supprimer le journal des lieux que vous avez visités ? Cette action est irréversible. Vous ne pourrez pas être prévenu en cas d’exposition lors de ces visites.",
    
-   "venueFlashCodeController.title": "Scannez le QR code",
-   "venueFlashCodeController.explanation": "Approchez votre téléphone du QR code indiqué par le lieu.",
+   "venueFlashCodeController.title": "Scannez le QR Code",
+   "venueFlashCodeController.explanation": "Scanner le QR Code pour enregistrer votre visite dans ce lieu.",
    "venueFlashCodeController.alert.invalidCode.title": "Code invalide",
    "venueFlashCodeController.alert.invalidCode.message": "Le code n'est pas valide. Veuillez essayer à nouveau.",
    "home.moreSection.appSharing": "Je partage TousAntiCovid",
    
-   "venuesHistoryController.title": "Historique des lieux",
-   "venuesHistoryController.noVenuesEmptyView.title": "Aucun lieu n'est enregistré sur votre téléphone. À noter que les lieux sont effacés au bout de 14 jours.",
+   "venuesHistoryController.title": "Journal des visites",
+   "venuesHistoryController.noVenuesEmptyView.title": "Vous n’avez enregistré aucune visite de lieu dans votre journal.\nLes visites de plus de 14 jours sont automatiquement effacées.",
    "venuesHistoryController.entry": "%@ : %@",
   
    "venueType.default" : "Lieu",
    
-   "onboarding.venuesController.title":"Lieux",
+   "onboarding.venuesController.title":"TousAntiCovid Signal",
    "onboarding.venuesController.bottomButton":"Continuer",
    "onboarding.venuesController.mainMessage.title":"Rompre les chaînes de transmission dans les lieux recevant du public et lors d’événements",
-   "onboarding.venuesController.mainMessage.subtitle":"En scannant les QR Codes affichés dans les lieux lorsque vous y rentrez, vous pourrez être informé si quelqu’un se déclare positif dans l'appli et qu’il a fréquenté le même lieu que vous lorsqu’il était contagieux.\n\nEt si vous vous déclarez positif dans l'appli, vous informerez anonymement toutes les personnes qui étaient dans ce lieu en même temps que vous quand vous étiez contagieux.\n\n👉🏻 En phase de pré-lancement, seulement un nombre limité de lieux présente ces QR Codes pour l'instant, pour accompagner la réouverture des lieux en fonction de la situation sanitaire et des mesures prises par les autorités.",
+   "onboarding.venuesController.mainMessage.subtitle":"TousAntiCovid Signal permet d’être alerté et d’alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\nPour cela vous devez scanner le QR Code affiché à l’entrée des lieux qui ont mis en place ce dispositif. Si vous êtes testé positif à la COVID-19, n’oubliez pas de vous déclarer positif dans l’application pour informer les autres utilisateurs.\n\nCe dispositif est anonyme, aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes présentes. Le nom et l’adresse du lieu ne sont pas contenus dans le QR Code.\n\n👉 Cette nouvelle fonctionnalité est en phase d'expérimentation dans un nombre limité de lieux pour l’instant.",
    
    "home.healthSection.warningContact.cellTitle": "Info : possible exposition à risque",
    "home.healthSection.warningContact.cellSubtitle": "Consultez nos recommandations",
@@ -617,7 +567,7 @@
    
    "venuesPrivateEventController.title": "Événement privé",
    "venuesPrivateEventController.mainMessage.title": "Voici un code pour votre événement privé, valable aujourd'hui",
-   "venuesPrivateEventController.mainMessage.subtitle": "Pour vous protéger collectivement et anonymement, vos convives peuvent scanner ce QR code avec TousAntiCovid.\nOu bien vous pouvez leur partager ce lien en appuyant sur le bouton \"Partager\".",
+   "venuesPrivateEventController.mainMessage.subtitle": "Pour vous protéger collectivement et anonymement, vos convives peuvent scanner ce QR Code avec TousAntiCovid.\nOu bien vous pouvez leur partager ce lien en appuyant sur le bouton \"Partager\".",
    "venuesPrivateEventController.button.sharedCode": "Partager ce code",
    "venuesPrivateEventController.button.generateNewCode": "Générer un nouveau code",
    "venuesPrivateEventController.sharing.text": "Voici un lien pour se protéger tous collectivement et anonymement :",
@@ -737,8 +687,8 @@
    "isolationFormController.footer.title": "Veuillez bien répondre aux questions du formulaire pour qu'on puisse vous faire des recommandations sur votre durée d’isolement.",
    
    "declareController.codeNotReceived.alert.contactUs": "Nous contacter",
-   "venuesHistoryController.footer": "Cet historique des lieux vous permettra d'être averti si vous avez fréquenté le même lieu ou événement qu’un utilisateur contagieux qui se déclare positif dans l’appli.\nTous les lieux de plus de 14 jours sont effacés automatiquement à chaque ouverture de l'application.",
-   "venuesHistoryController.delete.alert.title": "Souhaitez-vous supprimer ce lieu ou événement ?",
+   "venuesHistoryController.footer": "Ce journal des visites de lieux permettra d'être averti si vous avez fréquenté le même lieu ou événement qu’un utilisateur contagieux qui se déclare positif dans l’appli.\n\nToutes les visites de lieux de plus de 14 jours sont effacées automatiquement à chaque ouverture de l'application.",
+   "venuesHistoryController.delete.alert.title": "Souhaitez-vous supprimer cette visite de lieu ?",
    "venuesHistoryController.delete.alert.message": "Une fois supprimé, si une personne qui a fréquenté ce lieu en même temps que vous se déclare positif, alors vous ne serez pas notifié.",
    "manageDataController.isolationData.title":"Mes données \"isolement\"",
    "manageDataController.isolationData.subtitle":"Vous pouvez supprimer les données de votre téléphone liées aux informations d’isolement.",
@@ -746,34 +696,34 @@
    "manageDataController.isolationData.confirmationDialog.title":"Confirmation",
    "manageDataController.isolationData.confirmationDialog.message":"Confirmez-vous vouloir supprimer toutes les données liées à l'isolement ?",
    "confirmVenueQrCodeController.title":"Confirmation",
-   "confirmVenueQrCodeController.explanation.title":"En ajoutant ajoutant ce lieu, vous pourrez être averti si vous avez fréquenté le même lieu ou événement qu’un utilisateur contagieux qui se déclare positif dans l’appli.\n\nEt si vous vous déclarez positif, vous informerez anonymement toutes les personnes qui étaient dans ce lieu ou événement en même temps que vous lorsque vous étiez contagieux.",
-   "confirmVenueQrCodeController.explanation.subtitle":"Confirmez-vous l'ajout de ce lieu ou événement à votre historique ?",
+   "confirmVenueQrCodeController.explanation.title":"En ajoutant cette visite de lieu, vous pourrez être averti et avertir anonymement en cas de risque d'exposition à la COVID-19.",
+   "confirmVenueQrCodeController.explanation.subtitle":"Confirmez-vous l'ajout de cette visite de lieu à votre journal ?",
    "confirmVenueQrCodeController.confirm":"Ajouter",
    
    "home.vaccinationSection.cellTitle": "Je me fais vacciner !",
    "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez un centre près de chez vous pour vous faire vacciner.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Suis-je prioritaire pour me faire vacciner ?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- NOUVEAU 👉 Les personnes de 50 à 64 ans inclus, souffrant d’une ou plusieurs des comorbidités (appuyez sur \"En savoir plus\" pour plus de détails)\n- Les résidents de 60 ans et plus dans les foyers de travailleurs migrants (FTM)\n- Les professionnels du secteur de la santé et du secteur médico-social appartenant aux catégories prioritaires (appuyez sur \"En savoir plus\" pour plus de détails),\n- Les personnes âgées de plus de 75 ans,\n- Les personnes vulnérables ayant une pathologie qui les expose à un très haut risque face à la Covid-19 disposant d’une ordonnance médicale pour se faire vacciner prioritairement,\n- Les personnes âgées résidant en établissements (par exemple EHPAD, USLD),\n- Les personnes en situation de handicap hébergées en établissement",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- les personnes de 55 ans et plus, quels que soient leur lieu de vie et leur état de santé (avec ou sans comorbidités)\n- les femmes enceintes à partir du deuxième trimestre de la grossesse ;\n- les résidents en établissements (par exemple Ehpad, USLD)\n- les personnes de plus de 18 ans ayant une pathologie qui les expose à un très haut risque face à la Covid-19 ;\n- les personnes de 50 à 54 ans inclus, souffrant d’une ou plusieurs comorbidités\n- les personnes en situation de handicap hébergées en établissements\n- les résidents de 60 ans et plus dans les foyers de travailleurs migrants\n- les professionnels du secteur de la santé et du secteur médico-social appartenant aux catégories prioritaires.\n\nAppuyez sur \"En savoir plus\" pour plus de détails.",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
-   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/grands-dossiers/vaccin-covid-19/article/la-strategie-vaccinale-et-la-liste-des-publics-prioritaires",
+   "vaccinationController.eligibility.url": "https://www.gouvernement.fr/info-coronavirus/vaccins#tac",
    "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
    "vaccinationController.vaccinationLocation.subtitle": "Rendez vous sur www.Santé.fr pour trouver les centres de vaccination.",
    "vaccinationController.vaccinationLocation.buttonTitle": "Aller sur Santé.fr",
-   "vaccinationController.vaccinationLocation.url": "https://www.sante.fr/carte-vaccination-covid?source=TousAntiCovid",
+   "vaccinationController.vaccinationLocation.url": "https://www.sante.fr/cf/centres-vaccination-covid.html?source=TousAntiCovid",
    "contactUs.url": "https://bonjour.tousanticovid.gouv.fr/contact.html",
    
    "keyfigure.nombrevaccinations.colorCode.light":"#34C859",
    "keyfigure.nombrevaccinations.colorCode.dark":"#31D158",
    "keyfigure.nombrevaccinations.label":"Nombre total de personnes vaccinées",
    "keyfigure.nombrevaccinations.shortLabel":"Total vaccinés",
-   "keyfigure.nombrevaccinations.description":"Cet indicateur représente le nombre total de personnes primo-vaccinées (personnes ayant reçu une première injection). Les données sont consolidées le lendemain de leur remontée pour tenir compte des dernières données de vaccination de la veille au soir.",
+   "keyfigure.nombrevaccinations.description":"Cet indicateur représente le nombre total de personnes primo-vaccinées (personnes ayant reçu une première injection).\nLes données sont consolidées le lendemain de leur remontée pour tenir compte des dernières données de vaccination de la veille au soir.",
    "enterCodeController.alert.expiredCode.title":"Expiré",
    "enterCodeController.alert.expiredCode.message":"Votre présence dans ce lieu date de plus de 14 jours. Il n'est donc plus utile d'un point de vue sanitaire de l'ajouter à votre historique.",
    
    "keyFigureDetailController.section.evolution.title": "Evolution",
    "keyFigureDetailController.section.evolution.chartInfos": "%@ : %d dernières valeurs depuis le %@",
-   "keyfigure.nombrecas.learnMore":"Le nombre de nouveaux cas est un indicateur arrêté à J-1, donc sans le recul et la contextualisation nécessaires pour affirmer qu’il représente complètement la situation sanitaire ; il est très sensible aux variations quotidiennes des activités de dépistage qui sont remontées à Santé publique France et ne constitue pas un bon reflet de la situation sanitaire.\n\nLes données rapportées en début de semaine sont souvent moins élevées en raison d’une diminution des activités liées au dépistage le week-end.\n\nCet indicateur est seulement disponible au niveau national et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.\n\n👉🏻 L’indicateur \"Nouveaux cas prélevés J-3\" apporte plus de précision grâce au recul de 3 jours qui permet une remontée des données plus complète.\nVous y trouverez également une courbe avec des données lissées permettant de lire la tendance sur le nombre de nouveaux cas rapportés par jour au niveau national.",
+   "keyfigure.nombrecas.learnMore":"Le nombre de nouveaux cas est un indicateur arrêté à J-1, donc sans le recul et la contextualisation nécessaires pour affirmer qu’il représente complètement la situation sanitaire ; il est très sensible aux variations quotidiennes des activités de dépistage qui sont remontées à Santé publique France et ne constitue pas un bon reflet de la situation sanitaire.\n\nLes données rapportées en début de semaine sont souvent moins élevées en raison d’une diminution des activités liées au dépistage le week-end.\n\nCet indicateur est seulement disponible au niveau national et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.\n\n👉 L’indicateur \"Nouveaux cas prélevés J-3\" apporte plus de précision grâce au recul de 3 jours qui permet une remontée des données plus complète.\nVous y trouverez également une courbe avec des données lissées permettant de lire la tendance sur le nombre de nouveaux cas rapportés par jour au niveau national.",
    "keyFigureDetailController.section.learnmore.title": "En savoir plus",
    
    "keyfigure.registered.shortLabel":"Enregistrements",
@@ -787,7 +737,7 @@
    "home.activationExplanation.message": "Votre téléphone ne supportant pas complètement le Bluetooth Low Energy (BLE), TousAntiCovid va  redémarrer le Bluetooth de votre téléphone assez fréquemment pour fonctionner correctement.",
    "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé",
    
-   "keyfigure.nombrevaccinations.learnMore":"Le nombre cumulé de personnes vaccinées en France est obtenu quotidiennement via l’outil \"Vaccin Covid\" dans lequel le nombre de personnes vaccinées est enregistré directement. Les données sont ensuite consolidées par Santé publique France puis publiées sur data.gouv. Les données sont disponibles au niveau régional et national de manière quotidienne.",
+   "keyfigure.nombrevaccinations.learnMore":"Le nombre cumulé de personnes vaccinées en France est obtenu quotidiennement via l’outil \"Vaccin Covid\" dans lequel le nombre de personnes vaccinées est enregistré directement.\n\nLes données sont ensuite consolidées par Santé publique France puis publiées sur data.gouv.\n\nLes données sont disponibles au niveau régional et national de manière quotidienne.",
 
 	  "vaccinationController.vaccinationLocation.newPostalCode": "Renseigner un code postal",
 	  "vaccinationController.vaccinationLocation.updatePostalCode": "Changer de code postal",
@@ -814,7 +764,7 @@
    "proximityController.error.noAdvertising": "Votre téléphone ne possédant pas le Bluetooth advertising, il n'est pas compatible avec l’alerte des personnes contacts via Bluetooth malheureusement.",
    "common.privacyPolicy": "https://bonjour.tousanticovid.gouv.fr/privacy.html#camera",
    
-   "keyfigure.tauxincidence.learnMore" : "Le taux d’incidence est arrêté à J-3 et calculé sur la moyenne des 7 derniers jours [J-9 ; J-3] afin de mieux prendre en compte la fluctuation de remontée des données.\n\nIl est exprimé pour 100 000 habitants et permet de comparer des zones géographiques entre elles.\n\nLe taux d’incidence est disponible au niveau national (France métropolitaine) et au niveau départemental (départements métropolitains et ultra-marins) et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.",
+   "keyfigure.tauxincidence.learnMore" : "Le taux d’incidence est arrêté à J-3 et calculé sur la somme du nombre de nouvelles personnes testées positives des 7 derniers jours [J-9 ; J-3] afin de mieux prendre en compte la fluctuation de remontée des données.\n\nIl est exprimé pour 100 000 habitants et permet de comparer des zones géographiques entre elles.\n\nLe taux d’incidence est disponible au niveau national (France métropolitaine) et au niveau départemental (départements métropolitains et ultra-marins) et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.",
    
   "keyfigure.tauxpositivite.learnMore": "Le taux de positivité est arrêté à J-3 et calculé sur la moyenne des 7 derniers jours [J-9 ; J-3] afin de mieux prendre en compte la fluctuation de remontée des données.\n\nLe taux de positivité est disponible au niveau national (France métropolitaine) et au niveau départemental (départements métropolitains et ultra-marins) et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.",
   
@@ -828,13 +778,13 @@
    "common.updatePostalCode":"Code postal: %@",
    "common.updatePostalCode.end":"Changer",
 
-   "myHealthStateHeaderCell.exposureDate.title": "Date d'exposition approximative :",
+   "myHealthStateHeaderCell.exposureDate.title": "Date de contact approximative :",
    "myHealthStateHeaderCell.exposureDate.range": "Entre le %@ et %@",
     
-   "notification.lowRisk.title":"Info : contacts",
-   "notification.lowRisk.message":"Vous avez des contacts avec des personnes qui se sont déclarées positifs COVID-19, sans risque. Continuez de bien respecter les mesures barrières !",
+   "notification.lowRisk.title":"Info : restez vigilant",
+   "notification.lowRisk.message":"Restez vigilant, vous croisez régulièrement des personnes positives et contagieuses. Continuez de bien respecter les mesures barrières !",
    
-   "notification.atHighWarning.title": "Alerte : exposition à risque",
+   "notification.atHighWarning.title": "Alerte : contact à risque dans un lieu",
    "notification.atHighWarning.message": "Vous avez fréquenté le même lieu ou événement qu’au moins un utilisateur testé positif à la COVID-19 et contagieux ces derniers jours. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
    
    "manageDataController.hideStatus.title": "Mon statut de risque",
@@ -842,7 +792,7 @@
    "manageDataController.hideStatus.button": "Masquer mon statut",
 	
 	"risk.section.measures.title" : "Respectez les mesures barrières",
-	"risk.section.measures.body" : "Veuillez à respecter les mesures barrières pour freiner la propagation du virus.",
+	"risk.section.measures.body" : "Veillez à respecter les mesures barrières pour freiner la propagation du virus.",
 	"risk.section.measures.button" : "Les mesures barrières",
 	
 	"risk.section.mcc.title" : "Mes Conseils Covid",
@@ -854,60 +804,245 @@
 	"risk.section.limit.body" : "Veillez à limiter vos contacts en particulier avec les personnes à risque de forme grave.",
 	
 	"risk.section.test.title" : "Faites-vous tester",
-	"risk.section.test.body" : "Pour savoir quel jour est le plus adéquat pour vous faire tester en fonction de votre situation, actualisez votre état dans le module \"Recommandation isolement et test\". Vous bénéficiez d'un accès prioritaire au test.\n\nContactez votre médecin traitant en cas de doute.\n\nSi vous n'avez pas de médecin, appelez le 0 800 130 000 afin d'être orienté vers un médecin (service gratuit + appel gratuit).",
+	"risk.section.test.body" : "Vous bénéficiez d'un accès prioritaire au test. Il vous est recommandé de vous faire tester immédiatement et 7 jours après votre date de contact.\n\nPour savoir quel jour est le plus adéquat pour vous faire tester en fonction de votre situation, actualisez votre état dans le module \"Recommandation isolement\".\n\nContactez votre médecin traitant en cas de doute.\n\nSi vous n'avez pas de médecin, appelez le 0 800 130 000 afin d'être orienté vers un médecin (service gratuit + appel gratuit).",
 	"risk.section.test.button":"Trouver un centre",
 	"risk.section.test.url":"https://www.sante.fr/covid19/external/depistage?source=TousAntiCovid",
 	
+	"risk0.section.test.title" : "Où se faire dépister",
+	"risk0.section.test.body" : "Pour trouver où se faire dépister, rendez vous sur Santé.fr.",
+	
+	
 	"risk.section.symptoms.title" : "Apparition de symptômes",
-	"risk.section.symptoms.body" : "En cas de doute, n'hésitez pas à effectuer le questionnaire d'orientation sur Mes Conseils Covid ou appeler votre médecin.\n\nSi vous avez des symptômes compatibles avec la COVID-19, vous pouvez également actualiser votre état dans le module \"Recommandation isolement et test\" afin de savoir si votre durée d'isolement doit être modifiée.",
+	"risk.section.symptoms.body" : "En cas de doute, n'hésitez pas à effectuer le questionnaire d'orientation sur Mes Conseils Covid ou appeler votre médecin.\n\nSi vous avez des symptômes compatibles avec la COVID-19, vous pouvez également actualiser votre état dans le module \"Recommandation isolement\" afin de savoir si votre durée d'isolement doit être modifiée.",
 	
 	"risk.section.isolate.title" : "Isolez-vous",
 	"risk.section.isolate.body" : "Pour calculer la durée d'isolement nécessaire selon votre situation et protéger les autres, vous pouvez vous rendre sur le module \"Recommandation isolement\".\n\nVous pouvez bénéficer d'un arrêt de travail auprès de l'Assurance Maladie.\n\nVeillez à limiter vos contacts en particulier avec les personnes à risque de forme grave. Soyez extrêmement vigilant sur le respect strict des mesures barrières.",
 	
-	"risk0.home.title" : "Pas d'exposition à risque détectée",
+	"risk0.home.title" : "Pas de contact à risque détecté",
 	"risk0.home.sub" : "Appuyez pour avoir des conseils, savoir où se faire dépister et plus",
-	"risk0.details.title" : "Pas d'exposition à risque détectée",
+	"risk0.details.title" : "Pas de contact à risque détecté",
+	"risk0.widget.longTitle" : "Pas de contact à risque détecté. Appuyez pour avoir des conseils, savoir où se faire dépister et plus",
 	"risk0.details.sub" : "N'oubliez pas pour autant les mesures barrières et les recommandations sanitaires",
 	"risk0.section1.title" : "Votre risque",
-	"risk0.section1.body" : "Vous n'avez pas été à proximité d'un utilisateur testé positif et contagieux ni partagé un même lieu.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) ou dans le même lieu à risque qu'un utilisateur déclaré comme un cas de COVID-19.\n\nLa vérification de votre état se fait toutes les 24h.\n\nTousAntiCovid vous donnera alors les recommandations du ministère des Solidarités et de la Santé.",
+	"risk0.section1.body" : "Vous n'avez pas été à proximité d'un utilisateur testé positif et contagieux.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) d'un utilisateur déclaré comme un cas de COVID-19.\n\nLa vérification de votre état se fait environ toutes les 24h.\n\nTousAntiCovid vous donnera alors les recommandations du ministère des Solidarités et de la Santé.",
 	
 	"risk1.notif.title" : "Info : restez vigilant",
 	"risk1.notif.sub" : "Vous croisez régulièrement des personnes positives et contagieuses. Consultez nos recommandations.",
 	"risk1.home.title" : "Restez vigilant",
 	"risk1.home.sub" : "Vous croisez régulièrement des personnes positives et contagieuses. Consultez nos recommandations.",
-	"risk1.details.title" : "Pas d'exposition à risque détectée, mais restez vigilant",
+	"risk1.details.title" : "Pas de contact à risque détecté, mais restez vigilant",
 	"risk1.details.sub" : "N'oubliez pas les mesures barrières et les recommandations sanitaires",
 	"risk1.section1.title" : "Votre risque",
-	"risk1.section1.body" : "Vous n'avez pas été à proximité d'un utilisateur testé positif et contagieux ni déclaré avoir partagé un même lieu, mais vous croisez régulièrement des personnes positives et contagieuses.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) ou dans le même lieu à risque qu'un utilisateur déclaré comme un cas de COVID-19.\n\nLa vérification de votre état se fait toutes les 24h.\n\nTousAntiCovid vous donnera alors les recommandations du ministère des Solidarités et de la Santé.",
-	
-	
-	"risk2.notif.title" : "Info lieu",
-	"risk2.notif.sub" : "Vous avez partagé le même lieu qu'au moins une personne contagieuse. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
+	"risk1.section1.body" : "Vous n'avez pas été à proximité d'un utilisateur testé positif et contagieux, mais vous croisez régulièrement des personnes positives et contagieuses.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) ou dans le même lieu à risque qu'un utilisateur déclaré comme un cas de COVID-19.\n\nLa vérification de votre état se fait environ toutes les 24 heures.\n\nTousAntiCovid vous donnera alors les recommandations du ministère des Solidarités et de la Santé.",
+
+	"risk2.notif.title" : "Info: lieu à risque",
+	"risk2.notif.sub" : "Vous avez été exposé à un risque de contamination modéré suite à la fréquentation d’un même lieu qu'une personne contagieuse. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux",
 	"risk2.home.title" : "Info lieu : risque de contamination modéré",
 	"risk2.home.sub" : "Consultez nos recommandations",
 	"risk2.details.title" : "Vous avez fréquenté un lieu avec un risque de contamination modéré",
 	"risk2.details.sub" : "Faites-vous tester et respectez les mesures barrières !",
 	"risk2.section1.title" : "Votre risque",
-	"risk2.section1.body" : "Vous avez partagé le même lieu à risque modéré qu'au moins une personne contagieuse et qui se serait déclarée positive dans l'application.\n\nFaites-vous tester et respectez les mesures barrières!\"\n\nIl vous est recommandé de vous faire tester 7 jours après votre date d'exposition. Pour en savoir plus, allez sur le module \"recommandation isolement et test\". Vous bénéficiez d'un accès prioritaire au test.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été été dans un lieu avec un risque de contamination modéré.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) ou dans le même lieu à risque qu'un utilisateur déclaré comme un cas de COVID-19.",
+	"risk2.section1.body" : "Vous avez été exposé à un risque de contamination modéré suite à la fréquentation d’un même lieu qu’une personne contagieuse et qui s'est déclarée positive dans l'application.\n\nLa date de contact affichée est approximative à plus ou moins un jour, pour préserver l’anonymat des personnes s'étant déclarées positives.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été dans un lieu avec un risque de contamination modéré.",
 	
-	
-	"risk3.notif.title" : "Alerte lieu",
-	"risk3.notif.sub" : "Vous avez partagé le même lieu qu'au moins une personne contagieuse et qui se serait déclarée positive dans l'application. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
-	"risk3.home.title" : "Alerte : exposition à risque élevée dans un lieu",
+	"risk3.notif.title" : "Alerte : lieu à risque",
+	"risk3.notif.sub" : "Vous avez été exposé à un risque de contamination élevé suite à la fréquentation d’un même lieu qu' une personne contagieuse. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
+	"risk3.home.title" : "Alerte : contact à risque élevé dans un lieu",
 	"risk3.home.sub" : "Consultez nos recommandations",
-	"risk3.details.title" : "Exposition à risque élevée dans un lieu : vous êtes un contact à risque",
+	"risk3.details.title" : "Vous avez fréquenté un lieu avec un risque de contamination élevé : vous êtes un contact à risque",
 	"risk3.details.sub" : "Isolez-vous et faites-vous tester !",
 	"risk3.section1.title" : "Votre risque",
-	"risk3.section1.body" : "Vous avez partagé le même lieu qu'au moins une personne contagieuse et qui se serait déclarée positive dans l’application et avez été exposé à un risque élevé de contamination. Vous êtes un contact à risque.\n\nIsolez vous et faites vous tester!\n\nIl vous est recommandé de vous faire tester 7 jours après votre date d'exposition. Pour en savoir plus, allez sur le module \"recommandation isolement et test\". Vous bénéficiez d'un accès prioritaire au test et pouvez également bénéficier d'un arrêt de travail auprès de l'Assurance Maladie grâce au token (expliquer où il se trouve).\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été été dans un lieu avec un risque de contamination modéré.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) ou dans le même lieu à risque qu'un utilisateur déclaré comme un cas de COVID-19.",
+	"risk3.section1.body" : "Vous avez été exposé à un risque de contamination élevé suite à la fréquentation d’un même lieu qu’une personne contagieuse et qui s'est déclarée positive dans l'application. Vous êtes un contact à risque.\n\nLa date de contact affichée est approximative à plus ou moins un jour, pour préserver l’anonymat des personnes s'étant déclarées positives.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été dans un lieu avec un risque de contamination modéré.",
 	
-	
-	"risk4.notif.title" : "Alerte exposition",
+	"risk4.notif.title" : "Alerte : contact à risque",
 	"risk4.notif.sub" : "Vous avez été exposé à au moins un utilisateur testé positif et contagieux. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
 	"risk4.home.title" : "Alerte : exposition à risque élevée suite à un contact",
-	"risk4.home.sub" : "Consultez nos recommandations",
+	"risk4.home.sub" : "Date de contact, recommandations, arrêt de travail... 👉",
 	"risk4.details.title" : "Exposition à risque suite à un contact : vous êtes un contact à risque",
-	"risk4.details.sub" : "Isolez vous et faites-vous tester !",
+	"risk4.details.sub" : "Isolez-vous et faites-vous tester !",
 	"risk4.section1.title" : "Votre risque",
-	"risk4.section1.body" : "Vous avez été exposé à au moins un utilisateur testé positif et contagieux, vous êtes un contact à risque.\n\nPour savoir combien de temps vous isoler et quand vous faire tester, allez sur le module \"recommandation isolement et test\". Vous bénéficiez d'un accès prioritaire au test et pouvez également bénéficier d'un arrêt de travail auprès de l'Assurance Maladie grâce au token (expliquer où il se trouve).\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été à proximité d'au moins un utilisateur testé positif et contagieux."
+	"risk4.section1.body" : "Vous avez été exposé à au moins un utilisateur testé positif et contagieux, vous êtes un contact à risque.\n\nLa date de contact affichée est approximative à plus ou moins un jour, pour préserver l’anonymat des personnes s'étant déclarées positives.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été à proximité d'au moins un utilisateur testé positif et contagieux.",
 
+  "myHealthController.workStopping.title": "Arrêt de travail",
+  "myHealthController.workStopping.message": "Vous avez ici un lien unique qui vous permet de faire une demande d'arrêt de travail sur declare.ameli.fr, pendant 7 jours uniquement après la date de contact.\nVous pouvez réaliser cette demande à partir de votre smartphone, ou bien vous envoyer le lien pour faire la demande sur votre ordinateur.",
+  "myHealthController.workStopping.link": "Demander un arrêt",
+  "myHealthController.workStopping.share": "M'envoyer le lien unique",
+  
+  
+  
+  
+   "attestation.form.reason_curfew.label":"Motif de couvre-feu (19h-6h)",
+   "attestation.form.reason_curfew.placeholder":"-",
+   
+   "attestation.form.reason_curfew.travail.shortLabel":"1. Activité professionnelle, enseignement et formation, mission d’intérêt général",
+   "attestation.form.reason_curfew.travail.longLabel":"- Déplacements entre le domicile et le lieu de travail ou d’enseignement ou de formation.\n- Déplacements professionnels ne pouvant être différés, livraisons.\n- Déplacements pour effectuer des achats de fournitures nécessaires à l’activité professionnelle.\n- Déplacements liés à des missions d’intérêt général sur demande de l’autorité administrative.",
+   
+    "attestation.form.reason_curfew.sante.shortLabel":"2. Santé (consultation et soins)",
+   "attestation.form.reason_curfew.sante.longLabel":"Déplacements pour des consultations, examens, actes de prévention (dont vaccination) et soins ne pouvant être assurés à distance ou pour l’achat de produits de santé.",
+   
+   "attestation.form.reason_curfew.famille.shortLabel":"3. Motif familial impérieux, assistance aux personnes vulnérables, garde d’enfants, situation de handicap",
+   "attestation.form.reason_curfew.famille.longLabel":"- Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou précaires ou pour la garde d’enfants.\n- Déplacements des personnes en situation de handicap et de leur accompagnant. ",
+   
+   "attestation.form.reason_curfew.convocation_demarches.shortLabel":"4. Convocation judiciaire ou administrative, démarches ne pouvant être menées à distance",
+   "attestation.form.reason_curfew.convocation_demarches.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, pour se rendre dans un service public ou chez un professionnel du droit, pour un acte ou une démarche qui ne peut être réalisé à distance.",
+   
+   "attestation.form.reason_curfew.animaux.shortLabel":"5. Animaux de compagnie, le soir et la nuit.",
+   "attestation.form.reason_curfew.animaux.longLabel":"Déplacements brefs pour les besoins des animaux de compagnie (dans un rayon de 1 kilomètre autour du domicile).",
+   
+   
+    "attestation.form.reason_curfew.handicap.shortLabel":"4. Situation de handicap",
+   "attestation.form.reason_curfew.handicap.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_curfew.judiciaire.shortLabel":"5. Convocation judiciaire ou administrative",
+   "attestation.form.reason_curfew.judiciaire.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+    "attestation.form.reason_curfew.missions.shortLabel":"6. Missions d'intérêt général",
+   "attestation.form.reason_curfew.missions.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_curfew.transit.shortLabel":"7. Déplacements de transit et longue distance",
+   "attestation.form.reason_curfew.transit.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   
+   "attestation.form.reason_curfew.title":"Motifs couvre-feu",
+   
+    "attestation.form.reason_curfew.header":"Je me déplace entre 19h et 6h pour l'une des raisons suivantes :",
+    
+   "attestation.form.reason_curfew.footer":"Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.",
+   
+   
+   "attestation.form.reason_lockdown.label":"Motif de journée (6h-19h)",
+   "attestation.form.reason_lockdown.placeholder":"-",
+   
+   "attestation.form.reason_lockdown.travail.shortLabel":"1. Activité professionnelle, enseignement et formation, mission d’intérêt général",
+   "attestation.form.reason_lockdown.travail.longLabel":"- Déplacements entre le domicile et le lieu de travail ou d’enseignement ou de formation.\n- Déplacements professionnels ne pouvant être différés, livraisons.\n- Déplacements pour effectuer des achats de fournitures nécessaires à l’activité professionnelle.\n- Déplacements liés à des missions d’intérêt général sur demande de l’autorité administrative.",
+   
+   "attestation.form.reason_lockdown.sante.shortLabel":"2. Santé (consultation et soins)",
+   "attestation.form.reason_lockdown.sante.longLabel":"Déplacements pour des consultations, examens, actes de prévention (dont vaccination) et soins ne pouvant être assurés à distance ou pour l’achat de produits de santé.",
+   
+   "attestation.form.reason_lockdown.famille.shortLabel":"3. Motif familial impérieux, assistance aux personnes vulnérables, garde d’enfants, situation de handicap",
+   "attestation.form.reason_lockdown.famille.longLabel":"- Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou précaires ou pour la garde d’enfants\n- Déplacements des personnes en situation de handicap et de leur accompagnant ",
+   
+   "attestation.form.reason_lockdown.convocation_demarches.shortLabel":"4. Convocation judiciaire ou administrative, démarches ne pouvant être menées à distance",
+   "attestation.form.reason_lockdown.convocation_demarches.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, pour se rendre dans un service public ou chez un professionnel du droit, pour un acte ou une démarche qui ne peut être réalisé à distance.",
+   
+   "attestation.form.reason_lockdown.demenagement.shortLabel":"5. Déménagement",
+   "attestation.form.reason_lockdown.demenagement.longLabel":"- Déplacements liés à un déménagement résultant d’un changement de domicile.\n- Déplacements indispensables à l’acquisition ou à la location d’une résidence principale, ne pouvant être différés.",
+   
+   "attestation.form.reason_lockdown.achats_culte_culturel.shortLabel":"6. Achats, établissements culturels ou lieux de culte (au sein de mon département [1])",
+   "attestation.form.reason_lockdown.achats_culte_culturel.longLabel":"- Déplacements pour effectuer des achats de première nécessité, pour les retraits de commandes, ou pour bénéficier de prestations de service.\n- Déplacements pour se rendre dans un établissement culturel ou un lieu de culte ouvert.",
+   
+   "attestation.form.reason_lockdown.sport.shortLabel":"7. Activité physique, de plein air, promenade (dans un rayon de 10 kilomètres autour de votre domicile)",
+   "attestation.form.reason_lockdown.sport.longLabel":"- Déplacements liés à la promenade, à l’activité physique individuelle, à l’activité de plein air, aux besoins des animaux de compagnie.\n👉 Vous ne devez remplir l’attestation pour ce motif que si vous ne pouvez présenter un justificatif de domicile.",
+   
+   "attestation.form.reason_lockdown.achats.shortLabel":"2. Achats",
+   "attestation.form.reason_lockdown.achats.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.enfants.shortLabel":"3. Accompagnement des enfants à l’école",
+   "attestation.form.reason_lockdown.enfants.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+    "attestation.form.reason_lockdown.culte_culturel.shortLabel":"4. Etablissement culturel ou lieu de culte",
+   "attestation.form.reason_lockdown.culte_culturel.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.demarche.shortLabel":"5. Démarches administratives ou juridiques",
+   "attestation.form.reason_lockdown.demarche.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+    "attestation.form.reason_lockdown.handicap.shortLabel":"9. Situation de handicap",
+   "attestation.form.reason_lockdown.handicap.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.judiciaire.shortLabel":"10. Convocation judiciaire ou administrative",
+   "attestation.form.reason_lockdown.judiciaire.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.transit.shortLabel":"12. Déplacement de transit vers les gares et les aéroports",
+   "attestation.form.reason_lockdown.transit.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+
+
+   "attestation.form.reason_lockdown.title":"Motifs journée",
+   
+    "attestation.form.reason_lockdown.header":"Je me déplace entre 6h et 19h pour l'une des raisons suivantes :",
+    
+   "attestation.form.reason_lockdown.footer":"Les déplacements sont autorisés sous réserve de justifier de l’un des motifs prévus dans la présente attestation.\n\n[1] Pour les personnes résidant aux frontières d’un département, une tolérance de 30 kilomètres au-delà du département est acceptée.",
+   
+   "walletController.title": "Carnet de tests",
+   "walletController.explanations.title": "Comment ça marche ?",
+   "walletController.explanations.subtitle": "Pour numériser vos certificats de test et toujours les avoir à portée de main, c'est simple : une fois le résultat de votre test disponible, vous recevrez un SMS avec un lien et les instructions à suivre.\n\nCe certificat sera à montrer lors des contrôles pour vos voyages aériens 👉 expérimentation en cours, uniquement sur certains vols pour la Corse (Air France et Air Corsica informeront leurs clients éligibles).\n\nSi vous rencontrez un problème, vous pouvez appeler le 0 800 08 71 48.",
+   "walletController.flashButton.title": "Scanner le QR Code",
+   "walletController.flashExplanation": "Sur votre document SIDEP de résultat de test, vous avez un QR Code que vous pouvez scanner pour ajouter le certificat dans ce carnet.",
+   "walletController.recentCertificatesSection.title": "Certificats récents",
+   "walletController.recentCertificatesSection.subtitle": "Ces certificats ont moins de 3 jours.",
+   "walletController.oldCertificatesSection.title": "Certificats de plus de 3 jours",
+   "walletController.oldCertificatesSection.subtitle": "Ces certificats ont plus de 3 jours.",
+   "walletController.menu.share": "Partager le certificat",
+   "walletController.menu.share.text": "Voici mon certificat de test #TousAntiCovid",
+   "walletController.menu.delete": "Supprimer ce certificat",
+   "walletController.menu.delete.alert.title": "Confirmation",
+   "walletController.menu.delete.alert.message": "Êtes-vous sûr de vouloir supprimer ce certificat ?",
+   
+   "home.attestationSection.sanitaryCertificates.cell.title": "Mon carnet de tests",
+   "home.attestationSection.sanitaryCertificates.cell.subtitle": "Vos certificats de test seront disponibles ici",
+   
+   "flashWalletCodeController.title": "Scannez",
+   "flashWalletCodeController.explanation": "Scanner le QR Code sur votre document SIDEP.",
+   "flashWalletCodeController.alert.invalidCode.title": "Code invalide",
+   "flashWalletCodeController.alert.invalidCode.message": "Le code n'est pas valide. Veuillez essayer à nouveau.",
+   
+   "walletController.noCertificates.flashExplanation": "Sur votre document SIDEP de résultat de test, vous avez un QR Code que vous pouvez scanner pour ajouter le certificat dans ce carnet.",
+   "confirmWalletQrCodeController.title":"Carnet de test",
+   "confirmWalletQrCodeController.explanation.title":"Vous venez d'appuyer sur un lien TousAntiCovid pour ajouter un certificat de test dans votre carnet.",
+   "confirmWalletQrCodeController.explanation.subtitle":"Confirmez-vous cet ajout dans votre carnet ?",
+   "confirmWalletQrCodeController.confirm":"Ajouter",
+   
+   "flashDataMatrixCodeController.title": "Certificat 2D-DOC",
+   "flashDataMatrixCodeController.explanation": "Vérifiez un certificat en scannant le 2D-DOC",
+   "flashDataMatrixCodeController.alert.invalidCode.title": "Code invalide",
+   "flashDataMatrixCodeController.alert.invalidCode.message": "Le code n'est pas valide. Veuillez essayer à nouveau.",
+   
+   "home.moreSection.verifySanitaryCertificate": "Vérifier un certificat 2D-DOC",
+   "wallet.proof.sanitaryCertificate.F5.P": "Positif",
+   "wallet.proof.sanitaryCertificate.F5.N": "✅ Négatif",
+   "wallet.proof.sanitaryCertificate.F5.I": "Indéterminé",
+   "wallet.proof.sanitaryCertificate.F5.X": "Prélèvement non conforme",
+   "wallet.proof.sanitaryCertificate.F3.M": "Homme",
+   "wallet.proof.sanitaryCertificate.F3.F": "Femme",
+   "wallet.proof.sanitaryCertificate.F3.U": "Inconnu",
+   
+   "wallet.proof.sanitaryCertificate.loinc.94309" : "PCR COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.943092" : "PCR COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.945006" : "PCR COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.948455" : "PCR COVID (%@)",
+   
+   "wallet.proof.sanitaryCertificate.loinc.945584" : "Antigénique COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.945071" : "Sérologie COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.945089" : "Sérologie COVID (%@)",
+   
+    "wallet.proof.sanitaryCertificate.loinc.947622" : "Sérologie COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.945634" : "Sérologie COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.945642" : "Sérologie COVID (%@)",
+   
+   "wallet.proof.sanitaryCertificate.description": "<F0>, <F1>\nné(e) le <F2>, <F3>\n\n<F4>\n<F5>, prélevé le <F6>",
+   "wallet.proof.sanitaryCertificate.pillTitle": "Certificat de test",
+   "walletCertificateVerifiedController.title": "Certificat",
+   "walletCertificateVerifiedController.proofValidated": "Certificat vérifié",
+   "walletCertificateVerifiedController.validateAnotherProof": "Vérifier un autre certificat",
+    
+    "manageDataController.walletData.confirmationDialog.title": "Confirmation",
+    "manageDataController.walletData.confirmationDialog.message": "Confirmez-vous vouloir supprimer tous les certificats de test ?",
+    "manageDataController.walletData.title": "Mes certificats",
+    "manageDataController.walletData.subtitle": "Cette opération effacera tous vos certificats de test de votre téléphone.",
+    "manageDataController.walletData.button": "Effacer sur mon téléphone",
+    
+    "wallet.proof.error.1.title": "Certificat erroné",
+    "wallet.proof.error.1.message": "Le certificat scanné n’a pas le bon format. Si le problème persiste, veuillez appeler le 0 800 08 71 48",
+    "wallet.proof.error.2.title": "Certificat non authentique",
+    "wallet.proof.error.2.message": "L'authenticité du certificat scanné n'a pas pu être vérifiée. Si le problème persiste, veuillez appeler le 0 800 08 71 48",
+    
+    "wallet.proof.moreThanSpecificHours": "⚠️ Plus de %dh",
+    "wallet.proof.lessThanSpecificHours": "Moins de %dh",
+    
+   "keyfigure.variantsuk.label":"Variant britannique",
+   "keyfigure.variantsuk.shortLabel":"Variant UK",
+   "keyfigure.variantsuk.description":"Cet indicateur reflète le pourcentage de variants britanniques (UK 20I/501Y.V1) parmi les tests criblés.",
+   
+   "keyfigure.variantsuk.colorCode.light":"#4C76EB",
+   "keyfigure.variantsuk.colorCode.dark":"#A6B6E3",
+   
+    "keyfigure.variantsuk.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du variant 20I/501Y.V1 (UK) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
+    
+    "keyfigure.variantssabr.label":"Variants sud-africains ou brésiliens",
+	"keyfigure.variantssabr.shortLabel":"Variants SA ou BR",
+	"keyfigure.variantssabr.description":"Cet indicateur reflète le pourcentage de variants sud-africains ou brésiliens (20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR)) parmi les tests criblés.",
+	
+	"keyfigure.variantssabr.colorCode.light":"#D6774C",
+	"keyfigure.variantssabr.colorCode.dark":"#F6A37E",
+	
+	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021."
+	
 }

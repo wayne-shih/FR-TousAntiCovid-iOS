@@ -66,7 +66,7 @@ final class PrivacyManager: RemoteFileSyncManager {
     }
     
     override func remoteFileUrl(for languageCode: String) -> URL {
-        URL(string: "\(RemoteFileConstant.baseUrl)/privacy-\(languageCode).json")!
+        URL(string: "\(PrivacyConstant.baseUrl)/privacy-\(languageCode).json")!
     }
     
     override func processReceivedData(_ data: Data) -> Bool {
