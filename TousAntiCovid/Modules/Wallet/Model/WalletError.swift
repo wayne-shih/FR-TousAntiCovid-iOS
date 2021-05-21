@@ -23,6 +23,15 @@ enum WalletError {
         }
     }
     
-    var error: Error { NSError.localizedError(message: "wallet.proof.error.\(code).message".localized, code: code) }
+    var key: String {
+        switch self {
+        case .signature:
+            return "invalidSignature"
+        default:
+            return "invalidFormat"
+        }
+    }
+    
+    var error: Error { NSError.localizedError(message: key, code: code) }
     
 }

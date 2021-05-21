@@ -15,18 +15,14 @@ final class DateCell: TextFieldCell {
 
     let datePicker: UIDatePicker = UIDatePicker()
     let toolbar: UIToolbar = UIToolbar()
-    
-    deinit {
-        print("\(type(of: self)) deallocated")
-    }
-    
+        
     override func setup(with row: CVRow) {
         super.setup(with: row)
-        setupUI(row: row)
+        setupUI(with: row)
         setupAccessibility()
     }
     
-    private func setupUI(row: CVRow) {
+    private func setupUI(with row: CVRow) {
         cvTextField.text = nil
         cvSubtitleLabel?.isHidden = false
         updateSubtitle(with: row.subtitle)

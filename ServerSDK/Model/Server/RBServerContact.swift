@@ -12,8 +12,8 @@ import Foundation
 
 struct RBServerContact: Codable {
 
-    var ebid: String
-    var ecc: String
-    var ids: [RBServerContactId]
+    let ebid: String
+    let ecc: String
+    let ids: [RBServerContactId]
     
 }

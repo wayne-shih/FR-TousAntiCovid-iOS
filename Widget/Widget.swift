@@ -13,7 +13,6 @@ import WidgetKit
 
 @main
 struct TousAntiCovidWidget: Widget {
-
     private let kind: String = "TousAntiCovidWidget"
 
     public var body: some WidgetConfiguration {
@@ -24,7 +23,6 @@ struct TousAntiCovidWidget: Widget {
         .description("Soyez alertés et alertez les autres en cas d’exposition à la COVID-19")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
-
 }
 
 struct Provider: TimelineProvider {
@@ -39,7 +37,7 @@ struct Provider: TimelineProvider {
     @WidgetUserDefault(key: .lastStatusReceivedDate)
     private var lastStatusReceivedDate: Date? = nil
 
-    @OptionalWidgetUserDefault(key: .currentRiskLevel)
+    @WidgetUserDefault(key: .currentRiskLevel)
     private var currentRiskLevel: Double?
 
     func getSnapshot(in context: Context, completion: @escaping (WidgetContent) -> Void) {

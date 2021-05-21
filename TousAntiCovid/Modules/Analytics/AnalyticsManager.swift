@@ -18,9 +18,12 @@ final class AnalyticsManager: NSObject {
     static let shared: AnalyticsManager = AnalyticsManager()
     
     @UserDefault(key: .installationUuid)
-    private(set) var installationUuid: String = UUID().uuidString
-    
-    @OptionalUserDefault(key: .lastProximityActivationStartTimestamp)
+    private(set) var installationUuid: String = ""
+
+    @UserDefault(key: .isAnalyticsOptIn)
+    private(set) var isOptIn: Bool = true
+
+    @UserDefault(key: .lastProximityActivationStartTimestamp)
     var lastProximityActivationStartTimestamp: Double?
     
     var canCountForegroundComeBack: Bool = true
@@ -39,12 +42,19 @@ final class AnalyticsManager: NSObject {
     private var completions: [String: ProcessRequestCompletion] = [:]
     
     func start() {
+        if installationUuid.isEmpty {
+            installationUuid = UUID().uuidString
+        }
         createInfoIfNeeded()
         initProximityStartTimestampIfNeeded()
     }
+
+    func setOptIn(to isOptIn: Bool) {
+        self.isOptIn = isOptIn
+    }
     
     func sendAnalytics() {
-        guard ParametersManager.shared.isAnalyticsOn else {
+        guard ParametersManager.shared.isAnalyticsOn && isOptIn && !Constant.isDebug else {
             resetAppEvents()
             resetHealthEvents()
             resetErrors()
@@ -55,9 +65,12 @@ final class AnalyticsManager: NSObject {
             self.resetAppEvents()
             self.resetErrors()
         }
-        sendHealthAnalytics { error in
-            guard error == nil || (error as NSError?)?.code == 413 else { return }
-            self.resetHealthEvents()
+        let delay: Double = Double((500...2000).randomElement() ?? 500) / 1000.0
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            self.sendHealthAnalytics { error in
+                guard error == nil || (error as NSError?)?.code == 413 else { return }
+                self.resetHealthEvents()
+            }
         }
     }
     
@@ -67,6 +80,7 @@ final class AnalyticsManager: NSObject {
         resetHealthEvents()
         resetErrors()
         installationUuid = UUID().uuidString
+        isOptIn = true
         clearProximityStartTimestamp()
     }
     
@@ -198,11 +212,11 @@ extension AnalyticsManager: URLSessionDelegate, URLSessionDataDelegate {
 }
 
 extension Realm {
-    
+
     static func analyticsDb() throws -> Realm {
         return try Realm(configuration: analyticsConfiguration())
     }
-    
+
     static private func dbsDirectoryUrl() -> URL {
         var directoryUrl: URL = FileManager.libraryDirectory().appendingPathComponent("DBs")
         if !FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: nil) {
@@ -211,19 +225,16 @@ extension Realm {
         }
         return directoryUrl
     }
-    
+
     static private func analyticsConfiguration() -> Realm.Configuration {
         let classes: [Object.Type] = [AnalyticsAppInfo.self,
                                       AnalyticsHealthInfo.self,
                                       AnalyticsError.self,
                                       AnalyticsAppEvent.self,
-                                      AnalyticsHealthEvent.self,
-                                      Permission.self,
-                                      PermissionRole.self,
-                                      PermissionUser.self]
+                                      AnalyticsHealthEvent.self]
         let databaseUrl: URL = dbsDirectoryUrl().appendingPathComponent("analytics.realm")
-        let userConfig: Realm.Configuration = Realm.Configuration(fileURL: databaseUrl, schemaVersion: 10, migrationBlock: { _, _ in }, objectTypes: classes)
+        let userConfig: Realm.Configuration = Realm.Configuration(fileURL: databaseUrl, schemaVersion: 13, migrationBlock: { _, _ in }, objectTypes: classes)
         return userConfig
     }
-    
+
 }

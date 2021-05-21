@@ -45,8 +45,8 @@ final class KeyFigureCell: CVTableViewCell, Xibbed {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI()
-        setupContent(row: row)
-        setupAccessibility(row: row)
+        setupContent(with: row)
+        setupAccessibility(with: row)
     }
 
     override func capture() -> UIImage? {
@@ -91,7 +91,7 @@ final class KeyFigureCell: CVTableViewCell, Xibbed {
         changeInPreferredContentSize()
     }
     
-    private func setupContent(row: CVRow) {
+    private func setupContent(with row: CVRow) {
         guard let keyFigure = row.associatedValue as? KeyFigure else { return }
         valueLabel.textColor = keyFigure.color
         cvTitleLabel?.textColor = keyFigure.color
@@ -123,7 +123,7 @@ final class KeyFigureCell: CVTableViewCell, Xibbed {
         }
     }
     
-    private func setupAccessibility(row: CVRow) {
+    private func setupAccessibility(with row: CVRow) {
         guard let keyFigure = row.associatedValue as? KeyFigure else { return }
         accessibilityElements = [dateLabel!]
         if !departmentLabel.isHidden {

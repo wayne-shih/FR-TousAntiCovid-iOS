@@ -63,8 +63,12 @@ final class MyHealthController: CVTableViewController {
             rows = [headerRow()] + notRegisteredRows()
         } else if let currentRiskLevel = RisksUIManager.shared.currentLevel {
             rows = [headerRow()]
-            if RBManager.shared.lastStatusReceivedDate != nil  {
-                rows.append(riskRow(for: currentRiskLevel))
+            if RBManager.shared.lastStatusReceivedDate != nil {
+                let isStatusOnGoing: Bool = StatusManager.shared.isStatusOnGoing
+                rows.append(riskRow(for: currentRiskLevel, isStatusOnGoing: isStatusOnGoing))
+                if isStatusOnGoing {
+                    rows.append(statusVerificationRow(for: currentRiskLevel))
+                }
             }
             if let declarationToken = RBManager.shared.declarationToken, !declarationToken.isEmpty, !ameliUrl.isEmpty {
                 let ameliWithDeclarationUrl: String = String(format: ameliUrl, declarationToken)
@@ -75,10 +79,9 @@ final class MyHealthController: CVTableViewController {
         return rows
     }
 
-    private func riskRow(for currentRiskLevel: RisksUILevel) -> CVRow {
+    private func riskRow(for currentRiskLevel: RisksUILevel, isStatusOnGoing: Bool) -> CVRow {
         let notificationDate: Date? = RBManager.shared.lastStatusReceivedDate
-        let notificationDateString: String = notificationDate?.relativelyFormatted() ?? "N/A"
-
+        let notificationDateString: String? = currentRiskLevel.riskLevel == 0 ? notificationDate?.relativelyFormatted() : nil
         var lastContactDateString: String? = nil
         if let lastContactDateFrom = RisksUIManager.shared.lastContactDateFrom?.dayShortMonthFormatted(), let lastContactDateTo = RisksUIManager.shared.lastContactDateTo?.dayShortMonthYearFormatted() {
             lastContactDateString = String(format: "myHealthStateHeaderCell.exposureDate.range".localized, lastContactDateFrom, lastContactDateTo)
@@ -86,17 +89,28 @@ final class MyHealthController: CVTableViewController {
             lastContactDateString = lastContactDate
         }
 
-        let stateRow: CVRow = CVRow(title: currentRiskLevel.labels.detailTitle.localized,
-                                    subtitle: currentRiskLevel.labels.detailSubtitle.localized,
-                                    accessoryText: notificationDateString,
-                                    footerText: lastContactDateString,
-                                    xibName: .myHealthStateHeaderCell,
-                                    theme: CVRow.Theme(topInset: 0.0,
-                                                       bottomInset: 20.0,
-                                                       textAlignment: .natural,
-                                                       accessoryTextFont: { Appearance.Cell.Text.accessoryFont }),
-                                    associatedValue: currentRiskLevel)
-        return stateRow
+        return CVRow(title: currentRiskLevel.labels.detailTitle.localized,
+                     subtitle: currentRiskLevel.labels.detailSubtitle.localized,
+                     accessoryText: notificationDateString,
+                     footerText: lastContactDateString,
+                     xibName: .myHealthStateHeaderCell,
+                     theme: CVRow.Theme(topInset: 0.0,
+                                        bottomInset: isStatusOnGoing ? 0.0 : 20.0,
+                                        textAlignment: .natural,
+                                        accessoryTextFont: { Appearance.Cell.Text.accessoryFont },
+                                        maskedCorners: isStatusOnGoing ? .top : .all),
+                     associatedValue: currentRiskLevel)
+    }
+
+    private func statusVerificationRow(for currentRiskLevel: RisksUILevel) -> CVRow {
+        CVRow(title: "home.healthSection.statusState".localized,
+              xibName: .statusVerificationCell,
+              theme: CVRow.Theme(topInset: -2.0,
+                                 bottomInset: 20.0,
+                                 textAlignment: .natural,
+                                 maskedCorners: .bottom),
+              associatedValue: currentRiskLevel)
+
     }
     
     private func sickHeaderRows() -> [CVRow] {

@@ -20,9 +20,8 @@ final class AnalyticsAppInfo: Object, Encodable {
     @objc dynamic var deviceModel: String = UIDevice.current.modelName
     @objc dynamic var osVersion: String = UIDevice.current.systemVersion
     @objc dynamic var appVersion: String = UIApplication.shared.marketingVersion
-    @objc dynamic var appBuild: String = UIApplication.shared.buildNumber
+    @objc dynamic var appBuild: Int = Int(UIApplication.shared.buildNumber) ?? 0
     @objc dynamic var receivedHelloMessagesCount: Int = 0
-    @objc dynamic var secondsTracingActivated: Int = 0
     @objc dynamic var placesCount: Int = 0
     @objc dynamic var formsCount: Int = 0
     @objc dynamic var certificatesCount: Int = 0
@@ -37,7 +36,6 @@ final class AnalyticsAppInfo: Object, Encodable {
         case appVersion
         case appBuild
         case receivedHelloMessagesCount
-        case secondsTracingActivated
         case placesCount
         case formsCount
         case certificatesCount

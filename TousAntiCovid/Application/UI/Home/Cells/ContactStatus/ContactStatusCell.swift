@@ -20,18 +20,18 @@ final class ContactStatusCell: CVTableViewCell {
     
     override func setup(with row: CVRow) {
         super.setup(with: row)
-        setupUI()
-        setupContent(row: row)
+        setupUI(with: row)
+        setupContent(with: row)
     }
     
-    private func setupUI() {
+    private func setupUI(with row: CVRow) {
         cvTitleLabel?.font = Appearance.Cell.Text.titleFont
         cvSubtitleLabel?.font = Appearance.Cell.Text.subtitleFont
         cvAccessoryLabel?.font = Appearance.Cell.Text.accessoryFont
         cvAccessoryLabel?.textColor = .white
         containerView.layer.cornerRadius = 10.0
         containerView.layer.masksToBounds = true
-        
+        containerView.layer.maskedCorners = row.theme.maskedCorners
         setupParallaxEffect()
     }
     
@@ -41,7 +41,7 @@ final class ContactStatusCell: CVTableViewCell {
         effectView.configureParallax(intensity: -400)
     }
     
-    private func setupContent(row: CVRow) {
+    private func setupContent(with row: CVRow) {
         guard let gradientColors = row.associatedValue as? (startColor: UIColor, endColor: UIColor, effectAlpha: CGFloat) else { return }
         gradientView.startColor = gradientColors.startColor
         gradientView.endColor = gradientColors.endColor

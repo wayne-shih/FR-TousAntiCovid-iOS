@@ -18,7 +18,7 @@ final class NewPostalCodeCell: CVTableViewCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI()
-        setupContent(row: row)
+        setupContent(with: row)
         setupAccessibility()
     }
 
@@ -34,7 +34,7 @@ final class NewPostalCodeCell: CVTableViewCell {
         containerView.layer.masksToBounds = true
     }
 
-    private func setupContent(row: CVRow) {
+    private func setupContent(with row: CVRow) {
         button.setTitle(row.buttonTitle, for: .normal)
         button.isHidden = row.buttonTitle == nil
     }

@@ -47,10 +47,6 @@ public protocol RBStorage {
     func save(lastExposureTimeFrame: Int?)
     func lastExposureTimeFrame() -> Int?
 
-    // MARK: - Status: last status request date -
-    func saveLastStatusRequestDate(_ date: Date?)
-    func lastStatusRequestDate() -> Date?
-
     // MARK: - Status: last status received date -
     func saveLastStatusReceivedDate(_ date: Date?)
     func lastStatusReceivedDate() -> Date?
@@ -100,10 +96,6 @@ public protocol RBStorage {
     // MARK: - Status: Last Robert risk level -
     func saveLastRobertStatusRiskLevel(_ statusRiskLevelInfo: RBStatusRiskLevelInfo?)
     func lastRobertStatusRiskLevel() -> RBStatusRiskLevelInfo?
-    
-    // MARK: - Status: Last Warning risk level -
-    func saveLastWarningStatusRiskLevel(_ statusRiskLevelInfo: RBStatusRiskLevelInfo?)
-    func lastWarningStatusRiskLevel() -> RBStatusRiskLevelInfo?
     
     // MARK: - Data cleraing -
     func clearLocalEpochs()

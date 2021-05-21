@@ -34,6 +34,12 @@
          "key":"zip",
          "type":"number",
          "contentType": "addressPostalCode"
+      },
+      {
+         "key":"country",
+         "type":"text",
+         "contentType": "addressCountry",
+         "defaultValue": "France"
       }
    ],
    [

@@ -71,7 +71,7 @@ final class SendHistoryController: CVTableViewController {
     }
     
     private func sendButtonPressed() {
-        HUD.show(.progress)
+        HUD.show(.labeledProgress(title: "sendHistoryController.progress.title".localized, subtitle: "sendHistoryController.progress.message".localized))
         switch ParametersManager.shared.apiVersion {
         case .v5, .v6:
             RBManager.shared.report(code: symptomsParams.code,

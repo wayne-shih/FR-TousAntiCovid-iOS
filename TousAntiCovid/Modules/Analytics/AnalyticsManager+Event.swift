@@ -13,8 +13,9 @@ import RealmSwift
 
 extension AnalyticsManager {
     
-    func reportAppEvent(_ eventName: AnalyticsAppEvent.EventName) {
-        let event: AnalyticsAppEvent = AnalyticsAppEvent(name: eventName.rawValue, timestamp: Date().universalDateFormatted(), desc: nil)
+    func reportAppEvent(_ eventName: AnalyticsAppEvent.EventName, description: String? = nil) {
+        guard isOptIn else { return }
+        let event: AnalyticsAppEvent = AnalyticsAppEvent(name: eventName.rawValue, timestamp: Date().universalDateFormatted(), desc: description)
         let realm: Realm = try! Realm.analyticsDb()
         try! realm.write {
             realm.add(event)
@@ -22,6 +23,7 @@ extension AnalyticsManager {
     }
     
     func reportHealthEvent(_ eventName: AnalyticsHealthEvent.EventName) {
+        guard isOptIn else { return }
         let event: AnalyticsHealthEvent = AnalyticsHealthEvent(name: eventName.rawValue, timestamp: Date().universalDateFormatted(), desc: nil)
         let realm: Realm = try! Realm.analyticsDb()
         try! realm.write {

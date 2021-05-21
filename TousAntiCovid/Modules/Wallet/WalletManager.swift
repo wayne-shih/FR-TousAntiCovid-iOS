@@ -12,7 +12,7 @@ import UIKit
 import StorageSDK
 import ServerSDK
 
-protocol WalletChangesObserver: class {
+protocol WalletChangesObserver: AnyObject {
     
     func walletCertificatesDidUpdate()
     
@@ -34,10 +34,13 @@ final class WalletManager {
     var walletCertificates: [WalletCertificate] { storageManager.walletCertificates().compactMap { WalletCertificate.from(rawCertificate: $0) } }
     var walletCertificatesEmpty: Bool { storageManager.walletCertificates().isEmpty }
     
+    var recentWalletCertificates: [WalletCertificate] { storageManager.walletCertificates().compactMap { WalletCertificate.from(rawCertificate: $0) }.filter { !$0.isOld } }
+    var oldWalletCertificates: [WalletCertificate] { storageManager.walletCertificates().compactMap { WalletCertificate.from(rawCertificate: $0) }.filter { $0.isOld } }
+    
     var isWalletActivated: Bool {
         ParametersManager.shared.displaySanitaryCertificatesWallet
     }
-    
+
     private var observers: [WalletObserverWrapper] = []
     private var storageManager: StorageManager!
     
@@ -45,6 +48,17 @@ final class WalletManager {
         var type: WalletConstant.CertificateType?
         WalletConstant.CertificateType.allCases.forEach {
             guard value ~= $0.validationRegex else { return }
+            type = $0
+        }
+        return type
+    }
+
+    static func certificateTypeFromHeaderInUrl(_ url: URL) -> WalletConstant.CertificateType? {
+        guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+        guard let completeMessage = urlComponents.queryItems?.first(where: { $0.name == "v" })?.value else { return nil }
+        var type: WalletConstant.CertificateType?
+        WalletConstant.CertificateType.allCases.forEach {
+            guard completeMessage ~= $0.headerDetectionRegex else { return }
             type = $0
         }
         return type
@@ -114,7 +128,7 @@ final class WalletManager {
             let canVerify: Bool = SecKeyIsAlgorithmSupported(publicSecKey, .verify, algorithm)
             guard canVerify else { return false }
             
-            let encodedSignatureData: Data = try rawSignatureData.derEncodedSignature()
+            let encodedSignatureData: Data = certificate.isSignatureAlreadyEncoded ? rawSignatureData : try rawSignatureData.derEncodedSignature()
             
             var error: Unmanaged<CFError>?
             let isSignatureValid: Bool = SecKeyVerifySignature(publicSecKey,
@@ -124,7 +138,6 @@ final class WalletManager {
                                                                &error)
             return isSignatureValid
         } catch {
-            print(error)
             return false
         }
     }

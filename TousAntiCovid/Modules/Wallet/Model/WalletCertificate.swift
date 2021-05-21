@@ -18,28 +18,32 @@ class WalletCertificate {
     let value: String
     let type: WalletConstant.CertificateType
     
-    var header: String = ""
     var fields: [String: String] = [:]
     
     var authority: String?
     var certificateId: String?
     var message: Data? { fatalError("Must be overriden") }
     var signature: Data? { fatalError("Must be overriden") }
+    var isSignatureAlreadyEncoded: Bool { fatalError("Must be overriden") }
     
-    var pillTitle: String { fatalError("Must be overriden") }
+    var pillTitles: [String] { fatalError("Must be overriden") }
     var shortDescription: String { fatalError("Must be overriden") }
     var fullDescription: String { fatalError("Must be overriden") }
     
     var timestamp: Double { fatalError("Must be overriden") }
     var isOld: Bool {
-        Date().timeIntervalSince1970 - timestamp >= Double(ParametersManager.shared.walletOldCertificateThresholdInDays(certificateType: type.rawValue)) * 86400.0
+        guard let oldCertificateThreshold = ParametersManager.shared.walletOldCertificateThresholdInDays(certificateType: type.rawValue) else { return false }
+        return Date().timeIntervalSince1970 - timestamp >= Double(oldCertificateThreshold) * 86400.0
     }
-    var isStillValid: Bool {
-        Date().timeIntervalSince1970 - timestamp < Double(ParametersManager.shared.walletTestCertificateValidityThresholdInHours) * 3600.0
-    }
+
     var validityString: String {
-        String(format: (isStillValid ? "wallet.proof.lessThanSpecificHours" : "wallet.proof.moreThanSpecificHours").localized, ParametersManager.shared.walletTestCertificateValidityThresholdInHours)
+        let walletTestCertificateValidityThresholds: [Int] = ParametersManager.shared.walletTestCertificateValidityThresholds
+        let maxValidityInHours: Int = walletTestCertificateValidityThresholds.max() ?? 0
+        let timeSinceCreation: Double = Date().timeIntervalSince1970 - timestamp
+        let validityThresholdInHours: Int? = walletTestCertificateValidityThresholds.filter { Double($0 * 3600) > timeSinceCreation } .min()
+        return String(format: ( validityThresholdInHours == nil ? "wallet.proof.moreThanSpecificHours" : "wallet.proof.lessThanSpecificHours").localized, validityThresholdInHours ?? maxValidityInHours)
     }
+
     var publicKey: String? {
         guard let authority = authority else { return nil }
         guard let certificateId = certificateId else { return nil }
@@ -65,6 +69,8 @@ extension WalletCertificate {
         switch certificateType {
         case .sanitary:
             return SanitaryCertificate(id: rawCertificate.id, value: rawCertificate.value, type: certificateType, needParsing: true)
+        case .vaccination:
+            return VaccinationCertificate(id: rawCertificate.id, value: rawCertificate.value, type: certificateType, needParsing: true)
         }
     }
     
@@ -73,6 +79,8 @@ extension WalletCertificate {
         switch certificateType {
         case .sanitary:
             return SanitaryCertificate(value: doc, type: certificateType, needParsing: true)
+        case .vaccination:
+            return VaccinationCertificate(value: doc, type: certificateType, needParsing: true)
         }
     }
     

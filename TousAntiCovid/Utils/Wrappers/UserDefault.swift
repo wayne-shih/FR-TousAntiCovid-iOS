@@ -11,18 +11,22 @@
 import UIKit
 
 @propertyWrapper
-final class UserDefault<T> {
-    
-    private var defaults: UserDefaults = .standard
-    let key: Key
-    let defaultValue: T
-    
+struct UserDefault<T> {
+
+    private var defaults: UserDefaults
+    private let key: Key
+    private let defaultValue: T
+
     var projectedValue: String { key.rawValue }
-    
+
     var wrappedValue: T {
         get { defaults.object(forKey: key.rawValue) as? T ?? defaultValue }
         set {
-            defaults.set(newValue, forKey: key.rawValue)
+            if let optional = newValue as? AnyOptional, optional.isNil {
+                defaults.removeObject(forKey: key.rawValue)
+            } else {
+                defaults.set(newValue, forKey: key.rawValue)
+            }
             defaults.synchronize()
         }
     }
@@ -32,7 +36,13 @@ final class UserDefault<T> {
         self.key = key
         self.defaults = userDefault
     }
-    
+
+}
+
+extension UserDefault where T: ExpressibleByNilLiteral {
+    init(key: Key) {
+        self.init(wrappedValue: nil, key: key)
+    }
 }
 
 extension UserDefault {
@@ -46,13 +56,16 @@ extension UserDefault {
         case lastPrivacyUpdateDate
         case lastLinksUpdateDate
         case lastRiskLevelsUpdateDate
+        case lastWalletImagesUpdateDate
         case lastKeyFiguresExplanationsUpdateDate
         case lastRemoteFileLanguageCode
+        case lastMultipleRemoteFilesLanguageCode
         case lastInitialStringsBuildNumber
         case lastInitialPrivacyBuildNumber
         case lastInitialLinksBuildNumber
         case lastInitialKeyFiguresExplanationsBuildNumber
         case lastInitialRiskLevelsBuildNumber
+        case lastInitialWalletImagesBuildNumber
         case lastMaintenanceUpdateDate
         case infoCenterLastUpdatedAt
         case infoCenterDidReceiveNewInfo
@@ -62,9 +75,6 @@ extension UserDefault {
         case saveAttestationFieldsData
         case didAlreadySeeVenuesRecordingOnboarding
         case venuesFeaturedWasActivatedAtLeastOneTime
-        case privateEventQrCodeString
-        case privateEventQrCodeData
-        case privateEventQrCodeDate
         case currentVaccinationReferenceDepartmentCode
         case currentVaccinationReferenceLatitude
         case currentVaccinationReferenceLongitude
@@ -75,7 +85,9 @@ extension UserDefault {
         case zipGeolocVersion
         case installationUuid
         case lastProximityActivationStartTimestamp
-        
+        case cleaLastIteration
+        case isAnalyticsOptIn
+        case latestAvailableBuild
     }
     
 }

@@ -10,9 +10,7 @@
 
 import UIKit
 import CommonCrypto
-#if !PROXIMITY
 import ZXingObjC
-#endif
 
 extension String {
     
@@ -136,7 +134,7 @@ extension String {
         }
         return nil
     }
-    #if !PROXIMITY
+
     func dataMatrix() -> UIImage? {
         let writer: ZXMultiFormatWriter = ZXMultiFormatWriter()
         do {
@@ -144,12 +142,10 @@ extension String {
             guard let cgImage = ZXImage(matrix: result)?.cgimage else { return nil }
             return UIImage(cgImage: cgImage)
         } catch {
-            print(error)
             return nil
         }
     }
-    #endif
-    
+
     func sha256() -> String {
         if let stringData = self.data(using: String.Encoding.utf8) {
             return hexStringFromData(input: digest(input: stringData as NSData))
@@ -184,6 +180,16 @@ extension String {
             .replacingOccurrences(of: "-----END PUBLIC KEY-----", with: "")
             .replacingOccurrences(of: "-----BEGIN CERTIFICATE-----", with: "")
             .replacingOccurrences(of: "-----END CERTIFICATE-----", with: "")
+    }
+
+    func base64urlToBase64() -> String {
+        var base64: String = self
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        if base64.count % 4 != 0 {
+            base64.append(String(repeating: "=", count: 4 - base64.count % 4))
+        }
+        return base64
     }
     
 }

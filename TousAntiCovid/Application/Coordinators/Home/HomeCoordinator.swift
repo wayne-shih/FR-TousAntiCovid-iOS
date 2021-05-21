@@ -11,8 +11,9 @@
 import UIKit
 import PKHUD
 import RobertSDK
+import StoreKit
 
-final class HomeCoordinator: WindowedCoordinator {
+final class HomeCoordinator: NSObject, WindowedCoordinator {
 
     weak var parent: Coordinator?
     var childCoordinators: [Coordinator]
@@ -21,10 +22,12 @@ final class HomeCoordinator: WindowedCoordinator {
     private weak var navigationController: UINavigationController?
     private var launchScreenWindow: UIWindow?
     private var showLaunchScreen: Bool = true
+    private var isLoadingAppUpdate: Bool = false
     
     init(parent: Coordinator) {
         self.parent = parent
         self.childCoordinators = []
+        super.init()
         start()
         addObservers()
     }
@@ -38,6 +41,8 @@ final class HomeCoordinator: WindowedCoordinator {
             self?.showAbout()
         }, showCaptchaChallenge: { [weak self] captcha, didEnterCaptcha, didCancelCaptcha in
             self?.showCaptchaChallenge(captcha: captcha, didEnterCaptcha: didEnterCaptcha, didCancelCaptcha: didCancelCaptcha)
+        }, didTouchAppUpdate: { [weak self] in
+            self?.updateApp()
         }, didTouchDocument: { [weak self] in
             self?.showAttestations()
         }, didTouchManageData: { [weak self] in
@@ -60,8 +65,6 @@ final class HomeCoordinator: WindowedCoordinator {
             self?.showUsefulLinks()
         }, didTouchRecordVenues: { [weak self] in
             self?.showRecordVenues()
-        }, didTouchPrivateEvents: { [weak self] in
-            self?.showPrivateEvents()
         }, didTouchVenuesHistory: { [weak self] in
             self?.showVenuesHistory()
         }, didRecordVenue: { [weak self] url in
@@ -92,6 +95,29 @@ final class HomeCoordinator: WindowedCoordinator {
         if showLaunchScreen {
             hideLaunchScreen()
         }
+    }
+    
+    private func updateApp() {
+        guard !isLoadingAppUpdate else { return }
+        isLoadingAppUpdate = true
+        #if targetEnvironment(simulator)
+        URL(string: "https://apps.apple.com/in/app/TousAntiCovid/id\(Constant.appStoreId)")?.openInSafari()
+        isLoadingAppUpdate = false
+        #else
+        let storeViewController = SKStoreProductViewController()
+        storeViewController.delegate = self
+        let parameters: [String: String] = [SKStoreProductParameterITunesItemIdentifier: Constant.appStoreId]
+        HUD.show(.progress)
+        storeViewController.loadProduct(withParameters: parameters) { [weak self] loaded, error in
+            HUD.hide()
+            self?.isLoadingAppUpdate = false
+            guard loaded && error == nil else {
+                URL(string: "itms-apps://apple.com/app/id\(Constant.appStoreId)")?.openInSafari()
+                return
+            }
+            self?.navigationController?.present(storeViewController, animated: true)
+        }
+        #endif
     }
     
     private func showAbout() {
@@ -179,24 +205,6 @@ final class HomeCoordinator: WindowedCoordinator {
         let venuesRecordingCoordinator: VenuesRecordingCoordinator = VenuesRecordingCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
         addChild(coordinator: venuesRecordingCoordinator)
         AnalyticsManager.shared.reportAppEvent(.e12)
-    }
-    
-    private func showPrivateEvents() {
-        if VenuesManager.shared.needPrivateEventQrCodeGeneration {
-            HUD.show(.progress)
-            DispatchQueue.main.async {
-                VenuesManager.shared.generateNewPrivateEventQrCode()
-                HUD.hide()
-                self.showPrivateEventController()
-            }
-        } else {
-            self.showPrivateEventController()
-        }
-    }
-    
-    private func showPrivateEventController() {
-        let privateEventCoordinator: VenuesPrivateEventCoordinator = VenuesPrivateEventCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
-        addChild(coordinator: privateEventCoordinator)
     }
     
     private func showVenuesHistory() {
@@ -298,6 +306,14 @@ extension HomeCoordinator {
         navigationController?.dismiss(animated: true) {
             self.showMyHealth()
         }
+    }
+    
+}
+
+extension HomeCoordinator: SKStoreProductViewControllerDelegate {
+    
+    func productViewControllerDidFinish(_ viewController: SKStoreProductViewController) {
+        navigationController?.dismiss(animated: true)
     }
     
 }

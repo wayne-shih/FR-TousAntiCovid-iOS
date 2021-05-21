@@ -32,6 +32,9 @@ final class StandardCardCell: CVTableViewCell {
 
     private func setupAccessibility() {
         accessibilityElements = [cvTitleLabel].compactMap { $0 }
+        if let cvSubtitleLabel = cvSubtitleLabel, !cvSubtitleLabel.isHidden {
+            accessibilityElements?.append(cvSubtitleLabel)
+        }
     }
 
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {

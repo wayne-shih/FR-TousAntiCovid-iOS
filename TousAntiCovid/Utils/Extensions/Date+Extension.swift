@@ -48,6 +48,12 @@ extension Date {
         formatter.setLocalizedDateFormatFromTemplate("dMMMyyyy")
         return formatter.string(from: self)
     }
+    
+    func dayShortMonthYearTimeFormatted() -> String {
+        let formatter: DateFormatter = DateFormatter()
+        formatter.setLocalizedDateFormatFromTemplate("dMMMyyyyHHmm")
+        return formatter.string(from: self)
+    }
 
     func fullDayMonthFormatted() -> String {
         let formatter: DateFormatter = DateFormatter()
@@ -203,10 +209,9 @@ extension Date {
     init(timeIntervalSince1900: Int) {
         self.init(timeIntervalSince1970: Double(timeIntervalSince1900 - 2208988800))
     }
-    
-    func roundedTimeIntervalSince1900(interval: Int) -> Int {
-        let timeInterval: Int = timeIntervalSince1900
-        return timeInterval + interval / 2 - (timeInterval + interval / 2) % interval
+
+    func svDateByAddingDays(_ days: Int) -> Date {
+        addingTimeInterval(Double(days) * 24.0 * 3600.0)
     }
     
 }

@@ -37,6 +37,7 @@ internal enum Asset {
     internal static let buttonLabel = ColorAsset(name: "buttonLabel")
     internal static let captionTitle = ColorAsset(name: "captionTitle")
     internal static let error = ColorAsset(name: "error")
+    internal static let extraLightTint = ColorAsset(name: "extraLightTint")
     internal static let info = ColorAsset(name: "info")
     internal static let isolationAction = ColorAsset(name: "isolationAction")
     internal static let secondaryButtonBackground = ColorAsset(name: "secondaryButtonBackground")
@@ -46,7 +47,6 @@ internal enum Asset {
     internal static let tint = ColorAsset(name: "tint")
   }
   internal enum Images {
-    internal static let parties = ImageAsset(name: "Parties")
     internal static let shops = ImageAsset(name: "Shops")
     internal static let walletCard = ImageAsset(name: "WalletCard")
     internal static let attestationCard = ImageAsset(name: "attestationCard")
@@ -70,11 +70,8 @@ internal enum Asset {
     internal static let hand = ImageAsset(name: "Hand")
     internal static let manageData = ImageAsset(name: "ManageData")
     internal static let privacy = ImageAsset(name: "Privacy")
-    internal static let privateEventLeftCharacter = ImageAsset(name: "PrivateEventLeftCharacter")
-    internal static let privateEventRightCharacter = ImageAsset(name: "PrivateEventRightCharacter")
     internal static let qrCodePlaceholder = ImageAsset(name: "QRCodePlaceholder")
     internal static let replay = ImageAsset(name: "Replay")
-    internal static let shield = ImageAsset(name: "Shield")
     internal static let visual = ImageAsset(name: "Visual")
     internal static let web = ImageAsset(name: "Web")
     internal static let chartLegend = ImageAsset(name: "chartLegend")
@@ -110,6 +107,11 @@ internal enum Asset {
     internal static let sick = ImageAsset(name: "Sick")
     internal static let venuesRecording = ImageAsset(name: "VenuesRecording")
     internal static let wallet = ImageAsset(name: "Wallet")
+    internal static let debug4g = ImageAsset(name: "debug-4g")
+    internal static let debugDateToggle = ImageAsset(name: "debug-dateToggle")
+    internal static let debugFilter = ImageAsset(name: "debug-filter")
+    internal static let debugNotconnected = ImageAsset(name: "debug-notconnected")
+    internal static let debugWifi = ImageAsset(name: "debug-wifi")
     internal static let tabBarDeclareNormal = ImageAsset(name: "TabBarDeclare-Normal")
     internal static let tabBarInfoNormal = ImageAsset(name: "TabBarInfo-Normal")
     internal static let tabBarProximityNormal = ImageAsset(name: "TabBarProximity-Normal")
@@ -122,6 +124,7 @@ internal enum Asset {
     internal static let tabBarSharingSelected = ImageAsset(name: "TabBarSharing-Selected")
     internal static let tabBarSickSelected = ImageAsset(name: "TabBarSick-Selected")
     internal static let tabBarSupportSelected = ImageAsset(name: "TabBarSupport-Selected")
+    internal static let walletPhone = ImageAsset(name: "WalletPhone")
     internal static let usefulLinks = ImageAsset(name: "UsefulLinks")
     internal static let about = ImageAsset(name: "about")
     internal static let bubble = ImageAsset(name: "bubble")
@@ -134,6 +137,7 @@ internal enum Asset {
     internal static let parallaxEffect = ImageAsset(name: "parallaxEffect")
     internal static let pharmacy = ImageAsset(name: "pharmacy")
     internal static let search = ImageAsset(name: "search")
+    internal static let updateApp = ImageAsset(name: "updateApp")
   }
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name

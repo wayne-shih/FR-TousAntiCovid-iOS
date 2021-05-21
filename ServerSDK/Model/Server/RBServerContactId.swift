@@ -12,10 +12,10 @@ import Foundation
 
 struct RBServerContactId: Codable {
 
-    var timeCollectedOnDevice: Int
-    var timeFromHelloMessage: UInt16
-    var mac: String
-    var rssiRaw: Int
-    var rssiCalibrated: Int
-    
+    let timeCollectedOnDevice: Int
+    let timeFromHelloMessage: UInt16
+    let mac: String
+    let rssiRaw: Int
+    let rssiCalibrated: Int
+
 }

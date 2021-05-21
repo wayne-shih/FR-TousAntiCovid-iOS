@@ -43,13 +43,14 @@ final class ManageDataController: CVTableViewController {
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = [blockSeparatorRow()]
         let showInfoNotificationsRows: [CVRow] = switchRowsBlock(textPrefix: "manageDataController.showInfoNotifications",
-                                                                 isOn: NotificationsManager.shared.showNewInfoNotification) { isOn in
+                                                                 isOn: NotificationsManager.shared.showNewInfoNotification, dynamicSwitchLabel: false) { isOn in
             NotificationsManager.shared.showNewInfoNotification = isOn
         }
         rows.append(contentsOf: showInfoNotificationsRows)
         rows.append(blockSeparatorRow())
         let hideStatusRows: [CVRow] = switchRowsBlock(textPrefix: "manageDataController.hideStatus",
-                                                      isOn: StatusManager.shared.hideStatus) { isOn in
+                                                      isOn: StatusManager.shared.hideStatus,
+                                                      dynamicSwitchLabel: false) { isOn in
             StatusManager.shared.hideStatus = isOn
         }
         rows.append(contentsOf: hideStatusRows)
@@ -90,6 +91,15 @@ final class ManageDataController: CVTableViewController {
         }
         rows.append(contentsOf: contactRows)
         rows.append(blockSeparatorRow())
+        if ParametersManager.shared.isAnalyticsOn {
+            let analyticsRows: [CVRow] = switchRowsBlock(textPrefix: "manageDataController.analytics",
+                                                         isOn: AnalyticsManager.shared.isOptIn,
+                                                         dynamicSwitchLabel: true) { isOptIn in
+                AnalyticsManager.shared.setOptIn(to: isOptIn)
+            }
+            rows.append(contentsOf: analyticsRows)
+            rows.append(blockSeparatorRow())
+        }
         let quitRows: [CVRow] = rowsBlock(textPrefix: "manageDataController.quitStopCovid", isDestuctive: true) { [weak self] in
             self?.quitButtonPressed()
         }
@@ -112,7 +122,7 @@ final class ManageDataController: CVTableViewController {
         dismiss(animated: true, completion: nil)
     }
     
-    private func switchRowsBlock(textPrefix: String, isOn: Bool, handler: @escaping (_ isOn: Bool) -> ()) -> [CVRow] {
+    private func switchRowsBlock(textPrefix: String, isOn: Bool, dynamicSwitchLabel: Bool, handler: @escaping (_ isOn: Bool) -> ()) -> [CVRow] {
         var textRow: CVRow = CVRow(title: "\(textPrefix).title".localized,
                                    subtitle: "\(textPrefix).subtitle".localized,
                                    xibName: .textCell,
@@ -122,19 +132,22 @@ final class ManageDataController: CVTableViewController {
                                                       titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
                                                       separatorLeftInset: Appearance.Cell.leftMargin))
         textRow.theme.backgroundColor = Appearance.Cell.cardBackgroundColor
-        var switchRow: CVRow = CVRow(title: "\(textPrefix).button".localized,
-                                      isOn: isOn,
-                                      xibName: .standardSwitchCell,
-                                      theme: CVRow.Theme(topInset: 10.0,
-                                                         bottomInset: 10.0,
-                                                         textAlignment: .left,
-                                                         titleFont: { Appearance.Cell.Text.standardFont },
-                                                         separatorLeftInset: 0.0,
-                                                         separatorRightInset: 0.0),
-                                      valueChanged: { value in
-            guard let isOn = value as? Bool else { return }
-            handler(isOn)
-        })
+        var switchRow: CVRow = CVRow(title: (dynamicSwitchLabel ? (isOn ? "\(textPrefix).switch.on" : "\(textPrefix).switch.off") : "\(textPrefix).button").localized,
+                                     isOn: isOn,
+                                     xibName: .standardSwitchCell,
+                                     theme: CVRow.Theme(topInset: 10.0,
+                                                        bottomInset: 10.0,
+                                                        textAlignment: .left,
+                                                        titleFont: { Appearance.Cell.Text.standardFont },
+                                                        separatorLeftInset: 0.0,
+                                                        separatorRightInset: 0.0),
+                                     valueChanged: { [weak self] value in
+                                        guard let isOn = value as? Bool else { return }
+                                        handler(isOn)
+                                        if dynamicSwitchLabel {
+                                            self?.reloadUI()
+                                        }
+                                     })
         switchRow.theme.backgroundColor = Appearance.Cell.cardBackgroundColor
         return [textRow, switchRow]
     }

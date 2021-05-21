@@ -32,8 +32,8 @@ final class VenuesRecordingCoordinator: Coordinator {
     }
     
     private func start() {
-        if let openingUrl = openingUrl, showOnlyConfirmation {
-            startConfirmation(venueType: VenuesManager.shared.venueTypeFrom(url: openingUrl))
+        if openingUrl != nil, showOnlyConfirmation {
+            startConfirmation()
         } else if didAlreadySeeOnboarding {
             startFlashCode()
         } else {
@@ -60,9 +60,9 @@ final class VenuesRecordingCoordinator: Coordinator {
         presentingController?.topPresentedController.present(navigationController, animated: true)
     }
 
-    private func startConfirmation(venueType: String) {
+    private func startConfirmation() {
         let navigationController: CVNavigationController
-        navigationController = CVNavigationController(rootViewController: confirmationController(venueType: venueType))
+        navigationController = CVNavigationController(rootViewController: confirmationController())
         self.navigationController = navigationController
         presentingController?.topPresentedController.present(navigationController, animated: true)
     }
@@ -75,23 +75,25 @@ final class VenuesRecordingCoordinator: Coordinator {
         FlashVenueCodeController.controller(didFlash: { [weak self] stringUrl in
             guard let stringUrl = stringUrl else { return false }
             guard let url = URL(string: stringUrl) else { return false }
-            guard VenuesManager.shared.processVenueUrl(url) else { return false }
-            self?.showConfirmation(venueType: VenuesManager.shared.venueTypeFrom(url: url))
+            guard VenuesManager.shared.processVenueUrl(url) != nil else { return false }
+            guard VenuesManager.shared.isVenueUrlValid(url) else { return false }
+            guard !VenuesManager.shared.isVenueUrlExpired(url) else { return false }
+            self?.showConfirmation()
             return true
         }, deinitBlock: needDeinit ? { [weak self] in
             self?.didDeinit()
         } : nil)
     }
 
-    private func confirmationController(venueType: String) -> UIViewController {
-        let controller: UIViewController = VenuesRecordingConfirmationController(venueType: venueType, didFinish: { [weak self] in
+    private func confirmationController() -> UIViewController {
+        let controller: UIViewController = VenuesRecordingConfirmationController(didFinish: { [weak self] in
             self?.didTouchFinish()
         })
         return BottomButtonContainerController.controller(controller)
     }
     
-    private func showConfirmation(venueType: String) {
-        navigationController?.pushViewController(confirmationController(venueType: venueType), animated: true)
+    private func showConfirmation() {
+        navigationController?.pushViewController(confirmationController(), animated: true)
     }
 
 }

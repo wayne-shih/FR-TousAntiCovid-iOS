@@ -16,7 +16,7 @@ class TextFieldCell: CVTableViewCell {
     
     override func setup(with row: CVRow) {
         super.setup(with: row)
-        setupUI(row: row)
+        setupUI(with: row)
         setupAccessibility()
     }
     
@@ -25,7 +25,7 @@ class TextFieldCell: CVTableViewCell {
         currentAssociatedRow?.valueChanged?(cvTextField.text)
     }
     
-    private func setupUI(row: CVRow) {
+    private func setupUI(with row: CVRow) {
         cvTextField.delegate = self
         cvTextField.attributedPlaceholder = NSAttributedString(string: row.placeholder ?? "", attributes: [.foregroundColor: row.theme.placeholderColor])
         cvTextField.font = row.theme.subtitleFont()

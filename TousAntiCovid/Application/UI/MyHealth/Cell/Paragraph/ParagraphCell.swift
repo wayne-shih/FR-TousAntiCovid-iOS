@@ -18,7 +18,7 @@ final class ParagraphCell: CVTableViewCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI()
-        setupContent(row: row)
+        setupContent(with: row)
     }
     
     private func setupUI() {
@@ -35,7 +35,7 @@ final class ParagraphCell: CVTableViewCell {
         containerView.layer.masksToBounds = true
     }
     
-    private func setupContent(row: CVRow) {
+    private func setupContent(with row: CVRow) {
         if #available(iOS 13.0, *) {
             let imageAttachment: NSTextAttachment = NSTextAttachment()
             imageAttachment.image = UIImage(systemName: "arrow.up.right.square.fill")?.withRenderingMode(.alwaysTemplate)

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="-127" id="QbF-ae-MJ4" customClass="StatusVerificationCell" customModule="TAC_Multi_" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="495" height="44"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="QbF-ae-MJ4" id="8Br-O5-7ms">
+                <rect key="frame" x="0.0" y="0.0" width="495" height="44"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YTA-w0-5Lj">
+                        <rect key="frame" x="20" y="0.0" width="455" height="36.5"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PJy-gA-A57" customClass="GradientView" customModule="TAC_Multi_" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="455" height="36.5"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="startColor">
+                                        <color key="value" name="gradientStartRed"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="endColor">
+                                        <color key="value" name="gradientEndRed"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="horizontalMode" value="YES"/>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="hVk-AY-MAi">
+                                <rect key="frame" x="16" y="8" width="423" height="20.5"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lw7-7C-PiH">
+                                        <rect key="frame" x="0.0" y="0.0" width="399" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="Gzt-Dt-qom">
+                                        <rect key="frame" x="403" y="0.0" width="20" height="20.5"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="20" id="dP5-Zx-vMs"/>
+                                            <constraint firstAttribute="height" constant="20" id="qUC-bY-vCe"/>
+                                        </constraints>
+                                    </activityIndicatorView>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemFillColor"/>
+                        <constraints>
+                            <constraint firstItem="hVk-AY-MAi" firstAttribute="leading" secondItem="YTA-w0-5Lj" secondAttribute="leading" constant="16" id="8wG-eI-IKZ"/>
+                            <constraint firstItem="hVk-AY-MAi" firstAttribute="top" secondItem="YTA-w0-5Lj" secondAttribute="top" constant="8" id="AaI-hl-RVc"/>
+                            <constraint firstAttribute="trailing" secondItem="hVk-AY-MAi" secondAttribute="trailing" constant="16" id="CFc-Av-jHI"/>
+                            <constraint firstAttribute="trailing" secondItem="PJy-gA-A57" secondAttribute="trailing" id="GeI-4C-Cbt"/>
+                            <constraint firstAttribute="bottom" secondItem="PJy-gA-A57" secondAttribute="bottom" id="Sl7-jf-liX"/>
+                            <constraint firstItem="PJy-gA-A57" firstAttribute="leading" secondItem="YTA-w0-5Lj" secondAttribute="leading" id="cJ5-B0-4XB"/>
+                            <constraint firstItem="PJy-gA-A57" firstAttribute="top" secondItem="YTA-w0-5Lj" secondAttribute="top" id="gVX-fv-Aqr"/>
+                            <constraint firstAttribute="bottom" secondItem="hVk-AY-MAi" secondAttribute="bottom" constant="8" id="iIs-kv-6hv"/>
+                            <constraint firstItem="hVk-AY-MAi" firstAttribute="centerY" secondItem="YTA-w0-5Lj" secondAttribute="centerY" id="pKn-xq-cOp"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="YTA-w0-5Lj" firstAttribute="top" secondItem="8Br-O5-7ms" secondAttribute="top" id="LJx-bW-bE6"/>
+                    <constraint firstAttribute="trailing" secondItem="YTA-w0-5Lj" secondAttribute="trailing" constant="20" id="VoQ-aB-Rka"/>
+                    <constraint firstAttribute="bottom" secondItem="YTA-w0-5Lj" secondAttribute="bottom" constant="20" id="enb-Tb-ifE"/>
+                    <constraint firstItem="YTA-w0-5Lj" firstAttribute="leading" secondItem="8Br-O5-7ms" secondAttribute="leading" constant="20" id="pw5-DQ-O1C"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="activityIndicator" destination="Gzt-Dt-qom" id="yzP-jR-6cY"/>
+                <outlet property="bottomConstraint" destination="enb-Tb-ifE" id="mVU-En-dKy"/>
+                <outlet property="containerView" destination="YTA-w0-5Lj" id="Dpt-sR-zDR"/>
+                <outlet property="cvTitleLabel" destination="lw7-7C-PiH" id="Tc2-EN-tBI"/>
+                <outlet property="gradientView" destination="PJy-gA-A57" id="b6k-7b-cdT"/>
+                <outlet property="leadingConstraint" destination="pw5-DQ-O1C" id="HB2-wk-24a"/>
+                <outlet property="topConstraint" destination="LJx-bW-bE6" id="Wgg-Uf-Aij"/>
+                <outlet property="trailingConstraint" destination="VoQ-aB-Rka" id="FaD-uz-HsF"/>
+            </connections>
+            <point key="canvasLocation" x="50.000000000000007" y="-6.6964285714285712"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <namedColor name="gradientEndRed">
+            <color red="0.32899999618530273" green="0.32400000095367432" blue="0.4779999852180481" alpha="0.33000001311302185" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="gradientStartRed">
+            <color red="0.32899999618530273" green="0.32400000095367432" blue="0.4779999852180481" alpha="0.33000001311302185" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <systemColor name="systemFillColor">
+            <color red="0.47058823529411764" green="0.47058823529411764" blue="0.50196078431372548" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

@@ -10,7 +10,7 @@
 
 import Foundation
 
-protocol RisksUIChangesObserver: class {
+protocol RisksUIChangesObserver: AnyObject {
     
     func risksUIChanged()
     

@@ -23,9 +23,10 @@ public final class StorageManager: RBStorage {
         case proximityActivated
         case isAtRisk
         case lastExposureTimeFrame
-        case lastStatusRequestDate
         case lastStatusReceivedDate
         case lastStatusErrorDate
+        case lastCleaStatusReceivedDate
+        case lastCleaStatusErrorDate
         case lastRiskReceivedDate
         case isSick
         case positiveToSymptoms
@@ -38,7 +39,7 @@ public final class StorageManager: RBStorage {
 
         case currentRiskStatusLevel
         case lastRobertRiskStatusLevel
-        case lastWarningRiskStatusLevel
+        case lastCleaRiskStatusLevel
         case declarationToken
         case analyticsToken
 
@@ -206,15 +207,6 @@ public final class StorageManager: RBStorage {
         guard let lastExposureString = keychain.get(KeychainKey.lastExposureTimeFrame.rawValue), let lastExposure = Int(lastExposureString) else { return nil }
         return lastExposure
     }
-
-    // MARK: - Status: last status request date -
-    public func saveLastStatusRequestDate(_ date: Date?) {
-        saveDate(date, key: .lastStatusRequestDate)
-    }
-    
-    public func lastStatusRequestDate() -> Date? {
-        getDate(key: .lastStatusRequestDate)
-    }
     
     // MARK: - Status: last status received date -
     public func saveLastStatusReceivedDate(_ date: Date?) {
@@ -241,6 +233,24 @@ public final class StorageManager: RBStorage {
     
     public func lastRiskReceivedDate() -> Date? {
         getDate(key: .lastRiskReceivedDate)
+    }
+
+    // MARK: - Status: last clea status received date -
+    public func saveLastCleaStatusReceivedDate(_ date: Date?) {
+        saveDate(date, key: .lastCleaStatusReceivedDate)
+    }
+
+    public func lastCleaStatusReceivedDate() -> Date? {
+        getDate(key: .lastCleaStatusReceivedDate)
+    }
+
+    // MARK: - Status: last clea status error date -
+    public func saveLastCleaStatusErrorDate(_ date: Date?) {
+        saveDate(date, key: .lastCleaStatusErrorDate)
+    }
+
+    public func lastCleaStatusErrorDate() -> Date? {
+        getDate(key: .lastCleaStatusErrorDate)
     }
     
     // MARK: - Status: Is sick -
@@ -440,18 +450,18 @@ public final class StorageManager: RBStorage {
         return try? JSONDecoder().decode(RBStatusRiskLevelInfo.self, from: data)
     }
     
-    // MARK: - Status: Last Warning risk level -
-    public func saveLastWarningStatusRiskLevel(_ statusRiskLevelInfo: RBStatusRiskLevelInfo?) {
+    // MARK: - Status: Last Clea risk level -
+    public func saveLastCleaStatusRiskLevel(_ statusRiskLevelInfo: RBStatusRiskLevelInfo?) {
         guard let statusRiskLevelInfo = statusRiskLevelInfo else {
-            keychain.delete(KeychainKey.lastWarningRiskStatusLevel.rawValue)
+            keychain.delete(KeychainKey.lastCleaRiskStatusLevel.rawValue)
             return
         }
         guard let data = try? JSONEncoder().encode(statusRiskLevelInfo) else { return }
-        keychain.set(data, forKey: KeychainKey.lastWarningRiskStatusLevel.rawValue, withAccess: .accessibleAfterFirstUnlockThisDeviceOnly)
+        keychain.set(data, forKey: KeychainKey.lastCleaRiskStatusLevel.rawValue, withAccess: .accessibleAfterFirstUnlockThisDeviceOnly)
     }
     
-    public func lastWarningStatusRiskLevel() -> RBStatusRiskLevelInfo? {
-        guard let data = keychain.getData(KeychainKey.lastWarningRiskStatusLevel.rawValue) else { return nil }
+    public func lastCleaStatusRiskLevel() -> RBStatusRiskLevelInfo? {
+        guard let data = keychain.getData(KeychainKey.lastCleaRiskStatusLevel.rawValue) else { return nil }
         return try? JSONDecoder().decode(RBStatusRiskLevelInfo.self, from: data)
     }
     
@@ -511,9 +521,11 @@ public final class StorageManager: RBStorage {
     }
     
     public func clearAll(includingDBKey: Bool) {
-        KeychainKey.allCases.forEach {
-            if $0 != .dbKey || includingDBKey {
-                keychain.delete($0.rawValue)
+        keychain.allKeys.forEach {
+            guard $0.hasPrefix("SC") else { return }
+            let keyWithoutPrefix: String = String($0.suffix($0.count - 2))
+            if keyWithoutPrefix != KeychainKey.dbKey.rawValue || includingDBKey {
+                keychain.delete(keyWithoutPrefix)
             }
         }
         deleteAllAttestationFields()
@@ -643,33 +655,33 @@ public extension StorageManager {
 
 public extension StorageManager {
 
-    func saveVenueQrCode(_ venueQrCode: VenueQrCode) {
+    func saveVenueQrCodeInfo(_ venueQrCodeInfo: VenueQrCodeInfo) {
         guard let realm = realm else { return }
-        let realmVenueQrCode: RealmVenueQrCode = RealmVenueQrCode.from(venueQrCode: venueQrCode)
+        let realmVenueQrCodeInfo: RealmVenueQrCodeInfo = RealmVenueQrCodeInfo.from(venueQrCodeInfo: venueQrCodeInfo)
         try! realm.write {
-            realm.add(realmVenueQrCode, update: .all)
+            realm.add(realmVenueQrCodeInfo, update: .all)
         }
         notifyVenueQrCodeDataChanged()
     }
 
-    func deleteVenueQrCode(_ venueQrCode: VenueQrCode) {
+    func deleteVenueQrCodeInfo(_ venueQrCodeInfo: VenueQrCodeInfo) {
         guard let realm = realm else { return }
-        guard let realmVenueQrCode = realm.object(ofType: RealmVenueQrCode.self, forPrimaryKey: venueQrCode.id) else { return }
+        guard let realmVenueQrCodeInfo = realm.object(ofType: RealmVenueQrCodeInfo.self, forPrimaryKey: venueQrCodeInfo.id) else { return }
         try! realm.write {
-            realm.delete(realmVenueQrCode)
+            realm.delete(realmVenueQrCodeInfo)
         }
         notifyVenueQrCodeDataChanged()
     }
 
-    func venuesQrCodes() -> [VenueQrCode] {
+    func venuesQrCodes() -> [VenueQrCodeInfo] {
         guard let realm = realm else { return [] }
-        return realm.objects(RealmVenueQrCode.self).map { $0.toVenueQrCode() }
+        return realm.objects(RealmVenueQrCodeInfo.self).map { $0.toVenueQrCodeInfo() }
     }
 
     func deleteVenuesQrCodeData() {
         guard let realm = realm else { return }
         try! realm.write {
-            realm.delete(realm.objects(RealmVenueQrCode.self))
+            realm.delete(realm.objects(RealmVenueQrCodeInfo.self))
         }
         notifyVenueQrCodeDataChanged()
     }
@@ -677,11 +689,11 @@ public extension StorageManager {
     func deleteExpiredVenuesQrCodeData(durationInSeconds: Double) {
         guard let realm = realm else { return }
         let now: Date = Date()
-        let expiredVenueQrCodes: [RealmVenueQrCode] = [RealmVenueQrCode](realm.objects(RealmVenueQrCode.self)).filter { venueQrCode in
-            (Double(now.timeIntervalSince1900) - Double(venueQrCode.ntpTimestamp)) >= durationInSeconds
+        let expiredVenueQrCodeInfoList: [RealmVenueQrCodeInfo] = [RealmVenueQrCodeInfo](realm.objects(RealmVenueQrCodeInfo.self)).filter { venueQrCodeInfo in
+            (Double(now.timeIntervalSince1900) - Double(venueQrCodeInfo.ntpTimestamp)) >= durationInSeconds
         }
         try! realm.write {
-            realm.delete(expiredVenueQrCodes)
+            realm.delete(expiredVenueQrCodeInfoList)
         }
         notifyVenueQrCodeDataChanged()
     }
@@ -781,13 +793,10 @@ private extension Realm {
         let classes: [Object.Type] = [RealmEpoch.self,
                                       RealmLocalProximity.self,
                                       RealmAttestation.self,
-                                      RealmVenueQrCode.self,
-                                      RealmRawWalletCertificate.self,
-                                      Permission.self,
-                                      PermissionRole.self,
-                                      PermissionUser.self]
+                                      RealmVenueQrCodeInfo.self,
+                                      RealmRawWalletCertificate.self]
         let databaseUrl: URL = dbsDirectoryUrl().appendingPathComponent("db.realm")
-        let userConfig: Realm.Configuration = Realm.Configuration(fileURL: databaseUrl, encryptionKey: key, schemaVersion: 18, migrationBlock: { _, _ in }, objectTypes: classes)
+        let userConfig: Realm.Configuration = Realm.Configuration(fileURL: databaseUrl, encryptionKey: key, schemaVersion: 19, migrationBlock: { _, _ in }, objectTypes: classes)
         return userConfig
     }
     

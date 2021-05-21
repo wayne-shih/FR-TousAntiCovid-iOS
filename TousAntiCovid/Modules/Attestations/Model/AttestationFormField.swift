@@ -40,6 +40,7 @@ struct AttestationFormField: Codable {
         case addressCity
         case addressLine1
         case addressPostalCode
+        case addressCountry
         
         var textContentType: UITextContentType {
             switch self {
@@ -53,6 +54,8 @@ struct AttestationFormField: Codable {
                 return .streetAddressLine1
             case .addressPostalCode:
                 return .postalCode
+            case .addressCountry:
+                return .countryName
             }
         }
         
@@ -62,6 +65,7 @@ struct AttestationFormField: Codable {
     let key: String
     let type: FieldType
     let contentType: FieldContentType?
+    let defaultValue: String?
     let items: [AttestationFormFieldItem]?
     
     var dataKeyValue: String { dataKey ?? key }

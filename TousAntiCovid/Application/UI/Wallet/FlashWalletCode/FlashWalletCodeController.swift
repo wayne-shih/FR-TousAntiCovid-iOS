@@ -13,11 +13,13 @@ import StorageSDK
 
 final class FlashWalletCodeController: FlashCodeController {
     
-    private var didFlash: ((_ code: String?) throws -> Void)?
+    private var didFlash: ((_ code: String?) throws -> ())?
+    private var didGetCertificateError: ((_ error: Error) -> ())?
     
-    class func controller(didFlash: @escaping (_ code: String?) throws -> Void, deinitBlock: (() -> ())? = nil) -> FlashWalletCodeController {
+    class func controller(didFlash: @escaping (_ code: String?) throws -> Void, didGetCertificateError: @escaping (_ error: Error) -> (), deinitBlock: (() -> ())? = nil) -> FlashWalletCodeController {
         let flashCodeController: FlashWalletCodeController = StoryboardScene.FlashWalletCode.flashWalletCodeController.instantiate()
         flashCodeController.didFlash = didFlash
+        flashCodeController.didGetCertificateError = didGetCertificateError
         flashCodeController.deinitBlock = deinitBlock
         return flashCodeController
     }
@@ -40,28 +42,17 @@ final class FlashWalletCodeController: FlashCodeController {
         do {
             try didFlash?(code)
         } catch {
-            showErrorAlert(error: error)
+            didGetCertificateError?(error)
         }
-    }
-    
-    private func showErrorAlert(error: Error) {
-        let alertTitle: String = "wallet.proof.error.\((error as NSError).code).title".localized
-        let alertMessage: String = error.localizedDescription
-        showAlert(title: alertTitle,
-                  message: alertMessage,
-                  okTitle: "common.ok".localized, handler: {
-                    self.restartScanning()
-                  })
     }
     
     #if targetEnvironment(simulator)
     @objc private func didTouchFlashButton() {
-        scanView.stopScanning()
-        let url: String = "https://bonjour.tousanticovid.gouv.fr/app/wallet?v=DC04DHI0TST11E3C1E3CB201FRF0JEAN%20LOUIS/EDOUARD%1DF1DUPOND%1DF225111980F3MF494309%1DF5NF6110320211452%1FZCQ5EDEXRCRYMU4U5U4YQSF5GOE2PMFFC6PDWOMZK64434TUCJWQLIXCRYMA5TWVT7TEZSF2S3ZCJSYK3JYFOBVUHNOEXQMEKWQDG3A"
+        let url: String = "https://bonjour.tousanticovid.gouv.fr/app/wallet?v=DC04FR03AV011E791E79L101FRL0PAVOINE%1DL1EUGENE%1DL219081951L3COVID-19%1DL4J07BX03%1DL5MODERNA%1DL6MODERNA%1DL72L82L924032021LATE%1FKWT3FZQ726IFU6RUYD2KLOVYJUS7TMUGRNJNG55DIAN5BTBBM2Q6V3YXGM6YKRZVSD5GZZPY3RH7QNFFW5VZOT5MPULJOJBS7S567IA"
         do {
             try didFlash?(url)
         } catch {
-            showErrorAlert(error: error)
+            didGetCertificateError?(error)
         }
     }
     #endif

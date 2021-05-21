@@ -21,6 +21,7 @@ struct MaintenanceInfo: Decodable {
     let isActive: Bool?
     let mode: Mode?
     let minRequiredBuildNumber: Int?
+    let minInfoBuild: Int?
     private let message: [String: String]?
     private let buttonTitle: [String: String]?
     private let buttonURL: [String: String]?

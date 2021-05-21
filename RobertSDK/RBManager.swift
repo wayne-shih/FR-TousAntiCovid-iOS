@@ -50,10 +50,7 @@ public final class RBManager {
         get { storage.lastRobertStatusRiskLevel() }
         set { storage.saveLastRobertStatusRiskLevel(newValue) }
     }
-    public var lastWarningStatusRiskLevel: RBStatusRiskLevelInfo? {
-        get { storage.lastWarningStatusRiskLevel() }
-        set { storage.saveLastWarningStatusRiskLevel(newValue) }
-    }
+    
     public var declarationToken: String? {
         get { storage.declarationToken() }
         set { storage.saveDeclarationToken(newValue) }
@@ -62,11 +59,7 @@ public final class RBManager {
         get { storage.analyticsToken() }
         set { storage.saveAnalyticsToken(newValue) }
     }
-    
-    public var lastStatusRequestDate: Date? {
-        get { storage.lastStatusRequestDate() }
-        set { storage.saveLastStatusRequestDate(newValue) }
-    }
+
     public var lastStatusReceivedDate: Date? {
         get { storage.lastStatusReceivedDate() }
         set { storage.saveLastStatusReceivedDate(newValue) }
@@ -110,8 +103,8 @@ public final class RBManager {
     public var localProximityList: [RBLocalProximity] { storage.getLocalProximityList() }
     
     public var proximitiesRetentionDurationInDays: Int?
-    public var preSymptomsSpan: Int?
-    public var positiveSampleSpan: Int?
+    public var preSymptomsSpan: Int = 0
+    public var positiveSampleSpan: Int = 0
     public var contagiousSpan: Int?
     
     private var didStopProximityDueToLackOfEpochsHandler: (() -> ())?
@@ -223,7 +216,6 @@ extension RBManager {
         do {
             let ntpTimestamp: Int = Date().timeIntervalSince1900
             let statusMessage: RBStatusMessage = try RBMessageGenerator.generateStatusMessage(for: epoch, ntpTimestamp: ntpTimestamp, key: ka)
-            lastStatusRequestDate = Date()
             server.status(epochId: statusMessage.epochId, ebid: statusMessage.ebid, time: statusMessage.time, mac: statusMessage.mac) { result in
                 switch result {
                 case let .success(response):
@@ -260,34 +252,40 @@ extension RBManager {
             completion(.failure(error))
         }
     }
-    
+
     public func report(code: String, symptomsOrigin: Date?, positiveTestDate: Date?, completion: @escaping (_ error: Error?) -> ()) {
-        let symptomsOriginStartDate: Date? = symptomsOrigin?.rbDateByAddingDays(-(preSymptomsSpan ?? 0))
+        let symptomsOriginStartDate: Date? = symptomsOrigin?.rbDateByAddingDays(-preSymptomsSpan)
         let symptomsOriginEndDate: Date? = symptomsOrigin?.rbDateByAddingDays(contagiousSpan ?? 0)
-        let positiveTestDateStartDate: Date? = positiveTestDate?.rbDateByAddingDays(-(positiveSampleSpan ?? 0))
+        let positiveTestDateStartDate: Date? = positiveTestDate?.rbDateByAddingDays(-positiveSampleSpan)
         let positiveTestDateEndDate: Date? = positiveTestDate?.rbDateByAddingDays(contagiousSpan ?? 0)
         let startDate: Date = symptomsOriginStartDate ?? positiveTestDateStartDate ?? .distantPast
         let endDate: Date = min((symptomsOriginEndDate ?? positiveTestDateEndDate ?? Date()), Date())
         let localHelloMessages: [RBLocalProximity] = storage.getLocalProximityList(from: startDate, to: endDate)
-        do {
-            let filteredProximities: [RBLocalProximity] = try filter.filter(proximities: localHelloMessages)
-            server.report(code: code, helloMessages: filteredProximities) { result in
-                switch result {
-                case let .success(token):
-                    self.reportToken = token
-                    self.reportDate = symptomsOrigin ?? positiveTestDate ?? Date()
-                    self.reportDataOriginDate = startDate
-                    self.reportSymptomsStartDate = symptomsOrigin
-                    self.reportPositiveTestDate = positiveTestDate
-                    self.clearLocalProximityList()
-                    self.isSick = true
-                    completion(nil)
-                case let .failure(error):
-                    completion(error)
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let filteredProximities: [RBLocalProximity] = try self.filter.filter(proximities: localHelloMessages)
+                self.server.report(code: code, helloMessages: filteredProximities) { result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case let .success(token):
+                            self.reportToken = token
+                            self.reportDate = symptomsOrigin ?? positiveTestDate ?? Date()
+                            self.reportDataOriginDate = startDate
+                            self.reportSymptomsStartDate = symptomsOrigin
+                            self.reportPositiveTestDate = positiveTestDate
+                            self.clearLocalProximityList()
+                            self.isSick = true
+                            completion(nil)
+                        case let .failure(error):
+                            completion(error)
+                        }
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(NSError.rbLocalizedError(message: "Filtering of hello messages failed: \(error.localizedDescription)", code: 0))
                 }
             }
-        } catch {
-            completion(NSError.rbLocalizedError(message: "Filtering of hello messages failed: \(error.localizedDescription)", code: 0))
         }
     }
     
@@ -409,8 +407,7 @@ extension RBManager {
     
     private func processStatusResponse(_ response: RBStatusResponse) throws {
         let epochs: [RBEpoch] = try decrypt(tuples: response.tuples)
-        let now: Date = Date()
-        lastStatusReceivedDate = now
+        lastStatusReceivedDate = Date()
         lastStatusErrorDate = nil
         declarationToken = response.declarationToken
         analyticsToken = response.analyticsToken

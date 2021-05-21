@@ -13,11 +13,9 @@ import Lottie
 
 final class VenuesRecordingConfirmationController: CVTableViewController {
 
-    private let venueType: String
     private let didFinish: () -> ()
 
-    init(venueType: String, didFinish: @escaping () -> ()) {
-        self.venueType = venueType
+    init(didFinish: @escaping () -> ()) {
         self.didFinish = didFinish
         super.init(style: .plain)
     }
@@ -45,14 +43,8 @@ final class VenuesRecordingConfirmationController: CVTableViewController {
                                     theme: CVRow.Theme(topInset: 40.0))
         rows.append(stateRow)
 
-        var confirmationTitle: String = "erp.confirmationMessage.\(venueType.lowercased()).title".localizedOrEmpty
-        if confirmationTitle.isEmpty {
-            confirmationTitle = "erp.confirmationMessage.default.title".localized
-        }
-        var confirmationMessage: String = "erp.confirmationMessage.\(venueType.lowercased()).message".localizedOrEmpty
-        if confirmationMessage.isEmpty {
-            confirmationMessage = "erp.confirmationMessage.default.message".localized
-        }
+        let confirmationTitle: String = "erp.confirmationMessage.default.title".localized
+        let confirmationMessage: String = "erp.confirmationMessage.default.message".localized
         let textRow: CVRow = CVRow(title: confirmationTitle,
                                    subtitle: confirmationMessage,
                                    xibName: .textCell,

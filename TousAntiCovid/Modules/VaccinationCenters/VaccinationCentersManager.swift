@@ -47,11 +47,11 @@ final class VaccinationCenterManager: NSObject {
     
     private var vaccinationCenters: [VaccinationCenter]?
     
-    @OptionalUserDefault(key: .currentVaccinationReferenceDepartmentCode)
+    @UserDefault(key: .currentVaccinationReferenceDepartmentCode)
     private var currentDepartmentCode: String?
-    @OptionalUserDefault(key: .currentVaccinationReferenceLatitude)
+    @UserDefault(key: .currentVaccinationReferenceLatitude)
     private var currentVaccinationReferenceLatitude: Double?
-    @OptionalUserDefault(key: .currentVaccinationReferenceLongitude)
+    @UserDefault(key: .currentVaccinationReferenceLongitude)
     private var currentVaccinationReferenceLongitude: Double?
     
     private var currentLocation: CLLocation? {

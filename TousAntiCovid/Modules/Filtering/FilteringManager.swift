@@ -43,13 +43,14 @@ final class FilteringManager: RBFiltering {
                 switch filterOutput {
                     case let .success(proximityFilterOutput):
                         if proximityFilterOutput.areTimestampedRSSIsUpdated {
-                            proximityFilterOutput.timestampedRSSIs.forEach { timeStampedRssi in
-                                if let matchingLocalProximity = list.first(where: { $0.hashValue == timeStampedRssi.identifier as? Int }) {
-                                    var localProximity = matchingLocalProximity
-                                    localProximity.rssiCalibrated = timeStampedRssi.rssi
-                                    filteredHelloMessage.append(localProximity)
-                                }
+                            let localProximityByHashValue: [Int: [RBLocalProximity]] = Dictionary(grouping: list) { $0.hashValue }
+                            let filteredHelloMessageFromFilterOutput: [RBLocalProximity] = proximityFilterOutput.timestampedRSSIs.compactMap {
+                                guard let identifier = $0.identifier as? Int else { return nil }
+                                var localProximity: RBLocalProximity? = localProximityByHashValue[identifier]?.first
+                                localProximity?.rssiCalibrated = $0.rssi
+                                return localProximity
                             }
+                            filteredHelloMessage.append(contentsOf: filteredHelloMessageFromFilterOutput)
                         } else {
                             filteredHelloMessage.append(contentsOf: list)
                         }

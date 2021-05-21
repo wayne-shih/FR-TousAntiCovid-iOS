@@ -22,6 +22,9 @@ final class MaintenanceManager: NSObject {
     
     private var lastUpdateDate: Date = .distantPast
     
+    @UserDefault(key: .latestAvailableBuild)
+    private var latestAvailableBuild: Int?
+    
     override private init() {}
     
     func start(coordinator: MaintenanceSupportingCoordinator) {
@@ -49,6 +52,7 @@ final class MaintenanceManager: NSObject {
                         let iOSData: Data = try JSONSerialization.data(withJSONObject: iOSJson, options: [])
                         let info: MaintenanceInfo = try JSONDecoder().decode(MaintenanceInfo.self, from: iOSData)
                         self.triesCount = 0
+                        self.latestAvailableBuild = info.minInfoBuild
                         if info.shouldShow() {
                             self.showController(info: info)
                         } else {

@@ -11,27 +11,38 @@
 import UIKit
 
 @propertyWrapper
-final class WidgetUserDefault<T> {
-    
-    private let defaults: UserDefaults = .widget
-    let key: Key
-    let defaultValue: T
-    
+struct WidgetUserDefault<T> {
+
+    private var defaults: UserDefaults
+    private let key: Key
+    private let defaultValue: T
+
     var projectedValue: String { key.rawValue }
-    
+
     var wrappedValue: T {
         get { defaults.object(forKey: key.rawValue) as? T ?? defaultValue }
         set {
-            defaults.set(newValue, forKey: key.rawValue)
+            if let optional = newValue as? AnyOptional, optional.isNil {
+                defaults.removeObject(forKey: key.rawValue)
+            } else {
+                defaults.set(newValue, forKey: key.rawValue)
+            }
             defaults.synchronize()
         }
     }
 
-    init(wrappedValue: T, key: Key) {
+    init(wrappedValue: T, key: Key, userDefault: UserDefaults = .widget) {
         self.defaultValue = wrappedValue
         self.key = key
+        self.defaults = userDefault
     }
-    
+
+}
+
+extension WidgetUserDefault where T: ExpressibleByNilLiteral {
+    init(key: Key) {
+        self.init(wrappedValue: nil, key: key)
+    }
 }
 
 extension WidgetUserDefault {

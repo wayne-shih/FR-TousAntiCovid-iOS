@@ -108,11 +108,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         let request: UNNotificationRequest = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         requestAuthorization { _ in
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
-            UNUserNotificationCenter.current().add(request) { error in
-                if let error = error {
-                    print(error)
-                }
-            }
+            UNUserNotificationCenter.current().add(request) { _ in }
         }
     }
     
@@ -231,11 +227,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         requestAuthorization { _ in
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [NotificationsContant.Identifier.ultimate])
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NotificationsContant.Identifier.ultimate])
-            UNUserNotificationCenter.current().add(request) { error in
-                if let error = error {
-                    print(error)
-                }
-            }
+            UNUserNotificationCenter.current().add(request) { _ in }
         }
     }
     
@@ -250,11 +242,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         requestAuthorization { _ in
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [NotificationsContant.Identifier.proximityReactivation])
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NotificationsContant.Identifier.proximityReactivation])
-            UNUserNotificationCenter.current().add(request) { error in
-                if let error = error {
-                    print(error)
-                }
-            }
+            UNUserNotificationCenter.current().add(request) { _ in }
         }
     }
     

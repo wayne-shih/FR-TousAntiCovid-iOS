@@ -18,6 +18,7 @@ final class IsolationInitialCaseSafeCell: CVTableViewCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI()
+        setupAccessibility()
     }
     
     private func setupUI() {
@@ -40,6 +41,13 @@ final class IsolationInitialCaseSafeCell: CVTableViewCell {
             UIView.animate(withDuration: 0.3) {
                 self.contentView.alpha = 1.0
             }
+        }
+    }
+
+    private func setupAccessibility() {
+        accessibilityElements = [cvTitleLabel].compactMap { $0 }
+        if let cvSubtitleLabel = cvSubtitleLabel, !cvSubtitleLabel.isHidden {
+            accessibilityElements?.append(cvSubtitleLabel)
         }
     }
     

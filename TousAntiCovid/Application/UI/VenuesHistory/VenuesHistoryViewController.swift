@@ -10,6 +10,7 @@
 
 import UIKit
 import StorageSDK
+import RobertSDK
 
 final class VenuesHistoryViewController: CVTableViewController {
     
@@ -63,12 +64,12 @@ final class VenuesHistoryViewController: CVTableViewController {
     }
     
     override func createRows() -> [CVRow] {
-        let venuesQrCodes: [VenueQrCode] = VenuesManager.shared.venuesQrCodes.sorted { $0.ntpTimestamp > $1.ntpTimestamp }
-        updateEmptyView(areThereQrCodes: !venuesQrCodes.isEmpty)
+        let venuesQrCodes: [VenueQrCodeInfo] = VenuesManager.shared.venuesQrCodes.sorted { $0.ntpTimestamp > $1.ntpTimestamp }
+        updateEmptyView(areThereQrCodes: !venuesQrCodes.isEmpty, isSick: RBManager.shared.isSick)
         guard !venuesQrCodes.isEmpty else { return [] }
-        var rows: [CVRow] = venuesQrCodes.map { venueQrCode in
-            CVRow(title: venueQrCode.venueTypeDisplayName,
-                  subtitle: venueQrCode.uuid,
+        var rows: [CVRow] = venuesQrCodes.map { venueQrCodeInfo in
+            CVRow(title: venueQrCodeInfo.venueTypeDisplayName,
+                  subtitle: venueQrCodeInfo.ltid,
                   xibName: .venueHistoryCell,
                   theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                      topInset: 8.0,
@@ -76,10 +77,11 @@ final class VenuesHistoryViewController: CVTableViewController {
                                      rightInset: 8.0,
                                      textAlignment: .natural,
                                      titleFont: { Appearance.Cell.Text.standardFont },
+                                     subtitleFont: { Appearance.Cell.Text.subtitleFont },
                                      subtitleColor: Appearance.Cell.Text.subtitleColor.withAlphaComponent(0.5),
                                      separatorLeftInset: Appearance.Cell.leftMargin),
                   secondarySelectionAction: { [weak self] in
-                    self?.deleteVenueQrCode(venueQrCode)
+                    self?.deleteVenueQrCodeInfo(venueQrCodeInfo)
                   })
         }
         guard rows.count >= 1 else { return rows }
@@ -101,17 +103,17 @@ final class VenuesHistoryViewController: CVTableViewController {
         return rows
     }
     
-    private func updateEmptyView(areThereQrCodes: Bool) {
-        tableView.backgroundView = areThereQrCodes ? nil : VenuesHistoryEmptyView.view()
+    private func updateEmptyView(areThereQrCodes: Bool, isSick: Bool) {
+        tableView.backgroundView = areThereQrCodes ? nil : VenuesHistoryEmptyView.view(isSick: isSick)
     }
     
-    private func deleteVenueQrCode(_ venueQrCode: VenueQrCode) {
+    private func deleteVenueQrCodeInfo(_ venueQrCodeInfo: VenueQrCodeInfo) {
         showAlert(title: "venuesHistoryController.delete.alert.title".localized,
                   message: "venuesHistoryController.delete.alert.message".localized,
                   okTitle: "common.delete".localized,
                   isOkDestructive: true,
                   cancelTitle: "common.cancel".localized, handler: {
-            VenuesManager.shared.deleteVenueQrCode(venueQrCode)
+            VenuesManager.shared.deleteVenueQrCodeInfo(venueQrCodeInfo)
         })
     }
     

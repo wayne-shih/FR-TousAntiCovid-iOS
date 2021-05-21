@@ -44,13 +44,14 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         PrivacyManager.shared.start()
         LinksManager.shared.start()
         KeyFiguresExplanationsManager.shared.start()
+        WalletImagesManager.shared.start()
         OrientationManager.shared.start()
         if isOnboardingDone {
             BluetoothStateManager.shared.start()
         }
         
-        WarningServer.shared.start(baseUrl: { Constant.Server.warningBaseUrl },
-                                   certificateFile: Constant.Server.warningCertificate,
+        CleaServer.shared.start(reportBaseUrl: { Constant.Server.cleaReportBaseUrl },
+                                   statusBaseUrl: { Constant.Server.cleaStatusBaseUrl },
                                    requestLoggingHandler: { _, _, _ in })
         
         RBManager.shared.start(isFirstInstall: !isAppAlreadyInstalled,
@@ -78,11 +79,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         if #available(iOS 14.0, *) {
             WidgetManager.shared.start()
         }
-        StatusManager.shared.start()
+        StatusManager.shared.start(storageManager: storageManager)
         isAppAlreadyInstalled = true
         rootCoordinator.start()
         initAppMaintenance()
         DeepLinkingManager.shared.start()
+        HUD.leadingMargin = 8.0
+        HUD.trailingMargin = 8.0
         UIApplication.shared.registerForRemoteNotifications()
         if let shortcutItem = launchOptions?[UIApplication.LaunchOptionsKey.shortcutItem] as? UIApplicationShortcutItem {
             processShortcutItem(shortcutItem)

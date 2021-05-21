@@ -21,8 +21,12 @@ public final class ParametersManager: NSObject {
         case v6
     }
     
-    public enum WarningApiVersion: String {
-        case v2
+    public enum CleaStatusApiVersion: String {
+        case v1
+    }
+
+    public enum CleaReportApiVersion: String {
+        case v1
     }
     
     public enum AnalyticsApiVersion: String {
@@ -43,13 +47,11 @@ public final class ParametersManager: NSObject {
     }
     
     public var displayRecordVenues: Bool { valueFor(name: "app.displayRecordVenues") as? Bool ?? false }
-    public var displayPrivateEvent: Bool { valueFor(name: "app.displayPrivateEvent") as? Bool ?? false }
-    public var privateEventVenueType: String { valueFor(name: "app.privateEventVenueType") as? String ?? "NA" }
     public var displayAttestation: Bool { valueFor(name: "app.displayAttestation") as? Bool ?? false }
     public var displaySanitaryCertificatesWallet: Bool { valueFor(name: "app.displaySanitaryCertificatesWallet") as? Bool ?? false }
     public var displaySanitaryCertificatesValidation: Bool { valueFor(name: "app.displaySanitaryCertificatesValidation") as? Bool ?? false }
     public var isAnalyticsOn: Bool { valueFor(name: "app.isAnalyticsOn") as? Bool ?? false }
-    public var walletTestCertificateValidityThresholdInHours: Int { valueFor(name: "app.wallet.testCertificateValidityThresholdInHours") as? Int ?? 72 }
+    public var walletTestCertificateValidityThresholds: [Int] { valueFor(name: "app.wallet.testCertificateValidityThresholds") as? [Int] ?? [48, 72] }
     
     public var displayIsolation: Bool { valueFor(name: "app.displayIsolation") as? Bool ?? false }
     public var isolationMinRiskLevel: Double { valueFor(name: "app.isolationMinRiskLevel") as? Double ?? 4.0 }
@@ -62,13 +64,11 @@ public final class ParametersManager: NSObject {
     public var postIsolationDuration: Double { valueFor(name: "app.postIsolation.duration") as? Double ?? 604800.0 }
     
     var appAvailability: Bool? { valueFor(name: "app.appAvailability") as? Bool }
-    var preSymptomsSpan: Int? {
-        guard let span = valueFor(name: "app.preSymptomsSpan") as? Double else { return nil }
-        return Int(span)
+    var preSymptomsSpan: Int {
+        Int(valueFor(name: "app.preSymptomsSpan") as? Double ?? 2)
     }
-    var positiveSampleSpan: Int? {
-        guard let span = valueFor(name: "app.positiveSampleSpan") as? Double else { return nil }
-        return Int(span)
+    var positiveSampleSpan: Int {
+        Int(valueFor(name: "app.positiveSampleSpan") as? Double ?? 7)
     }
 
     public var minHoursBetweenVisibleNotif: Int {
@@ -95,8 +95,8 @@ public final class ParametersManager: NSObject {
     
     public var qrCodeDeletionHours: Double { valueFor(name: "app.qrCode.deletionHours") as? Double ?? 24.0}
     public var qrCodeExpiredHours: Double { valueFor(name: "app.qrCode.expiredHours") as? Double ?? 1.0}
-    public var qrCodeFormattedString: String { valueFor(name: "app.qrCode.formattedString") as? String ?? "Cree le: <creationDate> a <creationHour>;\nNom: <lastname>;\nPrenom: <firstname>;\nNaissance: <dob> a <cityofbirth>;\nAdresse: <address> <zip> <city>;\nSortie: <datetime-day> a <datetime-hour>;\nMotifs: <reason-code>" }
-    public var qrCodeFormattedStringDisplayed: String { valueFor(name: "app.qrCode.formattedStringDisplayed") as? String ?? "Créé le <creationDate> à <creationHour>\nNom : <lastname>;\nPrénom : <firstname>;\nNaissance : <dob> à <cityofbirth>\nAdresse : <address> <zip> <city>\nSortie : <datetime-day> à <datetime-hour>\nMotif: <reason-code>" }
+    public var qrCodeFormattedString: String { valueFor(name: "app.qrCode.formattedString") as? String ?? "Cree le: <creationDate> a <creationHour>;\nNom: <lastname>;\nPrenom: <firstname>;\nNaissance: <dob> a <cityofbirth>;\nAdresse: <address> <zip> <city> <country>;\nSortie: <datetime-day> a <datetime-hour>;\nMotifs: <reason-code>" }
+    public var qrCodeFormattedStringDisplayed: String { valueFor(name: "app.qrCode.formattedStringDisplayed") as? String ?? "Créé le <creationDate> à <creationHour>\nNom : <lastname>;\nPrénom : <firstname>;\nNaissance : <dob> à <cityofbirth>\nAdresse : <address> <zip> <city> <country>\nSortie : <datetime-day> à <datetime-hour>\nMotif: <reason-code>" }
     public var qrCodeFooterString: String { valueFor(name: "app.qrCode.footerString") as? String ?? "<firstname> - <datetime-day>, <datetime-hour>\n<reason-shortlabel>" }
     
     public var statusTimeInterval: Double {
@@ -132,7 +132,8 @@ public final class ParametersManager: NSObject {
     public var bleFilteringMode: String? { valueFor(name: "ble.filterMode") as? String }
     
     public var apiVersion: ApiVersion { ApiVersion(rawValue: valueFor(name: "app.apiVersion") as? String ?? "") ?? .v5 }
-    public var warningApiVersion: WarningApiVersion { WarningApiVersion(rawValue: valueFor(name: "app.warningApiVersion") as? String ?? "") ?? .v2 }
+    public var cleaStatusApiVersion: CleaStatusApiVersion { CleaStatusApiVersion(rawValue: valueFor(name: "app.cleaStatusApiVersion") as? String ?? "") ?? .v1 }
+    public var cleaReportApiVersion: CleaReportApiVersion { CleaReportApiVersion(rawValue: valueFor(name: "app.cleaReportApiVersion") as? String ?? "") ?? .v1 }
     public var analyticsApiVersion: AnalyticsApiVersion { AnalyticsApiVersion(rawValue: valueFor(name: "app.analyticsApiVersion") as? String ?? "") ?? .v1 }
     
     private var config: [[String: Any]] = [] {
@@ -173,10 +174,9 @@ public final class ParametersManager: NSObject {
         }
     }
     
-    public func walletOldCertificateThresholdInDays(certificateType: String) -> Int {
-        let defaultValue: Int = 7
-        guard let dict = valueFor(name: "app.wallet.oldCertificateThresholdInDays") as? [String: Int] else { return defaultValue }
-        guard let thresholdValue = dict[certificateType.lowercased()] else { return defaultValue }
+    public func walletOldCertificateThresholdInDays(certificateType: String) -> Int? {
+        guard let dict = valueFor(name: "app.wallet.oldCertificateThresholdInDays") as? [String: Int] else { return nil }
+        guard let thresholdValue = dict[certificateType.lowercased()] else { return nil }
         return thresholdValue
     }
     public func walletPublicKey(authority: String, certificateId: String) -> String? {

@@ -101,6 +101,11 @@ enum Appearance {
         
     }
     
+    enum SegmentedControl {
+        static var selectedFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .semibold(size: 14.0)) }
+        static var normalFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .medium(size: 13.0)) }
+    }
+    
     enum Cell {
         
         enum Onboarding {

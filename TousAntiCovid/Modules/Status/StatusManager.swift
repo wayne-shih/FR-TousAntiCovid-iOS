@@ -13,7 +13,7 @@ import RobertSDK
 import ServerSDK
 import StorageSDK
 
-protocol StatusChangesObserver: class {
+protocol StatusChangesObserver: AnyObject {
     
     func statusRiskLevelDidChange()
     
@@ -48,18 +48,27 @@ final class StatusManager {
         }
     }
     
+    @UserDefault(key: .cleaLastIteration)
+    var cleaLastIteration: Int?
+    var cleaClusterIndex: CleaServerStatusClusterIndex?
+    
     var lastRobertStatusRiskLevel: RBStatusRiskLevelInfo? {
         get { RBManager.shared.lastRobertStatusRiskLevel }
         set { RBManager.shared.lastRobertStatusRiskLevel = newValue }
     }
     
-    var lastWarningStatusRiskLevel: RBStatusRiskLevelInfo? {
-        get { RBManager.shared.lastWarningStatusRiskLevel }
-        set { RBManager.shared.lastWarningStatusRiskLevel = newValue }
+    var lastCleaStatusRiskLevel: RBStatusRiskLevelInfo? {
+        get { storageManager.lastCleaStatusRiskLevel() }
+        set { storageManager.saveLastCleaStatusRiskLevel(newValue) }
     }
-    
+
     var isAtRisk: Bool { currentStatusRiskLevel?.riskLevel ?? 0.0 >= ParametersManager.shared.isolationMinRiskLevel }
-    
+    var isStatusOnGoing: Bool = false {
+        didSet {
+            if oldValue != isStatusOnGoing { notifyStatusChange() }
+        }
+    }
+
     private let statusModelVersion: Int = 1
     
     @UserDefault(key: .currentStatusModelVersion)
@@ -69,62 +78,86 @@ final class StatusManager {
     private var mustNotifyLastRiskLevelChange: Bool = false
     private var mustShowAlertAboutLastRiskLevelChange: Bool = false
     private var observers: [StatusObserverWrapper] = []
-    
-    func start() {
+    private var storageManager: StorageManager!
+
+    func start(storageManager: StorageManager) {
+        self.storageManager = storageManager
         NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
         migrateOldAtRiskIfNeeded()
     }
     
     func status(showNotifications: Bool = false, force: Bool = false, completion: ((_ error: Error?) -> ())? = nil) {
+        guard RBManager.shared.isRegistered else {
+            completion?(nil)
+            return
+        }
+        let nowTimestamp: TimeInterval = Date().timeIntervalSince1970
+        guard nowTimestamp - lastStatusTriggerEventTimestamp > Constant.secondsBeforeStatusRetry || force else {
+            let error: Error = NSError.localizedError(message: "lastStatusTriggerEventTimestamp registered less than \(Int(Constant.secondsBeforeStatusRetry)) seconds ago", code: 0)
+            completion?(error)
+            return
+        }
+        self.lastStatusTriggerEventTimestamp = nowTimestamp
+
+        var robertStatusInfo: RBStatusRiskLevelInfo?
+        var robertError: Error?
+        var cleaStatusInfo: RBStatusRiskLevelInfo?
+        var cleaError: Error?
+        let dispatchGroup: DispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
         triggerStatusRequestIfNeeded(showNotifications: showNotifications, force: force) { statusResult in
             switch statusResult {
             case let .success(statusInfo):
-                guard let statusInfo = statusInfo else {
-                    completion?(nil)
-                    return
-                }
-                self.triggerWarningStatusRequestIfNeeded { wstatusResult in
-                    switch wstatusResult {
-                    case let .success(wstatusInfo):
-                        self.processReceivedStatusInfo(statusInfo: statusInfo, wstatusInfo: wstatusInfo)
-                        completion?(nil)
-                    case let .failure(error):
-                        completion?(error)
-                    }
-                }
+                robertStatusInfo = statusInfo
             case let .failure(error):
-                completion?(error)
+                robertError = error
             }
+            dispatchGroup.leave()
+        }
+        dispatchGroup.enter()
+        triggerCleaStatusRequestIfNeeded(force: force) { cleaStatusResult in
+            switch cleaStatusResult {
+            case let .success(statusInfo):
+                cleaStatusInfo = statusInfo
+            case let .failure(error):
+                cleaError = error
+            }
+            dispatchGroup.leave()
+        }
+        dispatchGroup.notify(queue: .main) {
+            self.isStatusOnGoing = false
+            self.processReceivedStatusInfo(statusInfo: robertStatusInfo, cleaStatusInfo: cleaStatusInfo, isInError: robertError != nil || cleaError != nil)
+            completion?(robertError ?? cleaError)
         }
     }
     
 }
 
 extension StatusManager {
-
+    
     func addObserver(_ observer: StatusChangesObserver) {
         guard observerWrapper(for: observer) == nil else { return }
         observers.append(StatusObserverWrapper(observer: observer))
     }
-
+    
     func removeObserver(_ observer: StatusChangesObserver) {
         guard let wrapper = observerWrapper(for: observer), let index = observers.firstIndex(of: wrapper) else { return }
         observers.remove(at: index)
     }
-
+    
     private func observerWrapper(for observer: StatusChangesObserver) -> StatusObserverWrapper? {
         observers.first { $0.observer === observer }
     }
-
+    
     private func notifyObservers() {
         observers.forEach { $0.observer?.statusRiskLevelDidChange() }
     }
-
+    
 }
 
 // MARK: - Migration management -
 extension StatusManager {
-
+    
     private func migrateOldAtRiskIfNeeded() {
         guard currentStatusModelVersion != statusModelVersion else { return }
         currentStatusModelVersion = statusModelVersion
@@ -144,80 +177,214 @@ extension StatusManager {
         }
         RBManager.shared.lastRiskReceivedDate = nil
     }
-
+    
 }
 
 // MARK: - Status triggering requests -
 extension StatusManager {
     
     private func triggerStatusRequestIfNeeded(showNotifications: Bool = false, force: Bool = false, completion: ((_ result: Result<RBStatusRiskLevelInfo?, Error>) -> ())? = nil) {
-        let nowTimestamp: TimeInterval = Date().timeIntervalSince1970
-        guard nowTimestamp - lastStatusTriggerEventTimestamp > Constant.secondsBeforeStatusRetry || force else {
-            let error: Error = NSError.localizedError(message: "lastStatusTriggerEventTimestamp registered less than \(Int(Constant.secondsBeforeStatusRetry)) seconds ago", code: 0)
-            completion?(.failure(error))
-            return
-        }
-        self.lastStatusTriggerEventTimestamp = nowTimestamp
-        if RBManager.shared.isRegistered {
-            let lastStatusErrorTimestamp: Double = RBManager.shared.lastStatusErrorDate?.timeIntervalSince1970 ?? 0.0
-            let lastStatusSuccessTimestamp: Double = RBManager.shared.lastStatusReceivedDate?.timeIntervalSince1970 ?? 0.0
-            let mostRecentResponseTimestamp: Double = max(lastStatusErrorTimestamp, lastStatusSuccessTimestamp)
-            let nowTimestamp: Double = Date().timeIntervalSince1970
-            if (nowTimestamp - mostRecentResponseTimestamp >= ParametersManager.shared.minStatusRetryTimeInterval && nowTimestamp - lastStatusSuccessTimestamp >= ParametersManager.shared.statusTimeInterval) || force {
-                switch ParametersManager.shared.apiVersion {
-                case .v5, .v6:
-                    RBManager.shared.status { result in
-                        switch result {
-                        case let .success(info):
-                            if showNotifications {
-                                self.processStatusResponseNotification(error: nil)
-                            }
-                            AnalyticsManager.shared.statusDidSucceed()
-                            AnalyticsManager.shared.sendAnalytics()
-                            NotificationsManager.shared.scheduleUltimateNotification(minHour: ParametersManager.shared.minHourContactNotif, maxHour: ParametersManager.shared.maxHourContactNotif)
-                            completion?(.success(info))
-                        case let .failure(error):
-                            AnalyticsManager.shared.reportError(serviceName: "status", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
-                            if showNotifications {
-                                self.processStatusResponseNotification(error: error)
-                            }
-                            completion?(.failure(error))
+        let lastStatusErrorTimestamp: Double = RBManager.shared.lastStatusErrorDate?.timeIntervalSince1970 ?? 0.0
+        let lastStatusSuccessTimestamp: Double = RBManager.shared.lastStatusReceivedDate?.timeIntervalSince1970 ?? 0.0
+        let mostRecentResponseTimestamp: Double = max(lastStatusErrorTimestamp, lastStatusSuccessTimestamp)
+        let nowTimestamp: Double = Date().timeIntervalSince1970
+        if (nowTimestamp - mostRecentResponseTimestamp >= ParametersManager.shared.minStatusRetryTimeInterval && nowTimestamp - lastStatusSuccessTimestamp >= ParametersManager.shared.statusTimeInterval) || force {
+            switch ParametersManager.shared.apiVersion {
+            case .v5, .v6:
+                isStatusOnGoing = true
+                RBManager.shared.status { result in
+                    switch result {
+                    case let .success(info):
+                        if showNotifications {
+                            self.processStatusResponseNotification(error: nil)
                         }
+                        AnalyticsManager.shared.statusDidSucceed()
+                        AnalyticsManager.shared.sendAnalytics()
+                        NotificationsManager.shared.scheduleUltimateNotification(minHour: ParametersManager.shared.minHourContactNotif, maxHour: ParametersManager.shared.maxHourContactNotif)
+                        completion?(.success(info))
+                    case let .failure(error):
+                        AnalyticsManager.shared.reportError(serviceName: "status", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
+                        if showNotifications {
+                            self.processStatusResponseNotification(error: error)
+                        }
+                        completion?(.failure(error))
                     }
                 }
-            } else {
-                if showNotifications {
-                    self.processStatusResponseNotification(error: nil)
-                }
-                let retryCriteria: String = "Current: \(Int(nowTimestamp - mostRecentResponseTimestamp)) | Expected: \(Int(ParametersManager.shared.minStatusRetryTimeInterval))"
-                let timeCriteria: String = "Current: \(Int(nowTimestamp - lastStatusSuccessTimestamp)) | Expected: \(Int(ParametersManager.shared.statusTimeInterval))"
-                let error: Error = NSError.localizedError(message: "Last status requested/received too recently:\n\n-----\nRetry\n-----\n\(retryCriteria)\n\n--------\nMin time\n--------\n\(timeCriteria)", code: 0)
-                completion?(.failure(error))
             }
         } else {
-            completion?(.success(nil))
+            if showNotifications {
+                self.processStatusResponseNotification(error: nil)
+            }
+            let retryCriteria: String = "Current: \(Int(nowTimestamp - mostRecentResponseTimestamp)) | Expected: \(Int(ParametersManager.shared.minStatusRetryTimeInterval))"
+            let timeCriteria: String = "Current: \(Int(nowTimestamp - lastStatusSuccessTimestamp)) | Expected: \(Int(ParametersManager.shared.statusTimeInterval))"
+            let error: Error = NSError.localizedError(message: "Last status requested/received too recently:\n\n-----\nRetry\n-----\n\(retryCriteria)\n\n--------\nMin time\n--------\n\(timeCriteria)", code: 0)
+            completion?(.failure(error))
         }
     }
     
-    private func triggerWarningStatusRequestIfNeeded(_ completion: ((_ result: Result<RBStatusRiskLevelInfo?, Error>) -> ())? = nil) {
-        let now: Date = Date()
-        let qrCodes: [VenueQrCode] = VenuesManager.shared.venuesQrCodes.filter { $0.ntpTimestamp <= now.timeIntervalSince1900 }
-        guard !qrCodes.isEmpty else {
-            completion?(.success(nil))
-            return
+    private func triggerCleaStatusRequestIfNeeded(force: Bool = false, completion: ((_ result: Result<RBStatusRiskLevelInfo?, Error>) -> ())? = nil) {
+        let lastCleaStatusErrorTimestamp: Double = storageManager.lastCleaStatusErrorDate()?.timeIntervalSince1970 ?? 0.0
+        let lastCleaStatusSuccessTimestamp: Double = storageManager.lastCleaStatusReceivedDate()?.timeIntervalSince1970 ?? 0.0
+        let mostRecentResponseTimestamp: Double = max(lastCleaStatusErrorTimestamp, lastCleaStatusSuccessTimestamp)
+        let nowTimestamp: Double = Date().timeIntervalSince1970
+        if (nowTimestamp - mostRecentResponseTimestamp >= ParametersManager.shared.minStatusRetryTimeInterval && nowTimestamp - lastCleaStatusSuccessTimestamp >= ParametersManager.shared.statusTimeInterval) || force {
+
+            let now: Date = Date()
+            let qrCodes: [VenueQrCodeInfo] = VenuesManager.shared.venuesQrCodes.filter { $0.ntpTimestamp <= now.timeIntervalSince1900 }
+            guard !qrCodes.isEmpty else {
+                completion?(.success(nil))
+                return
+            }
+            let cleaStatusStartDate: Date = Date()
+            let ltids: [String] = qrCodes.map { $0.ltid }
+            isStatusOnGoing = true
+            fetchNeededClusterPrefixes(ltids: ltids) { result in
+                switch result {
+                case let .success(matchingPrefixes):
+                    CleaServer.shared.getAllCleaClusters(for: matchingPrefixes, iteration: self.cleaLastIteration ?? 0) { result in
+                        switch result {
+                        case let .success(clusters):
+                            let clustersForLtids: [CleaServerStatusCluster] = clusters.filter { ltids.contains($0.ltid) }
+
+                            let matchingClusters: [CleaServerStatusCluster] = self.matchingClusters(clusters: clustersForLtids, venueQrCodeInfos: qrCodes)
+                            let newStatusRiskLevelInfo: RBStatusRiskLevelInfo? = self.newRiskStatus(clusters: matchingClusters)
+                            self.sendCleaStatusAnalytics(startDate: cleaStatusStartDate)
+                            self.storageManager.saveLastCleaStatusReceivedDate(Date())
+                            self.storageManager.saveLastCleaStatusErrorDate(nil)
+                            completion?(.success(newStatusRiskLevelInfo))
+                        case let .failure(error):
+                            AnalyticsManager.shared.reportError(serviceName: "wStatus", apiVersion: ParametersManager.shared.cleaStatusApiVersion, code: (error as NSError).code)
+                            self.storageManager.saveLastCleaStatusErrorDate(Date())
+                            completion?(.failure(error))
+                        }
+                    }
+                case let .failure(error):
+                    AnalyticsManager.shared.reportError(serviceName: "wStatus", apiVersion: ParametersManager.shared.cleaStatusApiVersion, code: (error as NSError).code)
+                    self.storageManager.saveLastCleaStatusErrorDate(Date())
+                    completion?(.failure(error))
+                }
+            }
+        } else {
+            let retryCriteria: String = "Current: \(Int(nowTimestamp - mostRecentResponseTimestamp)) | Expected: \(Int(ParametersManager.shared.minStatusRetryTimeInterval))"
+            let timeCriteria: String = "Current: \(Int(nowTimestamp - lastCleaStatusSuccessTimestamp)) | Expected: \(Int(ParametersManager.shared.statusTimeInterval))"
+            let error: Error = NSError.localizedError(message: "Last Clea status requested/received too recently:\n\n-----\nRetry\n-----\n\(retryCriteria)\n\n--------\nMin time\n--------\n\(timeCriteria)", code: 0)
+            completion?(.failure(error))
         }
-        let staticQrCodePayloads: [(String, Int)] = qrCodes.filter { $0.qrType == VenueQrCode.QrCodeType.static.rawValue }.map { ($0.payload, $0.ntpTimestamp) }
-        let dynamicQrCodePayloads: [(String, Int)] = qrCodes.filter { $0.qrType == VenueQrCode.QrCodeType.dynamic.rawValue }.map { ($0.payload, $0.ntpTimestamp) }
-        WarningServer.shared.wstatus(staticQrCodePayloads: staticQrCodePayloads,
-                                     dynamicQrCodePayloads: dynamicQrCodePayloads) { result in
+    }
+}
+
+// MARK: - Clea Management -
+extension StatusManager {
+    
+    private func fetchNeededClusterPrefixes(ltids: [String], _ completion: @escaping (Result<[String], Error>) -> ()) {
+        CleaServer.shared.getClusterIndex { result in
             switch result {
-            case let .success(info):
-                completion?(.success(info))
+            case let .success(cleaClusterIndex):
+                guard let cleaClusterIndex = cleaClusterIndex else {
+                    completion(.success([]))
+                    return
+                }
+                
+                // cleaLastIteration is set to nil after adding VenueQRCodeInfo
+                guard self.cleaLastIteration == nil || cleaClusterIndex.iteration > self.cleaLastIteration ?? 0 else {
+                    completion(.success([]))
+                    return
+                }
+                self.cleaLastIteration = cleaClusterIndex.iteration
+                self.saveToLocalClusterIndex(cleaClusterIndex)
+                let matchingPrefixes: [String] = self.matchingClusterPrefixes(for: ltids, clusterIndex: cleaClusterIndex)
+                completion(.success(matchingPrefixes))
             case let .failure(error):
-                AnalyticsManager.shared.reportError(serviceName: "wStatus", apiVersion: ParametersManager.shared.warningApiVersion, code: (error as NSError).code)
-                completion?(.failure(error))
+                completion(.failure(error))
             }
         }
+    }
+    private func matchingClusterPrefixes(for ltids: [String], clusterIndex: CleaServerStatusClusterIndex) -> [String] {
+        clusterIndex.clusterPrefixes.filter { clusterPrefix in
+            return ltids.first { $0.starts(with: clusterPrefix) } != nil
+        }
+    }
+    
+    private func matchingClusters(clusters: [CleaServerStatusCluster]?, venueQrCodeInfos: [VenueQrCodeInfo]) -> [CleaServerStatusCluster] {
+        var clustersWithTimeMatch: [CleaServerStatusCluster] = []
+        clusters?.forEach { cluster in
+            venueQrCodeInfos.forEach { venueQrCodeInfo in
+                guard cluster.ltid == venueQrCodeInfo.ltid  else { return }
+                let timeMatchingExposures: [CleaServerStatusClusterExposure] = cluster.exposures.filter { exposure in
+                    exposure.ntpTimestamp <= venueQrCodeInfo.ntpTimestamp
+                        && venueQrCodeInfo.ntpTimestamp <= exposure.ntpTimestamp + exposure.duration
+                }
+                guard !timeMatchingExposures.isEmpty else { return }
+                clustersWithTimeMatch.append(CleaServerStatusCluster(ltid: venueQrCodeInfo.ltid, exposures: timeMatchingExposures))
+            }
+        }
+        return clustersWithTimeMatch
+    }
+    
+    private func newRiskStatus(clusters: [CleaServerStatusCluster]?) -> RBStatusRiskLevelInfo? {
+        var currentRiskLevel: Double?
+        var currentNtpTimestamp: Int?
+        clusters?.forEach { cluster in
+            cluster.exposures.forEach { exposure in
+                if exposure.riskLevel > currentRiskLevel ?? 0.0 {
+                    currentRiskLevel = exposure.riskLevel
+                    currentNtpTimestamp = exposure.ntpTimestamp
+                } else if exposure.riskLevel ==  currentRiskLevel, exposure.ntpTimestamp > currentNtpTimestamp ?? 0 {
+                    currentNtpTimestamp = exposure.ntpTimestamp
+                }
+            }
+        }
+        
+        if let currentRiskLevel = currentRiskLevel {
+            var lastContactDate: Date?
+            if let lastContactDateTimestamp = currentNtpTimestamp {
+                lastContactDate = min(Date(timeIntervalSince1900: lastContactDateTimestamp).svDateByAddingDays([-1, 1].randomElement() ?? 0), Date().svDateByAddingDays(-1))
+            }
+            return RBStatusRiskLevelInfo(riskLevel: currentRiskLevel, lastContactDate: lastContactDate, lastRiskScoringDate: lastContactDate)
+        } else {
+            return nil
+        }
+    }
+
+    private func sendCleaStatusAnalytics(startDate: Date) {
+        let appStatus: String = UIApplication.shared.applicationState == .active ? "f" : "b"
+        let cleaStatusDuration: Int = Int((Date().timeIntervalSince1970 - startDate.timeIntervalSince1970) * 1000.0)
+        AnalyticsManager.shared.reportAppEvent(.e15, description: "\(appStatus) \(cleaStatusDuration)")
+    }
+    
+}
+
+// MARK: - Local files management -
+extension StatusManager {
+    
+    private func localClusterIndexUrl() -> URL {
+        let directoryUrl: URL = self.createWorkingDirectoryIfNeeded()
+        return directoryUrl.appendingPathComponent("clusterIndex.json")
+    }
+    
+    private func loadLocalClusterIndex() {
+        let localUrl: URL = localClusterIndexUrl()
+        guard FileManager.default.fileExists(atPath: localUrl.path) else {
+            return
+        }
+        guard let data = try? Data(contentsOf: localUrl) else {
+            return
+        }
+        cleaClusterIndex = try? JSONDecoder().decode(CleaServerStatusClusterIndex.self, from: data)
+    }
+    
+    private func saveToLocalClusterIndex(_ clusterIndex: CleaServerStatusClusterIndex) {
+        if let data = try? JSONEncoder().encode(clusterIndex) {
+            try? data.write(to: localClusterIndexUrl())
+        }
+    }
+    
+    private func createWorkingDirectoryIfNeeded() -> URL {
+        let directoryUrl: URL = FileManager.libraryDirectory().appendingPathComponent("Clea")
+        if !FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: nil) {
+            try? FileManager.default.createDirectory(at: directoryUrl, withIntermediateDirectories: false, attributes: nil)
+        }
+        return directoryUrl
     }
     
 }
@@ -240,20 +407,22 @@ extension StatusManager {
         }
     }
     
-    private func processReceivedStatusInfo(statusInfo: RBStatusRiskLevelInfo, wstatusInfo: RBStatusRiskLevelInfo?) {
-        if statusInfo.lastRiskScoringDate == nil || lastRobertStatusRiskLevel?.lastRiskScoringDate == nil || statusInfo.lastRiskScoringDate ?? .distantPast > lastRobertStatusRiskLevel?.lastRiskScoringDate ?? .distantPast {
-            lastRobertStatusRiskLevel = statusInfo
-        }
-        if let wstatusInfo = wstatusInfo {
-            if wstatusInfo.lastRiskScoringDate == nil || lastWarningStatusRiskLevel?.lastRiskScoringDate == nil || wstatusInfo.lastRiskScoringDate ?? .distantPast > lastWarningStatusRiskLevel?.lastRiskScoringDate ?? .distantPast {
-                lastWarningStatusRiskLevel = wstatusInfo
+    private func processReceivedStatusInfo(statusInfo: RBStatusRiskLevelInfo?, cleaStatusInfo: RBStatusRiskLevelInfo?, isInError: Bool) {
+        if let statusInfo = statusInfo {
+            if statusInfo.lastRiskScoringDate == nil || lastRobertStatusRiskLevel?.lastRiskScoringDate == nil || statusInfo.lastRiskScoringDate ?? .distantPast > lastRobertStatusRiskLevel?.lastRiskScoringDate ?? .distantPast {
+                lastRobertStatusRiskLevel = statusInfo
             }
-        } else {
-            lastWarningStatusRiskLevel = RBStatusRiskLevelInfo(riskLevel: 0.0, lastContactDate: nil, lastRiskScoringDate: nil)
+        }
+        if let cleaStatusInfo = cleaStatusInfo {
+            if cleaStatusInfo.lastRiskScoringDate == nil || lastCleaStatusRiskLevel?.lastRiskScoringDate == nil || cleaStatusInfo.lastRiskScoringDate ?? .distantPast > lastCleaStatusRiskLevel?.lastRiskScoringDate ?? .distantPast {
+                lastCleaStatusRiskLevel = cleaStatusInfo
+            }
         }
 
-        let newStatus: [RBStatusRiskLevelInfo] = [lastRobertStatusRiskLevel, lastWarningStatusRiskLevel].compactMap { $0 }
+        let newStatus: [RBStatusRiskLevelInfo] = [lastRobertStatusRiskLevel, lastCleaStatusRiskLevel].compactMap { $0 }
         var newRiskLevelInfo: RBStatusRiskLevelInfo = newStatus.max(\.riskLevel)!
+        guard !isInError || isInError && newRiskLevelInfo.riskLevel > currentStatusRiskLevel?.riskLevel ?? 0.0 else { return }
+
         if RisksUIManager.shared.level(for: newRiskLevelInfo.riskLevel) == nil {
             newRiskLevelInfo.riskLevel = 0.0
         }
@@ -262,12 +431,13 @@ extension StatusManager {
             mustNotifyLastRiskLevelChange = (newRiskLevelInfo.riskLevel > currentStatusRiskLevel?.riskLevel ?? 0.0) || (newRiskLevelInfo.riskLevel != 0.0 && newRiskLevelInfo.riskLevel == currentStatusRiskLevel?.riskLevel && newRiskLevelInfo.lastRiskScoringDate ?? .distantPast > currentStatusRiskLevel?.lastRiskScoringDate ?? .distantPast)
             mustShowAlertAboutLastRiskLevelChange = newRiskLevelInfo.lastRiskScoringDate != currentStatusRiskLevel?.lastRiskScoringDate
         }
+        
         currentStatusRiskLevel = newRiskLevelInfo
         showRiskLevelUpdateNotificationIfNeeded()
         if UIApplication.shared.applicationState == .active {
             showRiskLevelUpdateAlertIfNeeded()
         }
-
+        
         notifyStatusChange()
     }
     

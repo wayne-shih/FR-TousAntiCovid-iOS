@@ -35,6 +35,7 @@ final class MyHealthStateHeaderCell: CVTableViewCell {
         exposureDateLabel?.textColor = .white
         containerView.layer.cornerRadius = 10.0
         containerView.layer.masksToBounds = true
+        containerView.layer.maskedCorners = row.theme.maskedCorners
         gradientView.startColor = currentRiskLevel.color.fromColor
         gradientView.endColor = currentRiskLevel.color.toColor
         exposureDateStackView?.isHidden = row.footerText == nil

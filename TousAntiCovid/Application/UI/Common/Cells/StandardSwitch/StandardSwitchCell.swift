@@ -16,11 +16,11 @@ final class StandardSwitchCell: CVTableViewCell {
     
     override func setup(with row: CVRow) {
         super.setup(with: row)
-        setupUI(row: row)
+        setupUI(with: row)
         setupAccessibility()
     }
     
-    private func setupUI(row: CVRow) {
+    private func setupUI(with row: CVRow) {
         cvSwitch.onTintColor = Appearance.Switch.onTint
         cvSwitch.isOn = row.isOn ?? false
     }

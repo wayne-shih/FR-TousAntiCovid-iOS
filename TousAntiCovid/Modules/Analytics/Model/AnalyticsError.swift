@@ -30,7 +30,7 @@ final class AnalyticsError: Object, Encodable {
         super.init()
     }
     
-    required init() {
+    required override init() {
         self.name = ""
         self.timestamp = ""
         super.init()

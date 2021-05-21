@@ -60,8 +60,7 @@ public final class Server: NSObject, RBServer {
                 } else {
                     self.processRegister(captcha: captcha, captchaId: captchaId, publicKey: publicKey, completion: completion)
                 }
-            case let .failure(error):
-                print(error)
+            case .failure:
                 self.processRegister(captcha: captcha, captchaId: captchaId, publicKey: publicKey, completion: completion)
             }
         }
@@ -121,7 +120,7 @@ public final class Server: NSObject, RBServer {
                 } else {
                     let contacts: [RBServerContact] = self.prepareContactsReport(from: helloMessages)
                     let body: RBServerReportBody = RBServerReportBody(token: code, contacts: contacts)
-                    self.processRequest(url: self.baseUrl().appendingPathComponent("report"), method: .post, body: body) { result in
+                    self.processRequest(url: self.baseUrl().appendingPathComponent("report"), method: .post, body: body, timeoutInterval: ServerConstant.largeTimeout) { result in
                         switch result {
                         case let .success(data):
                             do {
@@ -261,14 +260,9 @@ public final class Server: NSObject, RBServer {
 }
 
 extension Server {
-    
+
     private func prepareContactsReport(from helloMessages: [RBLocalProximity]) -> [RBServerContact] {
-        var dict: [String: [RBLocalProximity]] = [:]
-        helloMessages.forEach {
-            var helloMessages: [RBLocalProximity] = dict[$0.ebid] ?? []
-            helloMessages.append($0)
-            dict[$0.ebid] = helloMessages
-        }
+        let dict: [String: [RBLocalProximity]] = Dictionary(grouping: helloMessages) { $0.ebid }
         return dict.keys.compactMap {
             guard let helloMessages: [RBLocalProximity] = dict[$0] else { return nil }
             guard let ecc = helloMessages.first?.ecc else { return nil }
@@ -287,7 +281,7 @@ extension Server {
 
 extension Server {
     
-    private func processRequest(url: URL, method: Method, body: RBServerBody, completion: @escaping (_ result: Result<Data, Error>) -> ()) {
+    private func processRequest(url: URL, method: Method, body: RBServerBody, timeoutInterval: Double? = nil, completion: @escaping (_ result: Result<Data, Error>) -> ()) {
         do {
             let bodyData: Data = try body.toData()
             let requestId: String = url.lastPathComponent
@@ -302,6 +296,9 @@ extension Server {
             request.httpMethod = method.rawValue
             request.setValue("application/json", forHTTPHeaderField: "Content-type")
             request.httpBody = bodyData
+            if let timeoutInterval = timeoutInterval {
+                request.timeoutInterval = timeoutInterval
+            }
             let task: URLSessionDownloadTask = session.downloadTask(with: request)
             task.taskDescription = requestId
             task.resume()
@@ -318,6 +315,7 @@ extension Server: URLSessionDelegate, URLSessionDownloadDelegate {
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         let requestId: String = task.taskDescription ?? ""
         guard let completion = completions[requestId] else { return }
+        completions[requestId] = nil
         DispatchQueue.main.async {
             if let error = error {
                 self.requestLoggingHandler(task, nil, error)
@@ -335,27 +333,15 @@ extension Server: URLSessionDelegate, URLSessionDownloadDelegate {
                     completion(.success(receivedData))
                 }
             }
-            self.completions[requestId] = nil
         }
     }
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let requestId: String = downloadTask.taskDescription ?? ""
-        guard let completion = completions[requestId] else { return }
+        guard completions[requestId] != nil else { return }
         guard let data = try? Data(contentsOf: location) else { return }
         try? FileManager.default.removeItem(at: location)
-        DispatchQueue.main.async {
-            if downloadTask.response?.svIsError == true {
-                let statusCode: Int = downloadTask.response?.svStatusCode ?? 0
-                let message: String? = data.isEmpty ? "No logs received from the server" : String(data: data, encoding: .utf8)
-                let error: Error = NSError.svLocalizedError(message: "Uknown error (\(statusCode)). (\(message ?? "N/A"))", code: statusCode)
-                self.requestLoggingHandler(downloadTask, nil, error)
-                completion(.failure(error))
-                self.completions[requestId] = nil
-            } else {
-                self.receivedData[requestId] = data
-            }
-        }
+        receivedData[requestId] = data
     }
     
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {

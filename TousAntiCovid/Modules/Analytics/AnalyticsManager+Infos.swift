@@ -23,7 +23,7 @@ extension AnalyticsManager {
         resetErrors()
     }
     
-    func createAppInfoIfNeeded() {
+    private func createAppInfoIfNeeded() {
         guard getCurrentAppInfo() == nil else { return }
         let infos: AnalyticsAppInfo = AnalyticsAppInfo()
         let realm: Realm = try! Realm.analyticsDb()
@@ -32,7 +32,7 @@ extension AnalyticsManager {
         }
     }
     
-    func createHealthInfoIfNeeded() {
+    private func createHealthInfoIfNeeded() {
         guard getCurrentHealthInfo() == nil else { return }
         let infos: AnalyticsHealthInfo = AnalyticsHealthInfo()
         let realm: Realm = try! Realm.analyticsDb()
@@ -64,6 +64,7 @@ extension AnalyticsManager {
     }
     
     func statusDidSucceed() {
+        guard isOptIn else { return }
         reportAppEvent(.e16)
         guard let infos = getCurrentAppInfo() else { return }
         let realm: Realm = try! Realm.analyticsDb()
@@ -101,7 +102,7 @@ extension AnalyticsManager {
             infos.deviceModel = UIDevice.current.modelName
             infos.osVersion = UIDevice.current.systemVersion
             infos.appVersion = UIApplication.shared.marketingVersion
-            infos.appBuild = UIApplication.shared.buildNumber
+            infos.appBuild = Int(UIApplication.shared.buildNumber) ?? 0
             infos.receivedHelloMessagesCount = RBManager.shared.localProximityList.count
             infos.placesCount = VenuesManager.shared.venuesQrCodes.count
             infos.formsCount = AttestationsManager.shared.attestations.count
@@ -117,12 +118,6 @@ extension AnalyticsManager {
         let realm: Realm = try! Realm.analyticsDb()
         try! realm.write {
             infos.os = UIDevice.current.systemName
-            infos.deviceModel = UIDevice.current.modelName
-            infos.osVersion = UIDevice.current.systemVersion
-            infos.appVersion = UIApplication.shared.marketingVersion
-            infos.appBuild = UIApplication.shared.buildNumber
-            infos.receivedHelloMessagesCount = RBManager.shared.localProximityList.count
-            infos.placesCount = VenuesManager.shared.venuesQrCodes.count
             infos.riskLevel = StatusManager.shared.currentStatusRiskLevel?.riskLevel ?? 0.0
             infos.dateSample = RBManager.shared.reportPositiveTestDate?.universalDateFormatted()
             infos.dateFirstSymptoms = RBManager.shared.reportSymptomsStartDate?.universalDateFormatted()
@@ -135,18 +130,9 @@ extension AnalyticsManager {
     private func updateInfoTracingDuration() {
         guard let lastStartTimestamp = lastProximityActivationStartTimestamp else { return }
         let elapsedTime: Double = Date().timeIntervalSince1970 - lastStartTimestamp
-        incrementAppInfoTracingDuration(by: elapsedTime)
         incrementHealthInfoTracingDuration(by: elapsedTime)
         
         lastProximityActivationStartTimestamp = Date().timeIntervalSince1970
-    }
-    
-    private func incrementAppInfoTracingDuration(by duration: Double) {
-        guard let info = getCurrentAppInfo() else { return }
-        let realm: Realm = try! Realm.analyticsDb()
-        try! realm.write {
-            info.secondsTracingActivated += Int(duration)
-        }
     }
     
     private func incrementHealthInfoTracingDuration(by duration: Double) {

@@ -313,6 +313,9 @@ final class NewAttestationViewController: CVTableViewController {
                                     if self.firstTextField == nil {
                                         self.firstTextField = (cell as? StandardTextFieldCell)?.cvTextField
                                     }
+                                    if let defaultValue = field.defaultValue, self.fieldValues[field.dataKeyValue]?[field.key] == nil {
+                                        self.fieldValues[field.dataKeyValue] = [field.key: defaultValue]
+                                    }
                                     (cell as? StandardTextFieldCell)?.cvTextField.text = self.fieldValues[field.dataKeyValue]?[field.key]
                                 }, valueChanged: { [weak self] value in
                                     if let value = value as? String, !value.isEmpty {

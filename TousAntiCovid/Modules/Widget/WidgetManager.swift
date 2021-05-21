@@ -18,7 +18,7 @@ final class WidgetManager {
     static let shared: WidgetManager = WidgetManager()
     
     static let scheme: String = "tousanticovid"
-    
+
     static let activationDeeplink: URL = URL(string: "\(scheme)://\(UrlAction.activation.rawValue)")!
     static let moreInformationsDeeplink: URL = URL(string: "\(scheme)://\(UrlAction.moreInformations.rawValue)")!
     
@@ -29,7 +29,7 @@ final class WidgetManager {
         case moreInformations
     }
 
-    @OptionalWidgetUserDefault(key: .currentRiskLevel)
+    @WidgetUserDefault(key: .currentRiskLevel)
     var currentRiskLevel: Double? {
         didSet {
             guard oldValue != currentRiskLevel else { return }
@@ -37,7 +37,7 @@ final class WidgetManager {
         }
     }
 
-    @OptionalWidgetUserDefault(key: .lastStatusReceivedDate)
+    @WidgetUserDefault(key: .lastStatusReceivedDate)
     var lastStatusReceivedDate: Date? {
         didSet {
             guard oldValue != lastStatusReceivedDate else { return }

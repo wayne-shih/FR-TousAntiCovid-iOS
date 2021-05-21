@@ -29,22 +29,35 @@ final class WalletCoordinator: Coordinator {
     }
     
     private func start() {
-        let walletController: WalletViewController = WalletViewController(initialUrlToProcess: initialUrlToProcess) { [weak self] in
-            self?.startFlashCode()
+        let walletController: WalletViewController = createWalletController()
+        let isHavingCertificates: Bool = !WalletManager.shared.walletCertificates.isEmpty
+        let navigationController: CVNavigationController = CVNavigationController(rootViewController: isHavingCertificates ? walletController : BottomButtonContainerController.controller(walletController))
+        DeepLinkingManager.shared.walletController = walletController
+        self.navigationController = navigationController
+        initialUrlToProcess = nil
+        presentingController?.present(navigationController, animated: true)
+    }
+    
+    private func createWalletController() -> WalletViewController {
+        WalletViewController(initialUrlToProcess: initialUrlToProcess) { [weak self] in
+            self?.showAddCertificate()
         } didTouchTermsOfUse: { [weak self] in
             self?.openTermsOfUse()
         } didTouchCertificate: { [weak self] dataMatrix, text in
             self?.showDataMatrixFullscreen(dataMatrix, text: text)
         } didRequestWalletScanAuthorization: { [weak self] completion in
             self?.requestWalletScanAuthorization(completion)
+        } didTouchDocumentExplanation: { [weak self] certificateType in
+            self?.showDocumentExplanation(certificateType: certificateType)
+        } didTouchWhenToUse: { [weak self]  in
+            self?.showWhenToUseExplanations()
+        } changeControllerContainer: { [weak self]  in
+            self?.changeContainerController()
+        } didGetCertificateError: { [weak self] certificateType, error in
+            self?.showCertificateError(certificateType: certificateType, error: error)
         } deinitBlock: { [weak self] in
             self?.didDeinit()
         }
-        let navigationController: CVNavigationController = CVNavigationController(rootViewController: walletController)
-        DeepLinkingManager.shared.walletController = walletController
-        self.navigationController = navigationController
-        initialUrlToProcess = nil
-        presentingController?.present(navigationController, animated: true)
     }
     
     private func openTermsOfUse() {
@@ -52,21 +65,15 @@ final class WalletCoordinator: Coordinator {
     }
     
     private func showDataMatrixFullscreen(_ dataMatrix: UIImage, text: String) {
-        let controller: UIViewController = CodeFullScreenViewController.controller(codeImage: dataMatrix, text: text, codeBottomText: "2D-DOC")
+        let controller: UIViewController = CodeFullScreenViewController.controller(codeImage: dataMatrix, text: text, codeBottomText: "2D-DOC", codeType: .dataMatrix)
         controller.modalTransitionStyle = .crossDissolve
         controller.modalPresentationStyle = .fullScreen
         navigationController?.present(controller, animated: true)
     }
     
-    private func startFlashCode() {
-        let controller: UIViewController = FlashWalletCodeController.controller(didFlash: { stringUrl in
-            guard let stringUrl = stringUrl else { throw WalletError.parsing.error }
-            guard let url = URL(string: stringUrl) else { throw WalletError.parsing.error }
-            try WalletManager.shared.processWalletUrl(url)
-            self.flashCodeController?.dismiss(animated: true)
-        })
-        flashCodeController = controller
-        presentingController?.topPresentedController.present(CVNavigationController(rootViewController: controller), animated: true)
+    private func showAddCertificate() {
+        let coordinator: WalletAddCertificateCoordinator = WalletAddCertificateCoordinator(presentingController: navigationController, parent: self)
+        addChild(coordinator: coordinator)
     }
 
     private func requestWalletScanAuthorization(_ completion: @escaping (_ granted: Bool) -> ()) {
@@ -77,6 +84,32 @@ final class WalletCoordinator: Coordinator {
         }
         let navigationController: UIViewController = CVNavigationController(rootViewController: walletScanAuthorizationController)
         self.navigationController?.topPresentedController.present(navigationController, animated: true)
+    }
+    
+    private func showDocumentExplanation(certificateType: WalletConstant.CertificateType) {
+        let controller: DocumentExplanationViewController = DocumentExplanationViewController(certificateType: certificateType)
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    private func showWhenToUseExplanations() {
+        URL(string: "walletController.whenToUse.url".localized)?.openInSafari()
+    }
+    
+    private func changeContainerController() {
+        guard let navigationController = navigationController else { return }
+        let isHavingCertificates: Bool = !WalletManager.shared.walletCertificates.isEmpty
+        let walletController: WalletViewController = createWalletController()
+        let controller: UIViewController = isHavingCertificates ? walletController : BottomButtonContainerController.controller(walletController)
+        UIView.transition(with: navigationController.view, duration: isHavingCertificates ? 0.0 : 0.3, options: .transitionCrossDissolve) {
+            navigationController.setViewControllers([controller], animated: false)
+        } completion: { _ in }
+
+        DeepLinkingManager.shared.walletController = walletController
+    }
+
+    private func showCertificateError(certificateType: WalletConstant.CertificateType, error: Error) {
+        let coordinator: WalletCertificateErrorCoordinator = WalletCertificateErrorCoordinator(presentingController: presentingController?.topPresentedController, parent: self, certificateType: certificateType, error: error)
+        addChild(coordinator: coordinator)
     }
 
 }

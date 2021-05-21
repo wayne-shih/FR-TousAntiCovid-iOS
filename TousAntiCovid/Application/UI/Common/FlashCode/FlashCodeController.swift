@@ -30,7 +30,7 @@ class FlashCodeController: UIViewController {
         if isFirstLoad {
             isFirstLoad = false
         } else {
-            scanView.startScanning()
+            restartScanning()
         }
     }
     
@@ -43,7 +43,9 @@ class FlashCodeController: UIViewController {
     }
     
     func restartScanning() {
+        #if !targetEnvironment(simulator)
         scanView.startScanning()
+        #endif
     }
     
     func processScannedQRCode(code: String?) {

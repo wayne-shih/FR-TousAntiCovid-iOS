@@ -29,23 +29,22 @@ final class SanitaryCertificate: WalletCertificate {
     override var signature: Data? {
         guard let signatureString = value.components(separatedBy: WalletConstant.Separator.unit.ascii).last else { return nil }
         do {
-            return try signatureString.decodeBase32()
+            return try signatureString.decodeBase32(padded: signatureString.hasSuffix("="))
         } catch {
-            print(error)
             return nil
         }
     }
+    override var isSignatureAlreadyEncoded: Bool { false }
     
     var firstName: String? { fields[FieldName.firstName.rawValue]?.replacingOccurrences(of: "/", with: ",") }
     var name: String? { fields[FieldName.name.rawValue] }
-    var birthDate: Date?
-    var birthDateString: String? { birthDate?.shortDateFormatted() }
+    var birthDateString: String?
     var gender: String? {
         guard let gender = fields[FieldName.gender.rawValue] else { return nil }
         return "wallet.proof.sanitaryCertificate.\(FieldName.gender.rawValue).\(gender)".localized
     }
     var analysisDate: Date?
-    var analysisDateString: String? { analysisDate?.fullDateTimeFormatted(withSeconds: false) }
+    var analysisDateString: String? { analysisDate?.dayShortMonthYearTimeFormatted() }
     var analysisCode: String? {
         guard let code = fields[FieldName.analysisCode.rawValue] else { return nil }
         guard let codeDisplayString: String = "wallet.proof.sanitaryCertificate.loinc.\(code)".localizedOrNil else { return "LOINC: \(code)" }
@@ -58,7 +57,7 @@ final class SanitaryCertificate: WalletCertificate {
 
     override var timestamp: Double { analysisDate?.timeIntervalSince1970 ?? 0.0 }
     
-    override var pillTitle: String { "wallet.proof.sanitaryCertificate.pillTitle".localized }
+    override var pillTitles: [String] { ["wallet.proof.sanitaryCertificate.pillTitle".localized] }
     override var shortDescription: String { [firstName, name].compactMap { $0 }.joined(separator: " ") }
     override var fullDescription: String {
         var text: String = "wallet.proof.sanitaryCertificate.description".localized
@@ -79,7 +78,7 @@ final class SanitaryCertificate: WalletCertificate {
     override init(id: String = UUID().uuidString, value: String, type: WalletConstant.CertificateType, needParsing: Bool = false) {
         super.init(id: id, value: value, type: type, needParsing: needParsing)
         guard needParsing else { return }
-        self.birthDate = parseBirthDate()
+        self.birthDateString = parseBirthDate()
         self.analysisDate = parseAnalysisDate()
     }
 
@@ -106,13 +105,12 @@ final class SanitaryCertificate: WalletCertificate {
         return captures
     }
     
-    private func parseBirthDate() -> Date? {
+    private func parseBirthDate() -> String? {
         guard let birthDateString = fields[FieldName.birthDate.rawValue], birthDateString.count == 8 else { return nil }
         let dayString: String = birthDateString[0...1]
         let monthString: String = birthDateString[2...3]
         let yearString: String = birthDateString[4...7]
-        let dateComponents: DateComponents = DateComponents(year: Int(yearString), month: Int(monthString), day: Int(dayString))
-        return Calendar.current.date(from: dateComponents)
+        return "\(dayString)/\(monthString)/\(yearString)"
     }
     
     private func parseAnalysisDate() -> Date? {

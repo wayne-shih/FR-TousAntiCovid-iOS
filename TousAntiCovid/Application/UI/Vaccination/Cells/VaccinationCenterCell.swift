@@ -20,12 +20,12 @@ final class VaccinationCenterCell: CVTableViewCell, Xibbed {
 
     override func setup(with row: CVRow) {
         super.setup(with: row)
-        setupUI(row: row)
-        setupContent(row: row)
-        setupAccessibility(row: row)
+        setupUI(with: row)
+        setupContent(with: row)
+        setupAccessibility(with: row)
     }
 
-    private func setupUI(row: CVRow) {
+    private func setupUI(with row: CVRow) {
         guard let vaccinationCenter = row.associatedValue as? VaccinationCenter else { return }
         containerView.backgroundColor = backgroundColor
         backgroundColor = .clear
@@ -47,7 +47,7 @@ final class VaccinationCenterCell: CVTableViewCell, Xibbed {
         containerView.layer.masksToBounds = true
     }
 
-    private func setupContent(row: CVRow) {
+    private func setupContent(with row: CVRow) {
         guard let vaccinationCenter = row.associatedValue as? VaccinationCenter else { return }
         cvTitleLabel?.text = vaccinationCenter.name
         cvSubtitleLabel?.text = vaccinationCenter.modalities
@@ -66,7 +66,7 @@ final class VaccinationCenterCell: CVTableViewCell, Xibbed {
        return [firstLineAddress, secondLineAddress].filter { !$0.isEmpty } .joined(separator: "\n")
     }
 
-    private func setupAccessibility(row: CVRow) {
+    private func setupAccessibility(with row: CVRow) {
         guard let vaccinationCenter = row.associatedValue as? VaccinationCenter else { return }
         accessibilityElements = [cvTitleLabel!, cvSubtitleLabel!, addressLabel!, openingDateTitleLabel!, openingDateLabel!]
         if let availabilityTimestamp = vaccinationCenter.availabilityTimestamp {

@@ -31,7 +31,7 @@ final class KeyFiguresCell: CVTableViewCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI()
-        setupContent(row: row)
+        setupContent(with: row)
         setupAccessibility()
     }
     
@@ -85,10 +85,11 @@ final class KeyFiguresCell: CVTableViewCell {
         secondaryValuesContainerStackView.thresholdSpacing = secondaryValuesContainerStackView.spacing
     }
     
-    private func setupContent(row: CVRow) {
+    private func setupContent(with row: CVRow) {
         headerLabel.text = row.title
         button.setTitle(row.buttonTitle, for: .normal)
         button.isHidden = row.buttonTitle == nil
+        cvAccessoryLabel?.isHidden = row.accessoryText == nil
         guard let keyFigures = row.associatedValue as? [KeyFigure] else { return }
         (0..<keyFigures.count).forEach { index in
             titleLabels[index].text = keyFigures[index].shortLabel
@@ -109,7 +110,10 @@ final class KeyFiguresCell: CVTableViewCell {
     }
     
     private func setupAccessibility() {
-        accessibilityElements = [headerLabel, cvAccessoryLabel].compactMap { $0 }
+        accessibilityElements = [headerLabel].compactMap { $0 }
+        if let cvAccessoryLabel = cvAccessoryLabel, !cvAccessoryLabel.isHidden {
+            accessibilityElements?.append(cvAccessoryLabel)
+        }
         if KeyFiguresManager.shared.displayDepartmentLevel && KeyFiguresManager.shared.currentPostalCode != nil {
             accessibilityElements?.append(titleHeaderSecondaryLabel!)
             accessibilityElements?.append(contentsOf: titleSecondaryLabels)

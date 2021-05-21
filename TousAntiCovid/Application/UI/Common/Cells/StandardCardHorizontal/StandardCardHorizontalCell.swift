@@ -18,6 +18,7 @@ final class StandardCardHorizontalCell: CVTableViewCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI(with: row)
+        setupAccessibility()
     }
 
     private func setupUI(with row: CVRow) {
@@ -39,6 +40,13 @@ final class StandardCardHorizontalCell: CVTableViewCell {
             UIView.animate(withDuration: 0.3) {
                 self.contentView.alpha = 1.0
             }
+        }
+    }
+
+    private func setupAccessibility() {
+        accessibilityElements = [cvTitleLabel].compactMap { $0 }
+        if let cvSubtitleLabel = cvSubtitleLabel, !cvSubtitleLabel.isHidden {
+            accessibilityElements?.append(cvSubtitleLabel)
         }
     }
 

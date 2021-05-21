@@ -54,8 +54,6 @@ enum XibName: String {
     case attestationCell = "AttestationCell"
     case animationCell = "AnimationCell"
     case venueRecordCell = "VenueRecordCell"
-    case privateEventCell = "PrivateEventCell"
-    case privateEventQRCodeCell = "PrivateEventQRCodeCell"
     case highlightedKeyFigureCell = "HighlightedKeyFigureCell"
     case isolationTopCell = "IsolationTopCell"
     case isolationInitialCaseSafeCell = "IsolationInitialCaseSafeCell"
@@ -68,4 +66,14 @@ enum XibName: String {
     case standardCardSwitchCell = "StandardCardSwitchCell"
     case sanitaryCertificateCell = "SanitaryCertificateCell"
     case sanitaryCertificatesWalletCell = "SanitaryCertificatesWalletCell"
+    case updateAppCell = "UpdateAppCell"
+    case statusVerificationCell = "StatusVerificationCell"
+    case walletDocumentsCell = "WalletDocumentsCell"
+    case whenToUseCell = "WhenToUseCell"
+    case phoneCell = "PhoneCell"
+    case walletModeSelectionCell = "WalletModeSelectionCell"
+    case walletAddCertificateCell = "WalletAddCertificateCell"
+    case checkDocumentCell = "CheckDocumentCell"
+    case zoomableImageCell = "ZoomableImageCell"
+    
 }

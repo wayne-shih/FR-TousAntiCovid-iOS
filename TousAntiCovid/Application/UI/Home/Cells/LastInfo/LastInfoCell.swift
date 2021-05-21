@@ -23,7 +23,7 @@ final class LastInfoCell: CVTableViewCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI()
-        setupContent(row: row)
+        setupContent(with: row)
         setupAccessibility()
     }
     
@@ -51,7 +51,7 @@ final class LastInfoCell: CVTableViewCell {
         newInfoAvailableIndicatorView.backgroundColor = Asset.Colors.error.color
     }
     
-    private func setupContent(row: CVRow) {
+    private func setupContent(with row: CVRow) {
         dateLabel.text = row.accessoryText
         button.setTitle(row.buttonTitle, for: .normal)
         button.isHidden = row.buttonTitle == nil

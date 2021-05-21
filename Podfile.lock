@@ -5,11 +5,11 @@ PODS:
   - KeychainSwift (19.0.0)
   - lottie-ios (3.1.8)
   - PKHUD (5.3.0)
-  - Realm (5.3.4):
-    - Realm/Headers (= 5.3.4)
-  - Realm/Headers (5.3.4)
-  - RealmSwift (5.3.4):
-    - Realm (= 5.3.4)
+  - Realm (10.7.4):
+    - Realm/Headers (= 10.7.4)
+  - Realm/Headers (10.7.4)
+  - RealmSwift (10.7.4):
+    - Realm (= 10.7.4)
   - SwCrypt (5.1.3)
   - SwiftGen (6.3.0)
   - TagListView (1.4.1)
@@ -46,13 +46,13 @@ SPEC CHECKSUMS:
   KeychainSwift: a06190cf933ad46b1e0abc3d77d29c06331715c7
   lottie-ios: 48fac6be217c76937e36e340e2d09cf7b10b7f5f
   PKHUD: 98f3e4bc904b9c916f1c5bb6d765365b5357291b
-  Realm: 4dd457b6ed025041cf7efe05dae78c027ba842e0
-  RealmSwift: 233af88fffe05ed7f9305eecef100d477c0c2c42
+  Realm: f08ce1a85649a41303ecfe1cbd914c62e9e6d710
+  RealmSwift: 60ec49d165f23d040ab48811d8dd177e09baf4d3
   SwCrypt: 0d1f951b8a993d6e107f4776ee0d72c1adafd1df
   SwiftGen: 3d5024a47ea79e408cded20763d7a17d18a4548c
   TagListView: a1c236d17960a0cf64156725a76ce6d73ebce2be
   ZXingObjC: fdbb269f25dd2032da343e06f10224d62f537bdb
 
-PODFILE CHECKSUM: b526bc6a063d66cc843bc50cfc0539dd2269c1ee
+PODFILE CHECKSUM: 91be7608cd0542442c6a5189a37960a8e788a237
 
 COCOAPODS: 1.10.1

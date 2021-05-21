@@ -52,8 +52,8 @@ final class FlashVenueCodeController: FlashCodeController {
     #if targetEnvironment(simulator)
     @objc private func didTouchFlashButton() {
         scanView.stopScanning()
-        let values: (uuid: String, venueType: String) = [("491ab3ae-ad35-4301-8dd9-414ecf210713", "L"), ("491ab3ae-ad35-4301-8dd9-414ecf210714", "N")].randomElement()!
-        if didFlash?("https://tac.gouv.fr/0/\(values.uuid)/\(values.venueType)/4/200/") == false {
+        let url: String = ["https://tac.gouv.fr?v=0#AGaRdaXVh8OLMN-eNtZ_V6mLlr77DpCEzGcmRkNz1ZQ1Cv2GUXlkp2QzzYuVVjM8X3JIRXhPzpbW4OVDb9kgvqAQoP3K_thjGcf1Ei8CK90ZV1UvaXs8_N7ZThf3HKYhMC8wj3f3pKXRUtvBvuU%3D", "https://tac.gouv.fr?v=0#AGaRdaXVh8OLMN-eNtZ_V6mLlr77DpCEzGcmRkNz1ZQ1Cv2GUXlkp2QzzYuVVjM8X3JIRXhPzpbW4OVDb9kgvqAQoP3K_thjGcf1Ei8CK90ZV1UvaXs8_N7ZThf3HKYhMC8wj3f3pKXRUtvBvuU%3D"].randomElement()!
+        if didFlash?(url) == false {
             showErrorAlert()
         }
     }

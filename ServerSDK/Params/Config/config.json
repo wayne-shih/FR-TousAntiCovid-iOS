@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "12 april 2021"
+      "value": "29 april 2021"
     },
     {
       "name": "version",
-      "value": 43
+      "value": 49
     },
     {
       "name": "versionCalibrationBle",
@@ -58,11 +58,11 @@
     },
     {
       "name": "app.vaccinationCentersCount",
-      "value": 10
+      "value": 14
     },
     {
       "name": "app.displaySanitaryCertificatesWallet",
-      "value": false
+      "value": true
     },
     {
       "name": "app.displaySanitaryCertificatesValidation",
@@ -83,26 +83,20 @@
       "value": 72
     },
     {
+      "name": "app.wallet.testCertificateValidityThresholds",
+      "value": [48, 72]
+    },
+    {
       "name": "app.walletPubKeys",
       "value": [
-        {
-          "auth": "DHI0",
-          "pubKeys": {
-            "TST1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6lPsrLPPis5Wl9u8Y7THfNIIfeEyq3q72MpzUm3gvr6ctYk4d3OQhn76GKSjSYX/0ZRC/cYO9479K0SUzYZ9yg==-----END PUBLIC KEY-----"
-          }
-        },
-        {
-          "auth": "FR00",
-          "pubKeys": {
-            "0001": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEqY8NfM1igIiTvsTUNuedGDSh1uAB1w8cTNzNnZ4v4in3JAUU6N3AypjQx0QMnMSShJoPvac/w5L02grgf4TCPA==-----END PUBLIC KEY-----"
-          }
-        },
         {
           "auth": "FR03",
           "pubKeys":
           	{
 	          	"AHP1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPnxJntwNwme9uHSasmGFFwdC0FWNEpucgzhjr+/AZ6UuTm3kL3ogEUAwKU0tShEVmZNK4/lM05h+0ZvtboJM/A==-----END PUBLIC KEY-----",
-	            "AHP2": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEOYUgmx8pKu0UbyqQ/kt4+PXSpUprkO2YLHmzzoN66XjDW0AnSzXorFPe556p73Vawqaoy3qQKDIDB62IBYWBuA==-----END PUBLIC KEY-----"
+	            "AHP2": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEOYUgmx8pKu0UbyqQ/kt4+PXSpUprkO2YLHmzzoN66XjDW0AnSzXorFPe556p73Vawqaoy3qQKDIDB62IBYWBuA==-----END PUBLIC KEY-----",
+	            "AV01": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1T9uG2bEP7uWND6RT/lJs2y787BkEJoRMMLXvqPKFFC3ckqFAPnFjbiv/odlWH04a1P9CvaCRxG31FMEOFZyXA==-----END PUBLIC KEY-----",
+	            "AV02": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3jL6zQ0aQj9eJHUw4VDHB9sMoviLVIlADnoBwC43Md8p9w655z2bDhYEEajQ2amQzt+eU7HdWrvqY23Do91Izg==-----END PUBLIC KEY-----"
             }
         }
       ]
@@ -161,11 +155,11 @@
     },
     {
       "name": "app.qrCode.formattedString",
-      "value": "Cree le: <creationDate> a <creationHour>;\nNom: <lastname>;\nPrenom: <firstname>;\nNaissance: <dob> a <cityofbirth>;\nAdresse: <address> <zip> <city>;\nSortie: <datetime-day> a <datetime-hour>;\nMotifs: <reason-code>"
+      "value": "Cree le: <creationDate> a <creationHour>;\nNom: <lastname>;\nPrenom: <firstname>;\nNaissance: <dob> a <cityofbirth>;\nAdresse: <address> <zip> <city> <country>;\nSortie: <datetime-day> a <datetime-hour>;\nMotifs: <reason-code>"
     },
     {
       "name": "app.qrCode.formattedStringDisplayed",
-      "value": "Créé le <creationDate> à <creationHour>\nNom : <lastname>\nPrénom : <firstname>\nNaissance : <dob> à <cityofbirth>\nAdresse : <address> <zip> <city>\nSortie : <datetime-day> à <datetime-hour>\nCode motif: <reason-code>"
+      "value": "Créé le <creationDate> à <creationHour>\nNom : <lastname>\nPrénom : <firstname>\nNaissance : <dob> à <cityofbirth>\nAdresse : <address> <zip> <city> <country>\nSortie : <datetime-day> à <datetime-hour>\nCode motif: <reason-code>"
     },
     {
       "name": "app.qrCode.footerString",
@@ -261,7 +255,7 @@
     },
     {
       "name": "ble.dontUseScannerHardwareBatching",
-      "value": [ "G3121", "E5603", "SM-G981B", "CDY-NX9A", "SM-J530F", "SM-G770F", "SM-G780F", "SM-G781B", "SM-G960F", "SM-G965F", "SM-G970F", "SM-G973F", "SM-G975F", "SM-G977B", "SM-G980F",  "SM-G981B", "SM-G985F", "SM-G986B", "SM-G988B", "SM-G991B", "SM-G996B", "SM-G998B", "SM-N770F", "SM-N970F", "SM-N975F", "SM-N976B", "SM-N980F", "SM-N981B", "SM-N985F", "SM-N986B", "SM-F700F", "SM-F707B", "SM-F900F", "SM-F916B", "SM-A025G", "SM-A125F", "SM-A326B", "SM-A415F", "SM-A415FN", "SM-A505FN", "SM-A525F", "SM-A526B", "SM-A715F", "SM-A805F", "SM-M115F", "SM-M315F", "SM-M317F", "SM-M515F", "SM-A202F", "SM-A207F", "SM-G715FN", "SM-J730F" ]
+      "value": [ "G3121", "E5603", "SM-G981B", "CDY-NX9A", "SM-J530F", "SM-G770F", "SM-G780F", "SM-G781B", "SM-G960F", "SM-G965F", "SM-G970F", "SM-G973F", "SM-G975F", "SM-G977B", "SM-G980F",  "SM-G981B", "SM-G985F", "SM-G986B", "SM-G988B", "SM-G991B", "SM-G996B", "SM-G998B", "SM-N770F", "SM-N970F", "SM-N975F", "SM-N976B", "SM-N980F", "SM-N981B", "SM-N985F", "SM-N986B", "SM-F700F", "SM-F707B", "SM-F900F", "SM-F916B", "SM-A025G", "SM-A125F", "SM-A326B", "SM-A415F", "SM-A415FN", "SM-A505FN", "SM-A525F", "SM-A526B", "SM-A715F", "SM-A805F", "SM-M115F", "SM-M315F", "SM-M317F", "SM-M515F", "SM-A202F", "SM-A207F", "SM-G715FN", "SM-J730F", "SM-A515F" ]
 	},
     {
       "name": "ble.calibration",

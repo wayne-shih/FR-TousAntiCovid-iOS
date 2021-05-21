@@ -43,6 +43,19 @@ extension Array where Element == UInt8 {
         tlvTriplet.append(contentsOf: self)
         return tlvTriplet
     }
+    
+    func trimmingUselessInitialZeroIfNeeded() -> [UInt8] {
+        guard self[0] == 0x00 && self[1] < 0x80 else { return self }
+        return suffix(count - 1)
+    }
+
+    func prefixingWithZeroIfNegativeInteger() -> [UInt8] {
+        guard let firstByte = first else { return self }
+        guard firstByte >= 0x80 else { return self }
+        var updatedBytes: [UInt8] = self
+        updatedBytes.insert(0x00, at: 0)
+        return updatedBytes
+    }
 
     private func lengthField() -> [UInt8] {
         var bytesCount: Int = count

@@ -52,9 +52,12 @@ struct CVRow {
     var footerText: String?
     var titleHighlightText: String?
     var image: UIImage?
+    var secondaryImage: UIImage?
     var animation: Animation?
     var buttonTitle: String?
     var isOn: Bool?
+    var segmentsTitles: [String]?
+    var selectedSegmentIndex: Int?
     var xibName: XibName
     var theme: Theme = Theme()
     var enabled: Bool = true
@@ -74,7 +77,8 @@ struct CVRow {
     var tertiarySelectionAction: (() -> ())?
     var quaternarySelectionAction: (() -> ())?
     var quinarySelectionAction: (() -> ())?
-    var senarySelectionAction: (()-> ())?
+    var senarySelectionAction: (() -> ())?
+    var segmentsActions: [() -> ()]?
     var willDisplay: ((_ cell: CVTableViewCell) -> ())?
     var valueChanged: ((_ value: Any?) -> ())?
     var didValidateValue: ((_ value: Any?, _ cell: CVTableViewCell) -> ())?

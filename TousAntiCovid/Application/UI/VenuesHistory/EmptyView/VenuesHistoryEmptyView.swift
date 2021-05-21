@@ -11,12 +11,14 @@
 import UIKit
 
 final class VenuesHistoryEmptyView: UIView {
-    
-    @IBOutlet private var titleLabel: UILabel!
-    
-    static func view() -> UIView {
-        Bundle.main.loadNibNamed("VenuesHistoryEmptyView", owner: nil, options: nil)![0] as! UIView
+
+    private static var sick: Bool = false
+    static func view(isSick: Bool) -> UIView {
+        sick = isSick
+        return Bundle.main.loadNibNamed("VenuesHistoryEmptyView", owner: nil, options: nil)![0] as! UIView
     }
+
+    @IBOutlet private var titleLabel: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -24,7 +26,7 @@ final class VenuesHistoryEmptyView: UIView {
     }
     
     private func initUI() {
-        titleLabel.text = "venuesHistoryController.noVenuesEmptyView.title".localized
+        titleLabel.text = VenuesHistoryEmptyView.sick ? "venuesHistoryController.noVenuesEmptyView.isSick.title".localized : "venuesHistoryController.noVenuesEmptyView.title".localized
         titleLabel.font = Appearance.Cell.Text.titleFont
     }
     

@@ -41,7 +41,7 @@ final class KeyFiguresManager: NSObject {
     @UserDefault(key: .isOnboardingDone)
     private var isOnboardingDone: Bool = false
 
-    @OptionalUserDefault(key: .currentPostalCode)
+    @UserDefault(key: .currentPostalCode)
     var currentPostalCode: String? {
         didSet {
             currentDepartmentName = departmentNameForPostalCode(currentPostalCode)
@@ -49,7 +49,7 @@ final class KeyFiguresManager: NSObject {
         }
     }
     
-    @OptionalUserDefault(key: .currentDepartmentName)
+    @UserDefault(key: .currentDepartmentName)
     var currentDepartmentName: String?
     
     var currentFormattedDepartmentNameAndPostalCode: String? {

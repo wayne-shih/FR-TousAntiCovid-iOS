@@ -36,16 +36,11 @@ final class VenuesManager: NSObject {
     var isVenuesRecordingActivated: Bool {
         ParametersManager.shared.displayRecordVenues
     }
-    var isPrivateEventsActivated: Bool {
-        ParametersManager.shared.displayPrivateEvent
-    }
-    var venuesQrCodes: [VenueQrCode] { storageManager?.venuesQrCodes() ?? [] }
-    var needPrivateEventQrCodeGeneration: Bool {
-        let now: Date = Date()
-        let currentQrCodeDate: Date = self.currentQrCodeDate ?? .distantPast
-        return !Calendar.current.isDate(now, inSameDayAs: currentQrCodeDate)
-    }
-    var currentQrCodeImage: UIImage? { UIImage(data: VenuesManager.shared.currentQrCodeData ?? Data()) }
+    
+    var venuesQrCodes: [VenueQrCodeInfo] { storageManager?.venuesQrCodes() ?? [] }
+
+    @UserDefault(key: .cleaLastIteration)
+    private var cleaLastIteration: Int?
     
     private var storageManager: StorageManager!
     private var observers: [VenuesObserverWrapper] = []
@@ -56,14 +51,7 @@ final class VenuesManager: NSObject {
     
     @UserDefault(key: .venuesFeaturedWasActivatedAtLeastOneTime)
     private var venuesFeaturedWasActivatedAtLeastOneTime: Bool = false
-    
-    @OptionalUserDefault(key: .privateEventQrCodeString)
-    private(set) var currentQrCodeString: String?
-    @OptionalUserDefault(key: .privateEventQrCodeData)
-    private(set) var currentQrCodeData: Data?
-    @OptionalUserDefault(key: .privateEventQrCodeDate)
-    private var currentQrCodeDate: Date?
-    
+
     func start(storageManager: StorageManager) {
         self.storageManager = storageManager
         addObserver()
@@ -73,13 +61,10 @@ final class VenuesManager: NSObject {
         storageManager.deleteVenuesQrCodeData()
         didAlreadySeeOnboarding = false
         venuesFeaturedWasActivatedAtLeastOneTime = false
-        currentQrCodeString = nil
-        currentQrCodeData = nil
-        currentQrCodeDate = nil
     }
     
-    func deleteVenueQrCode(_ venueQrCode: VenueQrCode) {
-        storageManager.deleteVenueQrCode(venueQrCode)
+    func deleteVenueQrCodeInfo(_ venueQrCodeInfo: VenueQrCodeInfo) {
+        storageManager.deleteVenueQrCodeInfo(venueQrCodeInfo)
     }
     
     func clearExpiredData() {
@@ -130,87 +115,69 @@ extension VenuesManager {
     func isVenueUrlValid(_ url: URL) -> Bool { parseUrlComponents(url) != nil }
     
     func isVenueUrlExpired(_ url: URL) -> Bool {
-        guard let urlComponents = parseUrlComponents(url) else { return true }
-        
+        guard let timestamp = parseUrlComponents(url)?.timestamp else { return false }
         let validityDuration: Double = Double(ParametersManager.shared.venuesRetentionPeriod) * 24.0 * 3600.0
-        return Date().timeIntervalSince1970 - urlComponents.timestamp >= validityDuration
+        return Date().timeIntervalSince1970 - timestamp >= validityDuration
     }
     
     @discardableResult
-    func processVenueUrl(_ url: URL) -> Bool {
-        guard let urlComponents = parseUrlComponents(url) else { return false }
-        
-        let date: Date = Date(timeIntervalSince1970: urlComponents.timestamp)
-        let nowRoundedNtpTimestamp: Int = date.roundedTimeIntervalSince1900(interval: ParametersManager.shared.venuesTimestampRoundingInterval)
-        
-        let id: String
-        if urlComponents.venueType == ParametersManager.shared.privateEventVenueType {
-            id = "\(urlComponents.uuid)"
-        } else {
-            id = "\(urlComponents.uuid)\(nowRoundedNtpTimestamp)"
-        }
-
-        let maxSalt: Int = ParametersManager.shared.venuesSalt
-        let salt: Int = (1...maxSalt).randomElement() ?? 0
-        let payload: String = "\(salt)\(urlComponents.uuid)".sha256()
-
-        let venueQrCode: VenueQrCode = VenueQrCode(id: id,
-                                                   uuid: urlComponents.uuid,
-                                                   qrType: urlComponents.qrType,
-                                                   venueType: urlComponents.venueType,
-                                                   ntpTimestamp: nowRoundedNtpTimestamp,
-                                                   venueCategory: urlComponents.venueCategory > 0 ? urlComponents.venueCategory : nil,
-                                                   venueCapacity: urlComponents.venueCapacity > 0 ? urlComponents.venueCapacity : nil,
-                                                   payload: payload)
-        storageManager.saveVenueQrCode(venueQrCode)
+    func processVenueUrl(_ url: URL) -> VenueQrCodeInfo? {
+        guard let venueQrCodeInfo = getVenueQrCodeInfo(from: url) else { return nil }
+        storageManager.saveVenueQrCodeInfo(venueQrCodeInfo)
+        cleaLastIteration = nil
         AnalyticsManager.shared.reportAppEvent(.e14)
-        return true
+        return venueQrCodeInfo
     }
     
-    func venueTypeFrom(url: URL) -> String {
-        let path: String = String(url.path.dropFirst(1))
-        let info: [String] = path.components(separatedBy: "/")
-        let venueType = info.item(at: 2) ?? ""
-        return venueType
+    private func getVenueQrCodeInfo(from url: URL) -> VenueQrCodeInfo? {
+        guard let urlComponents = parseUrlComponents(url) else { return nil }
+        guard let ltid = extractTlIdFromBase64Url(code: urlComponents.code) else { return nil }
+        guard ltid.isUuidCode else { return nil }
+        
+        let ntpTimestamp: Int
+        if let timestamp = urlComponents.timestamp {
+            ntpTimestamp = Date(timeIntervalSince1970: timestamp).timeIntervalSince1900
+        } else {
+            ntpTimestamp = Date().timeIntervalSince1900
+        }
+        
+        let id: String = "\(ltid)\(ntpTimestamp)"
+        return VenueQrCodeInfo(id: id,
+                           ltid: ltid,
+                           ntpTimestamp: ntpTimestamp,
+                           base64: urlComponents.code,
+                           version: urlComponents.version)
     }
     
-    func generateNewPrivateEventQrCode() {
-        let urlString: String = "https://tac.gouv.fr/0/\(UUID().uuidString.lowercased())/\(ParametersManager.shared.privateEventVenueType)"
-        let date: Date = Date()
-        guard let qrCode = urlString.qrCode() else { return }
-        guard let qrCodeData = UIGraphicsImageRenderer(size: qrCode.size, format: qrCode.imageRendererFormat).image(actions: { _ in
-            UIImage(ciImage: qrCode.ciImage!).draw(in: CGRect(origin: .zero, size: qrCode.size))
-        }).pngData() else { return }
-        currentQrCodeString = urlString
-        currentQrCodeData = qrCodeData
-        currentQrCodeDate = date
-        guard let url = URL(string: urlString) else { return }
-        processVenueUrl(url)
-    }
-    
-    private func parseUrlComponents(_ url: URL) -> (qrType: Int, uuid: String, venueType: String, venueCategory: Int, venueCapacity: Int, timestamp: Double)? {
+    private func parseUrlComponents(_ url: URL) -> (code: String, version: Int, timestamp: Double?)? {
         guard url.host == "tac.gouv.fr" else { return nil }
-        let path: String = String(url.path.dropFirst(1))
-        let info: [String] = path.components(separatedBy: "/")
-
+        
+        guard let cleanVenueUrl = URL(string: cleanVenueUrlString(stringUrl: String(url.absoluteString))) else { return nil }
+        
         // Values
-        guard let qrType = Int(info.item(at: 0) ?? "") else { return nil }
-        guard let uuid = info.item(at: 1) else { return nil }
-        guard let venueType = info.item(at: 2)?.uppercased() else { return nil }
-        let rawVenueCategory: Int? = info.count < 4 ? 0 : (info.item(at: 3) == "-" ? 0 : Int(info.item(at: 3) ?? ""))
-        let rawVenueCapacity: Int? = info.count < 5 ? 0 : (info.item(at: 4) == "-" ? 0 : Int(info.item(at: 4) ?? ""))
-        let timestamp: Double = Double(info.item(at: 5) ?? "") ?? Date().timeIntervalSince1970
-
-        // Conditions
-        guard [0, 1].contains(qrType) else { return nil }
-        guard uuid.isUuidCode else { return nil }
-        guard (1...3).contains(venueType.count) else { return nil }
-        guard let venueCategory = rawVenueCategory, (0...5).contains(venueCategory) else { return nil }
-        guard let venueCapacity = rawVenueCapacity, (0...).contains(venueCapacity) else { return nil }
-        guard "\(Int(timestamp))".count == "\(Int(Date().timeIntervalSince1970))".count else { return nil }
-        return (qrType, uuid, venueType, venueCategory, venueCapacity, timestamp)
+        guard let code = extractParamFrom(url: cleanVenueUrl, param: "code") else { return nil }
+        guard let version = Int(extractParamFrom(url: cleanVenueUrl, param: "v") ?? "") else { return nil }
+        let timestamp: Double? = Double(extractParamFrom(url: cleanVenueUrl, param: "t") ?? "")
+        
+        return (code, version, timestamp)
     }
-
+    
+    private func cleanVenueUrlString(stringUrl: String) -> String {
+        let cleanStringUrl: String = stringUrl.replacingOccurrences(of: "#", with: "&code=")
+        return cleanStringUrl.removingPercentEncoding ?? cleanStringUrl
+    }
+    
+    private func extractParamFrom(url: URL, param: String) -> String? {
+        guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+        return urlComponents.queryItems?.first(where: { $0.name == param })?.value
+    }
+    
+    func extractTlIdFromBase64Url(code: String) -> String? {
+        guard let data = Data(base64Encoded: code.base64urlToBase64()) else { return nil }
+        var byteArray: [UInt8] = [UInt8](repeating: 0, count: 16)
+        data.copyBytes(to: &byteArray, from: Range(NSRange(location: 1, length: 16))!)
+        return NSUUID(uuidBytes: byteArray).uuidString.lowercased()
+    }
 }
 
 // MARK: - Server requests -
@@ -221,17 +188,13 @@ extension VenuesManager {
             completion?(nil)
             return
         }
-        let now: Date = Date()
-        let qrCodes: [VenueQrCode] = venuesQrCodes.filter { $0.ntpTimestamp <= now.timeIntervalSince1900 }
-        guard !qrCodes.isEmpty else {
+        guard !venuesQrCodes.isEmpty else {
             completion?(nil)
             return
         }
-        let origin: Date = RBManager.shared.reportDataOriginDate ?? .distantPast
-        let filteredQrCodes: [VenueQrCode] = qrCodes.filter { $0.ntpTimestamp >= origin.timeIntervalSince1900 }
-        WarningServer.shared.wreport(token: token, visits: filteredQrCodes.map { $0.toWarningServerVisit() }) { error in
+        CleaServer.shared.report(token: token, visits: venuesQrCodes.map { $0.toCleaServerVisit() }) { error in
             if let error = error {
-                AnalyticsManager.shared.reportError(serviceName: "wreport", apiVersion: ParametersManager.shared.warningApiVersion, code: (error as NSError).code)
+                AnalyticsManager.shared.reportError(serviceName: "wreport", apiVersion: ParametersManager.shared.cleaReportApiVersion, code: (error as NSError).code)
                 guard (error as NSError).code != 403 else {
                     self.didAlreadyRetryReport = false
                     self.storageManager.deleteVenuesQrCodeData()

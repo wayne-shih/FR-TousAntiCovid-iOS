@@ -38,6 +38,7 @@ final class AnalyticsAppEvent: Object, Encodable {
         case e12
         case e13
         case e14
+        case e15
         case e16
     }
     
@@ -48,7 +49,7 @@ final class AnalyticsAppEvent: Object, Encodable {
         super.init()
     }
     
-    required init() {
+    required override init() {
         self.name = ""
         self.timestamp = ""
         super.init()

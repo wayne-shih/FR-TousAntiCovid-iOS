@@ -18,8 +18,8 @@ final class LinkButtonCell: CVTableViewCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI()
-        setupContent(row: row)
-        setupAccessibility(row: row)
+        setupContent(with: row)
+        setupAccessibility(with: row)
     }
     
     private func setupUI() {
@@ -29,12 +29,12 @@ final class LinkButtonCell: CVTableViewCell {
         button?.titleLabel?.font = Appearance.Button.linkFont
     }
     
-    private func setupAccessibility(row: CVRow) {
+    private func setupAccessibility(with row: CVRow) {
         button?.accessibilityLabel = row.buttonTitle?.removingEmojis()
         button?.accessibilityHint = nil
     }
     
-    private func setupContent(row: CVRow) {
+    private func setupContent(with row: CVRow) {
         if #available(iOS 13.0, *) {
             let imageAttachment: NSTextAttachment = NSTextAttachment()
             imageAttachment.image = UIImage(systemName: "arrow.up.right.square.fill")?.withRenderingMode(.alwaysTemplate)

@@ -80,54 +80,24 @@ final class AttestationsViewController: CVTableViewController {
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = []
         let newAttestationRow: CVRow = CVRow(title: "attestationsController.newAttestation".localized,
-                                             image: Asset.Images.add.image,
-                                             xibName: .standardCardCell,
-                                             theme:  CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                                 topInset: 0.0,
-                                                                 bottomInset: 20.0,
-                                                                 textAlignment: .natural,
-                                                                 titleFont: { Appearance.Cell.Text.standardFont },
-                                                                 titleColor: Appearance.Cell.Text.headerTitleColor,
-                                                                 imageTintColor: Appearance.Cell.Text.headerTitleColor),
+                                             xibName: .buttonCell,
+                                             theme: CVRow.Theme(topInset: 0.0, bottomInset: 0.0, buttonStyle: .primary),
                                              selectionAction: { [weak self] in
                                                 self?.didTouchNewAttestation()
-                                             },
-                                             willDisplay: { cell in
-                                                cell.selectionStyle = .none
-                                                cell.accessoryType = .none
                                              })
         rows.append(newAttestationRow)
-        let termsOfuseRow: CVRow = CVRow(title: "attestationsController.termsOfUse".localized,
-                                         image: Asset.Images.shield.image,
-                                         xibName: .standardCardCell,
-                                         theme:  CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                             topInset: 0.0,
-                                                             bottomInset: 0.0,
-                                                             textAlignment: .natural,
-                                                             titleFont: { Appearance.Cell.Text.standardFont },
-                                                             titleColor: Appearance.Cell.Text.headerTitleColor,
-                                                             imageTintColor: Appearance.Cell.Text.headerTitleColor),
-                                         selectionAction: { [weak self] in
-                                            self?.showTermsOfUseAlert()
-                                         },
-                                         willDisplay: { cell in
-                                            cell.selectionStyle = .none
-                                            cell.accessoryType = .none
-                                         })
-        rows.append(termsOfuseRow)
-        
         let attestations: [Attestation] = AttestationsManager.shared.attestations.filter { !$0.isExpired }
         if !attestations.isEmpty {
             let attestationsSectionRow: CVRow = CVRow(title: "attestationsController.validAttestationsSection.title".localized,
                                                       xibName: .textCell,
-                                                      theme: CVRow.Theme(topInset: 40.0,
-                                                                         bottomInset: 20.0,
+                                                      theme: CVRow.Theme(topInset: 20.0,
+                                                                         bottomInset: 0.0,
                                                                          textAlignment: .natural,
                                                                          titleFont: { Appearance.Cell.Text.headTitleFont }))
             rows.append(attestationsSectionRow)
             let attestationsExplanationRow: CVRow = CVRow(subtitle: "attestationsController.validAttestationsSection.subtitle".localized,
                                                           xibName: .textCell,
-                                                          theme: CVRow.Theme(topInset: 0.0,
+                                                          theme: CVRow.Theme(topInset: 20.0,
                                                                              bottomInset: 0.0,
                                                                              textAlignment: .natural))
             rows.append(attestationsExplanationRow)
@@ -154,14 +124,14 @@ final class AttestationsViewController: CVTableViewController {
         if !expiredAttestations.isEmpty {
             let attestationsSectionRow: CVRow = CVRow(title: "attestationsController.expiredSection.title".localized,
                                                       xibName: .textCell,
-                                                      theme: CVRow.Theme(topInset: 40.0,
-                                                                         bottomInset: 20.0,
+                                                      theme: CVRow.Theme(topInset: 20.0,
+                                                                         bottomInset: 0.0,
                                                                          textAlignment: .natural,
                                                                          titleFont: { Appearance.Cell.Text.headTitleFont }))
             rows.append(attestationsSectionRow)
             let attestationsExplanationRow: CVRow = CVRow(subtitle: "attestationsController.expiredSection.subtitle".localized,
                                                           xibName: .textCell,
-                                                          theme: CVRow.Theme(topInset: 0.0,
+                                                          theme: CVRow.Theme(topInset: 20.0,
                                                                              bottomInset: 0.0,
                                                                              textAlignment: .natural))
             rows.append(attestationsExplanationRow)
@@ -179,10 +149,17 @@ final class AttestationsViewController: CVTableViewController {
             }
             rows.append(contentsOf: attestationsRows)
         }
-        
+        let termsOfuseRow: CVRow = CVRow(buttonTitle: "attestationsController.termsOfUse".localized,
+                                         xibName: .linkButtonCell,
+                                         theme:  CVRow.Theme(topInset: 20.0,
+                                                             bottomInset: 0.0),
+                                         secondarySelectionAction: { [weak self] in
+                                            self?.showTermsOfUseAlert()
+                                         })
+        rows.append(termsOfuseRow)
         let footerRow: CVRow = CVRow(title: "attestationController.footer".localized,
                                      xibName: .textCell,
-                                     theme:  CVRow.Theme(topInset: 40.0,
+                                     theme:  CVRow.Theme(topInset: 20.0,
                                                          bottomInset: 8.0,
                                                          textAlignment: .natural,
                                                          titleFont: { Appearance.Cell.Text.footerFont },
