@@ -11,7 +11,7 @@
 import UIKit
 import CoreBluetooth
 
-protocol BluetoothStateObserver: class {
+protocol BluetoothStateObserver: AnyObject {
     
     func bluetoothStateDidUpdate()
     

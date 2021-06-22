@@ -29,13 +29,9 @@ public final class RBManager {
         get { storage.isProximityActivated() }
         set { storage.save(proximityActivated: newValue) }
     }
-    public var canReactivateProximity: Bool {
-        guard let reportDate = storage.reportDate() else { return true }
-        return Date().timeIntervalSince1970 - reportDate.timeIntervalSince1970 > RBConstants.proximityReactivationBlockingDelay
-    }
-    public var isSick: Bool {
-        get { storage.isSick() }
-        set { storage.save(isSick: newValue) }
+    public var isImmune: Bool {
+        guard let reportDate = storage.reportDate() else { return false }
+        return Date().timeIntervalSince1970 - reportDate.timeIntervalSince1970 < Double(covidPlusNoTracingDuration ?? 0)
     }
     public var pushToken: String? {
         get { storage.pushToken() }
@@ -101,7 +97,8 @@ public final class RBManager {
     public var currentEpoch: RBEpoch? { storage.getCurrentEpoch(defaultingToLast: false) }
     public var currentEpochOrLast: RBEpoch? { storage.getCurrentEpoch(defaultingToLast: true) }
     public var localProximityList: [RBLocalProximity] { storage.getLocalProximityList() }
-    
+
+    public var covidPlusNoTracingDuration: Int?
     public var proximitiesRetentionDurationInDays: Int?
     public var preSymptomsSpan: Int = 0
     public var positiveSampleSpan: Int = 0
@@ -129,11 +126,11 @@ public final class RBManager {
         self.storage.start()
         if isProximityActivated && restartProximityIfPossible && !isFirstInstall {
             if isRegistered {
-                if canReactivateProximity {
-                    startProximityDetection()
-                } else {
+                if RBManager.shared.isImmune {
                     isProximityActivated = false
                     stopProximityDetection()
+                } else {
+                    startProximityDetection()
                 }
             } else {
                 isProximityActivated = false
@@ -274,7 +271,6 @@ extension RBManager {
                             self.reportSymptomsStartDate = symptomsOrigin
                             self.reportPositiveTestDate = positiveTestDate
                             self.clearLocalProximityList()
-                            self.isSick = true
                             completion(nil)
                         case let .failure(error):
                             completion(error)

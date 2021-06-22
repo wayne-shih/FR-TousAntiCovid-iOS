@@ -36,7 +36,7 @@ final class MaintenanceManager: NSObject {
         var request: URLRequest = URLRequest(url: MaintenanceConstant.fileUrl)
         request.httpMethod = "GET"
         let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        let task: URLSessionDataTask = session.dataTask(with: request) { data, response, error in
+        let task: URLSessionDataTask = session.dataTaskWithETag(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
                     self.processCheckError(error: error, completion: completion)

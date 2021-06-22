@@ -13,7 +13,7 @@ import RobertSDK
 import StorageSDK
 import ServerSDK
 
-protocol IsolationChangesObserver: class {
+protocol IsolationChangesObserver: AnyObject {
     
     func isolationDidUpdate()
     
@@ -35,9 +35,7 @@ final class IsolationManager {
     
     // MARK: - Public workable values -
     var currentState: State? { State(rawValue: isolationState ?? "") }
-    var currentRecommendationState: RecommendationState {
-        return calculateRecommendationState()
-    }
+    var currentRecommendationState: RecommendationState { calculateRecommendationState() }
     
     private var storageManager: StorageManager!
     private var canTriggerUpdateNotif: Bool = true
@@ -147,14 +145,12 @@ final class IsolationManager {
         return date?.roundingToBeginningOfDay()
     }
     
-    var stillHavingFeverNotificationTriggerDate: Date {
-        return currentIsolationEndDate ?? Date()
-    }
+    var stillHavingFeverNotificationTriggerDate: Date { currentIsolationEndDate ?? Date() }
     
     // MARK: - Contact case dates calculated values -
     private var contactCaseIsolationContactCalculatedDate: Date {
         let date: Date
-        if RBManager.shared.isSick {
+        if RBManager.shared.isImmune {
             date = isolationLastContactDate ?? Date()
         } else {
             date = isolationLastContactDate ?? RBManager.shared.currentStatusRiskLevel?.lastRiskScoringDate ?? Date()
@@ -223,7 +219,7 @@ final class IsolationManager {
     func updateStateBasedOnAppMainStateIfNeeded() {
         guard currentState == nil else { return }
         var state: State? = nil
-        if RBManager.shared.isSick {
+        if RBManager.shared.isImmune {
             state = .positiveCase
         } else if StatusManager.shared.isAtRisk {
             state = .contactCase
@@ -371,7 +367,7 @@ final class IsolationManager {
     }
     
     private func calculateInitialCase() -> RecommendationState {
-        let isSick: Bool = RBManager.shared.isSick
+        let isSick: Bool = RBManager.shared.isImmune
         return StatusManager.shared.isAtRisk || isSick ? .initialCaseAtRiskOrSick : .initialCaseSafe
     }
     

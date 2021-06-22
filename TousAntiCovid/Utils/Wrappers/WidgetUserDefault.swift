@@ -8,7 +8,7 @@
 //  Created by Lunabee Studio / Date - 08/04/2019.
 //
 
-import UIKit
+import Foundation
 
 @propertyWrapper
 struct WidgetUserDefault<T> {

@@ -11,7 +11,7 @@
 import UIKit
 import ServerSDK
 
-protocol InfoCenterChangesObserver: class {
+protocol InfoCenterChangesObserver: AnyObject {
     
     func infoCenterDidUpdate()
     
@@ -100,12 +100,12 @@ extension InfoCenterManager {
             guard areUpdatesAvailable || languageChanged else { return }
             self.fetchTagsFile {
                 self.fetchInfoCenterFile {
-                    self.fetchLabelsFile(languageCode: Locale.currentLanguageCode) {
+                    self.fetchLabelsFile(languageCode: Locale.currentAppLanguageCode) {
                         self.lastUpdatedAt = lastUpdatedAt
                         guard !force && informAboutNews else { return }
                         DispatchQueue.main.async {
                             self.didReceiveNewInfo = true
-                            if self.isOnboardingDone && areUpdatesAvailable && !isInitialFetch {
+                            if self.isOnboardingDone && !isInitialFetch {
                                 NotificationsManager.shared.triggerInfoCenterNewsAvailableNotification()
                                 if UIApplication.shared.applicationState != .active {
                                     UIApplication.shared.applicationIconBadgeNumber = 1
@@ -121,21 +121,27 @@ extension InfoCenterManager {
     private func fetchLastUpdatedAtFile(_ completion: @escaping (_ areUpdatesAvailable: Bool, _ languageChanged: Bool, _ lastUpdatedAt: Int, _ informAboutNews: Bool) -> ()) {
         let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
         session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTask(with: InfoCenterConstant.lastUpdatedAtUrl) { data, response, error in
-            guard let data = data else {
+        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: InfoCenterConstant.lastUpdatedAtUrl) { data, response, error in
+            guard error == nil else {
                 DispatchQueue.main.async {
                     completion(false, false, 0, false)
                 }
                 return
             }
             do {
-                let lastUpdatedAtJson: InfoLastUpdatedAt = try JSONDecoder().decode(InfoLastUpdatedAt.self, from: data)
-                let areJsonUpdatesAvailable: Bool = self.lastUpdatedAt < lastUpdatedAtJson.lastUpdatedAt
+                let newLastUpdatedAt: Int
+                if let data = data {
+                    let lastUpdatedAtJson: InfoLastUpdatedAt = try JSONDecoder().decode(InfoLastUpdatedAt.self, from: data)
+                    newLastUpdatedAt = lastUpdatedAtJson.lastUpdatedAt
+                } else {
+                    newLastUpdatedAt = self.lastUpdatedAt
+                }
+                let areJsonUpdatesAvailable: Bool = self.lastUpdatedAt < newLastUpdatedAt
                 let lastUpdateWasMoreThan5MinsAgo: Bool = Date().timeIntervalSince1970 - Double(self.lastUpdatedAt) > 5.0 * 60.0
                 let areUpdatesAvailable: Bool = areJsonUpdatesAvailable || lastUpdateWasMoreThan5MinsAgo
-                let languageChanged: Bool = self.lastInfoLanguageCode != Locale.currentLanguageCode
+                let languageChanged: Bool = self.lastInfoLanguageCode != Locale.currentAppLanguageCode
                 DispatchQueue.main.async {
-                    completion(areUpdatesAvailable, languageChanged, lastUpdatedAtJson.lastUpdatedAt, areJsonUpdatesAvailable)
+                    completion(areUpdatesAvailable, languageChanged, newLastUpdatedAt, areJsonUpdatesAvailable)
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -149,9 +155,11 @@ extension InfoCenterManager {
     private func fetchTagsFile(_ completion: @escaping () -> ()) {
         let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
         session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTask(with: InfoCenterConstant.tagsUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: InfoCenterConstant.tagsUrl) { data, response, error in
             guard let data = data else {
-                completion()
+                DispatchQueue.main.async {
+                    completion()
+                }
                 return
             }
             do {
@@ -172,9 +180,11 @@ extension InfoCenterManager {
     private func fetchInfoCenterFile(_ completion: @escaping () -> ()) {
         let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
         session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTask(with: InfoCenterConstant.infoCenterUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: InfoCenterConstant.infoCenterUrl) { data, response, error in
             guard let data = data else {
-                completion()
+                DispatchQueue.main.async {
+                    completion()
+                }
                 return
             }
             do {
@@ -196,9 +206,11 @@ extension InfoCenterManager {
         let url: URL = labelsUrl(for: languageCode)
         let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
         session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTask(with: url) { data, response, error in
+        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: url) { data, response, error in
             guard let data = data else {
-                completion()
+                DispatchQueue.main.async {
+                    completion()
+                }
                 return
             }
             do {
@@ -206,17 +218,13 @@ extension InfoCenterManager {
                 guard let labelsDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] else { return }
                 self.labels = labelsDict
                 try data.write(to: localUrl)
-                self.lastInfoLanguageCode = Locale.currentLanguageCode
+                self.lastInfoLanguageCode = Locale.currentAppLanguageCode
                 DispatchQueue.main.async {
                     completion()
                 }
             } catch {
-                if languageCode != Constant.defaultLanguageCode {
-                    self.fetchLabelsFile(languageCode: Constant.defaultLanguageCode, completion: completion)
-                } else {
-                    DispatchQueue.main.async {
-                        completion()
-                    }
+                DispatchQueue.main.async {
+                    completion()
                 }
             }
         }
@@ -258,7 +266,7 @@ extension InfoCenterManager {
     }
     
     private func loadLocalLabels() {
-        var localUrl: URL = localLabelsUrl(for: Locale.currentLanguageCode)
+        var localUrl: URL = localLabelsUrl(for: Locale.currentAppLanguageCode)
         if !FileManager.default.fileExists(atPath: localUrl.path) {
             localUrl = localLabelsUrl(for: Constant.defaultLanguageCode)
         }

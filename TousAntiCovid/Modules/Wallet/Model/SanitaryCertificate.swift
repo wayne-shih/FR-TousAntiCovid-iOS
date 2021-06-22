@@ -8,8 +8,8 @@
 //  Created by Lunabee Studio / Date - 17/03/2021 - for the TousAntiCovid project.
 //
 
-import Foundation
 import StorageSDK
+import UIKit
 
 final class SanitaryCertificate: WalletCertificate {
 
@@ -31,11 +31,15 @@ final class SanitaryCertificate: WalletCertificate {
         do {
             return try signatureString.decodeBase32(padded: signatureString.hasSuffix("="))
         } catch {
+            print(error)
             return nil
         }
     }
     override var isSignatureAlreadyEncoded: Bool { false }
-    
+
+    override var codeImage: UIImage? { value.dataMatrix() }
+    override var codeImageTitle: String? { "2D-DOC" }
+
     var firstName: String? { fields[FieldName.firstName.rawValue]?.replacingOccurrences(of: "/", with: ",") }
     var name: String? { fields[FieldName.name.rawValue] }
     var birthDateString: String?
@@ -58,8 +62,8 @@ final class SanitaryCertificate: WalletCertificate {
     override var timestamp: Double { analysisDate?.timeIntervalSince1970 ?? 0.0 }
     
     override var pillTitles: [String] { ["wallet.proof.sanitaryCertificate.pillTitle".localized] }
-    override var shortDescription: String { [firstName, name].compactMap { $0 }.joined(separator: " ") }
-    override var fullDescription: String {
+    override var shortDescription: String? { [firstName, name].compactMap { $0 }.joined(separator: " ") }
+    override var fullDescription: String? {
         var text: String = "wallet.proof.sanitaryCertificate.description".localized
         text = text.replacingOccurrences(of: "<\(FieldName.firstName.rawValue)>", with: firstName ?? "N/A")
         text = text.replacingOccurrences(of: "<\(FieldName.name.rawValue)>", with: name ?? "N/A")
@@ -75,14 +79,14 @@ final class SanitaryCertificate: WalletCertificate {
         return text
     }
     
-    override init(id: String = UUID().uuidString, value: String, type: WalletConstant.CertificateType, needParsing: Bool = false) {
-        super.init(id: id, value: value, type: type, needParsing: needParsing)
-        guard needParsing else { return }
+    override init(id: String = UUID().uuidString, value: String, type: WalletConstant.CertificateType) {
+        super.init(id: id, value: value, type: type)
+        self.fields = parse(value)
         self.birthDateString = parseBirthDate()
         self.analysisDate = parseAnalysisDate()
     }
 
-    override func parse(_ value: String) -> [String: String] {
+    func parse(_ value: String) -> [String: String] {
         var captures: [String: String] = [:]
         guard let regex = try? NSRegularExpression(pattern: type.validationRegex) else { return captures }
         let matches: [NSTextCheckingResult] = regex.matches(in: value, options: [], range: NSRange(location: 0, length: value.count))

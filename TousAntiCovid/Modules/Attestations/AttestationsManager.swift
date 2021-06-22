@@ -12,7 +12,7 @@ import UIKit
 import ServerSDK
 import StorageSDK
 
-protocol AttestationsChangesObserver: class {
+protocol AttestationsChangesObserver: AnyObject {
     
     func attestationsDidUpdate()
     
@@ -92,7 +92,9 @@ final class AttestationsManager: NSObject {
         do {
             let regex: NSRegularExpression = try NSRegularExpression(pattern: "<[a-zA-Z0-9\\-]+>")
             qrCodeString = regex.stringByReplacingMatches(in: qrCodeString, range: NSRange(qrCodeString.startIndex..., in: qrCodeString), withTemplate: "qrCode.infoNotAvailable".localized)
-        } catch { }
+        } catch {
+            print(error)
+        }
         return qrCodeString
     }
     
@@ -156,7 +158,7 @@ extension AttestationsManager {
             configuration.timeoutIntervalForResource = timeout
         }
         let session: URLSession = URLSession(configuration: configuration, delegate: self, delegateQueue: .main)
-        let dataTask: URLSessionDataTask = session.dataTask(with: AttestationsConstant.jsonUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: AttestationsConstant.jsonUrl) { data, response, error in
             guard let data = data else {
                 completion()
                 return

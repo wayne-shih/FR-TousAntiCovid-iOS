@@ -15,6 +15,7 @@ enum Constant {
     
     static let appStoreId: String = "1511279125"
     static let defaultLanguageCode: String = "en"
+    static let supportedLanguageCodes: [String] = ["en", "fr"]
     static let maxPushDatesCount: Int = 100
     static let secondsBeforeStatusRetry: Double = 60.0
     static let proximityReactivationHours: [Int] = [1, 2, 4, 8, 12]
@@ -28,16 +29,16 @@ enum Constant {
     enum ShortcutItem: String {
         case newAttestation = "home.moreSection.curfewCertificate"
         case venues = "appShortcut.venues"
+        case qrScan = "appShortcut.qrScan"
     }
     
     enum Server {
         
         static let resourcesRootDomain: String = "app.tousanticovid.gouv.fr"
-        
+
         static var baseUrl: URL { URL(string: "https://api.tousanticovid.gouv.fr/api/\(ParametersManager.shared.apiVersion.rawValue)")! }
 
         static var cleaReportBaseUrl: URL { URL(string: "https://signal-api.tousanticovid.gouv.fr/api/clea/\(ParametersManager.shared.cleaReportApiVersion.rawValue)")! }
-        static var cleaStatusBaseUrl: URL { URL(string: "https://s3.fr-par.scw.cloud/clea-batch/\(ParametersManager.shared.cleaStatusApiVersion.rawValue)")! }
 
         static var analyticsBaseUrl: URL { URL(string: "https://analytics-api.tousanticovid.gouv.fr/api/\(ParametersManager.shared.analyticsApiVersion.rawValue)")! }
 
@@ -45,17 +46,24 @@ enum Constant {
 
         static var certificate: Data { Bundle.main.fileDataFor(fileName: "api.tousanticovid.gouv.fr", ofType: "pem") ?? Data() }
 
-        
+        static var dccCertsUrl: URL { URL(string: "https://\(resourcesRootDomain)/json/version-\(jsonVersion)/Certs/dcc-certs.json")! }
+
         static var analyticsCertificate: Data { Bundle.main.fileDataFor(fileName: "analytics-api.tousanticovid.gouv.fr", ofType: "pem") ?? Data() }
 
-        static var resourcesCertificate: Data { Bundle.main.fileDataFor(fileName: Constant.Server.resourcesRootDomain, ofType: "pem") ?? Data() }
+        static var resourcesCertificate: Data { Bundle.main.fileDataFor(fileName: resourcesRootDomain, ofType: "pem") ?? Data() }
 
-        static let jsonVersion: Int = 32
-        static let baseJsonUrl: String = "https://\(Constant.Server.resourcesRootDomain)/json/version-\(jsonVersion)/Config"
+        static let jsonVersion: Int = 33
+        static let baseJsonUrl: String = "https://\(resourcesRootDomain)/json/version-\(jsonVersion)/Config"
         static let configUrl: URL = URL(string: "\(baseJsonUrl)/config.json")!
 
+        static func cleaStatusBaseUrl(fallbackUrl: Bool = false) -> URL {
+            let defaultCleaUrl: URL = URL(string: ParametersManager.shared.defaultCleaUrl)!
+            let baseUrl: URL = fallbackUrl ? defaultCleaUrl : URL(string: ParametersManager.shared.cleaUrl) ?? defaultCleaUrl
+            return baseUrl.appendingPathComponent(ParametersManager.shared.cleaStatusApiVersion.rawValue)
+        }
+
     }
-    
+
 }
 
 typealias JSON = [String: Any]

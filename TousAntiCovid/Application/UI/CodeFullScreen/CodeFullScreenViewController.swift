@@ -10,40 +10,7 @@
 import UIKit
 
 final class CodeFullScreenViewController: UIViewController {
-    
-    enum CodeType {
-        case qrCode
-        case dataMatrix
-        
-        var backgroundColor: UIColor {
-            switch self {
-            case .qrCode:
-                return .black
-            case .dataMatrix:
-                return .white
-            }
-        }
-        
-        var textColor: UIColor {
-            switch self {
-            case .qrCode:
-                return .white
-            case .dataMatrix:
-                return .black
-            }
-        }
-        
-        var codeImageLeadingMargin: CGFloat {
-            switch self {
-            case .qrCode:
-                return 20.0
-            case .dataMatrix:
-                return 60.0
-            }
-        }
-        
-    }
-    
+
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var codeBottomLabel: UILabel!
     @IBOutlet private var label: UILabel!
@@ -54,15 +21,13 @@ final class CodeFullScreenViewController: UIViewController {
     private var codeBottomText: String?
     private var text: String!
     private var lastBrightness: CGFloat = 0.0
-    private var codeType: CodeType!
     private var isFirstLoad: Bool = true
     
-    static func controller(codeImage: UIImage, text: String, codeBottomText: String? = nil, codeType: CodeType) -> UIViewController {
+    static func controller(codeImage: UIImage, text: String, codeBottomText: String? = nil) -> UIViewController {
         let fullscreenController: CodeFullScreenViewController = StoryboardScene.CodeFullScreen.codeFullScreenViewController.instantiate()
         fullscreenController.codeImage = codeImage
         fullscreenController.text = text
         fullscreenController.codeBottomText = codeBottomText
-        fullscreenController.codeType = codeType
         return fullscreenController
     }
     
@@ -90,17 +55,17 @@ final class CodeFullScreenViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = codeType.backgroundColor
+        view.backgroundColor = .white
         imageView.image = codeImage
-        imageLeadingConstraint.constant = codeType.codeImageLeadingMargin
+        imageLeadingConstraint.constant = 60.0
         label.text = text
-        label.textColor = codeType.textColor
+        label.textColor = .black
         closeButton.setTitle("common.close".localized, for: .normal)
-        closeButton.setTitleColor(codeType.textColor, for: .normal)
+        closeButton.setTitleColor(.black, for: .normal)
         label.font = .regular(size: 20.0)
         codeBottomLabel.text = codeBottomText
         codeBottomLabel.font = Appearance.Cell.Text.headTitleFont4
-        codeBottomLabel.textColor = codeType.textColor
+        codeBottomLabel.textColor = .black
         codeBottomLabel.isHidden = codeBottomText == nil
     }
     

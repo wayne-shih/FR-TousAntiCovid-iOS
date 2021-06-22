@@ -18,12 +18,25 @@ final class WalletImagesManager: NSObject {
         case testCertificateFull = "test-certificate-full"
         case vaccinCertificate = "vaccin-certificate"
         case vaccinCertificateFull = "vaccin-certificate-full"
+        case vaccinEuropeCertificate = "vaccin-europe-certificate"
+        case vaccinEuropeCertificateFull = "vaccin-europe-certificate-full"
+        case testEuropeCertificate = "test-europe-certificate"
+        case testEuropeCertificateFull = "test-europe-certificate-full"
+        case recoveryEuropeCertificate = "recovery-europe-certificate"
+        case recoveryEuropeCertificateFull = "recovery-europe-certificate-full"
     }
     
     static let shared: WalletImagesManager = WalletImagesManager()
     
     @UserDefault(key: .lastMultipleRemoteFilesLanguageCode)
-    private var lastLanguageCode: String? = nil
+    private var lastLanguageCode: String? = nil {
+        didSet {
+            guard oldValue != lastLanguageCode else {
+                return
+            }
+            ETagManager.shared.clearAllData()
+        }
+    }
     private var fileNames: [String] = ImageName.allCases.map { $0.rawValue }
     private var images: [String: UIImage] = [:]
     
@@ -43,7 +56,7 @@ final class WalletImagesManager: NSObject {
     func image(named: ImageName) -> UIImage? { images[named.rawValue] }
     
     private func workingDirectoryName() -> String { "WalletImages" }
-    private func initialFileUrl(fileName: String) -> URL { Bundle.main.url(forResource: fileName, withExtension: nil)! }
+    private func initialFileUrl(fileName: String) -> URL? { Bundle.main.url(forResource: fileName, withExtension: nil) }
     
     @discardableResult
     private func processReceivedData(_ data: Data, fileName: String) -> Bool {
@@ -76,15 +89,17 @@ final class WalletImagesManager: NSObject {
     }
     
     private func fetchLastFiles() {
-        fileNames.forEach { fetchLastFile(with: $0, languageCode: Locale.currentLanguageCode) }
+        fileNames.forEach { fetchLastFile(with: $0, languageCode: Locale.currentAppLanguageCode) }
     }
 
     private func fetchLastFile(with name: String, languageCode: String) {
         let fileName: String = self.fileName(baseName: name, languageCode: languageCode)
         let url: URL = WalletImagesConstant.baseUrl.appendingPathComponent(fileName)
         let sesssion: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        let dataTask: URLSessionDataTask = sesssion.dataTask(with: url) { data, response, error in
-            guard let data = data else { return }
+        let dataTask: URLSessionDataTask = sesssion.dataTaskWithETag(with: url) { data, response, error in
+            guard let data = data else {
+                return
+            }
             do {
                 let localFileName: String = self.fileName(baseName: name, languageCode: languageCode)
                 let localUrl: URL = self.createWorkingDirectoryIfNeeded().appendingPathComponent(localFileName)
@@ -94,12 +109,8 @@ final class WalletImagesManager: NSObject {
                 } else {
                     self.loadLocalFile(with: name)
                 }
-                self.lastLanguageCode = Locale.currentLanguageCode
-            } catch {
-                if languageCode != Constant.defaultLanguageCode {
-                    self.fetchLastFile(with: name, languageCode: Constant.defaultLanguageCode)
-                }
-            }
+                self.lastLanguageCode = Locale.currentAppLanguageCode
+            } catch {}
         }
         dataTask.resume()
     }
@@ -107,7 +118,7 @@ final class WalletImagesManager: NSObject {
     private func loadLocalFiles() { fileNames.forEach { loadLocalFile(with: $0) } }
     
     private func loadLocalFile(with name: String) {
-        var fileName: String = self.fileName(baseName: name, languageCode: Locale.currentLanguageCode)
+        var fileName: String = self.fileName(baseName: name, languageCode: Locale.currentAppLanguageCode)
         var localUrl: URL = createWorkingDirectoryIfNeeded().appendingPathComponent(fileName)
         if !FileManager.default.fileExists(atPath: localUrl.path) {
             fileName = self.fileName(baseName: name, languageCode: Constant.defaultLanguageCode)
@@ -119,8 +130,8 @@ final class WalletImagesManager: NSObject {
     
     private func writeInitialFilesIfNeeded() {
         fileNames.forEach {
-            let fileName: String = self.fileName(baseName: $0, languageCode: Locale.currentLanguageCode)
-            writeInitialFileIfNeeded(fileUrl: initialFileUrl(fileName: fileName))
+            let fileName: String = self.fileName(baseName: $0, languageCode: Locale.currentAppLanguageCode)
+            writeInitialFileIfNeeded(fileUrl: initialFileUrl(fileName: fileName) ?? Bundle.main.url(forResource: "\($0)-\(Constant.defaultLanguageCode)", withExtension: "png")!)
         }
     }
     

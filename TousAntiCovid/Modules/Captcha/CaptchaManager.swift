@@ -66,7 +66,7 @@ final class CaptchaManager: NSObject {
     }
     
     private func generate(captchaType: CaptchaType, completion: @escaping (_ result: Result<CaptchaGenerationResponse, Error>) -> ()) {
-        let generateBody: CaptchaGenerationBody = CaptchaGenerationBody(type: captchaType.rawValue, locale: Locale.currentLanguageCode)
+        let generateBody: CaptchaGenerationBody = CaptchaGenerationBody(type: captchaType.rawValue, locale: Locale.current.languageCode ?? Constant.defaultLanguageCode)
         self.processRequest(url: CaptchaConstant.Url.create, method: .post, body: generateBody) { result in
             switch result {
             case let .success(data):

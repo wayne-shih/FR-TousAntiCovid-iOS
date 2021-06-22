@@ -36,12 +36,7 @@ final class DocumentExplanationViewController: CVTableViewController {
     }
     
     private func updateTitle() {
-        switch certificateType {
-        case .vaccination:
-            title = "documentExplanationController.vaccinCertificate.title".localized
-        case .sanitary:
-            title = "documentExplanationController.testCertificate.title".localized
-        }
+        title = "documentExplanationController.\(certificateType.textKey).title".localized
     }
     
     override func createRows() -> [CVRow] {
@@ -57,6 +52,12 @@ final class DocumentExplanationViewController: CVTableViewController {
             documentImage = WalletImagesManager.shared.image(named: .vaccinCertificateFull)!
         case .sanitary:
             documentImage = WalletImagesManager.shared.image(named: .testCertificateFull)!
+        case .sanitaryEurope:
+            documentImage = WalletImagesManager.shared.image(named: .testEuropeCertificateFull)!
+        case .vaccinationEurope:
+            documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
+        case .recoveryEurope:
+            documentImage = WalletImagesManager.shared.image(named: .recoveryEuropeCertificateFull)!
         }
         let ratioHeight: CGFloat = (documentImage.size.height / documentImage.size.width) * UIScreen.main.bounds.width
         let imageRow: CVRow = CVRow(image: documentImage,

@@ -15,7 +15,7 @@ final class DateCell: TextFieldCell {
 
     let datePicker: UIDatePicker = UIDatePicker()
     let toolbar: UIToolbar = UIToolbar()
-        
+    
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI(with: row)
@@ -70,8 +70,6 @@ final class DateCell: TextFieldCell {
         updateSubtitle(with: currentAssociatedRow?.displayValueForValue?(datePicker.date))
     }
 
-    override func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        return false
-    }
+    override func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool { false }
 
 }

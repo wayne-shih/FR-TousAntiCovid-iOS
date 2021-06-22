@@ -11,7 +11,7 @@
 import UIKit
 import ServerSDK
 
-protocol KeyFiguresChangesObserver: class {
+protocol KeyFiguresChangesObserver: AnyObject {
     
     func postalCodeDidUpdate(_ postalCode: String?)
     func keyFiguresDidUpdate()
@@ -207,9 +207,11 @@ extension KeyFiguresManager {
     private func fetchKeyFiguresFile(_ completion: @escaping () -> ()) {
         let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
         session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTask(with: KeyFiguresConstant.jsonUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: KeyFiguresConstant.jsonUrl) { data, response, error in
             guard let data = data else {
-                completion()
+                DispatchQueue.main.async {
+                    completion()
+                }
                 return
             }
             do {

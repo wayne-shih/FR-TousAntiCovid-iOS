@@ -13,7 +13,7 @@ import UIKit
 final class CVNavigationChildController: UIViewController {
     
     var navigationBarHeight: CGFloat { navigationBar.frame.height }
-    
+
     @IBOutlet private var navigationBarBackgroundView: UIVisualEffectView!
     @IBOutlet private var navigationBar: UINavigationBar!
     @IBOutlet private var containerView: UIView!
@@ -22,6 +22,11 @@ final class CVNavigationChildController: UIViewController {
     @IBOutlet private var fakeNavigationItem: UINavigationItem!
     
     weak var titleLabel: UILabel?
+    var rightBarButtonItemView: UIView? {
+        guard let buttonItem = fakeNavigationItem.rightBarButtonItem else { return nil }
+        return buttonItem.value(forKey: "view") as? UIView
+    }
+
     private weak var titleLabelContainerView: UIView?
     private var embeddedController: UIViewController?
     private var titleLabelContainerViewIntialY: CGFloat?
@@ -57,6 +62,13 @@ final class CVNavigationChildController: UIViewController {
     func updateRightBarButtonItem(_ barButtonItem: UIBarButtonItem) {
         fakeNavigationItem.rightBarButtonItem = barButtonItem
     }
+
+    func rightBarButtonItemFrame(in view: UIView) -> CGRect? {
+        guard let buttonItem = fakeNavigationItem.rightBarButtonItem else { return nil }
+        guard let buttonItemView = buttonItem.value(forKey: "view") as? UIView else { return nil }
+        guard let buttonItemImageView = buttonItemView.subviews.first?.subviews.first else { return nil }
+        return view.convert(buttonItemImageView.frame, from: buttonItemImageView.superview)
+    }
     
     private func initNavigationBar() {
         navigationBar.isAccessibilityElement = false
@@ -67,6 +79,7 @@ final class CVNavigationChildController: UIViewController {
         fakeNavigationBar.setBackgroundImage(UIImage(), for: .default)
         fakeNavigationBar.shadowImage = UIImage()
         fakeNavigationBar.tintColor = Asset.Colors.tint.color
+        fakeNavigationBar.tintAdjustmentMode = .normal
     }
     
     private func setupEmbeddedController() {

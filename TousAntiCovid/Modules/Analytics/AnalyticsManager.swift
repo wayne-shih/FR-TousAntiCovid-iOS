@@ -32,7 +32,10 @@ final class AnalyticsManager: NSObject {
     var appEvents: [AnalyticsAppEvent] { getCurrentAppEvents() }
     var healthEvents: [AnalyticsHealthEvent] { getCurrentHealthEvents() }
     var errors: [AnalyticsError] { getCurrentErrors() }
-    
+
+    @UserDefault(key: .deleteAnalyticsAfterNextStatus)
+    private var deleteAnalyticsAfterNextStatus: Bool = false
+
     private typealias ProcessRequestCompletion = (_ result: Result<Data, Error>) -> ()
     private lazy var session: URLSession = {
         let backgroundConfiguration: URLSessionConfiguration = URLSessionConfiguration.background(withIdentifier: "fr.gouv.tousanticovid.ios.Analytics")
@@ -52,8 +55,17 @@ final class AnalyticsManager: NSObject {
     func setOptIn(to isOptIn: Bool) {
         self.isOptIn = isOptIn
     }
+
+    func processAnalytics() {
+        deleteAnalyticsIfRequested()
+        sendAnalytics()
+    }
     
-    func sendAnalytics() {
+    func requestDeleteAnalytics() {
+        deleteAnalyticsAfterNextStatus = true
+    }
+
+    private func sendAnalytics() {
         guard ParametersManager.shared.isAnalyticsOn && isOptIn && !Constant.isDebug else {
             resetAppEvents()
             resetHealthEvents()
@@ -73,6 +85,18 @@ final class AnalyticsManager: NSObject {
             }
         }
     }
+
+    private func deleteAnalyticsIfRequested() {
+        guard deleteAnalyticsAfterNextStatus else { return }
+        sendDeleteAnalytics(for: installationUuid) { error in
+            if let error = error {
+                self.reportError(serviceName: "analytics", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
+            } else {
+                self.deleteAnalyticsAfterNextStatus = false
+                self.reset()
+            }
+        }
+    }
     
     func reset() {
         resetInfo()
@@ -81,6 +105,7 @@ final class AnalyticsManager: NSObject {
         resetErrors()
         installationUuid = UUID().uuidString
         isOptIn = true
+        deleteAnalyticsAfterNextStatus = false
         clearProximityStartTimestamp()
     }
     
@@ -139,14 +164,34 @@ extension AnalyticsManager {
 }
 
 extension AnalyticsManager {
+    private func sendDeleteAnalytics(for installationUuid: String, completion: @escaping (_ error: Error?) -> ()) {
+        var url: URLComponents? = URLComponents(url: Constant.Server.analyticsBaseUrl.appendingPathComponent("analytics"), resolvingAgainstBaseURL: false)
+        url?.queryItems = [URLQueryItem(name: "installationUuid", value: installationUuid)]
+        processRequest(httpMethod: .delete, url: url?.url ?? Constant.Server.analyticsBaseUrl.appendingPathComponent("analytics"), body: [:]) { result in
+            switch result {
+            case .success:
+                completion(nil)
+            case let .failure(error):
+                completion(error)
+            }
+        }
+    }
+}
 
-    private func processRequest(url: URL, body: JSON, completion: @escaping (_ result: Result<Data, Error>) -> ()) {
+extension AnalyticsManager {
+
+    private enum HttpMethod: String {
+        case post = "POST"
+        case delete = "DELETE"
+    }
+
+    private func processRequest(httpMethod: HttpMethod = .post, url: URL, body: JSON, completion: @escaping (_ result: Result<Data, Error>) -> ()) {
         do {
             let bodyData: Data = try JSONSerialization.data(withJSONObject: body, options: [])
             let requestId: String = UUID().uuidString
             completions[requestId] = completion
             var request: URLRequest = URLRequest(url: url)
-            request.httpMethod = "POST"
+            request.httpMethod = httpMethod.rawValue
             request.setValue("application/json", forHTTPHeaderField: "Content-type")
             if let token = RBManager.shared.analyticsToken {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -171,7 +216,7 @@ extension AnalyticsManager: URLSessionDelegate, URLSessionDataDelegate {
             if dataTask.response?.isError == true {
                 let statusCode: Int = dataTask.response?.responseStatusCode ?? 0
                 let message: String? = data.isEmpty ? "No logs received from the server" : String(data: data, encoding: .utf8)
-                let error: Error = NSError.localizedError(message: "Uknown error (\(statusCode)). (\(message ?? "N/A"))", code: statusCode)
+                let error: Error = NSError.localizedError(message: "Unknown error (\(statusCode)). (\(message ?? "N/A"))", code: statusCode)
                 completion(.failure(error))
                 self.completions[requestId] = nil
             } else {
@@ -192,8 +237,8 @@ extension AnalyticsManager: URLSessionDelegate, URLSessionDataDelegate {
                 let receivedData: Data = self.receivedData[requestId] ?? Data()
                 if task.response?.isError == true {
                     let statusCode: Int = task.response?.responseStatusCode ?? 0
-                    let message: String = receivedData.isEmpty ? "No data received from the server" : (String(data: receivedData, encoding: .utf8) ?? "Unknown error")
-                    let error: Error = NSError.localizedError(message: "Uknown error (\(statusCode)). (\(message))", code: statusCode)
+                    let message: String = receivedData.isEmpty ? "No data received from the server" : (String(data: receivedData, encoding: .utf8) ?? "common.error.unknown".localized)
+                    let error: Error = NSError.localizedError(message: "Unknown error (\(statusCode)). (\(message))", code: statusCode)
                     completion(.failure(error))
                 } else {
                     completion(.success(receivedData))

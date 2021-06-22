@@ -10,7 +10,7 @@
 
 import UIKit
 
-protocol OrientationChangesObserver: class {
+protocol OrientationChangesObserver: AnyObject {
     
     func orientationActivationStateDidChange()
     

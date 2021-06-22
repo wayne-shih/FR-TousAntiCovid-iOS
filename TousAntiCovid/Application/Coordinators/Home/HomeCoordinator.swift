@@ -23,7 +23,10 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
     private var launchScreenWindow: UIWindow?
     private var showLaunchScreen: Bool = true
     private var isLoadingAppUpdate: Bool = false
-    
+    private var isFlashingCode: Bool = false
+
+    private var animationWindow: UIWindow?
+
     init(parent: Coordinator) {
         self.parent = parent
         self.childCoordinators = []
@@ -79,6 +82,12 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
             self?.showSanitaryCertificates(url)
         }, didTouchVerifyWalletCertificate: { [weak self] in
             self?.showWalletCertificateVerification()
+        }, didTouchUniversalQrScan: { [weak self] in
+            self?.startUniversalCodeFlashing()
+        }, showUniversalQrScanExplanation: { [weak self] rect, animationDidEnd in
+            self?.showUniversalQrCodeScanningExplanations(initialButtonFrame: rect, animationDidEnd: animationDidEnd)
+        }, didEnterCodeFromDeeplink: { [weak self] code in
+            self?.didEnterCodeFromDeeplink(code)
         }, deinitBlock: { [weak self] in
             self?.didDeinit()
         }))
@@ -230,11 +239,7 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
         })
         addChild(coordinator: captchaCoordinator)
     }
-    
-    private func showFlash() {
-        let flashCodeCoordinator: FlashCodeCoordinator = FlashCodeCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
-        addChild(coordinator: flashCodeCoordinator)
-    }
+
     private func showEnterCode(code: String?) {
         let enterCodeCoordinator: EnterCodeCoordinator = EnterCodeCoordinator(presentingController: navigationController?.topPresentedController, parent: self, initialCode: code)
         addChild(coordinator: enterCodeCoordinator)
@@ -255,6 +260,68 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
         let vaccinationCoordinator: VaccinationCoordinator = VaccinationCoordinator(presentingController: navigationController?.topViewController, parent: self)
         addChild(coordinator: vaccinationCoordinator)
         AnalyticsManager.shared.reportAppEvent(.e7)
+    }
+
+    private func showUniversalQrCodeScanningExplanations(initialButtonFrame: CGRect?, animationDidEnd: @escaping (_ animated: Bool) -> ()) {
+        let explanationsAnimationController: UniversalQrCodeExplanationsAnimationController = UniversalQrCodeExplanationsAnimationController.controller(initialButtonFrame: initialButtonFrame)
+        animationWindow = createAnimationWindow(for: explanationsAnimationController)
+
+        let explanationsController: UniversalQrCodeExplanationsController = UniversalQrCodeExplanationsController(didTouchClose: { [weak self] imageView in
+            let canAnimate: Bool = explanationsAnimationController.positionImageViewToMatchView(imageView)
+            if canAnimate {
+                imageView?.alpha = 0.0
+                self?.animationWindow?.alpha = 1.0
+                self?.navigationController?.dismiss(animated: true)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    explanationsAnimationController.animateDisappearing { [weak self] in
+                        animationDidEnd(false)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            self?.animationWindow?.resignKey()
+                            self?.animationWindow?.isHidden = true
+                            self?.animationWindow = nil
+                        }
+                    }
+                }
+            } else {
+                self?.navigationController?.dismiss(animated: true) {
+                    animationDidEnd(true)
+                    self?.animationWindow = nil
+                }
+            }
+        }, didDismissManually: { [weak self] in
+            animationDidEnd(true)
+            self?.animationWindow = nil
+        })
+        navigationController?.present(CVNavigationController(rootViewController: explanationsController), animated: true)
+    }
+
+    private func createAnimationWindow(for controller: UIViewController) -> UIWindow {
+        let animationWindow = UIWindow(frame: UIScreen.main.bounds)
+        animationWindow.backgroundColor = .clear
+        animationWindow.rootViewController = controller
+        animationWindow.alpha = 0.0
+        animationWindow.makeKeyAndVisible()
+        return animationWindow
+    }
+
+    private func startUniversalCodeFlashing() {
+        guard !isFlashingCode else { return }
+        isFlashingCode = true
+        HUD.show(.progress)
+        DispatchQueue.main.async {
+            let controller: UniversalQrScanController = UniversalQrScanController.controller(didFlash: { [weak self] stringUrl in
+                guard let stringUrl = stringUrl else { throw NSError.localizedError(message: "universalQrScanController.error.noCodeFound".localized, code: 0) }
+                guard let url = URL(string: stringUrl) else { throw NSError.localizedError(message: "universalQrScanController.error.wrongUrl".localized, code: 0) }
+                self?.navigationController?.dismiss(animated: true) {
+                    DeepLinkingManager.shared.processUrl(url, fromApp: true)
+                }
+            }, deinitBlock: { [weak self] in
+                self?.isFlashingCode = false
+            })
+            self.navigationController?.topPresentedController.present(CVNavigationController(rootViewController: controller), animated: true) {
+                HUD.hide()
+            }
+        }
     }
     
     private func loadLaunchScreen() {
@@ -280,26 +347,19 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
 extension HomeCoordinator {
     
     private func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(didEnterCodeFromDeeplink(_:)), name: .didEnterCodeFromDeeplink, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(newAttestationFromDeeplink), name: .newAttestationFromDeeplink, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(dismissAllAndShowRecommandations), name: .dismissAllAndShowRecommandations, object: nil)
     }
-    
+
     private func removeObservers() {
         NotificationCenter.default.removeObserver(self)
     }
-    
-    @objc private func didEnterCodeFromDeeplink(_ notification: Notification) {
-        guard let code = notification.object as? String else { return }
+
+    private func didEnterCodeFromDeeplink(_ code: String) {
         if let controller = DeepLinkingManager.shared.enterCodeController {
             controller.enterCode(code)
         } else {
             showEnterCode(code: code)
         }
-    }
-    
-    @objc private func newAttestationFromDeeplink() {
-        showAttestations()
     }
     
     @objc private func dismissAllAndShowRecommandations() {

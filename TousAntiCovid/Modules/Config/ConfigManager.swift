@@ -26,5 +26,5 @@ final class ConfigManager {
             completion(result)
         }
     }
-    
+
 }

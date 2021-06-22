@@ -10,7 +10,7 @@
 
 import UIKit
 
-protocol LocalizationsChangesObserver: class {
+protocol LocalizationsChangesObserver: AnyObject {
     
     func localizationsChanged()
     
@@ -42,7 +42,7 @@ final class LocalizationsManager: RemoteFileSyncManager {
     override func canUpdateData() -> Bool {
         let now: Date = Date()
         let lastFetchIsTooOld: Bool = now.timeIntervalSince1970 - lastUpdateDate.timeIntervalSince1970 >= RemoteFileConstant.minDurationBetweenUpdatesInSeconds
-        let languageChanged: Bool = lastLanguageCode != Locale.currentLanguageCode
+        let languageChanged: Bool = lastLanguageCode != Locale.currentAppLanguageCode
         return lastFetchIsTooOld || languageChanged
     }
     

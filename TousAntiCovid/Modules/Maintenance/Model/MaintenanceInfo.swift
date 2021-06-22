@@ -32,7 +32,7 @@ struct MaintenanceInfo: Decodable {
     
     private func localizedValue(from: [String: String]?) -> String? {
         guard let from = from else { return nil }
-        if let description = from[Locale.currentLanguageCode], !description.isEmpty {
+        if let description = from[Locale.currentAppLanguageCode], !description.isEmpty {
             return description
         }
         return from[Constant.defaultLanguageCode]

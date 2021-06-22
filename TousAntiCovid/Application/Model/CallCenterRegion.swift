@@ -16,6 +16,6 @@ struct CallCenterRegion: Codable {
     let name: [String: String]
     let callCenters: [CallCenter]
     
-    var localizedName: String? { name[Locale.currentLanguageCode] }
+    var localizedName: String? { name[Locale.currentAppLanguageCode] }
     
 }

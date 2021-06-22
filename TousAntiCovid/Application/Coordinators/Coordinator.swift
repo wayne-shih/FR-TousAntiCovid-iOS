@@ -10,7 +10,7 @@
 
 import UIKit
 
-protocol Coordinator: class {
+protocol Coordinator: AnyObject {
     
     var parent: Coordinator? { get set }
     var childCoordinators: [Coordinator] { get set }

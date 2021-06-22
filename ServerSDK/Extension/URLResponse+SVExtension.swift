@@ -12,9 +12,7 @@ import Foundation
 
 extension URLResponse {
     
-    var svStatusCode: Int? {
-        (self as? HTTPURLResponse)?.statusCode
-    }
+    var svStatusCode: Int? { (self as? HTTPURLResponse)?.statusCode }
     
     var svIsError: Bool? {
         guard let statusCode = svStatusCode else { return nil }
@@ -30,4 +28,9 @@ extension URLResponse {
         return dateFormatter.date(from: dateString)?.timeIntervalSince1970 ?? Date().timeIntervalSince1970
     }
     
+    var svETag: String? {
+        (self as? HTTPURLResponse)?.allHeaderFields[ServerConstant.Etag.responseHeaderField] as? String
+    }
+    
+    var svIsNotModified: Bool { svStatusCode == 304 }
 }

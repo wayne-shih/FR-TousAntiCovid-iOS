@@ -65,7 +65,7 @@ final class VenuesHistoryViewController: CVTableViewController {
     
     override func createRows() -> [CVRow] {
         let venuesQrCodes: [VenueQrCodeInfo] = VenuesManager.shared.venuesQrCodes.sorted { $0.ntpTimestamp > $1.ntpTimestamp }
-        updateEmptyView(areThereQrCodes: !venuesQrCodes.isEmpty, isSick: RBManager.shared.isSick)
+        updateEmptyView(areThereQrCodes: !venuesQrCodes.isEmpty, isSick: RBManager.shared.isImmune)
         guard !venuesQrCodes.isEmpty else { return [] }
         var rows: [CVRow] = venuesQrCodes.map { venueQrCodeInfo in
             CVRow(title: venueQrCodeInfo.venueTypeDisplayName,

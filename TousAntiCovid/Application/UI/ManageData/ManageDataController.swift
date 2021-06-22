@@ -42,67 +42,90 @@ final class ManageDataController: CVTableViewController {
     
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = [blockSeparatorRow()]
-        let showInfoNotificationsRows: [CVRow] = switchRowsBlock(textPrefix: "manageDataController.showInfoNotifications",
-                                                                 isOn: NotificationsManager.shared.showNewInfoNotification, dynamicSwitchLabel: false) { isOn in
-            NotificationsManager.shared.showNewInfoNotification = isOn
-        }
+        let showInfoNotificationsRows: [CVRow] = [
+            sectionHeaderRow(textPrefix: "manageDataController.showInfoNotifications"),
+            switchRow(textPrefix: "manageDataController.showInfoNotifications",
+                      isOn: NotificationsManager.shared.showNewInfoNotification, dynamicSwitchLabel: false) { isOn in
+                NotificationsManager.shared.showNewInfoNotification = isOn
+            }]
         rows.append(contentsOf: showInfoNotificationsRows)
         rows.append(blockSeparatorRow())
-        let hideStatusRows: [CVRow] = switchRowsBlock(textPrefix: "manageDataController.hideStatus",
-                                                      isOn: StatusManager.shared.hideStatus,
-                                                      dynamicSwitchLabel: false) { isOn in
-            StatusManager.shared.hideStatus = isOn
-        }
+        let hideStatusRows: [CVRow] = [
+            sectionHeaderRow(textPrefix: "manageDataController.hideStatus"),
+            switchRow(textPrefix: "manageDataController.hideStatus",
+                      isOn: StatusManager.shared.hideStatus,
+                      dynamicSwitchLabel: false) { isOn in
+                StatusManager.shared.hideStatus = isOn
+            }]
         rows.append(contentsOf: hideStatusRows)
         rows.append(blockSeparatorRow())
-        let attestationRows: [CVRow] = rowsBlock(textPrefix: "manageDataController.attestationsData") { [weak self] in
+        let attestationRows: [CVRow] = [
+            sectionHeaderRow(textPrefix: "manageDataController.attestationsData"),
+            buttonRow(textPrefix: "manageDataController.attestationsData") { [weak self] in
             self?.eraseAttestationDataButtonPressed()
-        }
+        }]
         rows.append(contentsOf: attestationRows)
         rows.append(blockSeparatorRow())
         if WalletManager.shared.isWalletActivated {
-            let walletRows: [CVRow] = rowsBlock(textPrefix: "manageDataController.walletData") { [weak self] in
-                self?.eraseWalletDataButtonPressed()
-            }
+            let walletRows: [CVRow] = [
+                sectionHeaderRow(textPrefix: "manageDataController.walletData"),
+                buttonRow(textPrefix: "manageDataController.walletData") { [weak self] in
+                    self?.eraseWalletDataButtonPressed()
+                }]
             rows.append(contentsOf: walletRows)
             rows.append(blockSeparatorRow())
         }
         if ConfigManager.shared.venuesFeaturedWasActivatedAtLeastOneTime || !VenuesManager.shared.venuesQrCodes.isEmpty {
-            let venuesRows: [CVRow] = rowsBlock(textPrefix: "manageDataController.venuesData") { [weak self] in
-                self?.eraseVenuesDataButtonPressed()
-            }
+            let venuesRows: [CVRow] = [
+                sectionHeaderRow(textPrefix: "manageDataController.venuesData"),
+                buttonRow(textPrefix: "manageDataController.venuesData") { [weak self] in
+                    self?.eraseVenuesDataButtonPressed()
+                }]
             rows.append(contentsOf: venuesRows)
             rows.append(blockSeparatorRow())
         }
         if ParametersManager.shared.displayIsolation {
-            let isolationRows: [CVRow] = rowsBlock(textPrefix: "manageDataController.isolationData") { [weak self] in
-                self?.eraseIsolationDataButtonPressed()
-            }
+            let isolationRows: [CVRow] = [
+                sectionHeaderRow(textPrefix: "manageDataController.isolationData"),
+                buttonRow(textPrefix: "manageDataController.isolationData") { [weak self] in
+                    self?.eraseIsolationDataButtonPressed()
+                }]
             rows.append(contentsOf: isolationRows)
             rows.append(blockSeparatorRow())
         }
-        let historyRows: [CVRow] = rowsBlock(textPrefix: "manageDataController.eraseLocalHistory") { [weak self] in
-            self?.eraseLocalHistoryButtonPressed()
-        }
+        let historyRows: [CVRow] = [
+            sectionHeaderRow(textPrefix: "manageDataController.eraseLocalHistory"),
+            buttonRow(textPrefix: "manageDataController.eraseLocalHistory") { [weak self] in
+                self?.eraseLocalHistoryButtonPressed()
+            }]
         rows.append(contentsOf: historyRows)
         rows.append(blockSeparatorRow())
-        let contactRows: [CVRow] = rowsBlock(textPrefix: "manageDataController.eraseRemoteContact") { [weak self] in
+        let contactRows: [CVRow] = [
+            sectionHeaderRow(textPrefix: "manageDataController.eraseRemoteContact"),
+            buttonRow(textPrefix: "manageDataController.eraseRemoteContact") { [weak self] in
             self?.eraseContactsButtonPressed()
-        }
+        }]
         rows.append(contentsOf: contactRows)
         rows.append(blockSeparatorRow())
         if ParametersManager.shared.isAnalyticsOn {
-            let analyticsRows: [CVRow] = switchRowsBlock(textPrefix: "manageDataController.analytics",
-                                                         isOn: AnalyticsManager.shared.isOptIn,
-                                                         dynamicSwitchLabel: true) { isOptIn in
-                AnalyticsManager.shared.setOptIn(to: isOptIn)
-            }
+            let analyticsRows: [CVRow] = [
+                sectionHeaderRow(textPrefix: "manageDataController.analytics"),
+                switchRow(textPrefix: "manageDataController.analytics",
+                          isOn: AnalyticsManager.shared.isOptIn,
+                          dynamicSwitchLabel: true) { isOptIn in
+                    AnalyticsManager.shared.setOptIn(to: isOptIn)
+                },
+                buttonRow(textPrefix: "manageDataController.analytics") { [weak self] in
+                    self?.eraseAnalyticsButtonPressed()
+                }]
             rows.append(contentsOf: analyticsRows)
             rows.append(blockSeparatorRow())
         }
-        let quitRows: [CVRow] = rowsBlock(textPrefix: "manageDataController.quitStopCovid", isDestuctive: true) { [weak self] in
+        let quitRows: [CVRow] = [
+            sectionHeaderRow(textPrefix: "manageDataController.quitStopCovid"),
+            buttonRow(textPrefix: "manageDataController.quitStopCovid", isDestuctive: true) { [weak self] in
             self?.quitButtonPressed()
-        }
+        }]
         rows.append(contentsOf: quitRows)
         rows.append(.empty)
         return rows
@@ -121,8 +144,8 @@ final class ManageDataController: CVTableViewController {
     @objc private func didTouchCloseButton() {
         dismiss(animated: true, completion: nil)
     }
-    
-    private func switchRowsBlock(textPrefix: String, isOn: Bool, dynamicSwitchLabel: Bool, handler: @escaping (_ isOn: Bool) -> ()) -> [CVRow] {
+
+    private func sectionHeaderRow(textPrefix: String) -> CVRow {
         var textRow: CVRow = CVRow(title: "\(textPrefix).title".localized,
                                    subtitle: "\(textPrefix).subtitle".localized,
                                    xibName: .textCell,
@@ -132,6 +155,10 @@ final class ManageDataController: CVTableViewController {
                                                       titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
                                                       separatorLeftInset: Appearance.Cell.leftMargin))
         textRow.theme.backgroundColor = Appearance.Cell.cardBackgroundColor
+        return textRow
+    }
+    
+    private func switchRow(textPrefix: String, isOn: Bool, dynamicSwitchLabel: Bool, handler: @escaping (_ isOn: Bool) -> ()) -> CVRow {
         var switchRow: CVRow = CVRow(title: (dynamicSwitchLabel ? (isOn ? "\(textPrefix).switch.on" : "\(textPrefix).switch.off") : "\(textPrefix).button").localized,
                                      isOn: isOn,
                                      xibName: .standardSwitchCell,
@@ -149,19 +176,10 @@ final class ManageDataController: CVTableViewController {
                                         }
                                      })
         switchRow.theme.backgroundColor = Appearance.Cell.cardBackgroundColor
-        return [textRow, switchRow]
+        return switchRow
     }
     
-    private func rowsBlock(textPrefix: String, isDestuctive: Bool = false, handler: @escaping () -> ()) -> [CVRow] {
-        var textRow: CVRow = CVRow(title: "\(textPrefix).title".localized,
-                                   subtitle: "\(textPrefix).subtitle".localized,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: Appearance.Cell.leftMargin,
-                                                      bottomInset: Appearance.Cell.leftMargin,
-                                                      textAlignment: .natural,
-                                                      titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
-                                                      separatorLeftInset: Appearance.Cell.leftMargin))
-        textRow.theme.backgroundColor = Appearance.Cell.cardBackgroundColor
+    private func buttonRow(textPrefix: String, isDestuctive: Bool = false, handler: @escaping () -> ()) -> CVRow {
         var buttonRow: CVRow = CVRow(title: "\(textPrefix).button".localized,
                                      xibName: .standardCell,
                                      theme: CVRow.Theme(topInset: 15.0,
@@ -177,7 +195,7 @@ final class ManageDataController: CVTableViewController {
                 cell.cvTitleLabel?.accessibilityTraits = .button
         })
         buttonRow.theme.backgroundColor = Appearance.Cell.cardBackgroundColor
-        return [textRow, buttonRow]
+        return buttonRow
     }
     
     private func blockSeparatorRow() -> CVRow {
@@ -280,6 +298,24 @@ final class ManageDataController: CVTableViewController {
                     }
                   })
     }
+
+    private func eraseAnalyticsButtonPressed() {
+        showAlert(title: "manageDataController.analytics.confirmationDialog.title".localized,
+                  message: "manageDataController.analytics.confirmationDialog.message".localized,
+                  okTitle: "common.yes".localized,
+                  cancelTitle: "common.no".localized, handler:  { [weak self] in
+                    self?.deleteAnalytics()
+                  })
+    }
+
+    private func deleteAnalytics() {
+        AnalyticsManager.shared.reportAppEvent(.e17)
+        AnalyticsManager.shared.requestDeleteAnalytics()
+        StatusManager.shared.status()
+        showAlert(title: "manageDataController.analytics.successDialog.title".localized,
+                        message: "manageDataController.analytics.successDialog.message".localized,
+                        okTitle: "common.ok".localized)
+    }
     
     private func quitButtonPressed() {
         showAlert(title: "manageDataController.quitStopCovid.confirmationDialog.title".localized,
@@ -316,6 +352,9 @@ final class ManageDataController: CVTableViewController {
             VenuesManager.shared.clearAllData()
             VaccinationCenterManager.shared.clearAllData()
             WalletManager.shared.clearAllData()
+            ETagManager.shared.clearAllData()
+            SVETagManager.shared.clearAllData()
+
             AnalyticsManager.shared.reset()
             NotificationCenter.default.post(name: .changeAppState, object: RootCoordinator.State.onboarding, userInfo: nil)
         }

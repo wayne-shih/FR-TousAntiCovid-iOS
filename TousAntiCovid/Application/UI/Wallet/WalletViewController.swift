@@ -12,34 +12,32 @@ import UIKit
 import StorageSDK
 
 final class WalletViewController: CVTableViewController {
-    
+
     enum Mode {
         case empty
         case certificates
         case info
     }
-    
+
     private var isFirstLoad: Bool = true
     private var initialUrlToProcess: URL?
     private let didTouchFlashCertificate: () -> ()
     private let didTouchTermsOfUse: () -> ()
-    private let didTouchCertificate: (_ dataMatrix: UIImage, _ text: String) -> ()
-    private let didRequestWalletScanAuthorization: (_ completion: @escaping (_ granted: Bool) -> ()) -> ()
+    private let didTouchCertificate: (_ certificate: WalletCertificate) -> ()
+    private let didRequestWalletScanAuthorization: (_ comingFromTheApp: Bool, _ completion: @escaping (_ granted: Bool) -> ()) -> ()
     private let didTouchDocumentExplanation: (_ certificateType: WalletConstant.CertificateType) -> ()
     private let didTouchWhenToUse: () -> ()
-    private let changeControllerContainer: () -> ()
     private let didGetCertificateError: (_ certificateType: WalletConstant.CertificateType, _ error: Error) -> ()
     private let deinitBlock: () -> ()
     private var mode: Mode = .empty
-    
+
     init(initialUrlToProcess: URL?,
          didTouchFlashCertificate: @escaping () -> (),
          didTouchTermsOfUse: @escaping () -> (),
-         didTouchCertificate: @escaping (_ dataMatrix: UIImage, _ text: String) -> (),
-         didRequestWalletScanAuthorization: @escaping (_ completion: @escaping (_ granted: Bool) -> ()) -> (),
+         didTouchCertificate: @escaping (_ certificate: WalletCertificate) -> (),
+         didRequestWalletScanAuthorization: @escaping (_ comingFromTheApp: Bool, _ completion: @escaping (_ granted: Bool) -> ()) -> (),
          didTouchDocumentExplanation: @escaping (_ certificateType: WalletConstant.CertificateType) -> (),
          didTouchWhenToUse: @escaping () -> (),
-         changeControllerContainer: @escaping () -> (),
          didGetCertificateError: @escaping (_ certificateType: WalletConstant.CertificateType, _ error: Error) -> (),
          deinitBlock: @escaping () -> ()) {
         self.initialUrlToProcess = initialUrlToProcess
@@ -49,7 +47,6 @@ final class WalletViewController: CVTableViewController {
         self.didRequestWalletScanAuthorization = didRequestWalletScanAuthorization
         self.didTouchDocumentExplanation = didTouchDocumentExplanation
         self.didTouchWhenToUse = didTouchWhenToUse
-        self.changeControllerContainer = changeControllerContainer
         self.didGetCertificateError = didGetCertificateError
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
@@ -134,7 +131,7 @@ final class WalletViewController: CVTableViewController {
     }
     
     private func calculateNewMode() -> Mode {
-        WalletManager.shared.walletCertificatesEmpty ? .empty : (mode == .empty ? .certificates : mode)
+        WalletManager.shared.walletCertificates.isEmpty ? .empty : (mode == .empty ? .certificates : mode)
     }
     
     private func infoRows() -> [CVRow] {
@@ -154,8 +151,8 @@ final class WalletViewController: CVTableViewController {
                                         subtitle: "walletController.documents.subtitle".localized,
                                         accessoryText: "walletController.documents.vaccin".localized,
                                         footerText: "walletController.documents.test".localized,
-                                        image: WalletImagesManager.shared.image(named: .vaccinCertificate),
-                                        secondaryImage: WalletImagesManager.shared.image(named: .testCertificate),
+                                        image: WalletImagesManager.shared.image(named: .vaccinEuropeCertificate),
+                                        secondaryImage: WalletImagesManager.shared.image(named: .testEuropeCertificate),
                                         xibName: .walletDocumentsCell,
                                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                                            topInset: 15.0,
@@ -202,19 +199,6 @@ final class WalletViewController: CVTableViewController {
     }
     
     private func headerRows() -> [CVRow] {
-        let addCertificateRow: CVRow = CVRow(title: "walletController.addCertificate".localized,
-                                             xibName: .buttonCell,
-                                             theme: CVRow.Theme(topInset: 20.0, bottomInset: 0.0, buttonStyle: .primary),
-                                             selectionAction: { [weak self] in
-                                                self?.didTouchFlashCertificate()
-                                             })
-        let addCertificateExplanationRow: CVRow = CVRow(title: "walletController.addCertificateExplanation".localized,
-                                               xibName: .textCell,
-                                               theme:  CVRow.Theme(topInset: 12.0,
-                                                                   bottomInset: 0.0,
-                                                                   textAlignment: .natural,
-                                                                   titleFont: { Appearance.Cell.Text.footerFont },
-                                                                   titleColor: Appearance.Cell.Text.captionTitleColor))
         let certificatesModeSelectionAction: () -> () = { [weak self] in
             self?.mode = .certificates
             self?.reloadUI(animated: true, completion: nil)
@@ -228,15 +212,15 @@ final class WalletViewController: CVTableViewController {
                                             selectedSegmentIndex: mode == .certificates ? 0 : 1,
                                             xibName: .walletModeSelectionCell,
                                             theme:  CVRow.Theme(backgroundColor: .clear,
-                                                                topInset: 20.0,
+                                                                topInset: 30.0,
                                                                 bottomInset: 4.0,
                                                                 textAlignment: .natural,
                                                                 titleFont: { Appearance.SegmentedControl.selectedFont },
                                                                 subtitleFont: { Appearance.SegmentedControl.normalFont }),
                                             segmentsActions: [certificatesModeSelectionAction, infoModeSelectionAction])
-        return [addCertificateRow, addCertificateExplanationRow, modeSelectionRow]
+        return [modeSelectionRow]
     }
-    
+
     private func certificatesRows() -> [CVRow] {
         var rows: [CVRow] = []
         let recentCertificates: [WalletCertificate] = WalletManager.shared.recentWalletCertificates
@@ -244,14 +228,14 @@ final class WalletViewController: CVTableViewController {
             let recentCertificatesSectionRow: CVRow = CVRow(title: "walletController.recentCertificatesSection.title".localized,
                                                             subtitle: "walletController.recentCertificatesSection.subtitle".localized,
                                                             xibName: .textCell,
-                                                            theme: CVRow.Theme(topInset: 40.0,
+                                                            theme: CVRow.Theme(topInset: 20.0,
                                                                                bottomInset: 0.0,
                                                                                textAlignment: .natural,
                                                                                titleFont: { Appearance.Cell.Text.headTitleFont }))
             rows.append(recentCertificatesSectionRow)
             rows.append(contentsOf: recentCertificates.sorted { $0.timestamp > $1.timestamp }.map { certificateRow(certificate: $0) })
         }
-        
+
         let oldCertificates: [WalletCertificate] = WalletManager.shared.oldWalletCertificates
         if !oldCertificates.isEmpty {
             let oldCertificatesSectionRow: CVRow = CVRow(title: "walletController.oldCertificatesSection.title".localized,
@@ -268,10 +252,9 @@ final class WalletViewController: CVTableViewController {
     }
     
     private func certificateRow(certificate: WalletCertificate) -> CVRow {
-        let dataMatrix: UIImage? = certificate.value.dataMatrix()
-        return CVRow(title: "2D-DOC",
+        return CVRow(title: certificate.codeImageTitle,
                      subtitle: certificate.fullDescription,
-                     image: dataMatrix,
+                     image: certificate.codeImage,
                      xibName: .sanitaryCertificateCell,
                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                         topInset: 20.0,
@@ -283,15 +266,14 @@ final class WalletViewController: CVTableViewController {
                         self?.didTouchCertificateMenuButton(certificate: certificate, cell: cell)
                      },
                      selectionAction: { [weak self] in
-                        guard let dataMatrix = dataMatrix else { return }
-                        self?.didTouchCertificate(dataMatrix, certificate.shortDescription)
+                        self?.didTouchCertificate(certificate)
                      })
     }
     
     private func didTouchCertificateMenuButton(certificate: WalletCertificate, cell: CVTableViewCell) {
         let alertController: UIAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alertController.addAction(UIAlertAction(title: "walletController.menu.share".localized, style: .default, handler: { [weak self] _ in
-            self?.showSanitaryCertificateSharing(image: cell.capture(), text: certificate.fullDescription)
+            self?.showSanitaryCertificateSharing(image: cell.capture(), text: certificate.fullDescription ?? "")
         }))
         alertController.addAction(UIAlertAction(title: "walletController.menu.delete".localized, style: .destructive, handler: { [weak self] _ in
             self?.showCertificateDeletionAlert(certificate: certificate)
@@ -321,8 +303,17 @@ final class WalletViewController: CVTableViewController {
         guard let url = initialUrlToProcess else { return }
         initialUrlToProcess = nil
         do {
-            let certificate: WalletCertificate = try WalletManager.shared.extractCertificateFrom(url: url)
-            didRequestWalletScanAuthorization { granted in
+            let certificate: WalletCertificate?
+            switch url.path {
+            case WalletConstant.URLPath.wallet.rawValue, WalletConstant.URLPath.wallet2D.rawValue:
+                certificate = try WalletManager.shared.extractCertificateFrom(url: url)
+            case WalletConstant.URLPath.walletDCC.rawValue:
+                certificate = try WalletManager.shared.extractEuropeanCertificateFrom(url: url)
+            default:
+                certificate = nil
+            }
+            guard let certificate = certificate else { return }
+            didRequestWalletScanAuthorization(DeepLinkingManager.shared.lastDeeplinkScannedDirectlyFromApp) { granted in
                 guard granted == true else { return }
                 WalletManager.shared.saveCertificate(certificate)
             }
@@ -337,12 +328,7 @@ final class WalletViewController: CVTableViewController {
 extension WalletViewController: WalletChangesObserver {
 
     func walletCertificatesDidUpdate() {
-        let newMode: Mode = calculateNewMode()
-        guard mode != .empty && newMode != .empty else {
-            changeControllerContainer()
-            return
-        }
-        mode = .certificates
+        mode = calculateNewMode()
         reloadUI(animated: true)
     }
 

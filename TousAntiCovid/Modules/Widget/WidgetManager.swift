@@ -16,9 +16,9 @@ import RobertSDK
 final class WidgetManager {
     
     static let shared: WidgetManager = WidgetManager()
-    
-    static let scheme: String = "tousanticovid"
 
+    static let scheme: String = "tousanticovid"
+    
     static let activationDeeplink: URL = URL(string: "\(scheme)://\(UrlAction.activation.rawValue)")!
     static let moreInformationsDeeplink: URL = URL(string: "\(scheme)://\(UrlAction.moreInformations.rawValue)")!
     
@@ -142,7 +142,7 @@ final class WidgetManager {
     }
     
     private func triggerProximityActivation() {
-        guard RBManager.shared.canReactivateProximity else { return }
+        guard !RBManager.shared.isImmune else { return }
         if !RBManager.shared.isRegistered {
             NotificationCenter.default.post(name: .widgetDidRequestRegister, object: nil)
         } else if !RBManager.shared.isProximityActivated {
@@ -169,7 +169,7 @@ final class WidgetManager {
         isProximityActivated = RBManager.shared.isProximityActivated
         lastStatusReceivedDate = RBManager.shared.lastStatusReceivedDate
         currentRiskLevel = RisksUIManager.shared.currentLevel?.riskLevel
-        isSick = RBManager.shared.isSick
+        isSick = RBManager.shared.isImmune
         isRegistered = RBManager.shared.isRegistered
         isOnboardingDone = isAppOnboardingDone
         widgetGradientStartColor = RisksUIManager.shared.currentLevel?.color.from ?? ""
@@ -181,6 +181,7 @@ final class WidgetManager {
         guard isProximityActivationWaiting else { return }
         isProximityActivationWaiting = false
         triggerProximityActivation()
+        statusDataChanged()
     }
     #endif
 

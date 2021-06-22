@@ -13,23 +13,27 @@ import UIKit
 final class FlashVenueCodeController: FlashCodeController {
     
     private var didFlash: ((_ code: String?) -> Bool)?
-    
-    class func controller(didFlash: @escaping (_ code: String?) -> Bool, deinitBlock: (() -> ())? = nil) -> FlashVenueCodeController {
+    private var didTouchMoreInfo: (() -> ())?
+
+    class func controller(didTouchMoreInfo: @escaping () -> (), didFlash: @escaping (_ code: String?) -> Bool, deinitBlock: (() -> ())? = nil) -> FlashVenueCodeController {
         let flashCodeController: FlashVenueCodeController = StoryboardScene.FlashVenueCode.flashCodeController.instantiate()
         flashCodeController.didFlash = didFlash
         flashCodeController.deinitBlock = deinitBlock
+        flashCodeController.didTouchMoreInfo = didTouchMoreInfo
         return flashCodeController
     }
     
     override func initUI() {
-        title = "venueFlashCodeController.title".localized
         explanationLabel.text = "venueFlashCodeController.explanation".localized
         explanationLabel.font = Appearance.Cell.Text.standardFont
         explanationLabel.adjustsFontForContentSizeCategory = true
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
-        if navigationController?.viewControllers.first === self {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
-        }
+        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont,
+                                                                   .foregroundColor: UIColor.white]
+        navigationController?.navigationBar.tintColor = .white
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "common.moreInfo".localized, style: .plain, target: self, action: #selector(didTouchMoreInfoButton))
         #if targetEnvironment(simulator)
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Flash", style: .plain, target: self, action: #selector(didTouchFlashButton))
         #endif
@@ -62,5 +66,8 @@ final class FlashVenueCodeController: FlashCodeController {
     @objc private func didTouchCloseButton() {
         dismiss(animated: true, completion: nil)
     }
-    
+
+    @objc private func didTouchMoreInfoButton() {
+        didTouchMoreInfo?()
+    }
 }

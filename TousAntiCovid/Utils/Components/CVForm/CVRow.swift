@@ -66,7 +66,6 @@ struct CVRow {
     var textFieldReturnKeyType: UIReturnKeyType?
     var textFieldContentType: UITextContentType?
     var textFieldCapitalizationType: UITextAutocapitalizationType?
-    var textFieldRegex: String?
     var minimumDate: Date?
     var maximumDate: Date?
     var initialDate: Date?

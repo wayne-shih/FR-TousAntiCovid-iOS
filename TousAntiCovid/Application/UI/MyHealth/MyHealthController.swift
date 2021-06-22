@@ -36,7 +36,7 @@ final class MyHealthController: CVTableViewController {
         updateTitle()
         initUI()
         reloadUI()
-        if !RBManager.shared.isSick {
+        if !RBManager.shared.isImmune {
             addObservers()
         }
     }
@@ -46,13 +46,13 @@ final class MyHealthController: CVTableViewController {
     }
     
     private func updateTitle() {
-        title = RBManager.shared.isSick ? "myHealthController.sick.title".localized : "myHealthController.title".localized
+        title = RBManager.shared.isImmune ? "myHealthController.sick.title".localized : "myHealthController.title".localized
     }
     
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = []
         let ameliUrl: String = ParametersManager.shared.ameliUrl
-        if RBManager.shared.isSick {
+        if RBManager.shared.isImmune {
             rows = sickHeaderRows()
             if let declarationToken = RBManager.shared.declarationToken, !declarationToken.isEmpty, !ameliUrl.isEmpty {
                 let ameliWithDeclarationUrl: String = String(format: ameliUrl, declarationToken)

@@ -12,7 +12,7 @@ import UIKit
 import ServerSDK
 import CoreLocation
 
-protocol VaccinationCenterChangesObserver: class {
+protocol VaccinationCenterChangesObserver: AnyObject {
     
     func vaccinationCentersDidUpdate()
     
@@ -135,10 +135,10 @@ final class VaccinationCenterManager: NSObject {
         session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         let url: URL = VaccinationCentersConstant.jsonBaseUrl.appendingPathComponent(departmentCode)
                                                              .appendingPathComponent(VaccinationCentersConstant.vaccinationCentersFileName)
-        let dataTask: URLSessionDataTask = session.dataTask(with: url) { data, response, error in
+        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: url) { data, response, error in
             guard let data = data else {
                 DispatchQueue.main.async {
-                    completion(NSError.localizedError(message: "Missing data", code: 400))
+                    completion(error ?? NSError.localizedError(message: "Missing data", code: 400))
                 }
                 return
             }
@@ -162,10 +162,10 @@ final class VaccinationCenterManager: NSObject {
         session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         let url: URL = VaccinationCentersConstant.jsonBaseUrl.appendingPathComponent(departmentCode)
                                                              .appendingPathComponent(VaccinationCentersConstant.vaccinationCentersLastUpdateFileName)
-        let dataTask: URLSessionDataTask = session.dataTask(with: url) { data, response, error in
+        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: url) { data, response, error in
             guard let data = data else {
                 DispatchQueue.main.async {
-                    completion(.failure(NSError.localizedError(message: "Missing data", code: 400)))
+                    completion(.failure(error ?? NSError.localizedError(message: "Missing data", code: 400)))
                 }
                 return
             }

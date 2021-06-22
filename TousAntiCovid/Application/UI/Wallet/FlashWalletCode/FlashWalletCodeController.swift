@@ -14,9 +14,9 @@ import StorageSDK
 final class FlashWalletCodeController: FlashCodeController {
     
     private var didFlash: ((_ code: String?) throws -> ())?
-    private var didGetCertificateError: ((_ error: Error) -> ())?
+    private var didGetCertificateError: ((_ code: String?, _ error: Error) -> ())?
     
-    class func controller(didFlash: @escaping (_ code: String?) throws -> Void, didGetCertificateError: @escaping (_ error: Error) -> (), deinitBlock: (() -> ())? = nil) -> FlashWalletCodeController {
+    class func controller(didFlash: @escaping (_ code: String?) throws -> Void, didGetCertificateError: @escaping (_ code: String?, _ error: Error) -> (), deinitBlock: (() -> ())? = nil) -> FlashWalletCodeController {
         let flashCodeController: FlashWalletCodeController = StoryboardScene.FlashWalletCode.flashWalletCodeController.instantiate()
         flashCodeController.didFlash = didFlash
         flashCodeController.didGetCertificateError = didGetCertificateError
@@ -25,11 +25,14 @@ final class FlashWalletCodeController: FlashCodeController {
     }
     
     override func initUI() {
-        title = "flashWalletCodeController.title".localized
         explanationLabel.text = "flashWalletCodeController.explanation".localized
         explanationLabel.font = Appearance.Cell.Text.standardFont
         explanationLabel.adjustsFontForContentSizeCategory = true
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
+        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont,
+                                                                   .foregroundColor: UIColor.white]
+        navigationController?.navigationBar.tintColor = .white
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
         if navigationController?.viewControllers.first === self {
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
         }
@@ -40,9 +43,9 @@ final class FlashWalletCodeController: FlashCodeController {
 
     override func processScannedQRCode(code: String?) {
         do {
-            try didFlash?(code)
+            try didFlash?(WalletManager.shared.deeplinkForCode(code ?? ""))
         } catch {
-            didGetCertificateError?(error)
+            didGetCertificateError?(code, error)
         }
     }
     
@@ -52,7 +55,7 @@ final class FlashWalletCodeController: FlashCodeController {
         do {
             try didFlash?(url)
         } catch {
-            didGetCertificateError?(error)
+            didGetCertificateError?(url, error)
         }
     }
     #endif

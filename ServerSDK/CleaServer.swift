@@ -12,11 +12,13 @@ import Foundation
 import RobertSDK
 
 public final class CleaServer: NSObject {
-    
+
     public static let shared: CleaServer = CleaServer()
-    
-    private var reportBaseUrl: (() -> URL?)!
-    private var statusBaseUrl: (() -> URL?)!
+    typealias CleaProcessRequestCompletion = (_ result: Result<Data, Error>) -> ()
+
+    private var reportBaseUrl: (() -> URL)!
+    private var statusBaseUrl: (() -> URL)!
+    private var statusBaseFallbackUrl: (() -> URL)!
 
     private lazy var session: URLSession = {
         let backgroundConfiguration: URLSessionConfiguration = URLSessionConfiguration.background(withIdentifier: "fr.gouv.stopcovid.ios.ServerSDK-Warning")
@@ -26,7 +28,7 @@ public final class CleaServer: NSObject {
         return URLSession(configuration: backgroundConfiguration, delegate: self, delegateQueue: .main)
     }()
     private var receivedData: [String: Data] = [:]
-    private var completions: [String: Server.ProcessRequestCompletion] = [:]
+    private var completions: [String: CleaProcessRequestCompletion] = [:]
     private var requestLoggingHandler: Server.RequestLoggingHandler?
     
     private var pivotDate: Int {
@@ -44,20 +46,17 @@ public final class CleaServer: NSObject {
         return pivotDate
     }
     
-    public func start(reportBaseUrl: @escaping () -> URL?, statusBaseUrl: @escaping () -> URL?, requestLoggingHandler: @escaping Server.RequestLoggingHandler) {
+    public func start(reportBaseUrl: @escaping () -> URL, statusBaseUrl: @escaping () -> URL, statusBaseFallbackUrl: @escaping () -> URL, requestLoggingHandler: @escaping Server.RequestLoggingHandler) {
         self.reportBaseUrl = reportBaseUrl
         self.statusBaseUrl = statusBaseUrl
+        self.statusBaseFallbackUrl = statusBaseFallbackUrl
         self.requestLoggingHandler = requestLoggingHandler
     }
 
     public func report(token: String, visits: [CleaServerVisit], completion: @escaping (_ error: Error?) -> ()) {
-        guard let baseUrl = self.reportBaseUrl() else {
-            completion(nil)
-            return
-        }
         let visits: [RBCleaServerVisit] = visits.map { RBCleaServerVisit.from(visit: $0) }
         let body: RBCleaServerReportBody = RBCleaServerReportBody(pivotDate: pivotDate, visits: visits)
-        self.processRequest(url: baseUrl.appendingPathComponent("wreport"), method: .post, token: token, body: body) { result in
+        processRequest(url: reportBaseUrl().appendingPathComponent("wreport"), method: .post, token: token, body: body) { result in
             switch result {
             case .success:
                 completion(nil)
@@ -67,12 +66,9 @@ public final class CleaServer: NSObject {
         }
     }
 
-    public func getClusterIndex(completion: @escaping (_ result: Result<CleaServerStatusClusterIndex?, Error>) -> ()) {
-        guard let baseUrl = self.statusBaseUrl() else {
-            completion(.success(nil))
-            return
-        }
-        self.processRequest(url: baseUrl.appendingPathComponent("clusterIndex.json"), method: .get, body: nil) { result in
+    public func getClusterIndex(isRetry: Bool = false, completion: @escaping (_ result: Result<CleaServerStatusClusterIndex?, Error>) -> ()) {
+        let baseUrl: URL = isRetry ? statusBaseFallbackUrl() : statusBaseUrl()
+        processRequest(url: baseUrl.appendingPathComponent("clusterIndex.json"), method: .get, body: nil, useEtag: true) { result in
             switch result {
             case let .success(data):
                 do {
@@ -83,7 +79,11 @@ public final class CleaServer: NSObject {
                     completion(.failure(error))
                 }
             case let .failure(error):
-                completion(.failure(error))
+                guard !isRetry, baseUrl.absoluteString != self.statusBaseFallbackUrl().absoluteString else {
+                    completion(.failure(error))
+                    return
+                }
+                self.getClusterIndex(isRetry: true, completion: completion)
             }
         }
     }
@@ -115,12 +115,9 @@ public final class CleaServer: NSObject {
         }
     }
 
-    private func getClusters(iteration: Int, clusterPrefix: String, completion: @escaping (_ result: Result<[RBCleaServerStatusCluster]?, Error>) -> ()) {
-        guard let baseUrl = self.statusBaseUrl() else {
-            completion(.success(nil))
-            return
-        }
-        self.processRequest(url: baseUrl.appendingPathComponent("\(iteration)/\(clusterPrefix).json"), method: .get, body: nil) { result in
+    private func getClusters(isRetry: Bool = false, iteration: Int, clusterPrefix: String, completion: @escaping (_ result: Result<[RBCleaServerStatusCluster]?, Error>) -> ()) {
+        let baseUrl: URL = isRetry ? self.statusBaseFallbackUrl() : self.statusBaseUrl()
+        self.processRequest(url: baseUrl.appendingPathComponent("\(iteration)/\(clusterPrefix).json"), method: .get, body: nil, useEtag: true) { result in
             switch result {
             case let .success(data):
                 do {
@@ -130,7 +127,11 @@ public final class CleaServer: NSObject {
                     completion(.failure(error))
                 }
             case let .failure(error):
-                completion(.failure(error))
+                guard !isRetry, baseUrl.absoluteString != self.statusBaseFallbackUrl().absoluteString else {
+                    completion(.failure(error))
+                    return
+                }
+                self.getClusters(isRetry: true, iteration: iteration, clusterPrefix: clusterPrefix, completion: completion)
             }
         }
     }
@@ -138,7 +139,7 @@ public final class CleaServer: NSObject {
 
 extension CleaServer {
     
-    private func processRequest(url: URL, method: Server.Method, token: String? = nil, body: RBServerBody?, completion: @escaping (_ result: Result<Data, Error>) -> ()) {
+    private func processRequest(url: URL, method: Server.Method, token: String? = nil, body: RBServerBody?, useEtag: Bool = false, completion: @escaping CleaProcessRequestCompletion) {
         do {
             let bodyData: Data? = try body?.toData()
             let requestId: String = url.lastPathComponent
@@ -156,6 +157,10 @@ extension CleaServer {
             }
             request.setValue("application/json", forHTTPHeaderField: "Content-type")
             request.httpBody = bodyData
+            if useEtag {
+                let eTag: String? = SVETagManager.shared.eTag(for: url.absoluteString)
+                eTag.map { request.addValue($0, forHTTPHeaderField: ServerConstant.Etag.requestHeaderField) }
+            }
             let task: URLSessionDownloadTask = session.downloadTask(with: request)
             task.taskDescription = requestId
             task.resume()
@@ -168,7 +173,7 @@ extension CleaServer {
 }
 
 extension CleaServer: URLSessionDelegate, URLSessionDownloadDelegate {
-    
+
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         let requestId: String = task.taskDescription ?? ""
         guard let completion = completions[requestId] else { return }
@@ -177,15 +182,30 @@ extension CleaServer: URLSessionDelegate, URLSessionDownloadDelegate {
             if let error = error {
                 self.requestLoggingHandler?(task, nil, error)
                 completion(.failure(error))
+            } else if task.response?.svIsNotModified == true {
+                if let eTag = task.response?.svETag,
+                   let data = SVETagManager.shared.localDataFile(eTag: eTag) {
+                    // Response not updated since last fetch (ETag feature)
+                    self.requestLoggingHandler?(task, data, nil)
+                    completion(.success(data))
+                } else {
+                    let error: Error = NSError.svLocalizedError(message: "common.error.unknown".lowercased(), code: 0)
+                    self.requestLoggingHandler?(task, nil, error)
+                    completion(.failure(error))
+                }
             } else {
                 let receivedData: Data = self.receivedData[requestId] ?? Data()
                 if task.response?.svIsError == true {
                     let statusCode: Int = task.response?.svStatusCode ?? 0
                     let message: String = receivedData.isEmpty ? "No data received from the server" : (String(data: receivedData, encoding: .utf8) ?? "Unknown error")
-                    let error: Error = NSError.svLocalizedError(message: "Uknown error (\(statusCode)). (\(message))", code: statusCode)
+                    let error: Error = NSError.svLocalizedError(message: "Unknown error (\(statusCode)). (\(message))", code: statusCode)
                     self.requestLoggingHandler?(task, nil, error)
                     completion(.failure(error))
                 } else {
+                    // Save eTag and response if present
+                    if let eTag = task.response?.svETag, let url = task.currentRequest?.url?.absoluteString {
+                        SVETagManager.shared.save(eTag: eTag, data: receivedData, for: url)
+                    }
                     self.requestLoggingHandler?(task, receivedData, nil)
                     completion(.success(receivedData))
                 }

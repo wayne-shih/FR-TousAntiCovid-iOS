@@ -70,15 +70,6 @@ class TextFieldCell: CVTableViewCell {
 
 extension TextFieldCell: UITextFieldDelegate {
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        if let regex = currentAssociatedRow?.textFieldRegex {
-            guard !string.isEmpty else { return true }
-            let currentText: String = textField.text ?? ""
-            let range: Range<String.Index> = Range(range, in: currentText)!
-            let updatedText: String = currentText.replacingCharacters(in: range, with: string.trimmingCharacters(in: .whitespaces))
-            return updatedText ~= regex
-        }
-        return true
-    }
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool { true }
     
 }

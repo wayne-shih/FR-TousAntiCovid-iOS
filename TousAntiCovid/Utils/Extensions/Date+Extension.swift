@@ -110,8 +110,7 @@ extension Date {
     }
     
     func universalDateFormatted() -> String {
-        let formatter: DateFormatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        let formatter: ISO8601DateFormatter = ISO8601DateFormatter()
         return formatter.string(from: self)
     }
     

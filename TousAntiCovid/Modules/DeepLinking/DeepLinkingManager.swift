@@ -14,6 +14,7 @@ import RobertSDK
 final class DeepLinkingManager {
     
     static let shared: DeepLinkingManager = DeepLinkingManager()
+    var appLaunchedFromDeeplinkOrShortcut: Bool = false
     weak var enterCodeController: EnterCodeController?
     
     weak var attestationController: AttestationsViewController?
@@ -22,6 +23,7 @@ final class DeepLinkingManager {
     weak var walletController: WalletViewController?
     
     private var waitingNotification: Notification?
+    private(set) var lastDeeplinkScannedDirectlyFromApp: Bool = false
     
     func start() {
         addObservers()
@@ -51,27 +53,46 @@ final class DeepLinkingManager {
         }
         NotificationCenter.default.post(notification)
     }
-    
-    private func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
-    }
-    
-    @objc private func appDidBecomeActive() {
-        guard let notification = waitingNotification else { return }
+
+    func processOpenQrScan() {
+        let notification: Notification = Notification(name: .openQrScan)
+        guard UIApplication.shared.applicationState == .active else {
+            waitingNotification = notification
+            return
+        }
         NotificationCenter.default.post(notification)
-        waitingNotification = nil
     }
     
-    private func processUrl(_ url: URL) {
+    func processUrl(_ url: URL, fromApp: Bool = false) {
+        lastDeeplinkScannedDirectlyFromApp = fromApp
         if url.host == "tac.gouv.fr" {
             processVenueUrl(url)
         } else if url.path.hasPrefix("/app/code") {
             processCodeUrl(url)
-        } else if url.path.hasPrefix("/app/attestation") {
-            processAttestationUrl()
-        } else if url.path.hasPrefix("/app/wallet") {
-            processWalletUrl(url)
+        } else {
+            switch url.path {
+            case "/app/code":
+                processCodeUrl(url)
+            case "/app/attestation":
+                processAttestationUrl()
+            case WalletConstant.URLPath.wallet.rawValue,
+                 WalletConstant.URLPath.wallet2D.rawValue,
+                 WalletConstant.URLPath.walletDCC.rawValue:
+                processWalletUrl(url)
+            default:
+                break
+            }
         }
+    }
+
+    private func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+    }
+
+    @objc private func appDidBecomeActive() {
+        guard let notification = waitingNotification else { return }
+        NotificationCenter.default.post(notification)
+        waitingNotification = nil
     }
     
     private func processCodeUrl(_ url: URL) {

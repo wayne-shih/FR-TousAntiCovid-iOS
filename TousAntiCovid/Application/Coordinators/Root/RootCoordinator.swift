@@ -38,6 +38,9 @@ final class RootCoordinator: Coordinator {
         }
     }
 
+    @UserDefault(key: .didAlreadyShowUniversalQrCodeExplanations)
+    private var didAlreadyShowUniversalQrCodeExplanations: Bool = false
+
     func start() {
         if #available(iOS 14.0, *) {
             WidgetManager.shared.isOnboardingDone = isOnboardingDone
@@ -81,6 +84,7 @@ final class RootCoordinator: Coordinator {
 
     private func onboardingDidEnd() {
         isOnboardingDone = true
+        didAlreadyShowUniversalQrCodeExplanations = true
         switchTo(state: currentState())
     }
 

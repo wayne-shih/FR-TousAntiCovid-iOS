@@ -59,10 +59,6 @@ public protocol RBStorage {
     func saveLastRiskReceivedDate(_ date: Date?)
     func lastRiskReceivedDate() -> Date?
     
-    // MARK: - Status: Is sick -
-    func save(isSick: Bool)
-    func isSick() -> Bool
-    
     // MARK: - Push token -
     func save(pushToken: String?)
     func pushToken() -> String?

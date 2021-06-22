@@ -72,7 +72,11 @@ final class VenuesRecordingCoordinator: Coordinator {
     }
     
     private func flashCodeController(needDeinit: Bool = true) -> UIViewController {
-        FlashVenueCodeController.controller(didFlash: { [weak self] stringUrl in
+        FlashVenueCodeController.controller(didTouchMoreInfo: {
+            [weak self] in
+            self?.showMoreInformation()
+        },
+                                            didFlash: { [weak self] stringUrl in
             guard let stringUrl = stringUrl else { return false }
             guard let url = URL(string: stringUrl) else { return false }
             guard VenuesManager.shared.processVenueUrl(url) != nil else { return false }
@@ -94,6 +98,12 @@ final class VenuesRecordingCoordinator: Coordinator {
     
     private func showConfirmation() {
         navigationController?.pushViewController(confirmationController(), animated: true)
+    }
+
+    private func showMoreInformation() {
+        let venuesInformationCoordinator: VenuesInformationCoordinator = VenuesInformationCoordinator(presentingController: navigationController, parent: self)
+        self.addChild(coordinator: venuesInformationCoordinator)
+
     }
 
 }

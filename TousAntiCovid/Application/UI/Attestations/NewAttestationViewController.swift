@@ -307,7 +307,6 @@ final class NewAttestationViewController: CVTableViewController {
                                 textFieldKeyboardType: field.type.keyboardType,
                                 textFieldContentType: field.contentType?.textContentType,
                                 textFieldCapitalizationType: field.type.capitalizationType,
-                                textFieldRegex: field.key == "zip" ? "^[0-9]{0,5}$" : nil,
                                 willDisplay: { [weak self] cell in
                                     guard let self = self else { return }
                                     if self.firstTextField == nil {

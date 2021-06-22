@@ -17,4 +17,9 @@ public enum ServerConstant {
     static let maxClockShiftToleranceInSeconds: Double = 120.0
     public static let acceptedReportCodeLength: [Int] = [6, 36]
     
+    enum Etag {
+        static let requestHeaderField: String = "If-None-Match"
+        static let responseHeaderField: String = "Etag"
+    }
+    
 }

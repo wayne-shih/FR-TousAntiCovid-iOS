@@ -45,14 +45,16 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         LinksManager.shared.start()
         KeyFiguresExplanationsManager.shared.start()
         WalletImagesManager.shared.start()
+        DccCertificatesManager.shared.start()
         OrientationManager.shared.start()
         if isOnboardingDone {
             BluetoothStateManager.shared.start()
         }
         
         CleaServer.shared.start(reportBaseUrl: { Constant.Server.cleaReportBaseUrl },
-                                   statusBaseUrl: { Constant.Server.cleaStatusBaseUrl },
-                                   requestLoggingHandler: { _, _, _ in })
+                                statusBaseUrl: { Constant.Server.cleaStatusBaseUrl() },
+                                statusBaseFallbackUrl: { Constant.Server.cleaStatusBaseUrl(fallbackUrl: true) },
+                                requestLoggingHandler: { _, _, _ in })
         
         RBManager.shared.start(isFirstInstall: !isAppAlreadyInstalled,
                                server: Server(baseUrl: { Constant.Server.baseUrl },
@@ -162,6 +164,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         if #available(iOS 14.0, *) {
             WidgetManager.shared.processUserActivity(userActivity)
         }
+        DeepLinkingManager.shared.appLaunchedFromDeeplinkOrShortcut = true
         DeepLinkingManager.shared.processActivity(userActivity)
         return true
     }
@@ -204,14 +207,22 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                                                                       icon: UIApplicationShortcutIcon(type: .capturePhoto))
             shortcuts.append(venuesShortcut)
         }
+        let qrScanShortcut: UIApplicationShortcutItem = UIApplicationShortcutItem(type: Constant.ShortcutItem.qrScan.rawValue,
+                                                                                  localizedTitle: Constant.ShortcutItem.qrScan.rawValue.localized,
+                                                                                  localizedSubtitle: nil,
+                                                                                  icon: UIApplicationShortcutIcon(templateImageName: "qrScan"))
+        shortcuts.append(qrScanShortcut)
         UIApplication.shared.shortcutItems = shortcuts
     }
     
     private func processShortcutItem(_ shortcutItem: UIApplicationShortcutItem) {
+        DeepLinkingManager.shared.appLaunchedFromDeeplinkOrShortcut = true
         if shortcutItem.type == Constant.ShortcutItem.newAttestation.rawValue {
             DeepLinkingManager.shared.processAttestationUrl()
         } else if shortcutItem.type == Constant.ShortcutItem.venues.rawValue {
             DeepLinkingManager.shared.processFullVenueRecordingUrl()
+        } else if shortcutItem.type == Constant.ShortcutItem.qrScan.rawValue {
+            DeepLinkingManager.shared.processOpenQrScan()
         }
     }
 

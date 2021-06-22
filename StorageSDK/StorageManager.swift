@@ -28,7 +28,6 @@ public final class StorageManager: RBStorage {
         case lastCleaStatusReceivedDate
         case lastCleaStatusErrorDate
         case lastRiskReceivedDate
-        case isSick
         case positiveToSymptoms
         case pushToken
         case reportDate
@@ -251,15 +250,6 @@ public final class StorageManager: RBStorage {
 
     public func lastCleaStatusErrorDate() -> Date? {
         getDate(key: .lastCleaStatusErrorDate)
-    }
-    
-    // MARK: - Status: Is sick -
-    public func save(isSick: Bool) {
-        saveBool(isSick, key: .isSick)
-    }
-    
-    public func isSick() -> Bool {
-        keychain.getBool(KeychainKey.isSick.rawValue) ?? false
     }
     
     // MARK: - Push token -

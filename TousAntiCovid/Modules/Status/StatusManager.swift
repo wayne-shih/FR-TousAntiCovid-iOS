@@ -50,8 +50,7 @@ final class StatusManager {
     
     @UserDefault(key: .cleaLastIteration)
     var cleaLastIteration: Int?
-    var cleaClusterIndex: CleaServerStatusClusterIndex?
-    
+
     var lastRobertStatusRiskLevel: RBStatusRiskLevelInfo? {
         get { RBManager.shared.lastRobertStatusRiskLevel }
         set { RBManager.shared.lastRobertStatusRiskLevel = newValue }
@@ -76,6 +75,7 @@ final class StatusManager {
     
     private var lastStatusTriggerEventTimestamp: TimeInterval = 0.0
     private var mustNotifyLastRiskLevelChange: Bool = false
+
     private var mustShowAlertAboutLastRiskLevelChange: Bool = false
     private var observers: [StatusObserverWrapper] = []
     private var storageManager: StorageManager!
@@ -99,35 +99,31 @@ final class StatusManager {
         }
         self.lastStatusTriggerEventTimestamp = nowTimestamp
 
-        var robertStatusInfo: RBStatusRiskLevelInfo?
-        var robertError: Error?
-        var cleaStatusInfo: RBStatusRiskLevelInfo?
-        var cleaError: Error?
+        var robertStatusInfo: Result<RBStatusRiskLevelInfo?, Error> = .success(nil)
+        var cleaStatusInfo: Result<RBStatusRiskLevelInfo?, Error> = .success(nil)
+
         let dispatchGroup: DispatchGroup = DispatchGroup()
         dispatchGroup.enter()
         triggerStatusRequestIfNeeded(showNotifications: showNotifications, force: force) { statusResult in
-            switch statusResult {
-            case let .success(statusInfo):
-                robertStatusInfo = statusInfo
-            case let .failure(error):
-                robertError = error
-            }
+            robertStatusInfo = statusResult
             dispatchGroup.leave()
         }
         dispatchGroup.enter()
         triggerCleaStatusRequestIfNeeded(force: force) { cleaStatusResult in
-            switch cleaStatusResult {
-            case let .success(statusInfo):
-                cleaStatusInfo = statusInfo
-            case let .failure(error):
-                cleaError = error
-            }
+            cleaStatusInfo = cleaStatusResult
             dispatchGroup.leave()
         }
         dispatchGroup.notify(queue: .main) {
             self.isStatusOnGoing = false
-            self.processReceivedStatusInfo(statusInfo: robertStatusInfo, cleaStatusInfo: cleaStatusInfo, isInError: robertError != nil || cleaError != nil)
-            completion?(robertError ?? cleaError)
+            self.processReceivedStatusInfo(statusInfo: robertStatusInfo, cleaStatusInfo: cleaStatusInfo)
+
+            var error: Error?
+            if case let .failure(robertError) = robertStatusInfo {
+                error = robertError
+            } else if case let .failure(cleaError) = cleaStatusInfo {
+                error = cleaError
+            }
+            completion?(error)
         }
     }
     
@@ -199,8 +195,8 @@ extension StatusManager {
                             self.processStatusResponseNotification(error: nil)
                         }
                         AnalyticsManager.shared.statusDidSucceed()
-                        AnalyticsManager.shared.sendAnalytics()
                         NotificationsManager.shared.scheduleUltimateNotification(minHour: ParametersManager.shared.minHourContactNotif, maxHour: ParametersManager.shared.maxHourContactNotif)
+
                         completion?(.success(info))
                     case let .failure(error):
                         AnalyticsManager.shared.reportError(serviceName: "status", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)
@@ -291,7 +287,6 @@ extension StatusManager {
                     return
                 }
                 self.cleaLastIteration = cleaClusterIndex.iteration
-                self.saveToLocalClusterIndex(cleaClusterIndex)
                 let matchingPrefixes: [String] = self.matchingClusterPrefixes(for: ltids, clusterIndex: cleaClusterIndex)
                 completion(.success(matchingPrefixes))
             case let .failure(error):
@@ -354,41 +349,6 @@ extension StatusManager {
     
 }
 
-// MARK: - Local files management -
-extension StatusManager {
-    
-    private func localClusterIndexUrl() -> URL {
-        let directoryUrl: URL = self.createWorkingDirectoryIfNeeded()
-        return directoryUrl.appendingPathComponent("clusterIndex.json")
-    }
-    
-    private func loadLocalClusterIndex() {
-        let localUrl: URL = localClusterIndexUrl()
-        guard FileManager.default.fileExists(atPath: localUrl.path) else {
-            return
-        }
-        guard let data = try? Data(contentsOf: localUrl) else {
-            return
-        }
-        cleaClusterIndex = try? JSONDecoder().decode(CleaServerStatusClusterIndex.self, from: data)
-    }
-    
-    private func saveToLocalClusterIndex(_ clusterIndex: CleaServerStatusClusterIndex) {
-        if let data = try? JSONEncoder().encode(clusterIndex) {
-            try? data.write(to: localClusterIndexUrl())
-        }
-    }
-    
-    private func createWorkingDirectoryIfNeeded() -> URL {
-        let directoryUrl: URL = FileManager.libraryDirectory().appendingPathComponent("Clea")
-        if !FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: nil) {
-            try? FileManager.default.createDirectory(at: directoryUrl, withIntermediateDirectories: false, attributes: nil)
-        }
-        return directoryUrl
-    }
-    
-}
-
 // MARK: - Status response processing -
 extension StatusManager {
     
@@ -407,40 +367,62 @@ extension StatusManager {
         }
     }
     
-    private func processReceivedStatusInfo(statusInfo: RBStatusRiskLevelInfo?, cleaStatusInfo: RBStatusRiskLevelInfo?, isInError: Bool) {
-        if let statusInfo = statusInfo {
-            if statusInfo.lastRiskScoringDate == nil || lastRobertStatusRiskLevel?.lastRiskScoringDate == nil || statusInfo.lastRiskScoringDate ?? .distantPast > lastRobertStatusRiskLevel?.lastRiskScoringDate ?? .distantPast {
-                lastRobertStatusRiskLevel = statusInfo
+    private func processReceivedStatusInfo(statusInfo: Result<RBStatusRiskLevelInfo?, Error>, cleaStatusInfo: Result<RBStatusRiskLevelInfo?, Error>) {
+        var isInError: Bool = false
+        switch statusInfo {
+        case .success(let statusRiskLevelInfo):
+            if let statusInfo = statusRiskLevelInfo {
+                if statusInfo.lastRiskScoringDate == nil || lastRobertStatusRiskLevel?.lastRiskScoringDate == nil || statusInfo.lastRiskScoringDate ?? .distantPast > lastRobertStatusRiskLevel?.lastRiskScoringDate ?? .distantPast {
+                    lastRobertStatusRiskLevel = statusInfo
+                }
             }
+        case .failure:
+            isInError = true
         }
-        if let cleaStatusInfo = cleaStatusInfo {
-            if cleaStatusInfo.lastRiskScoringDate == nil || lastCleaStatusRiskLevel?.lastRiskScoringDate == nil || cleaStatusInfo.lastRiskScoringDate ?? .distantPast > lastCleaStatusRiskLevel?.lastRiskScoringDate ?? .distantPast {
-                lastCleaStatusRiskLevel = cleaStatusInfo
+
+        switch cleaStatusInfo {
+        case .success(let statusRiskLevelInfo):
+            if let cleaStatusInfo = statusRiskLevelInfo {
+                if cleaStatusInfo.lastRiskScoringDate == nil || lastCleaStatusRiskLevel?.lastRiskScoringDate == nil || cleaStatusInfo.lastRiskScoringDate ?? .distantPast > lastCleaStatusRiskLevel?.lastRiskScoringDate ?? .distantPast {
+                    lastCleaStatusRiskLevel = cleaStatusInfo
+                }
+            } else {
+                lastCleaStatusRiskLevel = nil
             }
+        case .failure:
+            isInError = true
         }
 
         let newStatus: [RBStatusRiskLevelInfo] = [lastRobertStatusRiskLevel, lastCleaStatusRiskLevel].compactMap { $0 }
-        var newRiskLevelInfo: RBStatusRiskLevelInfo = newStatus.max(\.riskLevel)!
-        guard !isInError || isInError && newRiskLevelInfo.riskLevel > currentStatusRiskLevel?.riskLevel ?? 0.0 else { return }
+        guard let newMaxRiskLevelInfo = newStatus.max(\.riskLevel) else { return }
+        guard !isInError || isInError && newMaxRiskLevelInfo.riskLevel > currentStatusRiskLevel?.riskLevel ?? 0.0 else { return }
 
+        var newRiskLevelInfo: RBStatusRiskLevelInfo = newMaxRiskLevelInfo
         if RisksUIManager.shared.level(for: newRiskLevelInfo.riskLevel) == nil {
             newRiskLevelInfo.riskLevel = 0.0
         }
-        
-        if !RBManager.shared.isSick {
+
+        if !RBManager.shared.isImmune {
             mustNotifyLastRiskLevelChange = (newRiskLevelInfo.riskLevel > currentStatusRiskLevel?.riskLevel ?? 0.0) || (newRiskLevelInfo.riskLevel != 0.0 && newRiskLevelInfo.riskLevel == currentStatusRiskLevel?.riskLevel && newRiskLevelInfo.lastRiskScoringDate ?? .distantPast > currentStatusRiskLevel?.lastRiskScoringDate ?? .distantPast)
             mustShowAlertAboutLastRiskLevelChange = newRiskLevelInfo.lastRiskScoringDate != currentStatusRiskLevel?.lastRiskScoringDate
+            if mustNotifyLastRiskLevelChange || mustShowAlertAboutLastRiskLevelChange {
+                AnalyticsManager.shared.reportAppEvent(.e2)
+                AnalyticsManager.shared.reportHealthEvent(.eh2, description: "\(newRiskLevelInfo.riskLevel)")
+            }
         }
-        
+
         currentStatusRiskLevel = newRiskLevelInfo
-        showRiskLevelUpdateNotificationIfNeeded()
+
         if UIApplication.shared.applicationState == .active {
             showRiskLevelUpdateAlertIfNeeded()
+        } else {
+            showRiskLevelUpdateNotificationIfNeeded()
         }
-        
+
         notifyStatusChange()
+        AnalyticsManager.shared.processAnalytics()
     }
-    
+
     private func notifyStatusChange() {
         NotificationCenter.default.post(name: .statusDataDidChange, object: nil)
         notifyObservers()
@@ -456,7 +438,7 @@ extension StatusManager {
     }
     
     private func showRiskLevelUpdateNotificationIfNeeded() {
-        guard !RBManager.shared.isSick else { return }
+        guard !RBManager.shared.isImmune else { return }
         guard mustNotifyLastRiskLevelChange else { return }
         mustNotifyLastRiskLevelChange = false
         NotificationsManager.shared.cancelNotificationForIdentifier(NotificationsContant.Identifier.atRisk)
@@ -466,12 +448,10 @@ extension StatusManager {
                                                          body: RisksUIManager.shared.currentLevel?.labels.notifBody?.localizedOrEmpty ?? "",
                                                          identifier: NotificationsContant.Identifier.atRisk,
                                                          badge: 1)
-        AnalyticsManager.shared.reportAppEvent(.e2)
-        AnalyticsManager.shared.reportHealthEvent(.eh2)
     }
     
     private func showRiskLevelUpdateAlertIfNeeded() {
-        guard !RBManager.shared.isSick else { return }
+        guard !RBManager.shared.isImmune else { return }
         guard mustShowAlertAboutLastRiskLevelChange else { return }
         mustShowAlertAboutLastRiskLevelChange = false
         NotificationsManager.shared.cancelNotificationForIdentifier(NotificationsContant.Identifier.atRisk)

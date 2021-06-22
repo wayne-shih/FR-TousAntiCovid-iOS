@@ -39,6 +39,9 @@ final class HomeViewController: CVTableViewController {
     private let didTouchVaccination: () -> ()
     private let didTouchSanitaryCertificates: (_ url: URL?) -> ()
     private let didTouchVerifyWalletCertificate: () -> ()
+    private let didTouchUniversalQrScan: () -> ()
+    private let didEnterCodeFromDeeplink: (_ code: String) -> ()
+    private let showUniversalQrScanExplanation: (_ initialButtonFrame: CGRect?, _ animationDidEnd: @escaping (_ animated: Bool) -> ()) -> ()
     private let deinitBlock: () -> ()
     
     private var popRecognizer: InteractivePopGestureRecognizer?
@@ -50,10 +53,20 @@ final class HomeViewController: CVTableViewController {
     private var areNotificationsAuthorized: Bool?
     private weak var stateCell: StateAnimationCell?
     private var isWaitingForNeededInfo: Bool = true
+    private var isSickWarningPeriod: Bool {
+        if RBManager.shared.isImmune, let reportDate = RBManager.shared.reportDate {
+            return reportDate.dateByAddingDays(ParametersManager.shared.covidPlusWarning) > Date()
+        } else {
+            return false
+        }
+    }
     
     @UserDefault(key: .latestAvailableBuild)
     private var latestAvailableBuild: Int?
 
+    @UserDefault(key: .didAlreadyShowUniversalQrCodeExplanations)
+    private var didAlreadyShowUniversalQrCodeExplanations: Bool = false
+    
     init(didTouchAbout: @escaping () -> (),
          showCaptchaChallenge: @escaping (_ captcha: Captcha, _ didEnterCaptcha: @escaping (_ id: String, _ answer: String) -> (), _ didCancelCaptcha: @escaping () -> ()) -> (),
          didTouchAppUpdate: @escaping () -> (),
@@ -76,6 +89,9 @@ final class HomeViewController: CVTableViewController {
          didTouchVaccination: @escaping () -> (),
          didTouchSanitaryCertificates: @escaping (_ url: URL?) -> (),
          didTouchVerifyWalletCertificate: @escaping () -> (),
+         didTouchUniversalQrScan: @escaping () -> (),
+         showUniversalQrScanExplanation: @escaping (_ initialButtonFrame: CGRect?, _ animationDidEnd: @escaping (_ animated: Bool) -> ()) -> (),
+         didEnterCodeFromDeeplink: @escaping (_ code: String) -> (),
          deinitBlock: @escaping () -> ()) {
         self.didTouchAppUpdate = didTouchAppUpdate
         self.didTouchDocument = didTouchDocument
@@ -99,6 +115,9 @@ final class HomeViewController: CVTableViewController {
         self.didTouchVaccination = didTouchVaccination
         self.didTouchSanitaryCertificates = didTouchSanitaryCertificates
         self.didTouchVerifyWalletCertificate = didTouchVerifyWalletCertificate
+        self.didTouchUniversalQrScan = didTouchUniversalQrScan
+        self.showUniversalQrScanExplanation = showUniversalQrScanExplanation
+        self.didEnterCodeFromDeeplink = didEnterCodeFromDeeplink
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
     }
@@ -128,6 +147,7 @@ final class HomeViewController: CVTableViewController {
         super.viewDidAppear(animated)
         initInitialContentOffset()
         stateCell?.continuePlayingIfNeeded()
+        showUniversalQrCodeExplanationsIfNeeded()
     }
     
     deinit {
@@ -163,7 +183,7 @@ final class HomeViewController: CVTableViewController {
         let messageFont: UIFont? = Appearance.BottomMessage.font
         let messageTextColor: UIColor = .black
         let messageBackgroundColor: UIColor = Asset.Colors.info.color
-        if !RBManager.shared.canReactivateProximity {
+        if RBManager.shared.isImmune {
             bottomMessageContainerController?.updateMessage { [weak self] in self?.updateTableViewBottomInset() }
         } else if !areNotificationsAuthorized && !BluetoothStateManager.shared.isAuthorized {
             bottomMessageContainerController?.updateMessage(text: "proximityController.error.noNotificationsOrBluetooth".localized,
@@ -227,6 +247,20 @@ final class HomeViewController: CVTableViewController {
             self.didFinishLoad = nil
         }
     }
+
+    private func showUniversalQrCodeExplanationsIfNeeded() {
+        guard !didAlreadyShowUniversalQrCodeExplanations else { return }
+        guard !DeepLinkingManager.shared.appLaunchedFromDeeplinkOrShortcut else { return }
+        didAlreadyShowUniversalQrCodeExplanations = true
+        navigationChildController?.rightBarButtonItemView?.alpha = 0.0
+        showUniversalQrScanExplanation(navigationChildController?.rightBarButtonItemFrame(in: navigationController?.view ?? view)) { [weak self] animated in
+            self?.navigationChildController?.rightBarButtonItemView?.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
+            UIView.animate(withDuration: animated ? 0.7 : 0.0, delay: 0.0, usingSpringWithDamping: 0.4, initialSpringVelocity: 1.0, options: .curveEaseInOut) {
+                self?.navigationChildController?.rightBarButtonItemView?.alpha = 1.0
+                self?.navigationChildController?.rightBarButtonItemView?.transform = .identity
+            }
+        }
+    }
     
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = []
@@ -246,15 +280,14 @@ final class HomeViewController: CVTableViewController {
         })
         rows.append(stateRow)
         rows.append(activationButtonRow(isRegistered: RBManager.shared.isRegistered))
+        rows.append(qrScanRow())
         if let latestAvailableBuild = latestAvailableBuild, latestAvailableBuild > Int(UIApplication.shared.buildNumber) ?? 0 {
             rows.append(appUpdateRow())
         }
         rows.append(contentsOf: healthSectionRows())
         rows.append(contentsOf: infoSectionRows())
-        if ParametersManager.shared.displayAttestation {
-            rows.append(contentsOf: attestationSectionRows())
-        }
-        if !RBManager.shared.isSick && VenuesManager.shared.isVenuesRecordingActivated {
+        rows.append(contentsOf: attestationSectionRows())
+        if VenuesManager.shared.isVenuesRecordingActivated {
             rows.append(contentsOf: venuesSectionRows())
         }
         rows.append(contentsOf: moreSectionRows())
@@ -270,7 +303,7 @@ final class HomeViewController: CVTableViewController {
         }
         navigationChildController?.scrollViewDidScroll(scrollView)
     }
-    
+
     private func initUI() {
         tableView.contentInset.top = navigationChildController?.navigationBarHeight ?? 0.0
         updateTableViewBottomInset()
@@ -280,13 +313,17 @@ final class HomeViewController: CVTableViewController {
         tableView.showsVerticalScrollIndicator = false
         tableView.canCancelContentTouches = true
         navigationController?.setNavigationBarHidden(true, animated: false)
+
+        let scanBarButtonItem: UIBarButtonItem = UIBarButtonItem(image: Asset.Images.qrScanItem.image, style: .plain, target: self, action: #selector(scanQrButtonPressed))
+        scanBarButtonItem.accessibilityLabel = "home.qrScan.button.title".localized
+        navigationChildController?.updateRightBarButtonItem(scanBarButtonItem)
     }
-    
+
     private func updateTableViewBottomInset() {
         let bottomSafeArea: CGFloat = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: max(bottomMessageContainerController?.messageHeight ?? bottomSafeArea, bottomSafeArea) + 20.0))
     }
-    
+
     private func initBottomMessageContainer() {
         bottomMessageContainerController?.messageDidTouch = { [weak self] in
             guard let self = self else { return }
@@ -301,7 +338,7 @@ final class HomeViewController: CVTableViewController {
             }
         }
     }
-    
+
     private func addObserver() {
         LocalizationsManager.shared.addObserver(self)
         BluetoothStateManager.shared.addObserver(self)
@@ -317,6 +354,9 @@ final class HomeViewController: CVTableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(newVenueRecordingFromDeeplink(_:)), name: .newVenueRecordingFromDeeplink, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(newWalletCertificateFromDeeplink(_:)), name: .newWalletCertificateFromDeeplink, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(lastAvailableBuildDidUpdate), name: .lastAvailableBuildDidUpdate, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(openQrScan), name: .openQrScan, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterCodeFromDeeplink(_:)), name: .didEnterCodeFromDeeplink, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(newAttestationFromDeeplink), name: .newAttestationFromDeeplink, object: nil)
     }
     
     private func removeObservers() {
@@ -327,7 +367,40 @@ final class HomeViewController: CVTableViewController {
         IsolationManager.shared.removeObserver(self)
         NotificationCenter.default.removeObserver(self)
     }
-    
+
+    @objc private func scanQrButtonPressed() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        AnalyticsManager.shared.reportAppEvent(.e18)
+        // This asyncAfter is here not to have a freeze for the Haptic feedback.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.openQrScan()
+        }
+    }
+
+    @objc private func openQrScan() {
+        CameraAuthorizationManager.requestAuthorization { granted, isFirstTimeRequest in
+            if granted {
+                self.didTouchUniversalQrScan()
+            } else if !isFirstTimeRequest {
+                self.showAlert(title: "scanCodeController.camera.authorizationNeeded.title".localized,
+                               message: "scanCodeController.camera.authorizationNeeded.message".localized,
+                               okTitle: "common.settings".localized,
+                               cancelTitle: "common.cancel".localized, handler:  {
+                                UIApplication.shared.openSettings()
+                               })
+            }
+        }
+    }
+
+    @objc private func didEnterCodeFromDeeplink(_ notification: Notification) {
+        guard let code = notification.object as? String else { return }
+        didEnterCodeFromDeeplink(code)
+    }
+
+    @objc private func newAttestationFromDeeplink() {
+        didTouchDocument()
+    }
+
     private func didTouchIsSickReadMore() {
         showAlert(title: "home.activation.sick.alert.title".localized,
                   message: "home.activation.sick.alert.message".localized,
@@ -502,18 +575,31 @@ final class HomeViewController: CVTableViewController {
     }
     
     @objc private func newVenueRecordingFromDeeplink(_ notification: Notification) {
-        guard !RBManager.shared.isSick else { return }
-        if let url = notification.object as? URL {
-            didRequestVenueScanAuthorization { granted in
-                guard granted == true else { return }
-                self.processOnlyRegistrationIfNeeded { error in
-                    guard error == nil else { return }
-                    if VenuesManager.shared.processVenueUrl(url) != nil {
-                        self.didRecordVenue(url)
-                        self.reloadUI(animated: true)
-                    } else {
-                        self.showVenueRecordingAlertError()
-                    }
+        if isSickWarningPeriod {
+            showAlert(title: "home.venuesSection.sickAlert.title".localized,
+                      message: "home.venuesSection.sickAlert.message".localized,
+                      okTitle: "home.venuesSection.sickAlert.positiveButton".localized,
+                      cancelTitle: "home.venuesSection.sickAlert.negativeButton".localized,
+                      handler: { [weak self] in
+                        guard let url = notification.object as? URL else { return }
+                        self?.newVenueRecordingFromDeeplink(url: url)
+                      })
+        }  else {
+            guard let url = notification.object as? URL else { return }
+            newVenueRecordingFromDeeplink(url: url)
+        }
+    }
+
+    private func newVenueRecordingFromDeeplink(url: URL) {
+        didRequestVenueScanAuthorization { granted in
+            guard granted == true else { return }
+            self.processOnlyRegistrationIfNeeded { error in
+                guard error == nil else { return }
+                if VenuesManager.shared.processVenueUrl(url) != nil {
+                    self.didRecordVenue(url)
+                    self.reloadUI(animated: true)
+                } else {
+                    self.showVenueRecordingAlertError()
                 }
             }
         }
@@ -522,7 +608,7 @@ final class HomeViewController: CVTableViewController {
     @objc private func newWalletCertificateFromDeeplink(_ notification: Notification) {
         if let url = notification.object as? URL {
             didTouchSanitaryCertificates(url)
-        }   
+        }
     }
     
     @objc private func lastAvailableBuildDidUpdate() {
@@ -548,8 +634,7 @@ final class HomeViewController: CVTableViewController {
         ParametersManager.shared.proximityReactivationReminderHours.forEach { hours in
             let hoursString: String = hours == 1 ? "home.deactivate.actionSheet.hours.singular" : "home.deactivate.actionSheet.hours.plural"
             alertController.addAction(UIAlertAction(title: String(format: hoursString.localized, Int(hours)), style: .default) { [weak self] _ in
-                let hoursToUse: Double = Double(hours)
-                self?.triggerReactivationReminder(hours: hoursToUse)
+                self?.triggerReactivationReminder(hours: Double(hours))
             })
         }
         alertController.addAction(UIAlertAction(title: "home.deactivate.actionSheet.noReminder".localized, style: .cancel) { [weak self] _ in
@@ -573,16 +658,16 @@ extension HomeViewController {
     private func activationButtonRow(isRegistered: Bool) -> CVRow {
         if isRegistered {
             let activationTitle: String = isActivated ? "home.mainButton.deactivate".localized : "home.mainButton.activate".localized
-            let activationButtonRow: CVRow = CVRow(title: RBManager.shared.canReactivateProximity ? activationTitle : "common.readMore".localized,
+            let activationButtonRow: CVRow = CVRow(title: RBManager.shared.isImmune ? "common.readMore".localized : activationTitle,
                                                    xibName: .buttonCell,
                                                    theme: CVRow.Theme(topInset: 0.0, bottomInset: 0.0, buttonStyle: isActivated ? .secondary : .primary),
                                                    enabled: canActivateProximity,
                                                    selectionAction: { [weak self] in
                                                     guard let self = self else { return }
-                                                    if RBManager.shared.canReactivateProximity {
-                                                        self.didChangeSwitchValue(isOn: !self.isActivated)
-                                                    } else {
+                                                    if RBManager.shared.isImmune {
                                                         self.didTouchIsSickReadMore()
+                                                    } else {
+                                                        self.didChangeSwitchValue(isOn: !self.isActivated)
                                                     }
             })
             return activationButtonRow
@@ -602,6 +687,18 @@ extension HomeViewController {
                                                    })
             return activationButtonRow
         }
+    }
+
+    private func qrScanRow() -> CVRow {
+        CVRow(title: "home.qrScan.button.title".localized,
+              xibName: .buttonCell,
+              theme: CVRow.Theme(topInset: 20.0, bottomInset: 0.0, buttonStyle: .secondary),
+              selectionAction: { [weak self] in
+                AnalyticsManager.shared.reportAppEvent(.e19)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self?.openQrScan()
+                }
+              })
     }
     
     private func appUpdateRow() -> CVRow {
@@ -625,7 +722,7 @@ extension HomeViewController {
         var rows: [CVRow] = []
         
         if !StatusManager.shared.hideStatus {
-            if RBManager.shared.isSick {
+            if RBManager.shared.isImmune {
                 let row: CVRow = contactStatusRow(header: nil,
                                                   title: "home.healthSection.isSick.standaloneTitle".localized,
                                                   subtitle: nil,
@@ -651,7 +748,7 @@ extension HomeViewController {
             }
         }
 
-        let showDeclare: Bool = RBManager.shared.isRegistered && !RBManager.shared.isSick
+        let showDeclare: Bool = RBManager.shared.isRegistered && !RBManager.shared.isImmune
         let displayVaccination: Bool = ParametersManager.shared.displayVaccination
         if ParametersManager.shared.displayIsolation {
             rows.append(contentsOf: isolationRows(isLastSectionBlock: !showDeclare && !displayVaccination))
@@ -714,7 +811,7 @@ extension HomeViewController {
                                             image: Asset.Images.healthCard.image,
                                             xibName: .contactStatusCell,
                                             theme: CVRow.Theme(topInset: 0.0,
-                                                               bottomInset: (RBManager.shared.isSick && !ParametersManager.shared.displayIsolation || isStatusOnGoing) ? 0.0 : Appearance.Cell.leftMargin,
+                                                               bottomInset: (RBManager.shared.isImmune && !ParametersManager.shared.displayIsolation || isStatusOnGoing) ? 0.0 : Appearance.Cell.leftMargin,
                                                                textAlignment: .natural,
                                                                titleColor: .white,
                                                                subtitleColor: .white,
@@ -766,13 +863,22 @@ extension HomeViewController {
                                                         titleColor: Appearance.Button.Primary.titleColor,
                                                         subtitleColor: Appearance.Button.Primary.titleColor),
                                      selectionAction: { [weak self] in
-                                        self?.processOnlyRegistrationIfNeeded { error in
+                                        guard let self = self else { return }
+                                        self.processOnlyRegistrationIfNeeded { error in
                                             guard error == nil else { return }
                                             CameraAuthorizationManager.requestAuthorization { granted, isFirstTimeRequest in
                                                 if granted {
-                                                    self?.didTouchRecordVenues()
+                                                    if self.isSickWarningPeriod {
+                                                        self.showAlert(title: "home.venuesSection.sickAlert.title".localized,
+                                                                        message: "home.venuesSection.sickAlert.message".localized,
+                                                                        okTitle: "home.venuesSection.sickAlert.positiveButton".localized,
+                                                                        cancelTitle: "home.venuesSection.sickAlert.negativeButton".localized,
+                                                                        handler: { self.didTouchRecordVenues() })
+                                                    }  else {
+                                                        self.didTouchRecordVenues()
+                                                    }
                                                 } else if !isFirstTimeRequest {
-                                                    self?.showAlert(title: "scanCodeController.camera.authorizationNeeded.title".localized,
+                                                    self.showAlert(title: "scanCodeController.camera.authorizationNeeded.title".localized,
                                                                     message: "scanCodeController.camera.authorizationNeeded.message".localized,
                                                                     okTitle: "common.settings".localized,
                                                                     cancelTitle: "common.cancel".localized, handler:  {
@@ -925,58 +1031,59 @@ extension HomeViewController {
         let attestationSectionRow: CVRow = CVRow(title: "home.attestationSection.title".localized,
                                                  xibName: .textCell,
                                                  theme: CVRow.Theme(topInset: 30.0,
-                                                                    bottomInset: 10.0,
+                                                                    bottomInset: 0.0,
                                                                     textAlignment: .natural,
                                                                     titleFont: { Appearance.Cell.Text.headTitleFont }))
         rows.append(attestationSectionRow)
 
-        let attestationsCount: Int = AttestationsManager.shared.attestations.filter { !$0.isExpired }.count
-        let subtitle: String
-        switch attestationsCount {
-        case 0:
-            subtitle = "home.attestationSection.cell.subtitle.noAttestations".localized
-        case 1:
-            subtitle = "home.attestationSection.cell.subtitle.oneAttestation".localized
-        default:
-            subtitle = String(format: "home.attestationSection.cell.subtitle.multipleAttestations".localized, attestationsCount)
+        if ParametersManager.shared.displayAttestation {
+            let attestationsCount: Int = AttestationsManager.shared.attestations.filter { !$0.isExpired }.count
+            let subtitle: String
+            switch attestationsCount {
+            case 0:
+                subtitle = "home.attestationSection.cell.subtitle.noAttestations".localized
+            case 1:
+                subtitle = "home.attestationSection.cell.subtitle.oneAttestation".localized
+            default:
+                subtitle = String(format: "home.attestationSection.cell.subtitle.multipleAttestations".localized, attestationsCount)
+            }
+
+            let attestationRow: CVRow = CVRow(title: "home.attestationSection.cell.title".localized,
+                                              subtitle: subtitle,
+                                              image: Asset.Images.attestationCard.image,
+                                              xibName: .attestationCell,
+                                              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                                                 topInset: 10.0,
+                                                                 bottomInset: 0.0,
+                                                                 textAlignment: .natural),
+                                              selectionAction: { [weak self] in
+                                                self?.didTouchDocument()
+                                              }, willDisplay: { cell in
+                                                cell.selectionStyle = .none
+                                                cell.accessoryType = .none
+                                              })
+            rows.append(attestationRow)
         }
-
-        let attestationRow: CVRow = CVRow(title: "home.attestationSection.cell.title".localized,
-                                          subtitle: subtitle,
-                                          image: Asset.Images.attestationCard.image,
-                                          xibName: .attestationCell,
-                                          theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                             topInset: 0.0,
-                                                             bottomInset: 0.0,
-                                                             textAlignment: .natural),
-                                          selectionAction: { [weak self] in
-                                            self?.didTouchDocument()
-                                          }, willDisplay: { cell in
-                                            cell.selectionStyle = .none
-                                            cell.accessoryType = .none
-                                          })
-        rows.append(attestationRow)
-
-        guard WalletManager.shared.isWalletActivated else { return rows }
-        let sanitaryCertificatesRow: CVRow = CVRow(title: "home.attestationSection.sanitaryCertificates.cell.title".localized,
-                                                   subtitle: "home.attestationSection.sanitaryCertificates.cell.subtitle".localized,
-                                                   image: Asset.Images.walletCard.image,
-                                                   xibName: .sanitaryCertificatesWalletCell,
-                                                   theme: CVRow.Theme(backgroundColor: Appearance.tintColor,
-                                                                      topInset: 20.0,
-                                                                      bottomInset: 0.0,
-                                                                      textAlignment: .natural,
-                                                                      titleColor: Appearance.Button.Primary.titleColor,
-                                                                      subtitleColor: Appearance.Button.Primary.titleColor),
-                                                   selectionAction: { [weak self] in
-                                                    self?.didTouchSanitaryCertificates(nil)
-                                                   }, willDisplay: { cell in
-                                                    cell.selectionStyle = .none
-                                                    cell.accessoryType = .none
-                                                   })
-        rows.append(sanitaryCertificatesRow)
-
-        return rows
+        if WalletManager.shared.isWalletActivated {
+            let sanitaryCertificatesRow: CVRow = CVRow(title: "home.attestationSection.sanitaryCertificates.cell.title".localized,
+                                                       subtitle: "home.attestationSection.sanitaryCertificates.cell.subtitle".localized,
+                                                       image: Asset.Images.walletCard.image,
+                                                       xibName: .sanitaryCertificatesWalletCell,
+                                                       theme: CVRow.Theme(backgroundColor: Appearance.tintColor,
+                                                                          topInset: rows.count == 1 ? 10.0 : 20.0,
+                                                                          bottomInset: 0.0,
+                                                                          textAlignment: .natural,
+                                                                          titleColor: Appearance.Button.Primary.titleColor,
+                                                                          subtitleColor: Appearance.Button.Primary.titleColor),
+                                                       selectionAction: { [weak self] in
+                                                        self?.didTouchSanitaryCertificates(nil)
+                                                       }, willDisplay: { cell in
+                                                        cell.selectionStyle = .none
+                                                        cell.accessoryType = .none
+                                                       })
+            rows.append(sanitaryCertificatesRow)
+        }
+        return rows.count == 1 ? [] : rows
     }
 
     private func didTouchUpdateLocation() {
@@ -1036,6 +1143,7 @@ extension HomeViewController {
                                                          actionBlock: { [weak self] in
                                                             self?.didTouchAbout()
                                                          })])
+
         rows.append(contentsOf: menuRowsForEntries(menuEntries))
         return rows
     }

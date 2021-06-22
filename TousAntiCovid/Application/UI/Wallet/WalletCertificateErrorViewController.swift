@@ -69,9 +69,22 @@ final class WalletCertificateErrorViewController: CVTableViewController {
                                                               bottomInset: 0.0,
                                                               textAlignment: .center,
                                                               titleFont: { Appearance.Cell.Text.headTitleFont }))
+        let documentImage: UIImage
+        switch certificateType {
+        case .vaccination:
+            documentImage = WalletImagesManager.shared.image(named: .vaccinCertificateFull)!
+        case .sanitary:
+            documentImage = WalletImagesManager.shared.image(named: .testCertificateFull)!
+        case .sanitaryEurope:
+            documentImage = WalletImagesManager.shared.image(named: .testEuropeCertificateFull)!
+        case .vaccinationEurope:
+            documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
+        case .recoveryEurope:
+            documentImage = WalletImagesManager.shared.image(named: .recoveryEuropeCertificateFull)!
+        }
         let checkDocumentRow: CVRow = CVRow(title: "walletCertificateErrorController.checkDocument.\(certificateType.textKey).title".localized,
                                             subtitle: "walletCertificateErrorController.checkDocument.\(certificateType.textKey).subtitle".localized,
-                                            image: WalletImagesManager.shared.image(named: certificateType == .sanitary ? .testCertificate : .vaccinCertificate),
+                                            image: documentImage,
                                         xibName: .checkDocumentCell,
                                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                                            topInset: 15.0,

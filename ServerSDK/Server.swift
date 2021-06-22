@@ -60,7 +60,8 @@ public final class Server: NSObject, RBServer {
                 } else {
                     self.processRegister(captcha: captcha, captchaId: captchaId, publicKey: publicKey, completion: completion)
                 }
-            case .failure:
+            case let .failure(error):
+                print(error)
                 self.processRegister(captcha: captcha, captchaId: captchaId, publicKey: publicKey, completion: completion)
             }
         }
@@ -281,7 +282,7 @@ extension Server {
 
 extension Server {
     
-    private func processRequest(url: URL, method: Method, body: RBServerBody, timeoutInterval: Double? = nil, completion: @escaping (_ result: Result<Data, Error>) -> ()) {
+    private func processRequest(url: URL, method: Method, body: RBServerBody, timeoutInterval: Double? = nil, completion: @escaping ProcessRequestCompletion) {
         do {
             let bodyData: Data = try body.toData()
             let requestId: String = url.lastPathComponent
@@ -325,7 +326,7 @@ extension Server: URLSessionDelegate, URLSessionDownloadDelegate {
                 if task.response?.svIsError == true {
                     let statusCode: Int = task.response?.svStatusCode ?? 0
                     let message: String = receivedData.isEmpty ? "No data received from the server" : (String(data: receivedData, encoding: .utf8) ?? "Unknown error")
-                    let error: Error = NSError.svLocalizedError(message: "Uknown error (\(statusCode)). (\(message))", code: statusCode)
+                    let error: Error = NSError.svLocalizedError(message: "Unknown error (\(statusCode)). (\(message))", code: statusCode)
                     self.requestLoggingHandler(task, nil, error)
                     completion(.failure(error))
                 } else {

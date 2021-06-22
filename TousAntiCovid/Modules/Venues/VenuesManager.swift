@@ -13,7 +13,7 @@ import RobertSDK
 import StorageSDK
 import ServerSDK
 
-protocol VenuesChangesObserver: class {
+protocol VenuesChangesObserver: AnyObject {
     
     func venuesDidUpdate()
     
@@ -33,9 +33,7 @@ final class VenuesManager: NSObject {
     
     static let shared: VenuesManager = VenuesManager()
     
-    var isVenuesRecordingActivated: Bool {
-        ParametersManager.shared.displayRecordVenues
-    }
+    var isVenuesRecordingActivated: Bool { ParametersManager.shared.displayRecordVenues }
     
     var venuesQrCodes: [VenueQrCodeInfo] { storageManager?.venuesQrCodes() ?? [] }
 
@@ -220,7 +218,7 @@ extension VenuesManager {
 
     private func retryReportIfNeeded() {
         guard RBManager.shared.reportToken != nil else {
-            if RBManager.shared.isSick, !venuesQrCodes.isEmpty {
+            if RBManager.shared.isImmune, !venuesQrCodes.isEmpty {
                 storageManager.deleteVenuesQrCodeData()
             }
             return

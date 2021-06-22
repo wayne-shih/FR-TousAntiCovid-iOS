@@ -23,4 +23,5 @@ extension NSNotification.Name {
     static var openFullVenueRecordingFlowFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "openFullVenueRecordingFlowFromDeeplink")
     static var newWalletCertificateFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newWalletCertificateFromDeeplink")
     static var lastAvailableBuildDidUpdate: NSNotification.Name = NSNotification.Name(rawValue: "lastAvailableBuildDidUpdate")
+    static var openQrScan: NSNotification.Name = NSNotification.Name(rawValue: "openQrScan")
 }

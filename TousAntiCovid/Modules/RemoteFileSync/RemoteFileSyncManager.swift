@@ -14,7 +14,14 @@ import ServerSDK
 class RemoteFileSyncManager: NSObject {
     
     @UserDefault(key: .lastRemoteFileLanguageCode)
-    var lastLanguageCode: String? = nil
+    var lastLanguageCode: String? = nil  {
+        didSet {
+            guard oldValue != lastLanguageCode else {
+                return
+            }
+            ETagManager.shared.clearAllData()
+        }
+    }
     
     func start() {
         writeInitialFileIfNeeded()
@@ -50,14 +57,16 @@ class RemoteFileSyncManager: NSObject {
     
     @objc private func appDidBecomeActive() {
         guard !RemoteFileConstant.useOnlyLocalStrings && canUpdateData() else { return }
-        fetchLastFile(languageCode: Locale.currentLanguageCode)
+        fetchLastFile(languageCode: Locale.currentAppLanguageCode)
     }
     
     private func fetchLastFile(languageCode: String) {
         let url: URL = remoteFileUrl(for: languageCode)
         let sesssion: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        let dataTask: URLSessionDataTask = sesssion.dataTask(with: url) { data, response, error in
-            guard let data = data else { return }
+        let dataTask: URLSessionDataTask = sesssion.dataTaskWithETag(with: url) { data, response, error in
+            guard let data = data else {
+                return
+            }
             do {
                 let localUrl: URL = self.localFileUrl(for: languageCode)
                 if self.processReceivedData(data) {
@@ -66,21 +75,17 @@ class RemoteFileSyncManager: NSObject {
                 } else {
                     self.loadLocalFile()
                 }
-                self.lastLanguageCode = Locale.currentLanguageCode
+                self.lastLanguageCode = Locale.currentAppLanguageCode
                 DispatchQueue.main.async {
                     self.notifyObservers()
                 }
-            } catch {
-                if languageCode != Constant.defaultLanguageCode {
-                    self.fetchLastFile(languageCode: Constant.defaultLanguageCode)
-                }
-            }
+            } catch {}
         }
         dataTask.resume()
     }
     
     private func loadLocalFile() {
-        var localUrl: URL = localFileUrl(for: Locale.currentLanguageCode)
+        var localUrl: URL = localFileUrl(for: Locale.currentAppLanguageCode)
         if !FileManager.default.fileExists(atPath: localUrl.path) {
             localUrl = localFileUrl(for: Constant.defaultLanguageCode)
         }
@@ -89,7 +94,7 @@ class RemoteFileSyncManager: NSObject {
     }
     
     private func writeInitialFileIfNeeded() {
-        let fileUrl: URL = initialFileUrl(for: Locale.currentLanguageCode)
+        let fileUrl: URL = initialFileUrl(for: Locale.currentAppLanguageCode)
         let destinationFileUrl: URL = createWorkingDirectoryIfNeeded().appendingPathComponent(fileUrl.lastPathComponent)
         let currentBuildNumber: String = UIApplication.shared.buildNumber
         let isNewAppVersion: Bool = lastBuildNumber() != currentBuildNumber

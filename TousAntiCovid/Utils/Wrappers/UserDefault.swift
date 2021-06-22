@@ -8,7 +8,7 @@
 //  Created by Lunabee Studio / Date - 08/04/2019.
 //
 
-import UIKit
+import Foundation
 
 @propertyWrapper
 struct UserDefault<T> {
@@ -85,9 +85,13 @@ extension UserDefault {
         case zipGeolocVersion
         case installationUuid
         case lastProximityActivationStartTimestamp
+        case eTags
         case cleaLastIteration
         case isAnalyticsOptIn
         case latestAvailableBuild
+        case didAlreadyShowUniversalQrCodeExplanations
+        case deleteAnalyticsAfterNextStatus
+        case lastInitialCertsBuildNumber
     }
     
 }

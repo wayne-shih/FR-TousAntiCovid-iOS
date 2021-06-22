@@ -42,7 +42,7 @@ final class PrivacyManager: RemoteFileSyncManager {
     override func canUpdateData() -> Bool {
         let now: Date = Date()
         let lastFetchIsTooOld: Bool = now.timeIntervalSince1970 - lastUpdateDate.timeIntervalSince1970 >= RemoteFileConstant.minDurationBetweenUpdatesInSeconds
-        let languageChanged: Bool = lastLanguageCode != Locale.currentLanguageCode
+        let languageChanged: Bool = lastLanguageCode != Locale.currentAppLanguageCode
         return lastFetchIsTooOld || languageChanged
     }
     

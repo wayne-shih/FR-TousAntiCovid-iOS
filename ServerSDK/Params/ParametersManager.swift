@@ -14,7 +14,7 @@ import RobertSDK
 
 public final class ParametersManager: NSObject {
     
-    typealias RequestCompletion = (_ result: Result<Double, Error>) -> ()
+    public typealias RequestCompletion = (_ result: Result<(Double), Error>) -> ()
     
     public enum ApiVersion: String {
         case v5
@@ -116,7 +116,15 @@ public final class ParametersManager: NSObject {
         guard let period = valueFor(name: "app.venuesRetentionPeriod") as? Double else { return 14 }
         return Int(period)
     }
-
+    public var covidPlusNoTracing: Int {
+        guard let period = valueFor(name: "app.covidPlusNoTracing") as? Double else { return 60 }
+        return Int(period)
+    }
+    
+    public var covidPlusWarning: Int {
+        guard let period = valueFor(name: "app.covidPlusWarning") as? Double else { return 14 }
+        return Int(period)
+    }
     public var venuesSalt: Int {
         guard let period = valueFor(name: "app.venuesSalt") as? Double else { return 1000 }
         return Int(period)
@@ -135,7 +143,11 @@ public final class ParametersManager: NSObject {
     public var cleaStatusApiVersion: CleaStatusApiVersion { CleaStatusApiVersion(rawValue: valueFor(name: "app.cleaStatusApiVersion") as? String ?? "") ?? .v1 }
     public var cleaReportApiVersion: CleaReportApiVersion { CleaReportApiVersion(rawValue: valueFor(name: "app.cleaReportApiVersion") as? String ?? "") ?? .v1 }
     public var analyticsApiVersion: AnalyticsApiVersion { AnalyticsApiVersion(rawValue: valueFor(name: "app.analyticsApiVersion") as? String ?? "") ?? .v1 }
-    
+
+    public var cleaUrl: String { cleaUrls.randomElement() ?? defaultCleaUrl }
+    public let defaultCleaUrl: String = "https://s3.fr-par.scw.cloud/clea-batch/"
+
+    private var cleaUrls: [String] { valueFor(name: "app.cleaUrls") as? [String] ?? [] }
     private var config: [[String: Any]] = [] {
         didSet { distributeUpdatedConfig() }
     }
@@ -186,10 +198,13 @@ public final class ParametersManager: NSObject {
         return authPubKeys[certificateId]
     }
     
-    public func fetchConfig(_ completion: @escaping (_ result: Result<Double, Error>) -> ()) {
+    public func fetchConfig(completion: @escaping RequestCompletion) {
         let requestId: String = UUID().uuidString
         completions[requestId] = completion
-        let task: URLSessionDataTask = session.dataTask(with: url)
+        var request: URLRequest = URLRequest(url: url)
+        let eTag: String? = SVETagManager.shared.eTag(for: url.absoluteString)
+        eTag.map { request.addValue($0, forHTTPHeaderField: ServerConstant.Etag.requestHeaderField) }
+        let task: URLSessionDataTask = session.dataTask(with: request)
         task.taskDescription = requestId
         task.resume()
     }
@@ -209,6 +224,7 @@ public final class ParametersManager: NSObject {
         RBManager.shared.preSymptomsSpan = preSymptomsSpan
         RBManager.shared.positiveSampleSpan = positiveSampleSpan
         RBManager.shared.contagiousSpan = contagiousSpan
+        RBManager.shared.covidPlusNoTracingDuration = covidPlusNoTracing
         if RBManager.shared.isProximityActivated {
             RBManager.shared.stopProximityDetection()
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -258,7 +274,7 @@ extension ParametersManager: URLSessionDelegate, URLSessionDataDelegate {
             if dataTask.response?.svIsError == true {
                 let statusCode: Int = dataTask.response?.svStatusCode ?? 0
                 let message: String = data.isEmpty ? "No logs received from the server" : (String(data: data, encoding: .utf8) ?? "Unknown error")
-                completion(.failure(NSError.svLocalizedError(message: "Uknown error (\(statusCode)). (\(message))", code: statusCode)))
+                completion(.failure(NSError.svLocalizedError(message: "Unknown error (\(statusCode)). (\(message))", code: statusCode)))
                 self.completions[dataTask.taskDescription ?? ""] = nil
             } else {
                 var receivedData: Data = self.receivedData[requestId] ?? Data()
@@ -274,12 +290,15 @@ extension ParametersManager: URLSessionDelegate, URLSessionDataDelegate {
         DispatchQueue.main.async {
             if let error = error {
                 completion(.failure(error))
+            } else if task.response?.svIsNotModified == true {
+                // Response not updated since last fetch (ETag feature)
+                completion(.success((task.response!.serverTime)))
             } else {
                 let receivedData: Data = self.receivedData[requestId] ?? Data()
                 if task.response!.svIsError == true {
                     let statusCode: Int = task.response?.svStatusCode ?? 0
                     let message: String = receivedData.isEmpty ? "No data received from the server" : (String(data: receivedData, encoding: .utf8) ?? "Unknown error" )
-                    completion(.failure(NSError.svLocalizedError(message: "Uknown error (\(statusCode)). (\(message))", code: statusCode)))
+                    completion(.failure(NSError.svLocalizedError(message: "Unknown error (\(statusCode)). (\(message))", code: statusCode)))
                     self.completions[task.taskDescription ?? ""] = nil
                 } else {
                     do {
@@ -292,8 +311,13 @@ extension ParametersManager: URLSessionDelegate, URLSessionDataDelegate {
                         }
                         try receivedData.write(to: self.localFileUrl())
                         self.config = json["config"] as? [[String: Any]] ?? []
+                        // Save eTag if present
+                        if let eTag = task.response?.svETag, let url = task.currentRequest?.url?.absoluteString {
+                            // We don't need to persiste received data in ETagsManager
+                            SVETagManager.shared.save(eTag: eTag, data: Data(), for: url)
+                        }
                         DispatchQueue.main.async {
-                            completion(.success(task.response!.serverTime))
+                            completion(.success((task.response!.serverTime)))
                         }
                     } catch {
                         DispatchQueue.main.async {

@@ -12,9 +12,11 @@ import UIKit
 
 final class WalletScanAuthorizationController: CVTableViewController {
 
+    private let comingFromTheApp: Bool
     private let didAnswer: (_ granted: Bool) -> ()
 
-    init(didAnswer: @escaping (_ granted: Bool) -> ()) {
+    init(comingFromTheApp: Bool, didAnswer: @escaping (_ granted: Bool) -> ()) {
+        self.comingFromTheApp = comingFromTheApp
         self.didAnswer = didAnswer
         super.init(style: .plain)
     }
@@ -53,7 +55,7 @@ final class WalletScanAuthorizationController: CVTableViewController {
                                     xibName: .imageCell,
                                     theme: CVRow.Theme(topInset: 40.0,
                                                        imageRatio: 375.0 / 233.0))
-        let explanationRow: CVRow = CVRow(title: "confirmWalletQrCodeController.explanation.title".localized,
+        let explanationRow: CVRow = CVRow(title: comingFromTheApp ? "confirmWalletQrCodeController.explanation.title.fromUniversalQrScan".localized : "confirmWalletQrCodeController.explanation.title".localized,
                                           xibName: .textCell,
                                           theme: CVRow.Theme(topInset: 40.0,
                                                              bottomInset: 10.0,

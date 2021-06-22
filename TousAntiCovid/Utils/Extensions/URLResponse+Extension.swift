@@ -12,13 +12,14 @@ import Foundation
 
 extension URLResponse {
     
-    var responseStatusCode: Int? {
-        (self as? HTTPURLResponse)?.statusCode
-    }
+    var responseStatusCode: Int? { (self as? HTTPURLResponse)?.statusCode }
     
     var isError: Bool? {
         guard let statusCode = responseStatusCode else { return nil }
         return "\(statusCode)".first != "2"
     }
     
+    var eTag: String? { (self as? HTTPURLResponse)?.allHeaderFields[ETagConstant.responseHeaderField] as? String }
+    var isNotModified: Bool { responseStatusCode == 304 }
+
 }

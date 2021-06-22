@@ -57,6 +57,13 @@ internal enum StoryboardScene {
 
     internal static let modalContainerViewController = SceneType<TousAntiCovid.ModalContainerViewController>(storyboard: ModalContainer.self, identifier: "ModalContainerViewController")
   }
+  internal enum UniversalQrScan: StoryboardType {
+    internal static let storyboardName = "UniversalQrScan"
+
+    internal static let universalQrCodeExplanationsContainerController = SceneType<TousAntiCovid.UniversalQrCodeExplanationsAnimationController>(storyboard: UniversalQrScan.self, identifier: "UniversalQrCodeExplanationsContainerController")
+
+    internal static let universalQrScanController = SceneType<TousAntiCovid.UniversalQrScanController>(storyboard: UniversalQrScan.self, identifier: "UniversalQrScanController")
+  }
   internal enum WalletCertificateVerified: StoryboardType {
     internal static let storyboardName = "WalletCertificateVerified"
 
