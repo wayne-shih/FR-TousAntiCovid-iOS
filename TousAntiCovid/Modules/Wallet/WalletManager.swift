@@ -74,7 +74,13 @@ final class WalletManager {
         } else {
             // In this case it means we scanned a raw DCC certificate.
             let encodedCode: String = code.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? ""
-            return "https://bonjour.tousanticovid.gouv.fr\(WalletConstant.URLPath.walletDCC.rawValue)#" + encodedCode
+            let path: String
+            if code.hasPrefix("DC04") {
+                path = WalletConstant.URLPath.wallet2D.rawValue
+            } else {
+                path = WalletConstant.URLPath.walletDCC.rawValue
+            }
+            return "https://bonjour.tousanticovid.gouv.fr\(path)#" + encodedCode
         }
     }
 
@@ -115,7 +121,6 @@ final class WalletManager {
                                                                &error)
             return isSignatureValid
         } catch {
-            print(error)
             return false
         }
     }
@@ -124,34 +129,20 @@ final class WalletManager {
 
 extension WalletManager {
 
-    func processUrl(_ url: URL) throws {
+    func getWalletCertificate(from url: URL) throws -> WalletCertificate? {
+        var certificate: WalletCertificate?
         switch url.path {
         case WalletConstant.URLPath.wallet.rawValue:
-            try processWalletUrl(url)
+            certificate = try extractCertificateFrom(url: url)
         case WalletConstant.URLPath.wallet2D.rawValue:
-            try processWallet2DUrl(url)
+            certificate = try extractCertificateFrom(url: url)
         case WalletConstant.URLPath.walletDCC.rawValue:
-            try processWalletDCCUrl(url)
+            certificate = try extractEuropeanCertificateFrom(url: url)
         default:
             break
         }
+        return certificate
     }
-
-    func processWalletUrl(_ url: URL) throws {
-        let certificate: WalletCertificate = try extractCertificateFrom(url: url)
-        saveCertificate(certificate)
-    }
-
-    func processWallet2DUrl(_ url: URL) throws {
-        let certificate: WalletCertificate = try extractCertificateFrom(url: url)
-        saveCertificate(certificate)
-    }
-
-    func processWalletDCCUrl(_ url: URL) throws {
-        let certificate: WalletCertificate = try extractEuropeanCertificateFrom(url: url)
-        saveCertificate(certificate)
-    }
-
 }
 
 extension WalletManager {
@@ -209,13 +200,13 @@ extension WalletManager {
         return try extractEuropeanCertificateFrom(doc: completeMessage)
     }
 
-    func extractEuropeanCertificateFrom(doc: String) throws -> WalletCertificate {
+    func extractEuropeanCertificateFrom(id: String = UUID().uuidString, doc: String) throws -> WalletCertificate {
         let errors: HCert.ParseErrors = HCert.ParseErrors()
         guard let hCert = HCert(from: doc, errors: errors) else { throw WalletError.parsing.error }
         guard errors.errors.isEmpty else { throw WalletError.parsing.error }
         guard hCert.cryptographicallyValid else { throw WalletError.signature.error }
         let certificateType: WalletConstant.CertificateType = WalletManager.certificateType(hCert: hCert)
-        return EuropeanCertificate(value: doc, type: certificateType, hCert: hCert)
+        return EuropeanCertificate(id: id, value: doc, type: certificateType, hCert: hCert)
     }
 
 }
@@ -223,9 +214,30 @@ extension WalletManager {
 extension WalletManager: PublicKeyStorageDelegate {
 
     func getEncodedPublicKeys(for kidStr: String) -> [String] {
-        DccCertificatesManager.shared.certificates(for: kidStr)
+        return DccCertificatesManager.shared.certificates(for: kidStr)
     }
 
+}
+
+extension WalletManager {
+    func converToEurope(certificate: WalletCertificate, completion: @escaping (_ result: Result<WalletCertificate, Error>) -> ()) {
+        let encodedCertificate: String = certificate.value.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? certificate.value
+        InGroupeServer.shared.convertCertificate(encodedCertificate: encodedCertificate, fromFormat: certificate.type.format.rawValue, toFormat: WalletConstant.CertificateType.Format.walletDCC.rawValue) { result in
+            switch result {
+            case let .success(doc):
+                do {
+                    let europeanCertificate: WalletCertificate = try self.extractEuropeanCertificateFrom(doc: doc)
+                    self.saveCertificate(europeanCertificate)
+                    self.deleteCertificate(id: certificate.id)
+                    completion(.success(europeanCertificate))
+                } catch {
+                    completion(.failure(error))
+                }
+            case let .failure(error):
+                completion(.failure(error))
+            }
+        }
+    }
 }
 
 extension WalletManager {

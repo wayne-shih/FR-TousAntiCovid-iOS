@@ -43,6 +43,7 @@ final class AnalyticsAppEvent: Object, Encodable {
         case e17
         case e18
         case e19
+        case e20
     }
     
     init(name: String, timestamp: String, desc: String?) {

@@ -249,7 +249,7 @@ extension AnalyticsManager: URLSessionDelegate, URLSessionDataDelegate {
     }
     
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFile: Constant.Server.analyticsCertificate) { validated, credential in
+        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.analyticsCertificates) { validated, credential in
             validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }

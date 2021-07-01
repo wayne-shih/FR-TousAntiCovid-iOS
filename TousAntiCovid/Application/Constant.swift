@@ -44,13 +44,15 @@ enum Constant {
 
         static let publicKey: Data = Data(base64Encoded: "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAc9IDt6qJq453SwyWPB94JaLB2VfTAcL43YVtMr3HhDCd22gKaQXIbX1d+tNhfvaKM51sxeaXziPjntUzbTNiw==")!
 
-        static var certificate: Data { Bundle.main.fileDataFor(fileName: "api.tousanticovid.gouv.fr", ofType: "pem") ?? Data() }
+        static var certificates: [Data] { ["certigna-root", "certigna-services"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
 
         static var dccCertsUrl: URL { URL(string: "https://\(resourcesRootDomain)/json/version-\(jsonVersion)/Certs/dcc-certs.json")! }
 
-        static var analyticsCertificate: Data { Bundle.main.fileDataFor(fileName: "analytics-api.tousanticovid.gouv.fr", ofType: "pem") ?? Data() }
+        static var analyticsCertificates: [Data] { ["certigna-root", "certigna-services"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
 
-        static var resourcesCertificate: Data { Bundle.main.fileDataFor(fileName: resourcesRootDomain, ofType: "pem") ?? Data() }
+        static var resourcesCertificates: [Data] { ["certigna-root", "certigna-services"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
+
+        static var convertCertificates: [Data] { ["ISRG-Root-X1", "R3"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
 
         static let jsonVersion: Int = 33
         static let baseJsonUrl: String = "https://\(resourcesRootDomain)/json/version-\(jsonVersion)/Config"

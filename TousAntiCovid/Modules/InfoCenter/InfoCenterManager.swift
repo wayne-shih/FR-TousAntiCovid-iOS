@@ -31,7 +31,7 @@ final class InfoCenterManager: NSObject {
     
     static let shared: InfoCenterManager = InfoCenterManager()
     
-    var info: [Info] { rawInfo.filter { !$0.title.isEmpty && !$0.description.isEmpty } }
+    var info: [Info] { rawInfo.filter { !$0.title.isEmpty && !$0.description.isEmpty && $0.date.timeIntervalSince1970 <= Date().timeIntervalSince1970 } }
     var labels: [String: String] = [:]
     
     @UserDefault(key: .infoCenterLastUpdatedAt)
@@ -311,7 +311,7 @@ extension InfoCenterManager {
 extension InfoCenterManager: URLSessionDelegate {
     
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFile: Constant.Server.resourcesCertificate) { validated, credential in
+        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
             validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }

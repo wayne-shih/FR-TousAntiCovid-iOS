@@ -35,9 +35,6 @@ final class EuropeanCertificate: WalletCertificate {
         return (date ?? hCert.iat).timeIntervalSince1970
     }
 
-    override var codeImage: UIImage? { value.qrCode() }
-    override var codeImageTitle: String? { nil }
-
     override var pillTitles: [String] { [hCert.certTypeString.trimmingCharacters(in: .whitespaces)] }
     override var shortDescription: String? { fullName }
 
@@ -50,6 +47,16 @@ final class EuropeanCertificate: WalletCertificate {
         case .recovery:
             return fullDescriptionRecovery
         }
+    }
+
+    var medicalProductCode: String? {
+        guard let vaccinationEntry = hCert.vaccineStatements.first else { return nil }
+        return vaccinationEntry.medicalProduct
+    }
+
+    var isLastDose: Bool? {
+        guard let vaccinationEntry = hCert.vaccineStatements.first else { return nil }
+        return vaccinationEntry.doseNumber == vaccinationEntry.dosesTotal
     }
 
     private let hCert: HCert
@@ -73,7 +80,7 @@ final class EuropeanCertificate: WalletCertificate {
             .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString ?? "")
             .replacingOccurrences(of: "<ANALYSIS_CODE>", with: l10n("test.man.\(testEntry.type)", or: testEntry.type))
             .replacingOccurrences(of: "<ANALYSIS_RESULT>", with: "wallet.proof.europe.test.\(testResultKey)".localized)
-            .replacingOccurrences(of: "<FROM_DATE>", with: testEntry.sampleTime.shortDateFormatted())
+            .replacingOccurrences(of: "<FROM_DATE>", with: testEntry.sampleTime.dayShortMonthYearTimeFormatted())
             .appending("\n\(validityString)")
     }
 
@@ -87,7 +94,7 @@ final class EuropeanCertificate: WalletCertificate {
             .replacingOccurrences(of: "<TO_DATE>", with: recoveryEntry.validUntil.shortDateFormatted())
     }
 
-    init(id: String = UUID().uuidString, value: String, type: WalletConstant.CertificateType, hCert: HCert) {
+    init(id: String, value: String, type: WalletConstant.CertificateType, hCert: HCert) {
         self.hCert = hCert
         super.init(id: id, value: value, type: type)
     }

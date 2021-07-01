@@ -11,7 +11,7 @@
 import Foundation
 
 enum RisksUIConstant {
-
+    
     static let baseUrl: String = "https://\(Constant.Server.resourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/Risks"
     
 }

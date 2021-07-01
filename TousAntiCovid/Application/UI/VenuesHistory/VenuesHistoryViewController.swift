@@ -59,10 +59,6 @@ final class VenuesHistoryViewController: CVTableViewController {
         VenuesManager.shared.removeObserver(self)
     }
     
-    override func reloadUI(animated: Bool = false, completion: (() -> ())? = nil) {
-        super.reloadUI(animated: animated, completion: completion)
-    }
-    
     override func createRows() -> [CVRow] {
         let venuesQrCodes: [VenueQrCodeInfo] = VenuesManager.shared.venuesQrCodes.sorted { $0.ntpTimestamp > $1.ntpTimestamp }
         updateEmptyView(areThereQrCodes: !venuesQrCodes.isEmpty, isSick: RBManager.shared.isImmune)

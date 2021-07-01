@@ -12,6 +12,10 @@
 		0F2ABF69262864FB0021AB39 /* ETagManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F2ABF68262864FB0021AB39 /* ETagManager.swift */; };
 		0F2ABF792628658A0021AB39 /* ETagConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F2ABF782628658A0021AB39 /* ETagConstant.swift */; };
 		0FF6A37A26257F49009D1CA4 /* URLSession+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FF6A37926257F49009D1CA4 /* URLSession+Extension.swift */; };
+		3700110E268B13EF008C547E /* R3.pem in Resources */ = {isa = PBXBuildFile; fileRef = 3700110B268B13EF008C547E /* R3.pem */; };
+		37001111268B13EF008C547E /* ISRG-Root-X1.pem in Resources */ = {isa = PBXBuildFile; fileRef = 3700110D268B13EF008C547E /* ISRG-Root-X1.pem */; };
+		3700111D268B7144008C547E /* certigna-root.pem in Resources */ = {isa = PBXBuildFile; fileRef = 3700111B268B7144008C547E /* certigna-root.pem */; };
+		37001120268B7144008C547E /* certigna-services.pem in Resources */ = {isa = PBXBuildFile; fileRef = 3700111C268B7144008C547E /* certigna-services.pem */; };
 		3700C0CC2553E9FD00FE3602 /* UIStackView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3700C0CB2553E9FD00FE3602 /* UIStackView+Extension.swift */; };
 		37014CA124460CD000CE0BF1 /* ModalContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37013E0B243F895000FCB360 /* ModalContainerViewController.swift */; };
 		37014CA224460CD000CE0BF1 /* OnboardingGestureCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A3478243E7E6B00148FCF /* OnboardingGestureCell.swift */; };
@@ -141,7 +145,6 @@
 		3714EDDF25813D1000D6736F /* IsolationInitialCaseSafeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714EDDB25813D1000D6736F /* IsolationInitialCaseSafeCell.swift */; };
 		3714EDE92581F1D300D6736F /* IsolationFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714EDE82581F1D300D6736F /* IsolationFormViewController.swift */; };
 		3714EDF32581F45F00D6736F /* IsolationFormCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714EDF22581F45F00D6736F /* IsolationFormCoordinator.swift */; };
-		3714EE052583D3F700D6736F /* tacw.tousanticovid.gouv.fr.pem in Resources */ = {isa = PBXBuildFile; fileRef = 3714EE032583D3F600D6736F /* tacw.tousanticovid.gouv.fr.pem */; };
 		3716B53226733AB700632FA8 /* UniversalQrCodeExplanationsAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3716B53126733AB700632FA8 /* UniversalQrCodeExplanationsAnimationController.swift */; };
 		3716B5372673506600632FA8 /* UniversalQrCodeExplanationsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3716B5362673506600632FA8 /* UniversalQrCodeExplanationsController.swift */; };
 		3716B5432673996B00632FA8 /* dcc-certs.json in Resources */ = {isa = PBXBuildFile; fileRef = 3716B5422673996A00632FA8 /* dcc-certs.json */; };
@@ -202,6 +205,7 @@
 		373DD7AE25153E3D0062CB4D /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373DD7AD25153E3D0062CB4D /* UIColor+Extension.swift */; };
 		3741A4D12472573600DC7EC2 /* RemoteFileConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741A4D02472573600DC7EC2 /* RemoteFileConstant.swift */; };
 		3741A4D62472668600DC7EC2 /* CameraAuthorizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741A4D52472668600DC7EC2 /* CameraAuthorizationManager.swift */; };
+		374ED21426848443005E01FB /* UniversalScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374ED21226848442005E01FB /* UniversalScannerView.swift */; };
 		37509963251256AC003CDAFC /* WidgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CECAAC250A291F00F13739 /* WidgetManager.swift */; };
 		3750996A251256AD003CDAFC /* WidgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CECAAC250A291F00F13739 /* WidgetManager.swift */; };
 		3750997A2512574B003CDAFC /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376928082460242800310876 /* Date+Extension.swift */; };
@@ -244,10 +248,7 @@
 		3765B79E255559FF00AA5659 /* GroupedMenuEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3765B79D255559FF00AA5659 /* GroupedMenuEntry.swift */; };
 		3765B7E125558D0100AA5659 /* CACornerMask+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3765B7E025558D0100AA5659 /* CACornerMask+Extension.swift */; };
 		3765B80125569F5C00AA5659 /* PositiveTestController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3765B80025569F5C00AA5659 /* PositiveTestController.swift */; };
-		3766102224A0F01C00A5F13D /* config-preprod.json in Resources */ = {isa = PBXBuildFile; fileRef = 3766102024A0F01C00A5F13D /* config-preprod.json */; };
 		3766102324A0F01C00A5F13D /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 3766102124A0F01C00A5F13D /* config.json */; };
-		3766102624A0FB4500A5F13D /* config-int.json in Resources */ = {isa = PBXBuildFile; fileRef = 3766102424A0FB4400A5F13D /* config-int.json */; };
-		3766102724A0FB4500A5F13D /* config-rec.json in Resources */ = {isa = PBXBuildFile; fileRef = 3766102524A0FB4400A5F13D /* config-rec.json */; };
 		37689F85246AE49700D99BC4 /* strings-es.json in Resources */ = {isa = PBXBuildFile; fileRef = 37689F84246AE49700D99BC4 /* strings-es.json */; };
 		37689F87246AE4B200D99BC4 /* privacy-es.json in Resources */ = {isa = PBXBuildFile; fileRef = 37689F86246AE4B200D99BC4 /* privacy-es.json */; };
 		37689F94246BCFE900D99BC4 /* NSError+RBExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37689F92246BCFE900D99BC4 /* NSError+RBExtension.swift */; };
@@ -446,7 +447,6 @@
 		37CAEFF0256D60CA00AB8540 /* VenuesHistoryEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CAEFEE256D60C900AB8540 /* VenuesHistoryEmptyView.swift */; };
 		37CAEFF3256D60CA00AB8540 /* VenuesHistoryEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37CAEFEF256D60C900AB8540 /* VenuesHistoryEmptyView.xib */; };
 		37CAF00F256E3A1D00AB8540 /* OnboardingVenuesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CAF00E256E3A1D00AB8540 /* OnboardingVenuesController.swift */; };
-		37CAF02C256E4D5F00AB8540 /* config-dev.json in Resources */ = {isa = PBXBuildFile; fileRef = 37CAF02B256E4D5F00AB8540 /* config-dev.json */; };
 		37D442E825DA823C00602E45 /* JSON+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D442E725DA823C00602E45 /* JSON+Extension.swift */; };
 		37D442FB25DA828E00602E45 /* NSMutableAttributedString+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D442FA25DA828E00602E45 /* NSMutableAttributedString+Extension.swift */; };
 		37D8F28F246475B4008E8005 /* Data+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D8F28E246475B4008E8005 /* Data+Extension.swift */; };
@@ -521,8 +521,6 @@
 		37EB2EC324865489003D999A /* DeviceParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D16F3E246D7C98009B3129 /* DeviceParameters.swift */; };
 		37EB2EC5248654EB003D999A /* FileManager+SVExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EB2EC4248654EB003D999A /* FileManager+SVExtension.swift */; };
 		37EB2FBD2487EC04003D999A /* TitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EB2FBC2487EC04003D999A /* TitleCell.swift */; };
-		37EB2FC52487F230003D999A /* app.tousanticovid.gouv.fr.pem in Resources */ = {isa = PBXBuildFile; fileRef = 37689F8A246AF2DE00D99BC4 /* app.tousanticovid.gouv.fr.pem */; };
-		37EB2FC62487F230003D999A /* api.tousanticovid.gouv.fr.pem in Resources */ = {isa = PBXBuildFile; fileRef = 37AC2F24247EB5E500AE2B13 /* api.tousanticovid.gouv.fr.pem */; };
 		37EB2FD82487F419003D999A /* CertificatePinning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EB2FD72487F419003D999A /* CertificatePinning.swift */; };
 		37EB2FDD2487FF11003D999A /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EB2FDC2487FF11003D999A /* UIDevice+Extension.swift */; };
 		37EB2FEC2488C976003D999A /* CaptchaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EB2FEB2488C976003D999A /* CaptchaViewController.swift */; };
@@ -571,8 +569,8 @@
 		660EA521264C185A003E18C8 /* Optional+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A164A2264C15CB0001291A /* Optional+Extension.swift */; };
 		660EA56E264C1C6B003E18C8 /* WidgetUserDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37960EB02510AE0100BAE41B /* WidgetUserDefault.swift */; };
 		6612D43D2625C3040037FBEA /* PrivacyConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6612D43C2625C3040037FBEA /* PrivacyConstant.swift */; };
-		6612D4EB26274FE90037FBEA /* analytics-api.tousanticovid.gouv.fr.pem in Resources */ = {isa = PBXBuildFile; fileRef = 6612D4E926274FE90037FBEA /* analytics-api.tousanticovid.gouv.fr.pem */; };
 		661E2027265D4BA600360FE5 /* EuropeanCertificate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661E2026265D4BA600360FE5 /* EuropeanCertificate.swift */; };
+		6622CBDC2684B3350096C606 /* InGroupServerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6622CBDB2684B3350096C606 /* InGroupServerError.swift */; };
 		663D48A0254726AF00FC0BF2 /* NewPostalCodeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 663D489F254726AF00FC0BF2 /* NewPostalCodeCell.xib */; };
 		663D48A7254726D300FC0BF2 /* NewPostalCodeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663D48A6254726D300FC0BF2 /* NewPostalCodeCell.swift */; };
 		663D48F2254734AF00FC0BF2 /* StandardCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663D48F0254734AF00FC0BF2 /* StandardCardCell.swift */; };
@@ -581,6 +579,7 @@
 		663D77782668C3550083666A /* SVUserDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663D77742668C3550083666A /* SVUserDefault.swift */; };
 		663D77862668C43F0083666A /* UserDefaults+SVExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663D77852668C43F0083666A /* UserDefaults+SVExtension.swift */; };
 		663D77AC2668C5090083666A /* Optional+SVExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663D77AB2668C5090083666A /* Optional+SVExtension.swift */; };
+		664883C3268B46CF005D364F /* CompletedVaccinationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664883C2268B46CF005D364F /* CompletedVaccinationController.swift */; };
 		664C555A2657E946009D64F9 /* VenuesInformationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664C55592657E946009D64F9 /* VenuesInformationController.swift */; };
 		664C556B2657F0B6009D64F9 /* VenuesInformationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664C556A2657F0B6009D64F9 /* VenuesInformationCoordinator.swift */; };
 		6667AAD1256BBED60082601E /* VenuesRecordingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6667AAD0256BBED60082601E /* VenuesRecordingCoordinator.swift */; };
@@ -597,6 +596,11 @@
 		6694C1A025C2BA5700D8F424 /* LoadingCardCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6694C19F25C2BA5700D8F424 /* LoadingCardCell.xib */; };
 		6694C1A925C2BAF600D8F424 /* LoadingCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6694C1A825C2BAF600D8F424 /* LoadingCardCell.swift */; };
 		66A164A3264C15CB0001291A /* Optional+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A164A2264C15CB0001291A /* Optional+Extension.swift */; };
+		66B68A59268482CB00B821FC /* InGroupeServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B68A58268482CB00B821FC /* InGroupeServer.swift */; };
+		66B68A5C2684858D00B821FC /* InGroupServerConvertBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B68A5B2684858D00B821FC /* InGroupServerConvertBody.swift */; };
+		66D18199268B6A4800F708D4 /* DaysAfterCompletionEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D18198268B6A4800F708D4 /* DaysAfterCompletionEntry.swift */; };
+		66D1819D268C9CC600F708D4 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D1819C268C9CC600F708D4 /* ConfettiView.swift */; };
+		66D181A6268CC18C00F708D4 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D181A5268CC18C00F708D4 /* HapticManager.swift */; };
 		66E3311825E6ADC800CE0B90 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373DD7AD25153E3D0062CB4D /* UIColor+Extension.swift */; };
 		66EB6226264054680042534D /* StatusVerificationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66EB6225264054680042534D /* StatusVerificationCell.xib */; };
 		66EB622F264054D80042534D /* StatusVerificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EB622E264054D80042534D /* StatusVerificationCell.swift */; };
@@ -713,6 +717,10 @@
 		0FF6A37926257F49009D1CA4 /* URLSession+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLSession+Extension.swift"; sourceTree = "<group>"; };
 		1FA1108BCEE42D622F05968F /* Pods_TousAntiCovid.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TousAntiCovid.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DA02CBEDACA215063614C6F /* Pods_RobertSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RobertSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3700110B268B13EF008C547E /* R3.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = R3.pem; sourceTree = "<group>"; };
+		3700110D268B13EF008C547E /* ISRG-Root-X1.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ISRG-Root-X1.pem"; sourceTree = "<group>"; };
+		3700111B268B7144008C547E /* certigna-root.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "certigna-root.pem"; sourceTree = "<group>"; };
+		3700111C268B7144008C547E /* certigna-services.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "certigna-services.pem"; sourceTree = "<group>"; };
 		3700C0CB2553E9FD00FE3602 /* UIStackView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Extension.swift"; sourceTree = "<group>"; };
 		37013DF0243F5E3D00FCB360 /* strings-en.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "strings-en.json"; sourceTree = "<group>"; };
 		37013DF1243F5E3D00FCB360 /* strings-fr.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "strings-fr.json"; sourceTree = "<group>"; };
@@ -772,10 +780,8 @@
 		3714EDDB25813D1000D6736F /* IsolationInitialCaseSafeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsolationInitialCaseSafeCell.swift; sourceTree = "<group>"; };
 		3714EDE82581F1D300D6736F /* IsolationFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IsolationFormViewController.swift; sourceTree = "<group>"; };
 		3714EDF22581F45F00D6736F /* IsolationFormCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IsolationFormCoordinator.swift; sourceTree = "<group>"; };
-		3714EE032583D3F600D6736F /* tacw.tousanticovid.gouv.fr.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = tacw.tousanticovid.gouv.fr.pem; sourceTree = "<group>"; };
 		3716B53126733AB700632FA8 /* UniversalQrCodeExplanationsAnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalQrCodeExplanationsAnimationController.swift; sourceTree = "<group>"; };
 		3716B5362673506600632FA8 /* UniversalQrCodeExplanationsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UniversalQrCodeExplanationsController.swift; sourceTree = "<group>"; };
-		3716B53E2673995300632FA8 /* dcc-certs-int.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dcc-certs-int.json"; sourceTree = "<group>"; };
 		3716B5422673996A00632FA8 /* dcc-certs.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dcc-certs.json"; sourceTree = "<group>"; };
 		3718A0F024894A09007EAC4F /* Bundle+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Extension.swift"; sourceTree = "<group>"; };
 		3718A0F7248A1BA5007EAC4F /* Captcha.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Captcha.swift; sourceTree = "<group>"; };
@@ -858,6 +864,7 @@
 		374840A62456C17700032061 /* RBServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBServer.swift; sourceTree = "<group>"; };
 		374840AA2456CA4900032061 /* RBStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBStorage.swift; sourceTree = "<group>"; };
 		374840AD2456D01E00032061 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
+		374ED21226848442005E01FB /* UniversalScannerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UniversalScannerView.swift; sourceTree = "<group>"; };
 		3753184F2549BD0B006DD736 /* DynamicContentStackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicContentStackView.swift; sourceTree = "<group>"; };
 		37531875254A9516006DD736 /* AttestationsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttestationsCoordinator.swift; sourceTree = "<group>"; };
 		37531884254A953B006DD736 /* AttestationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttestationsViewController.swift; sourceTree = "<group>"; };
@@ -891,10 +898,7 @@
 		3765B79D255559FF00AA5659 /* GroupedMenuEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedMenuEntry.swift; sourceTree = "<group>"; };
 		3765B7E025558D0100AA5659 /* CACornerMask+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CACornerMask+Extension.swift"; sourceTree = "<group>"; };
 		3765B80025569F5C00AA5659 /* PositiveTestController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PositiveTestController.swift; sourceTree = "<group>"; };
-		3766102024A0F01C00A5F13D /* config-preprod.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "config-preprod.json"; sourceTree = "<group>"; };
 		3766102124A0F01C00A5F13D /* config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
-		3766102424A0FB4400A5F13D /* config-int.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "config-int.json"; sourceTree = "<group>"; };
-		3766102524A0FB4400A5F13D /* config-rec.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "config-rec.json"; sourceTree = "<group>"; };
 		37663C81243CC672009F1D98 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		37663C8A243CC679009F1D98 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		37663C8D243CC679009F1D98 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -927,7 +931,6 @@
 		37689F7E246A8FA000D99BC4 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		37689F84246AE49700D99BC4 /* strings-es.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "strings-es.json"; sourceTree = "<group>"; };
 		37689F86246AE4B200D99BC4 /* privacy-es.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-es.json"; sourceTree = "<group>"; };
-		37689F8A246AF2DE00D99BC4 /* app.tousanticovid.gouv.fr.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = app.tousanticovid.gouv.fr.pem; sourceTree = "<group>"; };
 		37689F92246BCFE900D99BC4 /* NSError+RBExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSError+RBExtension.swift"; sourceTree = "<group>"; };
 		37689FBB246BFBAE00D99BC4 /* swiftgen.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = swiftgen.yml; sourceTree = SOURCE_ROOT; };
 		3768A036246C2C4100D99BC4 /* StandardTextFieldCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StandardTextFieldCell.xib; sourceTree = "<group>"; };
@@ -1019,7 +1022,6 @@
 		37AC2F13247E700200AE2B13 /* RBECKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBECKeys.swift; sourceTree = "<group>"; };
 		37AC2F15247E781700AE2B13 /* SecKey+RBExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecKey+RBExtension.swift"; sourceTree = "<group>"; };
 		37AC2F21247EA03700AE2B13 /* RBEpochKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBEpochKey.swift; sourceTree = "<group>"; };
-		37AC2F24247EB5E500AE2B13 /* api.tousanticovid.gouv.fr.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = api.tousanticovid.gouv.fr.pem; sourceTree = "<group>"; };
 		37AD4071246437ED005FD22B /* UIPopoverPresentationController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIPopoverPresentationController+Extension.swift"; sourceTree = "<group>"; };
 		37B0231624595ADF002281E9 /* RobertSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RobertSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37B0231824595ADF002281E9 /* RobertSDK.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RobertSDK.h; sourceTree = "<group>"; };
@@ -1119,7 +1121,6 @@
 		37CAEFEE256D60C900AB8540 /* VenuesHistoryEmptyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VenuesHistoryEmptyView.swift; sourceTree = "<group>"; };
 		37CAEFEF256D60C900AB8540 /* VenuesHistoryEmptyView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VenuesHistoryEmptyView.xib; sourceTree = "<group>"; };
 		37CAF00E256E3A1D00AB8540 /* OnboardingVenuesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingVenuesController.swift; sourceTree = "<group>"; };
-		37CAF02B256E4D5F00AB8540 /* config-dev.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "config-dev.json"; sourceTree = "<group>"; };
 		37D16F3E246D7C98009B3129 /* DeviceParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceParameters.swift; sourceTree = "<group>"; };
 		37D16F41246D7DA3009B3129 /* ParametersManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParametersManager.swift; sourceTree = "<group>"; };
 		37D442E725DA823C00602E45 /* JSON+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSON+Extension.swift"; sourceTree = "<group>"; };
@@ -1244,7 +1245,6 @@
 		37FA2B942608D036003246A9 /* Collection+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Extension.swift"; sourceTree = "<group>"; };
 		37FBB03B25E7A99F00377A52 /* StatusManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusManager.swift; sourceTree = "<group>"; };
 		37FBB06925E8158200377A52 /* RBStatusRiskLevelInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBStatusRiskLevelInfo.swift; sourceTree = "<group>"; };
-		3A65D27D95992A7AB7C924E2 /* Pods_Proximity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Proximity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		476D9C75250B69FE00B97541 /* MoreInformationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreInformationsView.swift; sourceTree = "<group>"; };
 		476D9C78250B6AAC00B97541 /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		476D9C7B250B6B1500B97541 /* InformationsContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationsContentView.swift; sourceTree = "<group>"; };
@@ -1269,8 +1269,8 @@
 		47CECAE1250A88DE00F13739 /* SmallInformationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallInformationsView.swift; sourceTree = "<group>"; };
 		5A46491A3C1095E27D9814E1 /* Pods-TousAntiCovid.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TousAntiCovid.debug.xcconfig"; path = "Target Support Files/Pods-TousAntiCovid/Pods-TousAntiCovid.debug.xcconfig"; sourceTree = "<group>"; };
 		6612D43C2625C3040037FBEA /* PrivacyConstant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConstant.swift; sourceTree = "<group>"; };
-		6612D4E926274FE90037FBEA /* analytics-api.tousanticovid.gouv.fr.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "analytics-api.tousanticovid.gouv.fr.pem"; sourceTree = "<group>"; };
 		661E2026265D4BA600360FE5 /* EuropeanCertificate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EuropeanCertificate.swift; sourceTree = "<group>"; };
+		6622CBDB2684B3350096C606 /* InGroupServerError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InGroupServerError.swift; sourceTree = "<group>"; };
 		663D489F254726AF00FC0BF2 /* NewPostalCodeCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewPostalCodeCell.xib; sourceTree = "<group>"; };
 		663D48A6254726D300FC0BF2 /* NewPostalCodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostalCodeCell.swift; sourceTree = "<group>"; };
 		663D48F0254734AF00FC0BF2 /* StandardCardCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StandardCardCell.swift; sourceTree = "<group>"; };
@@ -1279,6 +1279,7 @@
 		663D77742668C3550083666A /* SVUserDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVUserDefault.swift; sourceTree = "<group>"; };
 		663D77852668C43F0083666A /* UserDefaults+SVExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+SVExtension.swift"; sourceTree = "<group>"; };
 		663D77AB2668C5090083666A /* Optional+SVExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+SVExtension.swift"; sourceTree = "<group>"; };
+		664883C2268B46CF005D364F /* CompletedVaccinationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedVaccinationController.swift; sourceTree = "<group>"; };
 		664C55592657E946009D64F9 /* VenuesInformationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenuesInformationController.swift; sourceTree = "<group>"; };
 		664C556A2657F0B6009D64F9 /* VenuesInformationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenuesInformationCoordinator.swift; sourceTree = "<group>"; };
 		6667AAD0256BBED60082601E /* VenuesRecordingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenuesRecordingCoordinator.swift; sourceTree = "<group>"; };
@@ -1295,6 +1296,11 @@
 		6694C19F25C2BA5700D8F424 /* LoadingCardCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoadingCardCell.xib; sourceTree = "<group>"; };
 		6694C1A825C2BAF600D8F424 /* LoadingCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCardCell.swift; sourceTree = "<group>"; };
 		66A164A2264C15CB0001291A /* Optional+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+Extension.swift"; sourceTree = "<group>"; };
+		66B68A58268482CB00B821FC /* InGroupeServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InGroupeServer.swift; sourceTree = "<group>"; };
+		66B68A5B2684858D00B821FC /* InGroupServerConvertBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InGroupServerConvertBody.swift; sourceTree = "<group>"; };
+		66D18198268B6A4800F708D4 /* DaysAfterCompletionEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaysAfterCompletionEntry.swift; sourceTree = "<group>"; };
+		66D1819C268C9CC600F708D4 /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
+		66D181A5268CC18C00F708D4 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		66EB6225264054680042534D /* StatusVerificationCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StatusVerificationCell.xib; sourceTree = "<group>"; };
 		66EB622E264054D80042534D /* StatusVerificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusVerificationCell.swift; sourceTree = "<group>"; };
 		66F34F2D262F03A40002A2B9 /* RBCleaServerStatusClusterExposure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBCleaServerStatusClusterExposure.swift; sourceTree = "<group>"; };
@@ -1309,9 +1315,6 @@
 		AC7ECFD5F8865A0A83845E4E /* Pods-TousAntiCovid.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TousAntiCovid.release.xcconfig"; path = "Target Support Files/Pods-TousAntiCovid/Pods-TousAntiCovid.release.xcconfig"; sourceTree = "<group>"; };
 		B130EF6D37FCF486F81B6E07 /* Pods-RobertSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RobertSDK.debug.xcconfig"; path = "Target Support Files/Pods-RobertSDK/Pods-RobertSDK.debug.xcconfig"; sourceTree = "<group>"; };
 		DFDA4D3378410AAC7FAD02F1 /* Pods-RobertSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RobertSDK.release.xcconfig"; path = "Target Support Files/Pods-RobertSDK/Pods-RobertSDK.release.xcconfig"; sourceTree = "<group>"; };
-		EBF03C2900CDC5C28238CA06 /* Pods_TAC_Prod_Plus_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TAC_Prod_Plus_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		EC1C02A6DB46E9FBD6A33334 /* Pods_TAC_Multi_Plus.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TAC_Multi_Plus.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F78A3A0FEF5592FAD235AEDF /* Pods_TAC_Prod_Plus.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TAC_Prod_Plus.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA4F6E21CA0C924E56B05780 /* Pods-StorageSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StorageSDK.debug.xcconfig"; path = "Target Support Files/Pods-StorageSDK/Pods-StorageSDK.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1383,6 +1386,24 @@
 				0F2ABF68262864FB0021AB39 /* ETagManager.swift */,
 			);
 			path = ETag;
+			sourceTree = "<group>";
+		};
+		37001114268B13FC008C547E /* Convert */ = {
+			isa = PBXGroup;
+			children = (
+				3700110D268B13EF008C547E /* ISRG-Root-X1.pem */,
+				3700110B268B13EF008C547E /* R3.pem */,
+			);
+			path = Convert;
+			sourceTree = "<group>";
+		};
+		37001119268B7133008C547E /* Certigna */ = {
+			isa = PBXGroup;
+			children = (
+				3700111B268B7144008C547E /* certigna-root.pem */,
+				3700111C268B7144008C547E /* certigna-services.pem */,
+			);
+			path = Certigna;
 			sourceTree = "<group>";
 		};
 		37013DEF243F5DFD00FCB360 /* Strings */ = {
@@ -1527,19 +1548,10 @@
 		3714EC8C257F891800D6736F /* Prod */ = {
 			isa = PBXGroup;
 			children = (
-				37AC2F24247EB5E500AE2B13 /* api.tousanticovid.gouv.fr.pem */,
-				3714EE032583D3F600D6736F /* tacw.tousanticovid.gouv.fr.pem */,
-				6612D4E926274FE90037FBEA /* analytics-api.tousanticovid.gouv.fr.pem */,
+				37001119268B7133008C547E /* Certigna */,
+				37001114268B13FC008C547E /* Convert */,
 			);
 			path = Prod;
-			sourceTree = "<group>";
-		};
-		3714EC92257F892100D6736F /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				37689F8A246AF2DE00D99BC4 /* app.tousanticovid.gouv.fr.pem */,
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 		3714ECBB257FDFFF00D6736F /* Isolation */ = {
@@ -1579,7 +1591,6 @@
 		3716B53C2673993700632FA8 /* Certs */ = {
 			isa = PBXGroup;
 			children = (
-				3716B53E2673995300632FA8 /* dcc-certs-int.json */,
 				3716B5422673996A00632FA8 /* dcc-certs.json */,
 			);
 			path = Certs;
@@ -2093,10 +2104,6 @@
 			isa = PBXGroup;
 			children = (
 				3766102124A0F01C00A5F13D /* config.json */,
-				3766102424A0FB4400A5F13D /* config-int.json */,
-				3766102524A0FB4400A5F13D /* config-rec.json */,
-				3766102024A0F01C00A5F13D /* config-preprod.json */,
-				37CAF02B256E4D5F00AB8540 /* config-dev.json */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -2191,6 +2198,7 @@
 				3718A10F248A4797007EAC4F /* Captcha */,
 				372DE9FF2603BE0600A44E1A /* CodeFullScreen */,
 				37663D0B243DC01D009F1D98 /* Common */,
+				66D1819B268C9CAA00F708D4 /* Confetti */,
 				37C8DADE2518AF2A00F59CCB /* Declare */,
 				379B7EFE2443937F004E26B2 /* EnterCode */,
 				3758A9AF256CEFBF0072433B /* FlashReportCode */,
@@ -2285,11 +2293,13 @@
 				379B7EF124422D1A004E26B2 /* QRScannerView.swift */,
 				37F1F3EE264CF03400015DCE /* PanZoomImageView.swift */,
 				373AED73260CC4AF00F5BCBD /* DataMatrixScannerView.swift */,
+				374ED21226848442005E01FB /* UniversalScannerView.swift */,
 				37663CDA243D9D9C009F1D98 /* BottomButtonContainer */,
 				37013E2524404EC200FCB360 /* BottomMessageContainer */,
 				370456712493573A0042B7E6 /* CVForm */,
 				37013E08243F892800FCB360 /* ModalContainer */,
 				3725276F2446F65C007A2054 /* NavigationChild */,
+				66D181A5268CC18C00F708D4 /* HapticManager.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -2540,7 +2550,6 @@
 			isa = PBXGroup;
 			children = (
 				3714EC8C257F891800D6736F /* Prod */,
-				3714EC92257F892100D6736F /* Resources */,
 			);
 			path = Certificates;
 			sourceTree = "<group>";
@@ -2840,6 +2849,14 @@
 			path = RemoteFileSync;
 			sourceTree = "<group>";
 		};
+		37ABB75A268CCE460042C791 /* CompletedVaccination */ = {
+			isa = PBXGroup;
+			children = (
+				664883C2268B46CF005D364F /* CompletedVaccinationController.swift */,
+			);
+			path = CompletedVaccination;
+			sourceTree = "<group>";
+		};
 		37B0231724595ADF002281E9 /* RobertSDK */ = {
 			isa = PBXGroup;
 			children = (
@@ -2859,15 +2876,11 @@
 		37B02340245AA719002281E9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3A65D27D95992A7AB7C924E2 /* Pods_Proximity.framework */,
 				2DA02CBEDACA215063614C6F /* Pods_RobertSDK.framework */,
 				687CFE18D0E0E598C5A3BB2A /* Pods_StorageSDK.framework */,
 				47CECA78250A25B900F13739 /* WidgetKit.framework */,
 				47CECA7A250A25B900F13739 /* SwiftUI.framework */,
 				1FA1108BCEE42D622F05968F /* Pods_TousAntiCovid.framework */,
-				EC1C02A6DB46E9FBD6A33334 /* Pods_TAC_Multi_Plus.framework */,
-				F78A3A0FEF5592FAD235AEDF /* Pods_TAC_Prod_Plus.framework */,
-				EBF03C2900CDC5C28238CA06 /* Pods_TAC_Prod_Plus_Tests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -3256,6 +3269,7 @@
 				66F34FC0262F15E40002A2B9 /* CleaServerStatusClusterIndex.swift */,
 				66F34FCB262F15FC0002A2B9 /* CleaServerStatusClusterExposure.swift */,
 				37E06D8F256EB3EB003DAA68 /* CleaServerVisit.swift */,
+				66D18198268B6A4800F708D4 /* DaysAfterCompletionEntry.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -3267,6 +3281,8 @@
 				37F979E024521A6400CDA154 /* RBServerContactId.swift */,
 				37F979C82452153D00CDA154 /* Bodies */,
 				37F979C72452153600CDA154 /* Responses */,
+				66B68A5B2684858D00B821FC /* InGroupServerConvertBody.swift */,
+				6622CBDB2684B3350096C606 /* InGroupServerError.swift */,
 			);
 			path = Server;
 			sourceTree = "<group>";
@@ -3300,6 +3316,7 @@
 				37F0BE9B260DBD2800CBF4B2 /* WalletCertificateVerifiedController.swift */,
 				37F0BEA5260DDE0E00CBF4B2 /* WalletCertificateVerified.storyboard */,
 				37E582F626020351007106F8 /* Cells */,
+				37ABB75A268CCE460042C791 /* CompletedVaccination */,
 				37BBA3F0264AD61E002A01AA /* DocumentExplanation */,
 				372DEA062603BF2900A44E1A /* FlashWalletCode */,
 				373AED52260CC30100F5BCBD /* FlashWallet2DDoc */,
@@ -3485,6 +3502,7 @@
 				37F979EA24521BAA00CDA154 /* Server.swift */,
 				374840912456B26900032061 /* ServerConstant.swift */,
 				37E06D5E256EAD20003DAA68 /* CleaServer.swift */,
+				66B68A58268482CB00B821FC /* InGroupeServer.swift */,
 				663D77732668C3320083666A /* Utils */,
 				37EB2EBD2486485E003D999A /* Extension */,
 				37F979C22452137600CDA154 /* Model */,
@@ -3937,6 +3955,14 @@
 			path = LoadingCard;
 			sourceTree = "<group>";
 		};
+		66D1819B268C9CAA00F708D4 /* Confetti */ = {
+			isa = PBXGroup;
+			children = (
+				66D1819C268C9CC600F708D4 /* ConfettiView.swift */,
+			);
+			path = Confetti;
+			sourceTree = "<group>";
+		};
 		66EB62242640543D0042534D /* StatusVerificationCell */ = {
 			isa = PBXGroup;
 			children = (
@@ -4181,6 +4207,7 @@
 				372527722446F66E007A2054 /* CVNavigationChild.storyboard in Resources */,
 				375318C4254A991F006DD736 /* form.json in Resources */,
 				37014CFA24460CD000CE0BF1 /* OnboardingGovernmentCell.xib in Resources */,
+				37001111268B13EF008C547E /* ISRG-Root-X1.pem in Resources */,
 				37692807246010B200310876 /* MyHealthStateHeaderCell.xib in Resources */,
 				37C48125267761C700766A36 /* vaccin-europe-certificate-full-en.png in Resources */,
 				37F1F3CC264C1DB200015DCE /* test-certificate-full-en.png in Resources */,
@@ -4207,7 +4234,6 @@
 				375807FB2566CA2700CCB59F /* morekeyfigures-fr.json in Resources */,
 				37C772D824816E3E00B01BAE /* strings-ar.json in Resources */,
 				3768A09D246D276F00D99BC4 /* privacy-pt.json in Resources */,
-				3714EE052583D3F700D6736F /* tacw.tousanticovid.gouv.fr.pem in Resources */,
 				37BBA402264ADFEA002A01AA /* PhoneCell.xib in Resources */,
 				37C4812B267761C700766A36 /* vaccin-europe-certificate-fr.png in Resources */,
 				37C772DD24816ED200B01BAE /* privacy-de.json in Resources */,
@@ -4249,6 +4275,7 @@
 				37812EB425BAC96D00FDACA1 /* KeyFigureCaptureView.xib in Resources */,
 				373A965925DC182C00ACC737 /* StandardCardSwitchCell.xib in Resources */,
 				37DAA38825486A5D00ADE007 /* StandardSwitchCell.xib in Resources */,
+				3700110E268B13EF008C547E /* R3.pem in Resources */,
 				37F1F35A264BB04600015DCE /* CheckDocumentCell.xib in Resources */,
 				37E8D29F254AA30800686377 /* StandardTextFieldCell.xib in Resources */,
 				37F1F3BD264C1DB200015DCE /* vaccin-certificate-fr.png in Resources */,
@@ -4256,6 +4283,7 @@
 				37E582FC26020351007106F8 /* SanitaryCertificateCell.xib in Resources */,
 				37014D0424460CD000CE0BF1 /* TextFieldCell.xib in Resources */,
 				37BF68BB252DBAA3006D00AD /* LastInfoCell.xib in Resources */,
+				3700111D268B7144008C547E /* certigna-root.pem in Resources */,
 				370AA9BC244763D9009CEB0D /* SF-Pro-Text-Semibold.otf in Resources */,
 				37B4A2BD24D00EF300018320 /* OffToOn-Dark.json in Resources */,
 				37577FE625ADD13D000ADB0A /* VaccinationCell.xib in Resources */,
@@ -4265,6 +4293,7 @@
 				373A966125DC183400ACC737 /* CenteredImageCardCell.xib in Resources */,
 				37014D0624460CD000CE0BF1 /* Images.xcassets in Resources */,
 				3725276E2446DBE9007A2054 /* Colors.xcassets in Resources */,
+				37001120268B7144008C547E /* certigna-services.pem in Resources */,
 				370CF0B0255AD20F0019B735 /* links-fr.json in Resources */,
 				37B4A2B324CFF90500018320 /* OnWaving.json in Resources */,
 				37014D0724460CD000CE0BF1 /* TextCell.xib in Resources */,
@@ -4282,7 +4311,6 @@
 				37014D0A24460CD000CE0BF1 /* OnboardingImageCell.xib in Resources */,
 				37BF68D7252DEF6B006D00AD /* KeyFiguresCell.xib in Resources */,
 				66F5379325E7AA7B008B1AAD /* StandardCardHorizontalCell.xib in Resources */,
-				37EB2FC62487F230003D999A /* api.tousanticovid.gouv.fr.pem in Resources */,
 				6694C19625C1C08D00D8F424 /* VaccinationCenterCell.xib in Resources */,
 				37EE6026258749B700AC1636 /* VenueHistoryCell.xib in Resources */,
 				37C8DAF82518DC4D00F59CCB /* LinkButtonCell.xib in Resources */,
@@ -4293,7 +4321,6 @@
 				37014D0C24460CD000CE0BF1 /* StandardCell.xib in Resources */,
 				37C4812C267761C700766A36 /* recovery-europe-certificate-fr.png in Resources */,
 				377539AC254FE18800A1BAE7 /* TextWithoutStackCell.xib in Resources */,
-				37EB2FC52487F230003D999A /* app.tousanticovid.gouv.fr.pem in Resources */,
 				37014D0F24460CD000CE0BF1 /* SF-Pro-Text-Medium.otf in Resources */,
 				37014D1024460CD000CE0BF1 /* TitleCell.xib in Resources */,
 				37014D1124460CD000CE0BF1 /* BottomMessageContainer.storyboard in Resources */,
@@ -4312,7 +4339,6 @@
 				37014D1424460CD000CE0BF1 /* OnboardingGestureCell.xib in Resources */,
 				37F1F33B264B95A200015DCE /* WalletModeSelectionCell.xib in Resources */,
 				377EF16F25306406000F6175 /* ParagraphCell.xib in Resources */,
-				6612D4EB26274FE90037FBEA /* analytics-api.tousanticovid.gouv.fr.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4349,10 +4375,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3766102724A0FB4500A5F13D /* config-rec.json in Resources */,
-				3766102224A0F01C00A5F13D /* config-preprod.json in Resources */,
-				37CAF02C256E4D5F00AB8540 /* config-dev.json in Resources */,
-				3766102624A0FB4500A5F13D /* config-int.json in Resources */,
 				3766102324A0F01C00A5F13D /* config.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4545,6 +4567,7 @@
 				37F95BB825489606001DA26C /* ComponentHighlightButton.swift in Sources */,
 				37812E3825BA355E00FDACA1 /* YAxisCustomRenderer.swift in Sources */,
 				37CAEFF0256D60CA00AB8540 /* VenuesHistoryEmptyView.swift in Sources */,
+				664883C3268B46CF005D364F /* CompletedVaccinationController.swift in Sources */,
 				37C10C84265BE093008BDAA8 /* VaccinationEntry.swift in Sources */,
 				373DD7AE25153E3D0062CB4D /* UIColor+Extension.swift in Sources */,
 				37BBA405264ADFEA002A01AA /* PhoneCell.swift in Sources */,
@@ -4665,6 +4688,7 @@
 				37014CD324460CD000CE0BF1 /* EnterCodeCoordinator.swift in Sources */,
 				37BF68F0252DF78A006D00AD /* ContactStatusCell.swift in Sources */,
 				37014CD524460CD000CE0BF1 /* UserDefault.swift in Sources */,
+				66D1819D268C9CC600F708D4 /* ConfettiView.swift in Sources */,
 				37EB2FFB2488CC39003D999A /* CaptchaGenerationBody.swift in Sources */,
 				37014CD624460CD000CE0BF1 /* PrivacySection.swift in Sources */,
 				370CF0C9255AEADD0019B735 /* LinksController.swift in Sources */,
@@ -4701,8 +4725,10 @@
 				37F5D8402672416B0053AEFA /* UniversalQrScanController.swift in Sources */,
 				37014CDF24460CD000CE0BF1 /* CVRow+Extension.swift in Sources */,
 				37C8DAFB2518DC4D00F59CCB /* LinkButtonCell.swift in Sources */,
+				66D181A6268CC18C00F708D4 /* HapticManager.swift in Sources */,
 				3716B5372673506600632FA8 /* UniversalQrCodeExplanationsController.swift in Sources */,
 				37CAF00F256E3A1D00AB8540 /* OnboardingVenuesController.swift in Sources */,
+				374ED21426848443005E01FB /* UniversalScannerView.swift in Sources */,
 				377B0B2F25E50F8F00459BCE /* RisksUIConstant.swift in Sources */,
 				37B0234C245AAD67002281E9 /* BluetoothStateManager.swift in Sources */,
 				37FBB03C25E7A99F00377A52 /* StatusManager.swift in Sources */,
@@ -4897,6 +4923,7 @@
 				663D77782668C3550083666A /* SVUserDefault.swift in Sources */,
 				37EB2EB024864822003D999A /* RBServerReportBody.swift in Sources */,
 				37E06D72256EAE99003DAA68 /* RBCleaServerStatusClusterIndex.swift in Sources */,
+				66B68A59268482CB00B821FC /* InGroupeServer.swift in Sources */,
 				37EB2EB324864822003D999A /* RBServerDeleteExposureBody.swift in Sources */,
 				3704068024E15C13000C7C1B /* RBServerUnregisterBody.swift in Sources */,
 				37EB2EA42486480D003D999A /* Server.swift in Sources */,
@@ -4904,6 +4931,8 @@
 				37EB2EC124864AA3003D999A /* NSError+SVExtension.swift in Sources */,
 				37EB2EB424864822003D999A /* RBServerResponse.swift in Sources */,
 				3704067E24E1517B000C7C1B /* RBServerStatusBody.swift in Sources */,
+				66B68A5C2684858D00B821FC /* InGroupServerConvertBody.swift in Sources */,
+				6622CBDC2684B3350096C606 /* InGroupServerError.swift in Sources */,
 				37EB2EA32486480D003D999A /* ServerConstant.swift in Sources */,
 				3704067C24E15006000C7C1B /* RBServerPushInfo.swift in Sources */,
 				66F34FB9262F15CC0002A2B9 /* CleaServerStatusCluster.swift in Sources */,
@@ -4917,6 +4946,7 @@
 				37E06D91256EB3EB003DAA68 /* CleaServerVisit.swift in Sources */,
 				37E06D60256EAD21003DAA68 /* CleaServer.swift in Sources */,
 				66F34F42262F07430002A2B9 /* RBCleaServerStatusCluster.swift in Sources */,
+				66D18199268B6A4800F708D4 /* DaysAfterCompletionEntry.swift in Sources */,
 				37EB2EC5248654EB003D999A /* FileManager+SVExtension.swift in Sources */,
 				37EB2EBF24864873003D999A /* String+SVExtension.swift in Sources */,
 				3704564F249123FD0042B7E6 /* Date+SVExtension.swift in Sources */,
@@ -5007,7 +5037,7 @@
 				CODE_SIGN_ENTITLEMENTS = TousAntiCovid/Resources/Entitlements/TousAntiCovid.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 620;
+				CURRENT_PROJECT_VERSION = 660;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = PR958DC548;
 				INFOPLIST_FILE = TousAntiCovid/Resources/Info.plist;
@@ -5016,7 +5046,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.2.0;
+				MARKETING_VERSION = 3.3.2;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios;
 				PRODUCT_NAME = TousAntiCovid;
@@ -5034,7 +5064,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = TousAntiCovid/Resources/Entitlements/TousAntiCovid.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 620;
+				CURRENT_PROJECT_VERSION = 660;
 				DEVELOPMENT_TEAM = PR958DC548;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = TousAntiCovid/Resources/Info.plist;
@@ -5043,7 +5073,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.2.0;
+				MARKETING_VERSION = 3.3.2;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios;
 				PRODUCT_NAME = TousAntiCovid;
@@ -5178,7 +5208,7 @@
 				CODE_SIGN_ENTITLEMENTS = Widget/Resources/Entitlements/WidgetExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 620;
+				CURRENT_PROJECT_VERSION = 660;
 				DEVELOPMENT_TEAM = PR958DC548;
 				INFOPLIST_FILE = Widget/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -5187,7 +5217,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.2.0;
+				MARKETING_VERSION = 3.3.2;
 				OTHER_SWIFT_FLAGS = "-DDEBUG -DWIDGET -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5205,7 +5235,7 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_ENTITLEMENTS = Widget/Resources/Entitlements/WidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 620;
+				CURRENT_PROJECT_VERSION = 660;
 				DEVELOPMENT_TEAM = PR958DC548;
 				INFOPLIST_FILE = Widget/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -5214,7 +5244,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.2.0;
+				MARKETING_VERSION = 3.3.2;
 				OTHER_SWIFT_FLAGS = "-DWIDGET -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";

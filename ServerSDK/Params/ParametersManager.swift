@@ -32,10 +32,14 @@ public final class ParametersManager: NSObject {
     public enum AnalyticsApiVersion: String {
         case v1
     }
+
+    public enum InGroupApiVersion: String {
+        case v0
+    }
     
     public static let shared: ParametersManager = ParametersManager()
     var url: URL!
-    var certificateFile: Data!
+    var certificateFiles: [Data]!
     
     public var minHourContactNotif: Int? {
         guard let hour = valueFor(name: "app.minHourContactNotif") as? Double else { return nil }
@@ -130,6 +134,20 @@ public final class ParametersManager: NSObject {
         return Int(period)
     }
 
+    public var daysAfterCompletion: [DaysAfterCompletionEntry] {
+        guard let value = valueFor(name: "app.wallet.vaccin.daysAfterCompletion") as? [[String: Any]] else {
+            return []
+        }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode([DaysAfterCompletionEntry].self, from: jsonData)
+        } catch {
+            return []
+        }
+    }
+
+    public var confettiBirthRate: Double { valueFor(name: "app.wallet.confettiBirthRate") as? Double ?? 10.0 }
+
     var dataRetentionPeriod: Int {
         guard let period = valueFor(name: "app.dataRetentionPeriod") as? Double else { return 14 }
         return Int(period)
@@ -138,11 +156,18 @@ public final class ParametersManager: NSObject {
     public var bleCharacteristicUuid: String? { valueFor(name: "ble.characteristicUUID") as? String }
     public var bleFilteringConfig: String? { valueFor(name: "ble.filterConfig") as? String }
     public var bleFilteringMode: String? { valueFor(name: "ble.filterMode") as? String }
-    
+
+    public var certificateConversionUrl: URL { URL(string: valueFor(name: "app.certificateConversionUrl") as? String ?? "")! }
+    public var displayCertificateConversion: Bool { valueFor(name: "app.displayCertificateConversion") as? Bool ?? false }
+
     public var apiVersion: ApiVersion { ApiVersion(rawValue: valueFor(name: "app.apiVersion") as? String ?? "") ?? .v5 }
     public var cleaStatusApiVersion: CleaStatusApiVersion { CleaStatusApiVersion(rawValue: valueFor(name: "app.cleaStatusApiVersion") as? String ?? "") ?? .v1 }
     public var cleaReportApiVersion: CleaReportApiVersion { CleaReportApiVersion(rawValue: valueFor(name: "app.cleaReportApiVersion") as? String ?? "") ?? .v1 }
     public var analyticsApiVersion: AnalyticsApiVersion { AnalyticsApiVersion(rawValue: valueFor(name: "app.analyticsApiVersion") as? String ?? "") ?? .v1 }
+
+    public var certificateConversionSidepOnlyCode: [String] { valueFor(name: "app.wallet.certificateConversionSidepOnlyCode") as? [String] ?? [] }
+
+    public var inGroupApiVersion: InGroupApiVersion = .v0
 
     public var cleaUrl: String { cleaUrls.randomElement() ?? defaultCleaUrl }
     public let defaultCleaUrl: String = "https://s3.fr-par.scw.cloud/clea-batch/"
@@ -151,7 +176,7 @@ public final class ParametersManager: NSObject {
     private var config: [[String: Any]] = [] {
         didSet { distributeUpdatedConfig() }
     }
-    
+
     private var receivedData: [String: Data] = [:]
     private var completions: [String: RequestCompletion] = [:]
     
@@ -331,7 +356,7 @@ extension ParametersManager: URLSessionDelegate, URLSessionDataDelegate {
     }
     
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFile: certificateFile) { validated, credential in
+        CertificatePinning.validateChallenge(challenge, certificateFiles: certificateFiles) { validated, credential in
             validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }

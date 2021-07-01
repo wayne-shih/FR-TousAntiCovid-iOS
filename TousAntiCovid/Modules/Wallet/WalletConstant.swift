@@ -38,7 +38,12 @@ enum WalletConstant {
         case sanitaryEurope = "test"
         case vaccinationEurope = "vaccine"
         case recoveryEurope = "recovery"
-        
+
+        enum Format: String {
+            case wallet2DDoc = "DEUX_D_DOC"
+            case walletDCC = "DGCA"
+        }
+
         var textKey: String {
             switch self {
             case .vaccination:
@@ -119,6 +124,14 @@ enum WalletConstant {
                 return ""
             }
         }
+
+        var format: Format {
+            switch self {
+            case .sanitary, .vaccination:
+                return .wallet2DDoc
+            case .sanitaryEurope, .vaccinationEurope, .recoveryEurope:
+                return .walletDCC
+            }
+        }
     }
-    
 }

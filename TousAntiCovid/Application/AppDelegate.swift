@@ -50,23 +50,26 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         if isOnboardingDone {
             BluetoothStateManager.shared.start()
         }
-        
+        InGroupeServer.shared.start(certificateFiles: Constant.Server.convertCertificates,
+                                    convertUrl: { ParametersManager.shared.certificateConversionUrl },
+                                    requestLoggingHandler: { _, _, _, _ in })
+
         CleaServer.shared.start(reportBaseUrl: { Constant.Server.cleaReportBaseUrl },
                                 statusBaseUrl: { Constant.Server.cleaStatusBaseUrl() },
                                 statusBaseFallbackUrl: { Constant.Server.cleaStatusBaseUrl(fallbackUrl: true) },
-                                requestLoggingHandler: { _, _, _ in })
+                                taskLoggingHandler: { _, _, _ in })
         
         RBManager.shared.start(isFirstInstall: !isAppAlreadyInstalled,
                                server: Server(baseUrl: { Constant.Server.baseUrl },
                                               publicKey: Constant.Server.publicKey,
-                                              certificateFile: Constant.Server.certificate,
+                                              certificateFiles: Constant.Server.certificates,
                                               configUrl: Constant.Server.configUrl,
-                                              configCertificateFile: Constant.Server.resourcesCertificate,
+                                              configCertificateFiles: Constant.Server.resourcesCertificates,
                                               deviceTimeNotAlignedToServerTimeDetected: {
                                                 if UIApplication.shared.applicationState != .active {
                                                     NotificationsManager.shared.triggerDeviceTimeErrorNotification()
                                                 }
-                                              }, requestLoggingHandler: { _, _, _ in }),
+                                              }, taskLoggingHandler: { _, _, _ in }),
                                storage: storageManager,
                                bluetooth: BluetoothManager(),
                                filter: FilteringManager(),
@@ -157,6 +160,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         if #available(iOS 14.0, *) {
             WidgetManager.shared.processOpeningUrl(url)
         }
+        DeepLinkingManager.shared.processUrl(url)
         return true
     }
     

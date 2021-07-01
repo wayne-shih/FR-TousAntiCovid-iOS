@@ -73,10 +73,6 @@ final class AttestationsViewController: CVTableViewController {
         AttestationsManager.shared.removeObserver(self)
     }
     
-    override func reloadUI(animated: Bool = false, completion: (() -> ())? = nil) {
-        super.reloadUI(animated: animated, completion: completion)
-    }
-    
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = []
         let newAttestationRow: CVRow = CVRow(title: "attestationsController.newAttestation".localized,

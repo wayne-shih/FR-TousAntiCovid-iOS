@@ -52,12 +52,16 @@ final class WalletCoordinator: Coordinator {
             self?.showDataMatrixFullscreen(certificate)
         } didRequestWalletScanAuthorization: { [weak self] comingFromTheApp, completion in
             self?.requestWalletScanAuthorization(comingFromTheApp: comingFromTheApp, completion: completion)
+        } didScanEuropeanCertifcate: { [weak self] certificate in
+            self?.showCompletedVaccinationControllerIfNeeded(certificate: certificate)
         } didTouchDocumentExplanation: { [weak self] certificateType in
             self?.showDocumentExplanation(certificateType: certificateType)
         } didTouchWhenToUse: { [weak self]  in
             self?.showWhenToUseExplanations()
         } didGetCertificateError: { [weak self] certificateType, error in
             self?.showCertificateError(certificateType: certificateType, error: error)
+        } didTouchConvertToEuropeTermsOfUse: { [weak self] in
+            self?.openConvertToEuropeTermsOfUse()
         } deinitBlock: { [weak self] in
             self?.didDeinit()
         }
@@ -66,7 +70,10 @@ final class WalletCoordinator: Coordinator {
     private func openTermsOfUse() {
         URL(string: "walletController.termsOfUse.url".localized)?.openInSafari()
     }
-    
+    private func openConvertToEuropeTermsOfUse() {
+        URL(string: "walletController.menu.convertToEurope.alert.termsUrl".localized)?.openInSafari()
+    }
+
     private func showDataMatrixFullscreen(_ certificate: WalletCertificate) {
         guard let codeImage = certificate.codeImage else { return }
         let controller: UIViewController = CodeFullScreenViewController.controller(codeImage: codeImage, text: certificate.shortDescription ?? "", codeBottomText: certificate.codeImageTitle)
@@ -105,8 +112,15 @@ final class WalletCoordinator: Coordinator {
         let controller: FlashWalletCodeController = FlashWalletCodeController.controller(didFlash: { [weak self] stringUrl in
             guard let stringUrl = stringUrl else { throw WalletError.parsing.error }
             guard let url = URL(string: stringUrl) else { throw WalletError.parsing.error }
-            try WalletManager.shared.processUrl(url)
-            self?.navigationController?.dismiss(animated: true)
+            let certificate: WalletCertificate? = try WalletManager.shared.getWalletCertificate(from: url)
+            if let certificate = certificate {
+                WalletManager.shared.saveCertificate(certificate)
+            }
+            self?.navigationController?.dismiss(animated: true) { [weak self] in
+                if let europeanCertificate = certificate as? EuropeanCertificate {
+                    self?.showCompletedVaccinationControllerIfNeeded(certificate: europeanCertificate)
+                }
+            }
         }, didGetCertificateError: { [weak self] code, error in
             self?.showCertificateError(code: code, error: error)
         }, deinitBlock: { [weak self] in
@@ -126,6 +140,14 @@ final class WalletCoordinator: Coordinator {
             self?.flashCodeController?.restartScanning()
         })
         addChild(coordinator: coordinator)
+    }
+
+    private func showCompletedVaccinationControllerIfNeeded(certificate: EuropeanCertificate) {
+        guard certificate.type == .vaccinationEurope else { return }
+        guard certificate.isLastDose == true  else { return }
+        let completedVaccinationController: CompletedVaccinationController = CompletedVaccinationController(certificate: certificate)
+        let navigationController: UIViewController = CVNavigationController(rootViewController: completedVaccinationController)
+        self.navigationController?.topPresentedController.present(navigationController, animated: true)
     }
 
 }

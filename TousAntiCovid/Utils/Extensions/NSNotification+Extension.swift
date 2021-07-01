@@ -14,14 +14,16 @@ extension NSNotification.Name {
     
     static var selectTab: NSNotification.Name { NSNotification.Name(rawValue: "selectTab") }
     static var changeAppState: NSNotification.Name { NSNotification.Name(rawValue: "changeAppState") }
-    static var didTouchProximityReactivationNotification: NSNotification.Name = NSNotification.Name(rawValue: "didTouchProximityReactivationNotification")
-    static var didEnterCodeFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "didEnterCodeFromDeeplink")
-    static var newAttestationFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newAttestationFromDeeplink")
-    static var widgetDidRequestRegister: NSNotification.Name = NSNotification.Name(rawValue: "widgetDidRequestRegister")
-    static var dismissAllAndShowRecommandations: NSNotification.Name = NSNotification.Name(rawValue: "dismissAllAndShowRecommandations")
-    static var newVenueRecordingFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newVenueRecordingFromDeeplink")
-    static var openFullVenueRecordingFlowFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "openFullVenueRecordingFlowFromDeeplink")
-    static var newWalletCertificateFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newWalletCertificateFromDeeplink")
-    static var lastAvailableBuildDidUpdate: NSNotification.Name = NSNotification.Name(rawValue: "lastAvailableBuildDidUpdate")
-    static var openQrScan: NSNotification.Name = NSNotification.Name(rawValue: "openQrScan")
+    static let didTouchProximityReactivationNotification: NSNotification.Name = NSNotification.Name(rawValue: "didTouchProximityReactivationNotification")
+    static let didEnterCodeFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "didEnterCodeFromDeeplink")
+    static let newAttestationFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newAttestationFromDeeplink")
+    static let widgetDidRequestRegister: NSNotification.Name = NSNotification.Name(rawValue: "widgetDidRequestRegister")
+    static let dismissAllAndShowRecommandations: NSNotification.Name = NSNotification.Name(rawValue: "dismissAllAndShowRecommandations")
+    static let newVenueRecordingFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newVenueRecordingFromDeeplink")
+    static let openFullVenueRecordingFlowFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "openFullVenueRecordingFlowFromDeeplink")
+    static let newWalletCertificateFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newWalletCertificateFromDeeplink")
+    static let lastAvailableBuildDidUpdate: NSNotification.Name = NSNotification.Name(rawValue: "lastAvailableBuildDidUpdate")
+    static let openQrScan: NSNotification.Name = NSNotification.Name(rawValue: "openQrScan")
+    static let didCompletedVaccinationNotification: NSNotification.Name = NSNotification.Name(rawValue: "didCompletedVaccinationNotification")
+
 }

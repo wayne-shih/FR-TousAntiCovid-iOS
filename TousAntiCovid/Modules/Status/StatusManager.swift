@@ -196,7 +196,6 @@ extension StatusManager {
                         }
                         AnalyticsManager.shared.statusDidSucceed()
                         NotificationsManager.shared.scheduleUltimateNotification(minHour: ParametersManager.shared.minHourContactNotif, maxHour: ParametersManager.shared.maxHourContactNotif)
-
                         completion?(.success(info))
                     case let .failure(error):
                         AnalyticsManager.shared.reportError(serviceName: "status", apiVersion: ParametersManager.shared.apiVersion, code: (error as NSError).code)

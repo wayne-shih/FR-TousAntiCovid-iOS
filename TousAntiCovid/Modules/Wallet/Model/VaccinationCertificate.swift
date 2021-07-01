@@ -35,7 +35,6 @@ final class VaccinationCertificate: WalletCertificate {
         do {
             return try signatureString.decodeBase32(padded: signatureString.hasSuffix("="))
         } catch {
-            print(error)
             return nil
         }
     }
@@ -62,8 +61,6 @@ final class VaccinationCertificate: WalletCertificate {
     
     override var timestamp: Double { lastVaccinationDate?.timeIntervalSince1970 ?? 0.0 }
 
-    override var codeImage: UIImage? { value.dataMatrix() }
-    override var codeImageTitle: String? { "2D-DOC" }
 
     override var pillTitles: [String] { ["wallet.proof.vaccinationCertificate.pillTitle".localized, vaccinationCycleState].compactMap { $0 } }
     override var shortDescription: String? { [firstName, name].compactMap { $0 }.joined(separator: " ") }

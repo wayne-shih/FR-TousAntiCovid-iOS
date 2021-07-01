@@ -10,6 +10,8 @@
 
 import UIKit
 import StorageSDK
+import PKHUD
+import ServerSDK
 
 final class WalletViewController: CVTableViewController {
 
@@ -25,9 +27,11 @@ final class WalletViewController: CVTableViewController {
     private let didTouchTermsOfUse: () -> ()
     private let didTouchCertificate: (_ certificate: WalletCertificate) -> ()
     private let didRequestWalletScanAuthorization: (_ comingFromTheApp: Bool, _ completion: @escaping (_ granted: Bool) -> ()) -> ()
+    private let didScanEuropeanCertifcate: (_ certificate: EuropeanCertificate) -> ()
     private let didTouchDocumentExplanation: (_ certificateType: WalletConstant.CertificateType) -> ()
     private let didTouchWhenToUse: () -> ()
     private let didGetCertificateError: (_ certificateType: WalletConstant.CertificateType, _ error: Error) -> ()
+    private let didTouchConvertToEuropeTermsOfUse: () -> ()
     private let deinitBlock: () -> ()
     private var mode: Mode = .empty
 
@@ -36,18 +40,22 @@ final class WalletViewController: CVTableViewController {
          didTouchTermsOfUse: @escaping () -> (),
          didTouchCertificate: @escaping (_ certificate: WalletCertificate) -> (),
          didRequestWalletScanAuthorization: @escaping (_ comingFromTheApp: Bool, _ completion: @escaping (_ granted: Bool) -> ()) -> (),
+         didScanEuropeanCertifcate: @escaping (_ certificate: EuropeanCertificate) -> (),
          didTouchDocumentExplanation: @escaping (_ certificateType: WalletConstant.CertificateType) -> (),
          didTouchWhenToUse: @escaping () -> (),
          didGetCertificateError: @escaping (_ certificateType: WalletConstant.CertificateType, _ error: Error) -> (),
+         didTouchConvertToEuropeTermsOfUse: @escaping () -> (),
          deinitBlock: @escaping () -> ()) {
         self.initialUrlToProcess = initialUrlToProcess
         self.didTouchFlashCertificate = didTouchFlashCertificate
         self.didTouchTermsOfUse = didTouchTermsOfUse
         self.didTouchCertificate = didTouchCertificate
         self.didRequestWalletScanAuthorization = didRequestWalletScanAuthorization
+        self.didScanEuropeanCertifcate = didScanEuropeanCertifcate
         self.didTouchDocumentExplanation = didTouchDocumentExplanation
         self.didTouchWhenToUse = didTouchWhenToUse
         self.didGetCertificateError = didGetCertificateError
+        self.didTouchConvertToEuropeTermsOfUse = didTouchConvertToEuropeTermsOfUse
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
     }
@@ -103,10 +111,6 @@ final class WalletViewController: CVTableViewController {
         WalletManager.shared.removeObserver(self)
     }
     
-    override func reloadUI(animated: Bool = false, completion: (() -> ())? = nil) {
-        super.reloadUI(animated: animated, completion: completion)
-    }
-    
     private func updateBottomBarButton() {
         bottomButtonContainerController?.updateButton(title: "walletController.addCertificate".localized) { [weak self] in
             self?.didTouchFlashCertificate()
@@ -160,10 +164,10 @@ final class WalletViewController: CVTableViewController {
                                                            textAlignment: .center,
                                                            titleFont: { Appearance.Cell.Text.headTitleFont }),
                                         secondarySelectionAction: { [weak self] in
-                                            self?.didTouchDocumentExplanation(.vaccination)
+                                            self?.didTouchDocumentExplanation(.vaccinationEurope)
                                         },
                                         tertiarySelectionAction: { [weak self] in
-                                            self?.didTouchDocumentExplanation(.sanitary)
+                                            self?.didTouchDocumentExplanation(.sanitaryEurope)
                                         })
         let whenToUseRow: CVRow = CVRow(title: "walletController.whenToUse.title".localized,
                                         subtitle: "walletController.whenToUse.subtitle".localized,
@@ -275,13 +279,33 @@ final class WalletViewController: CVTableViewController {
         alertController.addAction(UIAlertAction(title: "walletController.menu.share".localized, style: .default, handler: { [weak self] _ in
             self?.showSanitaryCertificateSharing(image: cell.capture(), text: certificate.fullDescription ?? "")
         }))
+        if ParametersManager.shared.displayCertificateConversion && [.sanitary, .vaccination].contains(certificate.type) {
+            alertController.addAction(UIAlertAction(title: "walletController.menu.convertToEurope".localized, style: .default, handler: { [weak self] _ in
+                if ParametersManager.shared.certificateConversionSidepOnlyCode.contains((certificate as? SanitaryCertificate)?.analysisRawCode ?? "") {
+                    self?.showAntigenicCertificateAlert()
+                } else {
+                    self?.showConvertToEuropeAlert(certificate: certificate)
+                }
+            }))
+        }
         alertController.addAction(UIAlertAction(title: "walletController.menu.delete".localized, style: .destructive, handler: { [weak self] _ in
             self?.showCertificateDeletionAlert(certificate: certificate)
         }))
         alertController.addAction(UIAlertAction(title: "common.cancel".localized, style: .cancel))
         present(alertController, animated: true)
     }
-    
+
+    private func showAntigenicCertificateAlert() {
+        let alertController: UIAlertController = UIAlertController(title: "walletController.convertCertificate.antigenicAlert.title".localized,
+                                                                   message: "walletController.convertCertificate.antigenicAlert.message".localized,
+                                                                   preferredStyle: .alert)
+        if let url = URL(string: "walletController.convertCertificate.antigenicAlert.urlLink".localized) {
+            alertController.addAction(UIAlertAction(title: "walletController.convertCertificate.antigenicAlert.link".localized, style: .default, handler: { _ in url.openInSafari() }))
+        }
+        alertController.addAction(UIAlertAction(title: "common.ok".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+    }
+
     private func showCertificateDeletionAlert(certificate: WalletCertificate) {
         showAlert(title: "walletController.menu.delete.alert.title".localized,
                   message: "walletController.menu.delete.alert.message".localized,
@@ -298,29 +322,76 @@ final class WalletViewController: CVTableViewController {
         controller.excludedActivityTypes = [.saveToCameraRoll, .print]
         present(controller, animated: true, completion: nil)
     }
+
+    private func showConvertToEuropeAlert(certificate: WalletCertificate) {
+        let alertController: UIAlertController = UIAlertController(title: "walletController.menu.convertToEurope.alert.title".localized,
+                                                                   message: "walletController.menu.convertToEurope.alert.message".localized,
+                                                                   preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "common.ok".localized,
+                                                style: .default,
+                                                handler: { [weak self] _ in
+                                                    self?.processConvertToEurope(certificate)
+                                                    AnalyticsManager.shared.reportAppEvent(.e20)
+                                                }))
+        alertController.addAction(UIAlertAction(title: "common.cancel".localized,
+                                                style: .cancel,
+                                                handler: nil))
+        alertController.addAction(UIAlertAction(title: "walletController.menu.convertToEurope.alert.terms".localized,
+                                                style: .default,
+                                                handler: { [weak self] _ in
+                                                    self?.didTouchConvertToEuropeTermsOfUse()
+                                                }))
+
+        present(alertController, animated: true, completion: nil)
+    }
+
+    private func processConvertToEurope(_ certificate: WalletCertificate) {
+        HUD.show(.progress)
+        WalletManager.shared.converToEurope(certificate: certificate) { [weak self] result in
+            switch result {
+            case let .success(certificate):
+                HUD.flash(.success)
+                self?.showCompletedVaccinationControllerIfNeeded(certificate: certificate)
+            case let .failure(error):
+                HUD.hide()
+                AnalyticsManager.shared.reportError(serviceName: "certificateConversion", apiVersion: ParametersManager.shared.inGroupApiVersion, code: (error as NSError).code, desc: "\(error.localizedDescription) (\((error as NSError).code))")
+                let message: String = "walletController.convertCertificate.error.message".localized
+                self?.showConvertToEuropeErrorAlert(message: message)
+            }
+        }
+    }
+
+    private func showConvertToEuropeErrorAlert(message: String) {
+        let alertController: UIAlertController = UIAlertController(title: "common.error.unknown".localized, message: message, preferredStyle: .alert)
+        if let url1 = URL(string: "walletController.convertCertificate.error.url1".localized) {
+            alertController.addAction(UIAlertAction(title: "walletController.convertCertificate.error.url1.title".localized, style: .default, handler: { _ in url1.openInSafari() }))
+        }
+        if let url2 = URL(string: "walletController.convertCertificate.error.url2".localized) {
+            alertController.addAction(UIAlertAction(title: "walletController.convertCertificate.error.url2.title".localized, style: .default, handler: { _ in url2.openInSafari() }))
+        }
+        alertController.addAction(UIAlertAction(title: "common.ok".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+    }
     
     private func processInitialUrlIfNeeded() {
         guard let url = initialUrlToProcess else { return }
         initialUrlToProcess = nil
         do {
-            let certificate: WalletCertificate?
-            switch url.path {
-            case WalletConstant.URLPath.wallet.rawValue, WalletConstant.URLPath.wallet2D.rawValue:
-                certificate = try WalletManager.shared.extractCertificateFrom(url: url)
-            case WalletConstant.URLPath.walletDCC.rawValue:
-                certificate = try WalletManager.shared.extractEuropeanCertificateFrom(url: url)
-            default:
-                certificate = nil
-            }
-            guard let certificate = certificate else { return }
-            didRequestWalletScanAuthorization(DeepLinkingManager.shared.lastDeeplinkScannedDirectlyFromApp) { granted in
-                guard granted == true else { return }
+            guard let certificate = try WalletManager.shared.getWalletCertificate(from: url) else { return }
+            didRequestWalletScanAuthorization(DeepLinkingManager.shared.lastDeeplinkScannedDirectlyFromApp) { [weak self] granted in
+                guard granted else { return }
                 WalletManager.shared.saveCertificate(certificate)
+                self?.showCompletedVaccinationControllerIfNeeded(certificate: certificate)
             }
         } catch {
             let certificateType: WalletConstant.CertificateType = WalletManager.certificateTypeFromHeaderInUrl(url) ?? .sanitary
             didGetCertificateError(certificateType, error)
         }
+    }
+
+    private func showCompletedVaccinationControllerIfNeeded(certificate: WalletCertificate) {
+        guard let europeanCertificate = certificate as? EuropeanCertificate else { return }
+        didScanEuropeanCertifcate(europeanCertificate)
     }
 
 }

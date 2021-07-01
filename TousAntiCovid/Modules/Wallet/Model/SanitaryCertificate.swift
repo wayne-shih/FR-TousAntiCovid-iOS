@@ -31,14 +31,10 @@ final class SanitaryCertificate: WalletCertificate {
         do {
             return try signatureString.decodeBase32(padded: signatureString.hasSuffix("="))
         } catch {
-            print(error)
             return nil
         }
     }
     override var isSignatureAlreadyEncoded: Bool { false }
-
-    override var codeImage: UIImage? { value.dataMatrix() }
-    override var codeImageTitle: String? { "2D-DOC" }
 
     var firstName: String? { fields[FieldName.firstName.rawValue]?.replacingOccurrences(of: "/", with: ",") }
     var name: String? { fields[FieldName.name.rawValue] }
@@ -49,6 +45,7 @@ final class SanitaryCertificate: WalletCertificate {
     }
     var analysisDate: Date?
     var analysisDateString: String? { analysisDate?.dayShortMonthYearTimeFormatted() }
+    var analysisRawCode: String? { fields[FieldName.analysisCode.rawValue] }
     var analysisCode: String? {
         guard let code = fields[FieldName.analysisCode.rawValue] else { return nil }
         guard let codeDisplayString: String = "wallet.proof.sanitaryCertificate.loinc.\(code)".localizedOrNil else { return "LOINC: \(code)" }

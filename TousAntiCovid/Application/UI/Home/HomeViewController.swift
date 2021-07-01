@@ -357,6 +357,8 @@ final class HomeViewController: CVTableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(openQrScan), name: .openQrScan, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(didEnterCodeFromDeeplink(_:)), name: .didEnterCodeFromDeeplink, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(newAttestationFromDeeplink), name: .newAttestationFromDeeplink, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didCompletedVaccinationNotification), name: .didCompletedVaccinationNotification, object: nil)
+
     }
     
     private func removeObservers() {
@@ -405,6 +407,10 @@ final class HomeViewController: CVTableViewController {
         showAlert(title: "home.activation.sick.alert.title".localized,
                   message: "home.activation.sick.alert.message".localized,
                   okTitle: "common.ok".localized)
+    }
+
+    @objc private func didCompletedVaccinationNotification() {
+        didTouchSanitaryCertificates(nil)
     }
     
     private func didChangeSwitchValue(isOn: Bool) {
@@ -592,7 +598,7 @@ final class HomeViewController: CVTableViewController {
 
     private func newVenueRecordingFromDeeplink(url: URL) {
         didRequestVenueScanAuthorization { granted in
-            guard granted == true else { return }
+            guard granted else { return }
             self.processOnlyRegistrationIfNeeded { error in
                 guard error == nil else { return }
                 if VenuesManager.shared.processVenueUrl(url) != nil {

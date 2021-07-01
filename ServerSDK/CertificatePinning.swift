@@ -13,7 +13,7 @@ import Foundation
 
 public final class CertificatePinning {
 
-    public static func validateChallenge(_ challenge: URLAuthenticationChallenge, certificateFile: Data, completion: @escaping (_ validated: Bool, _ credential: URLCredential?) -> ()) {
+    public static func validateChallenge(_ challenge: URLAuthenticationChallenge, certificateFiles: [Data], completion: @escaping (_ validated: Bool, _ credential: URLCredential?) -> ()) {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust else {
             completion(false, nil)
             return
@@ -22,21 +22,18 @@ public final class CertificatePinning {
             completion(false, nil)
             return
         }
-        guard let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) else {
-            completion(false, nil)
-            return
+
+        let base64CertificatesToCheck: [String] = certificateFiles.compactMap { fileBase64Content($0) }
+        let base64CertificatesReceived: [String] = (0..<SecTrustGetCertificateCount(serverTrust)).compactMap {
+            guard let certificate = SecTrustGetCertificateAtIndex(serverTrust, $0) else { return nil }
+            let certificateData: CFData = SecCertificateCopyData(certificate)
+            let data: UnsafePointer<UInt8> = CFDataGetBytePtr(certificateData)
+            let size: CFIndex = CFDataGetLength(certificateData)
+            let certBase64: String = Data(bytes: data, count: size).base64EncodedString()
+            return certBase64
         }
-        
-        let serverCertificateData: CFData = SecCertificateCopyData(serverCertificate)
-        let data: UnsafePointer<UInt8> = CFDataGetBytePtr(serverCertificateData)
-        let size: CFIndex = CFDataGetLength(serverCertificateData)
-        let cert1Base64: String = Data(bytes: data, count: size).base64EncodedString()
-        
-        guard let cert2Base64 = self.fileBase64Content(certificateFile) else {
-            completion(false, nil)
-            return
-        }
-        let certificateIsValid: Bool = cert1Base64 == cert2Base64
+
+        let certificateIsValid: Bool = base64CertificatesToCheck.allSatisfy { base64CertificatesReceived.contains($0) }
         
         completion(certificateIsValid, URLCredential(trust: serverTrust))
     }

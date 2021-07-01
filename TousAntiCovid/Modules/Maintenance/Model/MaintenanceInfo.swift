@@ -40,7 +40,7 @@ struct MaintenanceInfo: Decodable {
     
     func shouldShow() -> Bool {
         let currentBuildNumber: Int = Int(UIApplication.shared.buildNumber) ?? 0
-        return  (isActive ?? false) && (minRequiredBuildNumber ?? 0 > currentBuildNumber)
+        return (isActive ?? false) && (minRequiredBuildNumber ?? 0 > currentBuildNumber)
     }
     
 }

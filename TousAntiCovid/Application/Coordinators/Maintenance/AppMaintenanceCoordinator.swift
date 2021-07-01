@@ -26,15 +26,23 @@ final class AppMaintenanceCoordinator: WindowedCoordinator {
         self.maintenanceInfo = maintenanceInfo
         start()
     }
-    
+
     func updateMaintenanceInfo(_ maintenanceInfo: MaintenanceInfo) {
         currentController?.maintenanceInfo = maintenanceInfo
     }
     
     private func start() {
-        let controller: AppMaintenanceController = AppMaintenanceController(maintenanceInfo: maintenanceInfo) { [weak self] in
+        let controller: AppMaintenanceController = AppMaintenanceController(maintenanceInfo: maintenanceInfo, didTouchAbout: { [weak self] in
             self?.didTouchAbout()
-        }
+        }, didTouchLater: { [weak self] in
+            UIView.animate(withDuration: 0.2, animations: {
+                self?.window?.alpha = 0.0
+            }) { _ in
+                self?.window.isHidden = true
+                self?.window = nil
+                self?.didDeinit()
+            }
+        })
         currentController = controller
         let navController: UIViewController = UINavigationController(rootViewController: controller)
         createWindow(for: navController)

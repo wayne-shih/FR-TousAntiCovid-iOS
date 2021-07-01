@@ -10,9 +10,7 @@
 
 import UIKit
 import CommonCrypto
-#if !PROXIMITY
 import ZXingObjC
-#endif
 
 extension String {
     
@@ -136,7 +134,7 @@ extension String {
         }
         return nil
     }
-    #if !PROXIMITY
+
     func dataMatrix() -> UIImage? {
         let writer: ZXMultiFormatWriter = ZXMultiFormatWriter()
         do {
@@ -148,7 +146,6 @@ extension String {
             return nil
         }
     }
-    #endif
     
     func sha256() -> String {
         if let stringData = self.data(using: String.Encoding.utf8) {

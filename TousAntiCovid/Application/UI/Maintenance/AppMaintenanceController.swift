@@ -22,9 +22,11 @@ final class AppMaintenanceController: CVTableViewController, MaintenanceControll
         }
     }
     private let didTouchAbout: () -> ()
+    private let didTouchLater: () -> ()
     
-    init(maintenanceInfo: MaintenanceInfo, didTouchAbout: @escaping () -> ()) {
+    init(maintenanceInfo: MaintenanceInfo, didTouchAbout: @escaping () -> (), didTouchLater: @escaping () -> ()) {
         self.maintenanceInfo = maintenanceInfo
+        self.didTouchLater = didTouchLater
         self.didTouchAbout = didTouchAbout
         super.init(style: .plain)
     }
@@ -59,21 +61,30 @@ final class AppMaintenanceController: CVTableViewController, MaintenanceControll
         
         if let buttonTitle = maintenanceInfo.localizedButtonTitle, let buttonUrl = maintenanceInfo.localizedButtonUrl, maintenanceInfo.mode == .upgrade {
             let buttonRow: CVRow = CVRow(title: buttonTitle,
-                                        xibName: .buttonCell,
-                                        theme: CVRow.Theme(topInset: 40.0),
-                                        selectionAction: {
-                URL(string: buttonUrl)?.openInSafari()
-            })
+                                         xibName: .buttonCell,
+                                         theme: CVRow.Theme(topInset: 40.0,
+                                                            bottomInset: 0.0),
+                                         selectionAction: {
+                                            URL(string: buttonUrl)?.openInSafari()
+                                         })
             rows.append(buttonRow)
         } else {
             let retryRow: CVRow = CVRow(title: "common.tryAgain".localized,
                                         xibName: .buttonCell,
-                                        theme: CVRow.Theme(topInset: 40.0),
+                                        theme: CVRow.Theme(topInset: 40.0,
+                                                           bottomInset: 0.0),
                                         selectionAction: { [weak self] in
                                             self?.didTouchButton()
-            })
+                                        })
             rows.append(retryRow)
         }
+        let laterRow: CVRow = CVRow(title: "appMaintenanceController.later.button.title".localized,
+                                    xibName: .buttonCell,
+                                    theme: CVRow.Theme(topInset: 0.0, buttonStyle: .quaternary),
+                                    selectionAction: { [weak self] in
+                                        self?.didTouchLater()
+                                    })
+        rows.append(laterRow)
         return rows
     }
     

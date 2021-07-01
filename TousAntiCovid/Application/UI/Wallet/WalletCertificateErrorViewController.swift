@@ -56,10 +56,6 @@ final class WalletCertificateErrorViewController: CVTableViewController {
         dismiss(animated: true, completion: nil)
     }
 
-    override func reloadUI(animated: Bool = false, completion: (() -> ())? = nil) {
-        super.reloadUI(animated: animated, completion: completion)
-    }
-
     override func createRows() -> [CVRow] {
         let explanationsRow: CVRow = CVRow(title: "walletCertificateErrorController.explanations.\(error.localizedDescription).\(certificateType.textKey).title".localized,
                                            subtitle: "walletCertificateErrorController.explanations.\(error.localizedDescription).\(certificateType.textKey).subtitle".localized,

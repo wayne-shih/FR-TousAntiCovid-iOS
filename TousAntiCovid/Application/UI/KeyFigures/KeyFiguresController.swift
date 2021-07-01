@@ -75,10 +75,6 @@ final class KeyFiguresController: CVTableViewController {
         KeyFiguresManager.shared.removeObserver(self)
     }
     
-    override func reloadUI(animated: Bool = false, completion: (() -> ())? = nil) {
-        super.reloadUI(animated: animated, completion: completion)
-    }
-    
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = []
         let healthSectionRow: CVRow =  CVRow(title: "keyFiguresController.section.health".localized,

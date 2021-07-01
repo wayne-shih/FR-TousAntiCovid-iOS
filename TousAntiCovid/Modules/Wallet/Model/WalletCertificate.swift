@@ -26,14 +26,30 @@ class WalletCertificate {
     var signature: Data? { fatalError("Must be overriden") }
     var isSignatureAlreadyEncoded: Bool { fatalError("Must be overriden") }
 
-    var codeImage: UIImage? { fatalError("Must be overriden") }
-    var codeImageTitle: String? { fatalError("Must be overriden") }
-    
     var pillTitles: [String] { fatalError("Must be overriden") }
     var shortDescription: String? { fatalError("Must be overriden") }
     var fullDescription: String? { fatalError("Must be overriden") }
     
     var timestamp: Double { fatalError("Must be overriden") }
+
+    var codeImageTitle: String? {
+        switch type.format {
+        case .wallet2DDoc:
+            return "2D-DOC"
+        case .walletDCC:
+            return nil
+        }
+    }
+
+    var codeImage: UIImage? {
+        switch type.format {
+        case .wallet2DDoc:
+            return  value.dataMatrix()
+        case .walletDCC:
+            return value.qrCode()
+        }
+    }
+
     var isOld: Bool {
         guard let oldCertificateThreshold = ParametersManager.shared.walletOldCertificateThresholdInDays(certificateType: type.rawValue) else { return false }
         return Date().timeIntervalSince1970 - timestamp >= Double(oldCertificateThreshold) * 86400.0

@@ -29,7 +29,7 @@ public final class CleaServer: NSObject {
     }()
     private var receivedData: [String: Data] = [:]
     private var completions: [String: CleaProcessRequestCompletion] = [:]
-    private var requestLoggingHandler: Server.RequestLoggingHandler?
+    private var taskLoggingHandler: Server.TaskLoggingHandler?
     
     private var pivotDate: Int {
         let pivotDate: Int
@@ -46,11 +46,11 @@ public final class CleaServer: NSObject {
         return pivotDate
     }
     
-    public func start(reportBaseUrl: @escaping () -> URL, statusBaseUrl: @escaping () -> URL, statusBaseFallbackUrl: @escaping () -> URL, requestLoggingHandler: @escaping Server.RequestLoggingHandler) {
+    public func start(reportBaseUrl: @escaping () -> URL, statusBaseUrl: @escaping () -> URL, statusBaseFallbackUrl: @escaping () -> URL, taskLoggingHandler: @escaping Server.TaskLoggingHandler) {
         self.reportBaseUrl = reportBaseUrl
         self.statusBaseUrl = statusBaseUrl
         self.statusBaseFallbackUrl = statusBaseFallbackUrl
-        self.requestLoggingHandler = requestLoggingHandler
+        self.taskLoggingHandler = taskLoggingHandler
     }
 
     public func report(token: String, visits: [CleaServerVisit], completion: @escaping (_ error: Error?) -> ()) {
@@ -145,7 +145,7 @@ extension CleaServer {
             let requestId: String = url.lastPathComponent
             guard completions[requestId] == nil else {
                 let error: Error = NSError.svLocalizedError(message: "A request for \"\(requestId)\" is already being treated", code: 0)
-                self.requestLoggingHandler?(nil, nil, error)
+                self.taskLoggingHandler?(nil, nil, error)
                 completion(.failure(error))
                 return
             }
@@ -165,7 +165,7 @@ extension CleaServer {
             task.taskDescription = requestId
             task.resume()
         } catch {
-            self.requestLoggingHandler?(nil, nil, error)
+            self.taskLoggingHandler?(nil, nil, error)
             completion(.failure(error))
         }
     }
@@ -180,17 +180,17 @@ extension CleaServer: URLSessionDelegate, URLSessionDownloadDelegate {
         completions[requestId] = nil
         DispatchQueue.main.async {
             if let error = error {
-                self.requestLoggingHandler?(task, nil, error)
+                self.taskLoggingHandler?(task, nil, error)
                 completion(.failure(error))
             } else if task.response?.svIsNotModified == true {
                 if let eTag = task.response?.svETag,
                    let data = SVETagManager.shared.localDataFile(eTag: eTag) {
                     // Response not updated since last fetch (ETag feature)
-                    self.requestLoggingHandler?(task, data, nil)
+                    self.taskLoggingHandler?(task, data, nil)
                     completion(.success(data))
                 } else {
                     let error: Error = NSError.svLocalizedError(message: "common.error.unknown".lowercased(), code: 0)
-                    self.requestLoggingHandler?(task, nil, error)
+                    self.taskLoggingHandler?(task, nil, error)
                     completion(.failure(error))
                 }
             } else {
@@ -199,14 +199,14 @@ extension CleaServer: URLSessionDelegate, URLSessionDownloadDelegate {
                     let statusCode: Int = task.response?.svStatusCode ?? 0
                     let message: String = receivedData.isEmpty ? "No data received from the server" : (String(data: receivedData, encoding: .utf8) ?? "Unknown error")
                     let error: Error = NSError.svLocalizedError(message: "Unknown error (\(statusCode)). (\(message))", code: statusCode)
-                    self.requestLoggingHandler?(task, nil, error)
+                    self.taskLoggingHandler?(task, nil, error)
                     completion(.failure(error))
                 } else {
                     // Save eTag and response if present
                     if let eTag = task.response?.svETag, let url = task.currentRequest?.url?.absoluteString {
                         SVETagManager.shared.save(eTag: eTag, data: receivedData, for: url)
                     }
-                    self.requestLoggingHandler?(task, receivedData, nil)
+                    self.taskLoggingHandler?(task, receivedData, nil)
                     completion(.success(receivedData))
                 }
             }

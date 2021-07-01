@@ -18,12 +18,14 @@ public final class Server: NSObject, RBServer {
         case post = "POST"
     }
     
-    public typealias RequestLoggingHandler = (_ task: URLSessionTask?, _ responseData: Data?, _ error: Error?) -> ()
+    public typealias TaskLoggingHandler = (_ task: URLSessionTask?, _ responseData: Data?, _ error: Error?) -> ()
+    public typealias RequestLoggingHandler = (_ request: URLRequest?, _ response: URLResponse?, _ responseData: Data?, _ error: Error?) -> ()
+
     typealias ProcessRequestCompletion = (_ result: Result<Data, Error>) -> ()
     
     public let publicKey: Data
     private let baseUrl: () -> URL
-    private let certificateFile: Data
+    private let certificateFiles: [Data]
     private let deviceTimeNotAlignedToServerTimeDetected: () -> ()
     
     private lazy var session: URLSession = {
@@ -37,16 +39,16 @@ public final class Server: NSObject, RBServer {
     }()
     private var receivedData: [String: Data] = [:]
     private var completions: [String: ProcessRequestCompletion] = [:]
-    private let requestLoggingHandler: RequestLoggingHandler
+    private let taskLoggingHandler: TaskLoggingHandler
     
-    public init(baseUrl: @escaping () -> URL, publicKey: Data, certificateFile: Data, configUrl: URL, configCertificateFile: Data, deviceTimeNotAlignedToServerTimeDetected: @escaping () -> (), requestLoggingHandler: @escaping RequestLoggingHandler) {
+    public init(baseUrl: @escaping () -> URL, publicKey: Data, certificateFiles: [Data], configUrl: URL, configCertificateFiles: [Data], deviceTimeNotAlignedToServerTimeDetected: @escaping () -> (), taskLoggingHandler: @escaping TaskLoggingHandler) {
         self.baseUrl = baseUrl
         self.publicKey = publicKey
-        self.certificateFile = certificateFile
+        self.certificateFiles = certificateFiles
         self.deviceTimeNotAlignedToServerTimeDetected = deviceTimeNotAlignedToServerTimeDetected
-        self.requestLoggingHandler = requestLoggingHandler
+        self.taskLoggingHandler = taskLoggingHandler
         ParametersManager.shared.url = configUrl
-        ParametersManager.shared.certificateFile = configCertificateFile
+        ParametersManager.shared.certificateFiles = configCertificateFiles
     }
     
     public func register(captcha: String, captchaId: String, publicKey: String, completion: @escaping (_ result: Result<RBRegisterResponse, Error>) -> ()) {
@@ -288,7 +290,7 @@ extension Server {
             let requestId: String = url.lastPathComponent
             guard completions[requestId] == nil else {
                 let error: Error = NSError.svLocalizedError(message: "A request for \"\(requestId)\" is already being treated", code: 0)
-                self.requestLoggingHandler(nil, nil, error)
+                self.taskLoggingHandler(nil, nil, error)
                 completion(.failure(error))
                 return
             }
@@ -304,7 +306,7 @@ extension Server {
             task.taskDescription = requestId
             task.resume()
         } catch {
-            self.requestLoggingHandler(nil, nil, error)
+            self.taskLoggingHandler(nil, nil, error)
             completion(.failure(error))
         }
     }
@@ -319,7 +321,7 @@ extension Server: URLSessionDelegate, URLSessionDownloadDelegate {
         completions[requestId] = nil
         DispatchQueue.main.async {
             if let error = error {
-                self.requestLoggingHandler(task, nil, error)
+                self.taskLoggingHandler(task, nil, error)
                 completion(.failure(error))
             } else {
                 let receivedData: Data = self.receivedData[requestId] ?? Data()
@@ -327,10 +329,10 @@ extension Server: URLSessionDelegate, URLSessionDownloadDelegate {
                     let statusCode: Int = task.response?.svStatusCode ?? 0
                     let message: String = receivedData.isEmpty ? "No data received from the server" : (String(data: receivedData, encoding: .utf8) ?? "Unknown error")
                     let error: Error = NSError.svLocalizedError(message: "Unknown error (\(statusCode)). (\(message))", code: statusCode)
-                    self.requestLoggingHandler(task, nil, error)
+                    self.taskLoggingHandler(task, nil, error)
                     completion(.failure(error))
                 } else {
-                    self.requestLoggingHandler(task, receivedData, nil)
+                    self.taskLoggingHandler(task, receivedData, nil)
                     completion(.success(receivedData))
                 }
             }
@@ -346,7 +348,7 @@ extension Server: URLSessionDelegate, URLSessionDownloadDelegate {
     }
     
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFile: certificateFile) { validated, credential in
+        CertificatePinning.validateChallenge(challenge, certificateFiles: certificateFiles) { validated, credential in
             validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }

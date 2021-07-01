@@ -92,9 +92,7 @@ final class AttestationsManager: NSObject {
         do {
             let regex: NSRegularExpression = try NSRegularExpression(pattern: "<[a-zA-Z0-9\\-]+>")
             qrCodeString = regex.stringByReplacingMatches(in: qrCodeString, range: NSRange(qrCodeString.startIndex..., in: qrCodeString), withTemplate: "qrCode.infoNotAvailable".localized)
-        } catch {
-            print(error)
-        }
+        } catch {}
         return qrCodeString
     }
     
@@ -246,7 +244,7 @@ extension AttestationsManager {
 extension AttestationsManager: URLSessionDelegate {
     
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFile: Constant.Server.resourcesCertificate) { validated, credential in
+        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
             validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }

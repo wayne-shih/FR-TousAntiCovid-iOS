@@ -62,8 +62,8 @@ class RemoteFileSyncManager: NSObject {
     
     private func fetchLastFile(languageCode: String) {
         let url: URL = remoteFileUrl(for: languageCode)
-        let sesssion: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        let dataTask: URLSessionDataTask = sesssion.dataTaskWithETag(with: url) { data, response, error in
+        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
+        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: url) { data, response, error in
             guard let data = data else {
                 return
             }
@@ -110,7 +110,7 @@ class RemoteFileSyncManager: NSObject {
 extension RemoteFileSyncManager: URLSessionDelegate {
     
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFile: Constant.Server.resourcesCertificate) { validated, credential in
+        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
             validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }
