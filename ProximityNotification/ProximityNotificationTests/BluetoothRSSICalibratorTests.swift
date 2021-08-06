@@ -15,8 +15,7 @@ class BluetoothRSSICalibratorTests: XCTestCase {
 
     private let settings = BluetoothSettings(serviceUniqueIdentifier: UUID().uuidString,
                                              serviceCharacteristicUniqueIdentifier: UUID().uuidString,
-                                             txCompensationGain: 10,
-                                             rxCompensationGain: 20,
+                                             dynamicSettings: BluetoothDynamicSettings(txCompensationGain: 10, rxCompensationGain: 20),
                                              connectionTimeInterval: 3)
 
     func testCalibratedRSSIWithRawRSSIInScan() {
@@ -27,14 +26,14 @@ class BluetoothRSSICalibratorTests: XCTestCase {
         }
 
         let rssiCalibrator = BluetoothRSSICalibrator(settings: settings)
-        let bluetoothPeripheral = BluetoothPeripheral(peripheralIdentifier: UUID(),
-                                                      timestamp: Date(),
-                                                      rssi: -30,
-                                                      isRSSIFromPayload: false)
+        let bluetoothPeripheralRSSIInfo = BluetoothPeripheralRSSIInfo(peripheralIdentifier: UUID(),
+                                                                      timestamp: Date(),
+                                                                      rssi: -30,
+                                                                      isRSSIFromPayload: false)
         let bluetoothProximityPayload = BluetoothProximityPayload(payload: proximityPayload, txPowerLevel: 25)
 
         // When
-        let calibratedRSSI = rssiCalibrator.calibrateRSSI(for: bluetoothPeripheral,
+        let calibratedRSSI = rssiCalibrator.calibrateRSSI(for: bluetoothPeripheralRSSIInfo,
                                                           from: bluetoothProximityPayload)
 
         // Then
@@ -49,14 +48,14 @@ class BluetoothRSSICalibratorTests: XCTestCase {
         }
 
         let rssiCalibrator = BluetoothRSSICalibrator(settings: settings)
-        let bluetoothPeripheral = BluetoothPeripheral(peripheralIdentifier: UUID(),
-                                                      timestamp: Date(),
-                                                      rssi: nil,
-                                                      isRSSIFromPayload: false)
+        let bluetoothPeripheralRSSIInfo = BluetoothPeripheralRSSIInfo(peripheralIdentifier: UUID(),
+                                                                      timestamp: Date(),
+                                                                      rssi: nil,
+                                                                      isRSSIFromPayload: false)
         let bluetoothProximityPayload = BluetoothProximityPayload(payload: proximityPayload, txPowerLevel: 25)
 
         // When
-        let calibratedRSSI = rssiCalibrator.calibrateRSSI(for: bluetoothPeripheral,
+        let calibratedRSSI = rssiCalibrator.calibrateRSSI(for: bluetoothPeripheralRSSIInfo,
                                                           from: bluetoothProximityPayload)
 
         // Then
@@ -71,14 +70,14 @@ class BluetoothRSSICalibratorTests: XCTestCase {
         }
 
         let rssiCalibrator = BluetoothRSSICalibrator(settings: settings)
-        let bluetoothPeripheral = BluetoothPeripheral(peripheralIdentifier: UUID(),
-                                                      timestamp: Date(),
-                                                      rssi: -30,
-                                                      isRSSIFromPayload: true)
+        let bluetoothPeripheralRSSIInfo = BluetoothPeripheralRSSIInfo(peripheralIdentifier: UUID(),
+                                                                      timestamp: Date(),
+                                                                      rssi: -30,
+                                                                      isRSSIFromPayload: true)
         let bluetoothProximityPayload = BluetoothProximityPayload(payload: proximityPayload, txPowerLevel: 25)
 
         // When
-        let calibratedRSSI = rssiCalibrator.calibrateRSSI(for: bluetoothPeripheral,
+        let calibratedRSSI = rssiCalibrator.calibrateRSSI(for: bluetoothPeripheralRSSIInfo,
                                                           from: bluetoothProximityPayload)
 
         // Then

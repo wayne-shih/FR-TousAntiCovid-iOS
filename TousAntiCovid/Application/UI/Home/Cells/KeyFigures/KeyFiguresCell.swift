@@ -91,10 +91,17 @@ final class KeyFiguresCell: CVTableViewCell {
         button.isHidden = row.buttonTitle == nil
         cvAccessoryLabel?.isHidden = row.accessoryText == nil
         guard let keyFigures = row.associatedValue as? [KeyFigure] else { return }
-        (0..<keyFigures.count).forEach { index in
-            titleLabels[index].text = keyFigures[index].shortLabel
-            titleLabels[index].textColor = keyFigures[index].color
-            valueLabels[index].text = keyFigures[index].valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible()
+        (0..<titleLabels.count).forEach { index in
+            if keyFigures.indices.contains(index) {
+                titleLabels[index].isHidden = false
+                valueLabels[index].isHidden = false
+                titleLabels[index].text = keyFigures[index].shortLabel
+                titleLabels[index].textColor = keyFigures[index].color
+                valueLabels[index].text = keyFigures[index].valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible()
+            } else {
+                titleLabels[index].isHidden = true
+                valueLabels[index].isHidden = true
+            }
         }
         let departmentKeyFigures: [KeyFigureDepartment?] = keyFigures.map { $0.currentDepartmentSpecificKeyFigure }
         let filteredDepartmentKeyFigures: [KeyFigureDepartment] = departmentKeyFigures.compactMap { $0 }
@@ -102,10 +109,17 @@ final class KeyFiguresCell: CVTableViewCell {
         titleHeaderLabel.isHidden = hideDepartmentKeyFigures
         secondaryStackView.isHidden = hideDepartmentKeyFigures
         titleHeaderSecondaryLabel.text = filteredDepartmentKeyFigures.last?.label.uppercased()
-        (0..<departmentKeyFigures.count).forEach { index in
-            titleSecondaryLabels[index].text = keyFigures[index].shortLabel
-            titleSecondaryLabels[index].textColor = keyFigures[index].color
-            valueSecondaryLabels[index].text = departmentKeyFigures[index]?.valueToDisplay.formattingValueWithThousandsSeparatorIfPossible() ?? "-"
+        (0..<titleSecondaryLabels.count).forEach { index in
+            if keyFigures.indices.contains(index) {
+                valueSecondaryLabels[index].isHidden = false
+                titleSecondaryLabels[index].isHidden = false
+                titleSecondaryLabels[index].text = keyFigures[index].shortLabel
+                titleSecondaryLabels[index].textColor = keyFigures[index].color
+                valueSecondaryLabels[index].text = departmentKeyFigures[index]?.valueToDisplay.formattingValueWithThousandsSeparatorIfPossible() ?? "-"
+            } else {
+                titleSecondaryLabels[index].isHidden = true
+                valueSecondaryLabels[index].isHidden = true
+            }
         }
     }
     

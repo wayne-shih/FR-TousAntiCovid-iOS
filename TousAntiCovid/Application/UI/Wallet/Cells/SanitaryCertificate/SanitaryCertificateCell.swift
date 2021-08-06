@@ -13,13 +13,14 @@ import TagListView
 
 final class SanitaryCertificateCell: CVTableViewCell {
 
+    @IBOutlet private var favoriteButton: UIButton!
     @IBOutlet private var topRightButton: UIButton!
     @IBOutlet private var containerView: UIView!
     @IBOutlet private var tagListView: TagListView!
     
     override func setup(with row: CVRow) {
         super.setup(with: row)
-        setupUI()
+        setupUI(with: row)
         setupContent(with: row)
         setupAccessibility(with: row)
     }
@@ -36,15 +37,17 @@ final class SanitaryCertificateCell: CVTableViewCell {
         return imageView.screenshot()
     }
     
-    private func setupUI() {
+    private func setupUI(with row: CVRow) {
         selectionStyle = .none
         accessoryType = .none
         containerView.backgroundColor = backgroundColor
         backgroundColor = .clear
         containerView.layer.cornerRadius = 10.0
+        containerView.layer.maskedCorners = row.theme.maskedCorners
         containerView.layer.masksToBounds = true
         topRightButton.tintColor = Appearance.tintColor
-        
+        favoriteButton.tintColor = Appearance.tintColor
+        favoriteButton.isHidden = row.secondarySelectionAction == nil
         tagListView.textFont = Appearance.Tag.font2
         tagListView.alignment = .center
         tagListView.paddingX = 10.0
@@ -56,7 +59,7 @@ final class SanitaryCertificateCell: CVTableViewCell {
     
     private func setupContent(with row: CVRow) {
         tagListView.removeAllTags()
-        guard let texts = row.associatedValue as? [String] else {
+        guard let texts = row.segmentsTitles else {
             tagListView.isHidden = true
             return
         }
@@ -70,26 +73,36 @@ final class SanitaryCertificateCell: CVTableViewCell {
         tagListView.accessibilityTraits = .staticText
         tagListView.accessibilityLabel = row.accessoryText
         tagListView.tagViews.forEach { $0.isAccessibilityElement = false }
+        favoriteButton.setImage(row.isOn == true ? Asset.Images.filledHeart.image : Asset.Images.emptyHeart.image, for: .normal)
         layoutSubviews()
     }
     
     private func setupAccessibility(with row: CVRow) {
-        containerView?.accessibilityLabel = "\(row.title?.removingEmojis() ?? "") \(row.associatedValue ?? "") \(row.subtitle?.removingEmojis() ?? "")"
+        containerView?.accessibilityLabel = "\(row.title?.removingEmojis() ?? "") \(row.segmentsTitles?.joined() ?? "") \(row.subtitle?.removingEmojis() ?? "")"
         containerView?.accessibilityTraits = .staticText
         containerView?.isAccessibilityElement = true
         topRightButton.accessibilityLabel = "\("walletController.menu.share".localized), \("walletController.menu.delete".localized)"
         topRightButton?.accessibilityTraits = .button
         topRightButton?.isAccessibilityElement = true
+        favoriteButton.accessibilityLabel = "accessibility.wallet.dcc.favorite.\(row.isOn == true ? "remove": "define")".localized
+        favoriteButton?.accessibilityTraits = .button
+        favoriteButton?.isAccessibilityElement = true
 
         cvTitleLabel?.isAccessibilityElement = false
         cvSubtitleLabel?.isAccessibilityElement = false
         tagListView?.isAccessibilityElement = false
         cvImageView?.isAccessibilityElement = false
 
-        accessibilityElements = [containerView, topRightButton].compactMap { $0 }
+        accessibilityElements = [containerView, favoriteButton, topRightButton].compactMap { $0 }
     }
-    
+
+    @IBAction private func favoriteButtonPressed(_ sender: Any) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        currentAssociatedRow?.secondarySelectionAction?()
+    }
+
     @IBAction private func topRightButtonPressed(_ sender: Any) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         currentAssociatedRow?.selectionActionWithCell?(self)
     }
     

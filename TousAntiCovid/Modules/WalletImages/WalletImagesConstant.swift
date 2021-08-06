@@ -12,7 +12,7 @@ import Foundation
 
 enum WalletImagesConstant {
     
-    static let baseUrl: URL = URL(string: "https://\(Constant.Server.resourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/Wallet")!
+    static let baseUrl: URL = URL(string: "https://\(Constant.Server.staticResourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/Wallet")!
     
     static let minDurationBetweenUpdatesInSeconds: Double = 1.0 * 60.0
 }

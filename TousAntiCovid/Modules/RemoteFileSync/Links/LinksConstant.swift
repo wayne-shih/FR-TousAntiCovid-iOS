@@ -12,6 +12,6 @@ import Foundation
 
 enum LinksConstant {
 
-    static let baseUrl: String = "https://\(Constant.Server.resourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/Links"
+    static let baseUrl: String = "https://\(Constant.Server.staticResourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/Links"
     
 }

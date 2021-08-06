@@ -10,8 +10,10 @@
 
 import Foundation
 
-protocol BluetoothPeripheralManagerProtocol: class {
+protocol BluetoothPeripheralManagerProtocol: AnyObject {
 
+    var settings: BluetoothSettings { get set }
+    
     var delegate: BluetoothPeripheralManagerDelegate? { get set }
     
     func start(proximityPayloadProvider: @escaping ProximityPayloadProvider)

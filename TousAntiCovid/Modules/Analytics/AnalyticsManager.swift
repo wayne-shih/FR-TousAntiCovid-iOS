@@ -79,6 +79,7 @@ final class AnalyticsManager: NSObject {
         }
         let delay: Double = Double((500...2000).randomElement() ?? 500) / 1000.0
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            guard !self.healthEvents.isEmpty else { return }
             self.sendHealthAnalytics { error in
                 guard error == nil || (error as NSError?)?.code == 413 else { return }
                 self.resetHealthEvents()
@@ -104,7 +105,6 @@ final class AnalyticsManager: NSObject {
         resetHealthEvents()
         resetErrors()
         installationUuid = UUID().uuidString
-        isOptIn = true
         deleteAnalyticsAfterNextStatus = false
         clearProximityStartTimestamp()
     }

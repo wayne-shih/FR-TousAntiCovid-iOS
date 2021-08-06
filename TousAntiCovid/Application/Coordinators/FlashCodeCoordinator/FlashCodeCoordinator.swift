@@ -27,7 +27,11 @@ final class FlashCodeCoordinator: Coordinator {
     private func start() {
         let controller: UIViewController = FlashReportCodeController.controller(didFlash: { [weak self] code in
             guard let code = code else { return }
-            self?.showSymptomsOrigin(symptomsParams: SymptomsDeclarationParams(code: code))
+            if let url = URL(string: code), WalletManager.shared.isWalletActivated, DeepLinkingManager.shared.isComboDeeplink(url) {
+                self?.showComboDeclareWalletCertificate(url: url)
+            } else {
+                self?.showSymptomsOrigin(symptomsParams: SymptomsDeclarationParams(code: code))
+            }
         }) { [weak self] in
             self?.didDeinit()
         }
@@ -39,6 +43,12 @@ final class FlashCodeCoordinator: Coordinator {
     private func showSymptomsOrigin(symptomsParams: SymptomsDeclarationParams) {
         let symptomsOriginCoordinator: SymptomsOriginCoordinator = SymptomsOriginCoordinator(navigationController: navigationController, parent: self, symptomsParams: symptomsParams)
         addChild(coordinator: symptomsOriginCoordinator)
+    }
+
+    private func showComboDeclareWalletCertificate(url: URL) {
+        self.navigationController?.dismiss(animated: true, completion: {
+            DeepLinkingManager.shared.processUrl(url)
+        })
     }
     
 }

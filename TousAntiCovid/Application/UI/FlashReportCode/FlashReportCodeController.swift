@@ -22,6 +22,7 @@ final class FlashReportCodeController: FlashCodeController {
     }
     
     override func initUI() {
+        super.initUI()
         title = "declareController.button.flash".localized
         explanationLabel.text = "scanCodeController.explanation".localized
         explanationLabel.font = Appearance.Cell.Text.standardFont
@@ -31,19 +32,28 @@ final class FlashReportCodeController: FlashCodeController {
     }
 
     override func processScannedQRCode(code: String?) {
-        if code?.isUuidCode == true {
+        if isValidCode(code: code) == true {
             didFlash?(code)
         } else {
             showAlert(title: "enterCodeController.alert.invalidCode.title".localized,
                       message: "enterCodeController.alert.invalidCode.message".localized,
                       okTitle: "common.ok".localized, handler: {
                         self.restartScanning()
-            })
+                      })
         }
     }
-
+    
     @objc private func didTouchCloseButton() {
         dismiss(animated: true, completion: nil)
+    }
+    
+    private func isValidCode(code: String?) -> Bool {
+        guard let code = code else { return false }
+        if let url = URL(string: code), DeepLinkingManager.shared.isComboDeeplink(url) {
+            return true
+        } else {
+            return code.isUuidCode || code.isShortCode || code.contains("/app/code")
+        }
     }
     
 }

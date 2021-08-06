@@ -13,7 +13,6 @@ import WidgetKit
 
 @main
 struct TousAntiCovidWidget: Widget {
-
     private let kind: String = "TousAntiCovidWidget"
 
     public var body: some WidgetConfiguration {

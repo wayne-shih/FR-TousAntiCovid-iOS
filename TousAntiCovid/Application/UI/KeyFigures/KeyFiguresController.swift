@@ -93,26 +93,27 @@ final class KeyFiguresController: CVTableViewController {
                                                 self?.didTouchReadExplanationsNow()
                                              })
         rows.append(readNowRow)
-        let keyFiguresHealthRows: [CVRow] = KeyFiguresManager.shared.keyFigures.filter { $0.category == .health }.map { keyFigure in
-            CVRow(title: keyFigure.label,
-                  subtitle: keyFigure.description,
-                  xibName: .keyFigureCell,
-                  theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                     topInset: 10.0,
-                                     bottomInset: 10.0,
-                                     textAlignment: .natural,
-                                     subtitleLinesCount: 2),
-                  associatedValue: keyFigure,
-                  selectionActionWithCell: { [weak self] cell in
-                    self?.didTouchSharingFor(cell: cell, keyFigure: keyFigure)
-                  },
-                  selectionAction: { [weak self] in
-                    self?.didTouchKeyFigure(keyFigure)
-                  },
-                  willDisplay: { cell in
-                    cell.accessoryType = .none
-                    cell.selectionStyle = .none
-                  })
+        let keyFiguresHealthRows: [CVRow] = KeyFiguresManager.shared.keyFigures.filter { $0.category == .health }.compactMap { keyFigure in
+            guard keyFigure.isLabelReady else { return nil }
+            return CVRow(title: keyFigure.label,
+                         subtitle: keyFigure.description,
+                         xibName: .keyFigureCell,
+                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                            topInset: 10.0,
+                                            bottomInset: 10.0,
+                                            textAlignment: .natural,
+                                            subtitleLinesCount: 2),
+                         associatedValue: keyFigure,
+                         selectionActionWithCell: { [weak self] cell in
+                            self?.didTouchSharingFor(cell: cell, keyFigure: keyFigure)
+                         },
+                         selectionAction: { [weak self] in
+                            self?.didTouchKeyFigure(keyFigure)
+                         },
+                         willDisplay: { cell in
+                            cell.accessoryType = .none
+                            cell.selectionStyle = .none
+                         })
         }
         rows.append(contentsOf: keyFiguresHealthRows)
         let appSectionRow: CVRow =  CVRow(title: "keyFiguresController.section.app".localized,
@@ -122,26 +123,27 @@ final class KeyFiguresController: CVTableViewController {
                                                              textAlignment: .natural,
                                                              titleFont: { Appearance.Cell.Text.headTitleFont }))
         rows.append(appSectionRow)
-        let keyFiguresAppRows: [CVRow] = KeyFiguresManager.shared.keyFigures.filter { $0.category == .app }.map { keyFigure in
-            CVRow(title: keyFigure.label,
-                  subtitle: keyFigure.description,
-                  xibName: .keyFigureCell,
-                  theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                     topInset: 10.0,
-                                     bottomInset: 10.0,
-                                     textAlignment: .natural,
-                                     subtitleLinesCount: 2),
-                  associatedValue: keyFigure,
-                  selectionActionWithCell: { [weak self] cell in
-                    self?.didTouchSharingFor(cell: cell, keyFigure: keyFigure)
-                  },
-                  selectionAction: { [weak self] in
-                    self?.didTouchKeyFigure(keyFigure)
-                  },
-                  willDisplay: { cell in
-                    cell.accessoryType = .none
-                    cell.selectionStyle = .none
-                  })
+        let keyFiguresAppRows: [CVRow] = KeyFiguresManager.shared.keyFigures.filter { $0.category == .app }.compactMap { keyFigure in
+            guard keyFigure.isLabelReady else { return nil }
+            return CVRow(title: keyFigure.label,
+                         subtitle: keyFigure.description,
+                         xibName: .keyFigureCell,
+                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                            topInset: 10.0,
+                                            bottomInset: 10.0,
+                                            textAlignment: .natural,
+                                            subtitleLinesCount: 2),
+                         associatedValue: keyFigure,
+                         selectionActionWithCell: { [weak self] cell in
+                            self?.didTouchSharingFor(cell: cell, keyFigure: keyFigure)
+                         },
+                         selectionAction: { [weak self] in
+                            self?.didTouchKeyFigure(keyFigure)
+                         },
+                         willDisplay: { cell in
+                            cell.accessoryType = .none
+                            cell.selectionStyle = .none
+                         })
         }
         rows.append(contentsOf: keyFiguresAppRows)
         return rows

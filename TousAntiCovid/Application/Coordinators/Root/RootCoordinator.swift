@@ -34,6 +34,7 @@ final class RootCoordinator: Coordinator {
         didSet {
             if #available(iOS 14.0, *) {
                 WidgetManager.shared.isOnboardingDone = isOnboardingDone
+                WidgetDCCManager.shared.isOnboardingDone = isOnboardingDone
             }
         }
     }
@@ -44,6 +45,7 @@ final class RootCoordinator: Coordinator {
     func start() {
         if #available(iOS 14.0, *) {
             WidgetManager.shared.isOnboardingDone = isOnboardingDone
+            WidgetDCCManager.shared.isOnboardingDone = isOnboardingDone
         }
         switchTo(state: currentState())
         addObservers()

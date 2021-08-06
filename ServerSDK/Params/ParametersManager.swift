@@ -49,17 +49,24 @@ public final class ParametersManager: NSObject {
         guard let hour = valueFor(name: "app.maxHourContactNotif") as? Double else { return nil }
         return Int(hour)
     }
-    
+
+    public var minFilesRefreshInterval: Double? { valueFor(name: "app.minFilesRefreshInterval") as? Double }
+
     public var displayRecordVenues: Bool { valueFor(name: "app.displayRecordVenues") as? Bool ?? false }
     public var displayAttestation: Bool { valueFor(name: "app.displayAttestation") as? Bool ?? false }
     public var displaySanitaryCertificatesWallet: Bool { valueFor(name: "app.displaySanitaryCertificatesWallet") as? Bool ?? false }
     public var displaySanitaryCertificatesValidation: Bool { valueFor(name: "app.displaySanitaryCertificatesValidation") as? Bool ?? false }
     public var isAnalyticsOn: Bool { valueFor(name: "app.isAnalyticsOn") as? Bool ?? false }
     public var walletTestCertificateValidityThresholds: [Int] { valueFor(name: "app.wallet.testCertificateValidityThresholds") as? [Int] ?? [48, 72] }
-    
+    public var walletConversionApiVersion: Int { valueFor(name: "app.wallet.conversionApiVersion") as? Int ?? 1 }
+    public var walletConversionPublicKey: (key: String, value: String)? {
+        (valueFor(name: "app.wallet.conversionPublicKey") as? [String: String])?.first
+    }
+
     public var displayIsolation: Bool { valueFor(name: "app.displayIsolation") as? Bool ?? false }
     public var isolationMinRiskLevel: Double { valueFor(name: "app.isolationMinRiskLevel") as? Double ?? 4.0 }
     public var ameliUrl: String { valueFor(name: "app.ameliUrl") as? String ?? "https://declare.ameli.fr/tousanticovid/t/%@/" }
+    public var ratingsKeyFiguresOpeningThreshold: Int { valueFor(name: "app.ratingsKeyFiguresOpeningThreshold") as? Int ?? 10 }
     public var contagiousSpan: Int { valueFor(name: "app.contagiousSpan") as? Int ?? 10 }
     public var displayVaccination: Bool { valueFor(name: "app.displayVaccination") as? Bool ?? false }
     public var vaccinationCentersCount: Int { valueFor(name: "app.vaccinationCentersCount") as? Int ?? 5 }
@@ -157,7 +164,6 @@ public final class ParametersManager: NSObject {
     public var bleFilteringConfig: String? { valueFor(name: "ble.filterConfig") as? String }
     public var bleFilteringMode: String? { valueFor(name: "ble.filterMode") as? String }
 
-    public var certificateConversionUrl: URL { URL(string: valueFor(name: "app.certificateConversionUrl") as? String ?? "")! }
     public var displayCertificateConversion: Bool { valueFor(name: "app.displayCertificateConversion") as? Bool ?? false }
 
     public var apiVersion: ApiVersion { ApiVersion(rawValue: valueFor(name: "app.apiVersion") as? String ?? "") ?? .v5 }
@@ -191,7 +197,7 @@ public final class ParametersManager: NSObject {
         writeInitialFileIfNeeded()
         loadLocalConfig()
     }
-    
+
     public func getDeviceParametersFor(model: String) -> DeviceParameters? {
         guard let deviceCalibration = valueFor(name: "ble.calibration") as? [[String: Any]] else { return nil }
         guard let data = try? JSONSerialization.data(withJSONObject: deviceCalibration, options: []) else { return nil }
@@ -251,10 +257,7 @@ public final class ParametersManager: NSObject {
         RBManager.shared.contagiousSpan = contagiousSpan
         RBManager.shared.covidPlusNoTracingDuration = covidPlusNoTracing
         if RBManager.shared.isProximityActivated {
-            RBManager.shared.stopProximityDetection()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                RBManager.shared.startProximityDetection()
-            }
+            RBManager.shared.updateProximityDetectionSettings()
         }
         refreshBackgroundFetchInterval()
     }

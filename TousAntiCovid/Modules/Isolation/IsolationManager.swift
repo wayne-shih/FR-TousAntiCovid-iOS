@@ -145,7 +145,9 @@ final class IsolationManager {
         return date?.roundingToBeginningOfDay()
     }
     
-    var stillHavingFeverNotificationTriggerDate: Date { currentIsolationEndDate ?? Date() }
+    var stillHavingFeverNotificationTriggerDate: Date {
+        currentIsolationEndDate ?? Date()
+    }
     
     // MARK: - Contact case dates calculated values -
     private var contactCaseIsolationContactCalculatedDate: Date {

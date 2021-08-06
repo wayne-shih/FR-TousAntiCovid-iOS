@@ -14,7 +14,7 @@ import RealmSwift
 
 extension AnalyticsManager {
 
-    func reportError<ApiVersion: RawRepresentable>(serviceName: String, apiVersion: ApiVersion, code: Int, desc: String? = nil)  where ApiVersion.RawValue == String {
+    func reportError<ApiVersion: RawRepresentable>(serviceName: String, apiVersion: ApiVersion, code: Int, desc: String? = nil) where ApiVersion.RawValue == String {
         guard isOptIn else { return }
         let error: AnalyticsError = AnalyticsError(name: "ERR-\(serviceName.uppercased())-\(apiVersion.rawValue)-\(code)", timestamp: Date().universalDateFormatted(), desc: desc)
         let realm: Realm = try! Realm.analyticsDb()

@@ -15,6 +15,7 @@ import ServerSDK
 protocol WalletChangesObserver: AnyObject {
     
     func walletCertificatesDidUpdate()
+    func walletFavoriteCertificateDidUpdate()
     
 }
 
@@ -38,13 +39,25 @@ final class WalletManager {
         }
         set { _walletCertificates = newValue }
     }
-
+    
     var areThereLoadedCertificates: Bool { !_walletCertificates.isEmpty }
     var recentWalletCertificates: [WalletCertificate] { walletCertificates.filter { !$0.isOld } }
     var oldWalletCertificates: [WalletCertificate] { walletCertificates.filter { $0.isOld } }
+    var areThereCertificatesNeedingAttention: Bool {
+        !walletCertificates.compactMap { $0 as? EuropeanCertificate }
+            .first { ($0.isTestNegative == false && $0.type == .sanitaryEurope) || DccBlacklistManager.shared.isBlacklisted(certificate: $0) }
+            .isNil
+    }
     
     var isWalletActivated: Bool { ParametersManager.shared.displaySanitaryCertificatesWallet }
-
+    
+    var favoriteCertificate: WalletCertificate? { _walletCertificates.filter { $0.id == favoriteDccId }.first ?? loadCertificate(for: favoriteDccId) }
+    
+    @UserDefault(key: .favoriteDccId)
+    private(set) var favoriteDccId: String? {
+        didSet { notifyFavoriteCertificate() }
+    }
+    
     private var _walletCertificates: [WalletCertificate] = []
     private var observers: [WalletObserverWrapper] = []
     private var storageManager: StorageManager!
@@ -54,50 +67,51 @@ final class WalletManager {
         addObservers()
         HCert.publicKeyStorageDelegate = self
     }
-
+    
+    func setFavorite(certificate: WalletCertificate) {
+        favoriteDccId = certificate.id
+    }
+    
+    func removeFavorite() {
+        favoriteDccId = nil
+    }
+    
     func saveCertificate(_ certificate: WalletCertificate) {
         storageManager.saveWalletCertificate(RawWalletCertificate(id: certificate.id, value: certificate.value))
-        AnalyticsManager.shared.reportAppEvent(.e13)
     }
     
     func deleteCertificate(id: String) {
         storageManager.deleteWalletCertificate(id: id)
+        if favoriteDccId == id { favoriteDccId = nil }
     }
     
     func clearAllData() {
         storageManager.deleteWalletCertificates()
+        favoriteDccId = nil
     }
-
-    func deeplinkForCode(_ code: String) -> String {
-        if URL(string: code) != nil {
-            return code
-        } else {
-            // In this case it means we scanned a raw DCC certificate.
-            let encodedCode: String = code.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? ""
-            let path: String
-            if code.hasPrefix("DC04") {
-                path = WalletConstant.URLPath.wallet2D.rawValue
-            } else {
-                path = WalletConstant.URLPath.walletDCC.rawValue
-            }
-            return "https://bonjour.tousanticovid.gouv.fr\(path)#" + encodedCode
-        }
+    
+    func isDuplicatedCertificate(_ certificate: WalletCertificate)  -> Bool {
+        (walletCertificates.first { $0.value == certificate.value } != nil)
     }
-
+    
+    private func loadCertificate(for id: String?) -> WalletCertificate? {
+        storageManager.walletCertificates().filter { $0.id == id }.first.flatMap { WalletCertificate.from(rawCertificate: $0) }
+    }
+    
     private func reloadCertificates() {
         let loadedCertificatesDict: [String: [WalletCertificate]] = [String: [WalletCertificate]](grouping: _walletCertificates) { $0.id }
         _walletCertificates = storageManager.walletCertificates().compactMap {
             loadedCertificatesDict[$0.id]?.first ?? WalletCertificate.from(rawCertificate: $0)
         }
     }
-
+    
     private func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(walletCertificateDataDidUpdate), name: .walletCertificateDataDidChange, object: nil)
     }
     
     @objc private func walletCertificateDataDidUpdate() {
         reloadCertificates()
-        notifyObservers()
+        notify()
     }
     
     private func checkCertificateSignature(_ certificate: WalletCertificate) -> Bool {
@@ -106,7 +120,7 @@ final class WalletManager {
         guard let messageData = certificate.message else { return false }
         guard let rawSignatureData = certificate.signature else { return false }
         do {
-            let publicSecKey: SecKey = try SecKey.publicKeyfromDer(data: publicKeyData)
+            let publicSecKey: SecKey = try SecKey.publicKeyfromDerData(publicKeyData)
             let algorithm: SecKeyAlgorithm = .ecdsaSignatureMessageX962SHA256
             let canVerify: Bool = SecKeyIsAlgorithmSupported(publicSecKey, .verify, algorithm)
             guard canVerify else { return false }
@@ -124,33 +138,39 @@ final class WalletManager {
             return false
         }
     }
-
+    
 }
 
 extension WalletManager {
-
-    func getWalletCertificate(from url: URL) throws -> WalletCertificate? {
-        var certificate: WalletCertificate?
+    
+    func getWalletCertificate(from url: URL) throws -> WalletCertificate {
+        var certificate: WalletCertificate
         switch url.path {
         case WalletConstant.URLPath.wallet.rawValue:
             certificate = try extractCertificateFrom(url: url)
         case WalletConstant.URLPath.wallet2D.rawValue:
             certificate = try extractCertificateFrom(url: url)
         case WalletConstant.URLPath.walletDCC.rawValue:
-            certificate = try extractEuropeanCertificateFrom(url: url)
+            if DeepLinkingManager.shared.isComboDeeplink(url),
+               let certificatStringUrl = url.absoluteString.components(separatedBy: WalletConstant.Separator.declareCode.rawValue).first,
+               let certificatUrl = URL(string: certificatStringUrl) {
+                certificate = try extractEuropeanCertificateFrom(url: certificatUrl)
+            } else {
+                certificate = try extractEuropeanCertificateFrom(url: url)
+            }
         default:
-            break
+            throw WalletError.parsing.error
         }
         return certificate
     }
 }
 
 extension WalletManager {
-
+    
     static func certificateType(doc: String) -> WalletConstant.CertificateType? {
-        WalletConstant.CertificateType.allCases.first { doc ~= $0.validationRegex }
+        WalletConstant.CertificateType.allCases.first { doc ~> $0.validationRegex }
     }
-
+    
     static func certificateType(hCert: HCert) -> WalletConstant.CertificateType {
         switch hCert.type {
         case .test:
@@ -161,13 +181,13 @@ extension WalletManager {
             return .recoveryEurope
         }
     }
-
+    
     static func certificateTypeFromHeaderInUrl(_ url: URL) -> WalletConstant.CertificateType? {
         guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
         guard let completeMessage = urlComponents.queryItems?.first(where: { $0.name == "v" })?.value ?? urlComponents.fragment else { return nil }
         switch urlComponents.path {
         case WalletConstant.URLPath.wallet.rawValue, WalletConstant.URLPath.wallet2D.rawValue:
-            return WalletConstant.CertificateType.allCases.first { completeMessage ~= $0.headerDetectionRegex }
+            return WalletConstant.CertificateType.allCases.first { completeMessage ~> $0.headerDetectionRegex }
         case WalletConstant.URLPath.walletDCC.rawValue:
             guard let hCert = HCert(from: completeMessage) else { return nil }
             return certificateType(hCert: hCert)
@@ -200,13 +220,14 @@ extension WalletManager {
         return try extractEuropeanCertificateFrom(doc: completeMessage)
     }
 
-    func extractEuropeanCertificateFrom(id: String = UUID().uuidString, doc: String) throws -> WalletCertificate {
+    func extractEuropeanCertificateFrom(id: String = UUID().uuidString, doc: String) throws -> EuropeanCertificate {
         let errors: HCert.ParseErrors = HCert.ParseErrors()
-        guard let hCert = HCert(from: doc, errors: errors) else { throw WalletError.parsing.error }
         guard errors.errors.isEmpty else { throw WalletError.parsing.error }
-        guard hCert.cryptographicallyValid else { throw WalletError.signature.error }
+        guard let hCert = HCert(from: doc, errors: errors) else { throw WalletError.parsing.error }
         let certificateType: WalletConstant.CertificateType = WalletManager.certificateType(hCert: hCert)
-        return EuropeanCertificate(id: id, value: doc, type: certificateType, hCert: hCert)
+        let certificate: EuropeanCertificate = EuropeanCertificate(id: id, value: doc, type: certificateType, hCert: hCert)
+        guard certificate.isForeignCertificate || hCert.cryptographicallyValid else { throw WalletError.signature.error }
+        return certificate
     }
 
 }
@@ -220,13 +241,23 @@ extension WalletManager: PublicKeyStorageDelegate {
 }
 
 extension WalletManager {
-    func converToEurope(certificate: WalletCertificate, completion: @escaping (_ result: Result<WalletCertificate, Error>) -> ()) {
+
+    func convertToEurope(certificate: WalletCertificate, completion: @escaping (_ result: Result<EuropeanCertificate, Error>) -> ()) {
+        switch ParametersManager.shared.walletConversionApiVersion {
+        case 2:
+            convertToEuropeV2(certificate: certificate, completion: completion)
+        default:
+            convertToEuropeV1(certificate: certificate, completion: completion)
+        }
+    }
+
+    private func convertToEuropeV1(certificate: WalletCertificate, completion: @escaping (_ result: Result<EuropeanCertificate, Error>) -> ()) {
         let encodedCertificate: String = certificate.value.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? certificate.value
         InGroupeServer.shared.convertCertificate(encodedCertificate: encodedCertificate, fromFormat: certificate.type.format.rawValue, toFormat: WalletConstant.CertificateType.Format.walletDCC.rawValue) { result in
             switch result {
             case let .success(doc):
                 do {
-                    let europeanCertificate: WalletCertificate = try self.extractEuropeanCertificateFrom(doc: doc)
+                    let europeanCertificate: EuropeanCertificate = try self.extractEuropeanCertificateFrom(doc: doc)
                     self.saveCertificate(europeanCertificate)
                     self.deleteCertificate(id: certificate.id)
                     completion(.success(europeanCertificate))
@@ -238,6 +269,42 @@ extension WalletManager {
             }
         }
     }
+
+    private func convertToEuropeV2(certificate: WalletCertificate, completion: @escaping (_ result: Result<EuropeanCertificate, Error>) -> ()) {
+        do {
+            guard let remotePublicKey = ParametersManager.shared.walletConversionPublicKey else {
+                completion(.failure(NSError.localizedError(message: "Server public key not found", code: 0)))
+                return
+            }
+            guard let remotePublicKeyData = Data(base64Encoded: remotePublicKey.value) else {
+                completion(.failure(NSError.localizedError(message: "Server public key not properly formatted", code: 0)))
+                return
+            }
+            let keyPair: CryptoKeyPair = try Crypto.generateKeys()
+            let sharedSecret: Data = try Crypto.generateSecret(localPrivateKey: keyPair.privateKey, remotePublicKey: remotePublicKeyData)
+            let encryptionKey: Data = try Crypto.generateConversionEncryptionKey(sharedSecret: sharedSecret)
+            let encryptedCertificate: Data = try Crypto.encrypt(certificate.value, key: encryptionKey)
+            InGroupeServer.shared.convertCertificateV2(encodedCertificate: encryptedCertificate.base64EncodedString(), fromFormat: certificate.type.format.rawValue, toFormat: WalletConstant.CertificateType.Format.walletDCC.rawValue, keyId: remotePublicKey.key, key: keyPair.publicKeyData.base64EncodedString()) { result in
+                switch result {
+                case let .success(docBase64):
+                    do {
+                        let doc: String = try Crypto.decrypt(docBase64, key: encryptionKey)
+                        let europeanCertificate: EuropeanCertificate = try self.extractEuropeanCertificateFrom(doc: doc)
+                        self.saveCertificate(europeanCertificate)
+                        self.deleteCertificate(id: certificate.id)
+                        completion(.success(europeanCertificate))
+                    } catch {
+                        completion(.failure(error))
+                    }
+                case let .failure(error):
+                    completion(.failure(error))
+                }
+            }
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
 }
 
 extension WalletManager {
@@ -256,8 +323,12 @@ extension WalletManager {
         observers.first { $0.observer === observer }
     }
     
-    private func notifyObservers() {
+    private func notify() {
         observers.forEach { $0.observer?.walletCertificatesDidUpdate() }
+    }
+    
+    private func notifyFavoriteCertificate() {
+        observers.forEach { $0.observer?.walletFavoriteCertificateDidUpdate() }
     }
     
 }

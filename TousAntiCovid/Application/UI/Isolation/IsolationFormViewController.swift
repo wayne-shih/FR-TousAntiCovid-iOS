@@ -275,21 +275,19 @@ extension IsolationFormViewController {
 extension IsolationFormViewController {
     
     private func selectableRow(title: String, isSelected: Bool, isLastRowInGroup: Bool, selectionBlock: @escaping () -> ()) -> CVRow {
-        let row: CVRow = CVRow(title: title,
-                               xibName: .textCell,
-                               theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                  topInset: Appearance.Cell.leftMargin,
-                                                  bottomInset: Appearance.Cell.leftMargin,
-                                                  textAlignment: .natural,
-                                                  titleFont: { Appearance.Cell.Text.standardFont },
-                                                  separatorLeftInset: isLastRowInGroup ? 0.0 : Appearance.Cell.leftMargin,
-                                                  separatorRightInset: 0.0),
-                               selectionAction: {
-                                selectionBlock()
-                               }, willDisplay: { cell in
-                                cell.accessoryType = isSelected ? .checkmark : .none
-                               })
-        return row
+        CVRow(title: title,
+              isOn: isSelected,
+              xibName: .selectableCell,
+              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                 topInset: Appearance.Cell.leftMargin,
+                                 bottomInset: Appearance.Cell.leftMargin,
+                                 textAlignment: .natural,
+                                 titleFont: { Appearance.Cell.Text.standardFont },
+                                 separatorLeftInset: isLastRowInGroup ? 0.0 : Appearance.Cell.leftMargin,
+                                 separatorRightInset: 0.0),
+              selectionAction: {
+                selectionBlock()
+              })
     }
     
     private func dateRow(title: String, date: Date?, dateChangedBlock: @escaping (_ newDate: Date, _ closePicker: Bool) -> ()) -> CVRow {

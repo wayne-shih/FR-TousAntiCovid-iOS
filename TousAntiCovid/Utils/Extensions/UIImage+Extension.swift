@@ -21,5 +21,17 @@ extension UIImage {
         UIGraphicsEndImageContext()
         self.init(cgImage: (image?.cgImage!)!)
     }
-    
+
+    func getQRCodeValue() -> String? {
+        guard let ciImage = CIImage(image: self) else { return nil }
+        let detector: CIDetector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])!
+        let features: [CIQRCodeFeature] = detector.features(in: ciImage) as? [CIQRCodeFeature] ?? []
+        return features.compactMap { $0.messageString }.first
+    }
+
+    func cropImage(rect: CGRect) -> UIImage? {
+        guard let croppedCGImage = cgImage?.cropping(to: rect) else { return nil }
+        return UIImage(cgImage: croppedCGImage)
+    }
+
 }

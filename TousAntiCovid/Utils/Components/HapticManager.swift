@@ -12,7 +12,7 @@ import Foundation
 import CoreHaptics
 
 @available(iOS 13.0, *)
-class HapticManager {
+final class HapticManager {
 
     static let shared: HapticManager = HapticManager()
 

@@ -24,6 +24,7 @@ final class FlashVenueCodeController: FlashCodeController {
     }
     
     override func initUI() {
+        super.initUI()
         explanationLabel.text = "venueFlashCodeController.explanation".localized
         explanationLabel.font = Appearance.Cell.Text.standardFont
         explanationLabel.adjustsFontForContentSizeCategory = true

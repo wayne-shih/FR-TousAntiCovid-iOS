@@ -10,13 +10,19 @@
 
 import Foundation
 
-protocol BluetoothCentralManagerDelegate: class {
+protocol BluetoothCentralManagerDelegate: AnyObject {
     
-    func bluetoothCentralManager(_ centralManager: BluetoothCentralManagerProtocol, stateDidChange state: ProximityNotificationState)
+    func bluetoothCentralManager(_ centralManager: BluetoothCentralManagerProtocol,
+                                 stateDidChange state: ProximityNotificationState)
     
-    func bluetoothCentralManager(_ centralManager: BluetoothCentralManagerProtocol, didScan peripheral: BluetoothPeripheral, bluetoothProximityPayload: BluetoothProximityPayload?) -> Bool
+    func bluetoothCentralManager(_ centralManager: BluetoothCentralManagerProtocol,
+                                 didScan bluetoothPeripheralRSSIInfo: BluetoothPeripheralRSSIInfo,
+                                 bluetoothProximityPayload: BluetoothProximityPayload?) -> Bool
     
-    func bluetoothCentralManager(_ centralManager: BluetoothCentralManagerProtocol, didReadCharacteristicForPeripheralIdentifier peripheralIdentifier: UUID, bluetoothProximityPayload: BluetoothProximityPayload)
+    func bluetoothCentralManager(_ centralManager: BluetoothCentralManagerProtocol,
+                                 didRead bluetoothProximityPayload: BluetoothProximityPayload,
+                                 forPeripheralIdentifier peripheralIdentifier: UUID)
     
-    func bluetoothCentralManager(_ centralManager: BluetoothCentralManagerProtocol, didNotFindServiceForPeripheralIdentifier peripheralIdentifier: UUID)
+    func bluetoothCentralManager(_ centralManager: BluetoothCentralManagerProtocol,
+                                 didNotFindServiceForPeripheralIdentifier peripheralIdentifier: UUID)
 }

@@ -29,7 +29,7 @@ final class OnboardingCoordinator: WindowedCoordinator {
     
     private func start() {
         let controller: UIViewController = OnboardingWelcomeController(didContinue: { [weak self] in
-            self?.didTouchHowDoesItWork()
+            self?.goToExplanations()
         }, deinitBlock: { [weak self] in
             self?.didDeinit()
         })
@@ -42,8 +42,8 @@ final class OnboardingCoordinator: WindowedCoordinator {
 
 // MARK: - Flow management -
 extension OnboardingCoordinator {
-    
-    private func didTouchHowDoesItWork() {
+
+    private func goToExplanations() {
         let controller: UIViewController = CVNavigationChildController.controller(OnboardingExplanationsController(didContinue: { [weak self] in
             self?.didTouchPrivacy()
         }))

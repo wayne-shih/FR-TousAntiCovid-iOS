@@ -10,6 +10,7 @@
 
 
 import Foundation
+import CommonCrypto
 
 extension Data {
     
@@ -38,6 +39,16 @@ extension Data {
         let sBytes: [UInt8] = [UInt8](self[(count / 2)...]).trimmingUselessInitialZeroIfNeeded().prefixingWithZeroIfNegativeInteger()
         let bytes: [UInt8] = (rBytes.encodeAsInteger() + sBytes.encodeAsInteger()).encodeAsSequence()
         return Data(bytes)
+    }
+
+    func hmac(key: Data) -> Data {
+        let string: UnsafePointer<UInt8> = (self as NSData).bytes.bindMemory(to: UInt8.self, capacity: self.count)
+        let stringLength = self.count
+        let keyString: [CUnsignedChar] = [UInt8](key)
+        let keyLength: Int = key.bytes.count
+        var result = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+        CCHmac(CCHmacAlgorithm(kCCHmacAlgSHA256), keyString, keyLength, string, stringLength, &result)
+        return Data(result)
     }
 
 }

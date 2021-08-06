@@ -34,6 +34,7 @@ final class KeyFiguresCoordinator: Coordinator {
         }))
         self.navigationController = navigationController
         presentingController?.present(navigationController, animated: true)
+        RatingsManager.shared.didOpenKeyFigures()
     }
 
     private func showKeyFiguresExplanations() {

@@ -16,7 +16,7 @@ import RobertSDK
 final class WidgetManager {
     
     static let shared: WidgetManager = WidgetManager()
-
+    
     static let scheme: String = "tousanticovid"
     
     static let activationDeeplink: URL = URL(string: "\(scheme)://\(UrlAction.activation.rawValue)")!
@@ -161,7 +161,6 @@ final class WidgetManager {
         LocalizationsManager.shared.addObserver(self)
         reloadStrings()
         #endif
-        WidgetCenter.shared.reloadAllTimelines()
     }
     
     #if !WIDGET

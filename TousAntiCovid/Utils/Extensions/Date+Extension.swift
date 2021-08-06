@@ -19,9 +19,13 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    func shortDateFormatted() -> String {
+    func shortDateFormatted(timeZoneIndependant: Bool) -> String {
         let formatter: DateFormatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy"
+        if timeZoneIndependant {
+            formatter.calendar = Calendar(identifier: .iso8601)
+            formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        }
         return formatter.string(from: self).uppercased()
     }
     
@@ -42,19 +46,29 @@ extension Date {
         formatter.setLocalizedDateFormatFromTemplate("dMMM")
         return formatter.string(from: self)
     }
-
-    func dayShortMonthYearFormatted() -> String {
+    
+    func dayShortMonthYearFormatted(timeZoneIndependant: Bool, forceEnglishFormat: Bool = false) -> String {
         let formatter: DateFormatter = DateFormatter()
+        if timeZoneIndependant {
+            formatter.calendar = Calendar(identifier: .iso8601)
+            formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        }
+        if forceEnglishFormat {
+            formatter.locale = Locale(identifier: "en-GB")
+        }
         formatter.setLocalizedDateFormatFromTemplate("dMMMyyyy")
         return formatter.string(from: self)
     }
     
-    func dayShortMonthYearTimeFormatted() -> String {
+    func dayShortMonthYearTimeFormatted(forceEnglishFormat: Bool = false) -> String {
         let formatter: DateFormatter = DateFormatter()
+        if forceEnglishFormat {
+            formatter.locale = Locale(identifier: "en-GB")
+        }
         formatter.setLocalizedDateFormatFromTemplate("dMMMyyyyHHmm")
         return formatter.string(from: self)
     }
-
+    
     func fullDayMonthFormatted() -> String {
         let formatter: DateFormatter = DateFormatter()
         formatter.dateFormat = "EEEE d MMMM"
@@ -73,14 +87,14 @@ extension Date {
         formatter.timeStyle = .short
         return formatter.string(from: self)
     }
-
+    
     func fullDateTimeFormatted(withSeconds: Bool = true) -> String {
         let formatter: DateFormatter = DateFormatter()
         formatter.dateStyle = .short
         formatter.timeStyle = withSeconds ? .medium : .short
         return formatter.string(from: self)
     }
-
+    
     func dateByAddingDays(_ days: Int) -> Date {
         addingTimeInterval(Double(days) * 24.0 * 3600.0)
     }
@@ -90,19 +104,19 @@ extension Date {
         dateComponent.year = years
         return Calendar.current.date(byAdding: dateComponent, to: self)!
     }
-
+    
     func fullDateFormatted() -> String {
         let formatter: DateFormatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         return formatter.string(from: self)
     }
-
+    
     func testCodeFormatted() -> String {
         let formatter: DateFormatter = DateFormatter()
         formatter.dateFormat = "dMMMyyyy"
         return formatter.string(from: self).uppercased()
     }
-
+    
     func underscoreDateFormatted() -> String {
         let formatter: DateFormatter = DateFormatter()
         formatter.dateFormat = "dd_MM_yyyy"
@@ -196,7 +210,7 @@ extension Date {
         components.second = 59
         return Calendar.current.date(from: components)
     }
-
+    
 }
 
 extension Date {
@@ -208,7 +222,7 @@ extension Date {
     init(timeIntervalSince1900: Int) {
         self.init(timeIntervalSince1970: Double(timeIntervalSince1900 - 2208988800))
     }
-
+    
     func svDateByAddingDays(_ days: Int) -> Date {
         addingTimeInterval(Double(days) * 24.0 * 3600.0)
     }

@@ -12,6 +12,12 @@ import Foundation
 
 extension UserDefaults {
     
-    static var widget: UserDefaults { UserDefaults(suiteName: "group.fr.gouv.stopcovid.ios.contents")! }
+    static var widget: UserDefaults {
+        UserDefaults(suiteName: "group.fr.gouv.stopcovid.ios.contents")!
+    }
+    
+    static var widgetDCC: UserDefaults {
+        UserDefaults(suiteName: "group.fr.gouv.stopcovid.ios.contents.dcc")!
+    }
     
 }

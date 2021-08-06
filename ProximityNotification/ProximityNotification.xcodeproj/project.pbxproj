@@ -7,10 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		973B9EF925A35C7E004A303F /* CBCharacteristic+BluetoothProximityNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 973B9EF825A35C7E004A303F /* CBCharacteristic+BluetoothProximityNotification.swift */; };
+		973B9EFF25A35DCC004A303F /* CBCharacteristicProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 973B9EFE25A35DCC004A303F /* CBCharacteristicProtocol.swift */; };
+		973B9F2325A37479004A303F /* CBCharacteristicMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 973B9F2225A37479004A303F /* CBCharacteristicMock.swift */; };
+		97409B59256BC1DF00E59F65 /* CBPeripheral+BluetoothProximityNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97409B58256BC1DF00E59F65 /* CBPeripheral+BluetoothProximityNotification.swift */; };
+		97409B5F256BCBF600E59F65 /* CBPeripheralState+BluetoothProximityNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97409B5E256BCBF600E59F65 /* CBPeripheralState+BluetoothProximityNotification.swift */; };
+		975A19D025E64A2400795467 /* BluetoothPeripheralConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975A19CF25E64A2400795467 /* BluetoothPeripheralConnectionManager.swift */; };
+		975A19E125E7DD5800795467 /* BluetoothPeripheralConnectionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975A19E025E7DD5800795467 /* BluetoothPeripheralConnectionManagerTests.swift */; };
 		976BA398255A8FE2000EBD3B /* BluetoothPeripheralManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 976BA397255A8FE2000EBD3B /* BluetoothPeripheralManagerDelegate.swift */; };
+		979277032562B5E00003737B /* BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 979277022562B5E00003737B /* BluetoothPeripheral.swift */; };
+		979277072562B6930003737B /* BluetoothPeripheralDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 979277062562B6930003737B /* BluetoothPeripheralDataStore.swift */; };
 		97B698E72519FD6B002EF270 /* ProximityNotificationEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97B698E62519FD6B002EF270 /* ProximityNotificationEvent.swift */; };
-		97CD79E4257E857D00EDE346 /* BluetoothRSSICalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD79E3257E857D00EDE346 /* BluetoothRSSICalibrator.swift */; };
-		97CD79EA257E8B6F00EDE346 /* BluetoothRSSICalibratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD79E9257E8B6F00EDE346 /* BluetoothRSSICalibratorTests.swift */; };
+		97CD779525710F4600EDE346 /* BluetoothPeripheralConnectionSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD779425710F4600EDE346 /* BluetoothPeripheralConnectionSelector.swift */; };
+		97CD7A0C257F835200EDE346 /* BluetoothRSSICalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD7A0B257F835200EDE346 /* BluetoothRSSICalibrator.swift */; };
+		97CD7A12257F84BD00EDE346 /* BluetoothRSSICalibratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD7A11257F84BD00EDE346 /* BluetoothRSSICalibratorTests.swift */; };
+		97CD7A1C257F92AE00EDE346 /* CBPeripheralProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD7A1B257F92AE00EDE346 /* CBPeripheralProtocol.swift */; };
+		97CD7A20257F932300EDE346 /* CBCentralManager+BluetoothProximityNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD7A1F257F932300EDE346 /* CBCentralManager+BluetoothProximityNotification.swift */; };
+		97CD7A32257FC12A00EDE346 /* BluetoothPeripheralDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD7A31257FC12A00EDE346 /* BluetoothPeripheralDataStoreTests.swift */; };
+		97CD7A3A257FC24500EDE346 /* CBPeripheralMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD7A39257FC24500EDE346 /* CBPeripheralMock.swift */; };
+		97CD7A4A2580DAE700EDE346 /* BluetoothPeripheralConnectionSelectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD7A492580DAE600EDE346 /* BluetoothPeripheralConnectionSelectorTests.swift */; };
+		97CD7A5125812CD700EDE346 /* BluetoothPeripheralBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CD7A5025812CD700EDE346 /* BluetoothPeripheralBuilder.swift */; };
 		AF114A6D248A695D00736059 /* TimestampedRSSIDataSet.csv in Resources */ = {isa = PBXBuildFile; fileRef = AF114A6C248A695D00736059 /* TimestampedRSSIDataSet.csv */; };
 		AF114A6F248E2EC700736059 /* ProximityFilterConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF114A6E248E2EC700736059 /* ProximityFilterConfiguration.swift */; };
 		AF114A71248E2F0E00736059 /* ProximityFilterOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF114A70248E2F0E00736059 /* ProximityFilterOutput.swift */; };
@@ -38,7 +54,7 @@
 		AFB393A124631533003A7D58 /* BluetoothProximityMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB3939624630F8F003A7D58 /* BluetoothProximityMetadata.swift */; };
 		AFB393A224631533003A7D58 /* BluetoothProximityNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB3938F24630F8F003A7D58 /* BluetoothProximityNotification.swift */; };
 		AFB393A324631533003A7D58 /* BluetoothProximityPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB3938E24630F8F003A7D58 /* BluetoothProximityPayload.swift */; };
-		AFB393A524631533003A7D58 /* BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB3939324630F8F003A7D58 /* BluetoothPeripheral.swift */; };
+		AFB393A524631533003A7D58 /* BluetoothPeripheralRSSIInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB3939324630F8F003A7D58 /* BluetoothPeripheralRSSIInfo.swift */; };
 		AFB393A724631533003A7D58 /* BluetoothSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB3939024630F8F003A7D58 /* BluetoothSettings.swift */; };
 		AFB393A824631533003A7D58 /* CBManagerState+BluetoothProximityNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB3939724630F8F003A7D58 /* CBManagerState+BluetoothProximityNotification.swift */; };
 		AFB393AA24631533003A7D58 /* ProximityInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB3938924630F8F003A7D58 /* ProximityInfo.swift */; };
@@ -76,10 +92,26 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		973B9EF825A35C7E004A303F /* CBCharacteristic+BluetoothProximityNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CBCharacteristic+BluetoothProximityNotification.swift"; sourceTree = "<group>"; };
+		973B9EFE25A35DCC004A303F /* CBCharacteristicProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBCharacteristicProtocol.swift; sourceTree = "<group>"; };
+		973B9F2225A37479004A303F /* CBCharacteristicMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBCharacteristicMock.swift; sourceTree = "<group>"; };
+		97409B58256BC1DF00E59F65 /* CBPeripheral+BluetoothProximityNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CBPeripheral+BluetoothProximityNotification.swift"; sourceTree = "<group>"; };
+		97409B5E256BCBF600E59F65 /* CBPeripheralState+BluetoothProximityNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CBPeripheralState+BluetoothProximityNotification.swift"; sourceTree = "<group>"; };
+		975A19CF25E64A2400795467 /* BluetoothPeripheralConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralConnectionManager.swift; sourceTree = "<group>"; };
+		975A19E025E7DD5800795467 /* BluetoothPeripheralConnectionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralConnectionManagerTests.swift; sourceTree = "<group>"; };
 		976BA397255A8FE2000EBD3B /* BluetoothPeripheralManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralManagerDelegate.swift; sourceTree = "<group>"; };
+		979277022562B5E00003737B /* BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheral.swift; sourceTree = "<group>"; };
+		979277062562B6930003737B /* BluetoothPeripheralDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDataStore.swift; sourceTree = "<group>"; };
 		97B698E62519FD6B002EF270 /* ProximityNotificationEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProximityNotificationEvent.swift; sourceTree = "<group>"; };
-		97CD79E3257E857D00EDE346 /* BluetoothRSSICalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothRSSICalibrator.swift; sourceTree = "<group>"; };
-		97CD79E9257E8B6F00EDE346 /* BluetoothRSSICalibratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothRSSICalibratorTests.swift; sourceTree = "<group>"; };
+		97CD779425710F4600EDE346 /* BluetoothPeripheralConnectionSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralConnectionSelector.swift; sourceTree = "<group>"; };
+		97CD7A0B257F835200EDE346 /* BluetoothRSSICalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothRSSICalibrator.swift; sourceTree = "<group>"; };
+		97CD7A11257F84BD00EDE346 /* BluetoothRSSICalibratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothRSSICalibratorTests.swift; sourceTree = "<group>"; };
+		97CD7A1B257F92AE00EDE346 /* CBPeripheralProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralProtocol.swift; sourceTree = "<group>"; };
+		97CD7A1F257F932300EDE346 /* CBCentralManager+BluetoothProximityNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CBCentralManager+BluetoothProximityNotification.swift"; sourceTree = "<group>"; };
+		97CD7A31257FC12A00EDE346 /* BluetoothPeripheralDataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDataStoreTests.swift; sourceTree = "<group>"; };
+		97CD7A39257FC24500EDE346 /* CBPeripheralMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralMock.swift; sourceTree = "<group>"; };
+		97CD7A492580DAE600EDE346 /* BluetoothPeripheralConnectionSelectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralConnectionSelectorTests.swift; sourceTree = "<group>"; };
+		97CD7A5025812CD700EDE346 /* BluetoothPeripheralBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralBuilder.swift; sourceTree = "<group>"; };
 		AF114A6C248A695D00736059 /* TimestampedRSSIDataSet.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TimestampedRSSIDataSet.csv; sourceTree = "<group>"; };
 		AF114A6E248E2EC700736059 /* ProximityFilterConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProximityFilterConfiguration.swift; sourceTree = "<group>"; };
 		AF114A70248E2F0E00736059 /* ProximityFilterOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProximityFilterOutput.swift; sourceTree = "<group>"; };
@@ -111,7 +143,7 @@
 		AFB3939024630F8F003A7D58 /* BluetoothSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSettings.swift; sourceTree = "<group>"; };
 		AFB3939124630F8F003A7D58 /* BluetoothCentralManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothCentralManager.swift; sourceTree = "<group>"; };
 		AFB3939224630F8F003A7D58 /* BluetoothPeripheralManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralManager.swift; sourceTree = "<group>"; };
-		AFB3939324630F8F003A7D58 /* BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheral.swift; sourceTree = "<group>"; };
+		AFB3939324630F8F003A7D58 /* BluetoothPeripheralRSSIInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralRSSIInfo.swift; sourceTree = "<group>"; };
 		AFB3939624630F8F003A7D58 /* BluetoothProximityMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothProximityMetadata.swift; sourceTree = "<group>"; };
 		AFB3939724630F8F003A7D58 /* CBManagerState+BluetoothProximityNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CBManagerState+BluetoothProximityNotification.swift"; sourceTree = "<group>"; };
 		AFB3939B24630F8F003A7D58 /* ProximityNotificationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProximityNotificationSettings.swift; sourceTree = "<group>"; };
@@ -185,16 +217,26 @@
 				AFB3939124630F8F003A7D58 /* BluetoothCentralManager.swift */,
 				AF51E49E24744D6F00645356 /* BluetoothCentralManagerDelegate.swift */,
 				AF51E4A024744D8900645356 /* BluetoothCentralManagerProtocol.swift */,
-				AFB3939324630F8F003A7D58 /* BluetoothPeripheral.swift */,
+				979277022562B5E00003737B /* BluetoothPeripheral.swift */,
+				975A19CF25E64A2400795467 /* BluetoothPeripheralConnectionManager.swift */,
+				97CD779425710F4600EDE346 /* BluetoothPeripheralConnectionSelector.swift */,
+				979277062562B6930003737B /* BluetoothPeripheralDataStore.swift */,
 				AFB3939224630F8F003A7D58 /* BluetoothPeripheralManager.swift */,
 				976BA397255A8FE2000EBD3B /* BluetoothPeripheralManagerDelegate.swift */,
 				AF51E49C24744D5200645356 /* BluetoothPeripheralManagerProtocol.swift */,
+				AFB3939324630F8F003A7D58 /* BluetoothPeripheralRSSIInfo.swift */,
 				AFB3939624630F8F003A7D58 /* BluetoothProximityMetadata.swift */,
 				AFB3938F24630F8F003A7D58 /* BluetoothProximityNotification.swift */,
 				AFB3938E24630F8F003A7D58 /* BluetoothProximityPayload.swift */,
-				97CD79E3257E857D00EDE346 /* BluetoothRSSICalibrator.swift */,
+				97CD7A0B257F835200EDE346 /* BluetoothRSSICalibrator.swift */,
 				AFB3939024630F8F003A7D58 /* BluetoothSettings.swift */,
+				97CD7A1F257F932300EDE346 /* CBCentralManager+BluetoothProximityNotification.swift */,
+				973B9EF825A35C7E004A303F /* CBCharacteristic+BluetoothProximityNotification.swift */,
+				973B9EFE25A35DCC004A303F /* CBCharacteristicProtocol.swift */,
 				AFB3939724630F8F003A7D58 /* CBManagerState+BluetoothProximityNotification.swift */,
+				97409B58256BC1DF00E59F65 /* CBPeripheral+BluetoothProximityNotification.swift */,
+				97CD7A1B257F92AE00EDE346 /* CBPeripheralProtocol.swift */,
+				97409B5E256BCBF600E59F65 /* CBPeripheralState+BluetoothProximityNotification.swift */,
 			);
 			path = Bluetooth;
 			sourceTree = "<group>";
@@ -203,11 +245,17 @@
 			isa = PBXGroup;
 			children = (
 				AF51E48F247444A300645356 /* BluetoothCentralManagerMock.swift */,
+				97CD7A5025812CD700EDE346 /* BluetoothPeripheralBuilder.swift */,
+				975A19E025E7DD5800795467 /* BluetoothPeripheralConnectionManagerTests.swift */,
+				97CD7A492580DAE600EDE346 /* BluetoothPeripheralConnectionSelectorTests.swift */,
+				97CD7A31257FC12A00EDE346 /* BluetoothPeripheralDataStoreTests.swift */,
 				AF51E48D247444A300645356 /* BluetoothPeripheralManagerMock.swift */,
 				AF51E4942474475300645356 /* BluetoothProximityNotificationTests.swift */,
 				AF51E4952474475300645356 /* BluetoothProximityPayloadTests.swift */,
-				97CD79E9257E8B6F00EDE346 /* BluetoothRSSICalibratorTests.swift */,
+				97CD7A11257F84BD00EDE346 /* BluetoothRSSICalibratorTests.swift */,
 				AF51E4962474475300645356 /* CacheTests.swift */,
+				973B9F2225A37479004A303F /* CBCharacteristicMock.swift */,
+				97CD7A39257FC24500EDE346 /* CBPeripheralMock.swift */,
 				AFC9D3C1246C413F001B7F5B /* Info.plist */,
 				AFAD13932487D8C300058D6A /* ProximityFilterTests.swift */,
 				AF51E4882474242F00645356 /* ProximityPayloadTests.swift */,
@@ -280,7 +328,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1140;
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = Orange;
 				TargetAttributes = {
 					AFB3937D24630DF8003A7D58 = {
@@ -326,37 +374,47 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97CD7A20257F932300EDE346 /* CBCentralManager+BluetoothProximityNotification.swift in Sources */,
 				AFB3939D24631533003A7D58 /* BluetoothCentralManager.swift in Sources */,
 				AFB3939F24631533003A7D58 /* BluetoothPeripheralManager.swift in Sources */,
 				97B698E72519FD6B002EF270 /* ProximityNotificationEvent.swift in Sources */,
 				AF401CBA247E65DB00CFDD4B /* RSSIClipper.swift in Sources */,
 				AFB393A124631533003A7D58 /* BluetoothProximityMetadata.swift in Sources */,
+				97CD7A0C257F835200EDE346 /* BluetoothRSSICalibrator.swift in Sources */,
 				AFC9D3B3246B181A001B7F5B /* RiskComputer.swift in Sources */,
 				AFB393A224631533003A7D58 /* BluetoothProximityNotification.swift in Sources */,
+				97CD7A1C257F92AE00EDE346 /* CBPeripheralProtocol.swift in Sources */,
 				AF114A71248E2F0E00736059 /* ProximityFilterOutput.swift in Sources */,
+				979277072562B6930003737B /* BluetoothPeripheralDataStore.swift in Sources */,
+				97CD779525710F4600EDE346 /* BluetoothPeripheralConnectionSelector.swift in Sources */,
 				AF114A75248E313400736059 /* ProximityFilterMode.swift in Sources */,
 				AFB393A324631533003A7D58 /* BluetoothProximityPayload.swift in Sources */,
 				AF114A77248E38EE00736059 /* RSSIClipperOutput.swift in Sources */,
 				AF51E49F24744D6F00645356 /* BluetoothCentralManagerDelegate.swift in Sources */,
 				AFF54C72248123EA00B6B411 /* Collection+ProximityFilter.swift in Sources */,
 				AF114A73248E2FDC00736059 /* ProximityFilterError.swift in Sources */,
-				AFB393A524631533003A7D58 /* BluetoothPeripheral.swift in Sources */,
+				973B9EFF25A35DCC004A303F /* CBCharacteristicProtocol.swift in Sources */,
+				AFB393A524631533003A7D58 /* BluetoothPeripheralRSSIInfo.swift in Sources */,
 				AFB393A724631533003A7D58 /* BluetoothSettings.swift in Sources */,
 				AF401CBE247E952F00CFDD4B /* ProximityFilter.swift in Sources */,
+				975A19D025E64A2400795467 /* BluetoothPeripheralConnectionManager.swift in Sources */,
 				AFB393A824631533003A7D58 /* CBManagerState+BluetoothProximityNotification.swift in Sources */,
-				97CD79E4257E857D00EDE346 /* BluetoothRSSICalibrator.swift in Sources */,
 				AFB393AA24631533003A7D58 /* ProximityInfo.swift in Sources */,
 				AFF54C702481165100B6B411 /* TimestampedRSSI.swift in Sources */,
 				AF848871246D8BD700117176 /* Cache.swift in Sources */,
 				AF51E4A124744D8900645356 /* BluetoothCentralManagerProtocol.swift in Sources */,
+				97409B5F256BCBF600E59F65 /* CBPeripheralState+BluetoothProximityNotification.swift in Sources */,
+				979277032562B5E00003737B /* BluetoothPeripheral.swift in Sources */,
 				AFC9D3AC246B06C5001B7F5B /* ProximityNotificationVersion.swift in Sources */,
 				976BA398255A8FE2000EBD3B /* BluetoothPeripheralManagerDelegate.swift in Sources */,
 				AF51E49D24744D5200645356 /* BluetoothPeripheralManagerProtocol.swift in Sources */,
+				973B9EF925A35C7E004A303F /* CBCharacteristic+BluetoothProximityNotification.swift in Sources */,
 				AFB393AC24631533003A7D58 /* ProximityNotification.swift in Sources */,
 				AFB393AD24631533003A7D58 /* ProximityNotificationLogger.swift in Sources */,
 				AF114A6F248E2EC700736059 /* ProximityFilterConfiguration.swift in Sources */,
 				AFB393AE24631533003A7D58 /* ProximityNotificationService.swift in Sources */,
 				AFB393AF24631533003A7D58 /* ProximityNotificationSettings.swift in Sources */,
+				97409B59256BC1DF00E59F65 /* CBPeripheral+BluetoothProximityNotification.swift in Sources */,
 				AF51E485247418E000645356 /* ProximityPayload.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -366,14 +424,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF51E49A2474475300645356 /* CacheTests.swift in Sources */,
+				97CD7A4A2580DAE700EDE346 /* BluetoothPeripheralConnectionSelectorTests.swift in Sources */,
+				975A19E125E7DD5800795467 /* BluetoothPeripheralConnectionManagerTests.swift in Sources */,
 				AF51E490247444A300645356 /* BluetoothPeripheralManagerMock.swift in Sources */,
+				97CD7A5125812CD700EDE346 /* BluetoothPeripheralBuilder.swift in Sources */,
+				97CD7A32257FC12A00EDE346 /* BluetoothPeripheralDataStoreTests.swift in Sources */,
 				AF51E4892474242F00645356 /* ProximityPayloadTests.swift in Sources */,
 				AF51E492247444A300645356 /* BluetoothCentralManagerMock.swift in Sources */,
 				AF670FA0248794AA00F4C5F0 /* RSSIClipperTests.swift in Sources */,
+				97CD7A12257F84BD00EDE346 /* BluetoothRSSICalibratorTests.swift in Sources */,
 				AF51E4972474475300645356 /* RiskComputerTests.swift in Sources */,
+				97CD7A3A257FC24500EDE346 /* CBPeripheralMock.swift in Sources */,
 				AF51E4982474475300645356 /* BluetoothProximityNotificationTests.swift in Sources */,
+				973B9F2325A37479004A303F /* CBCharacteristicMock.swift in Sources */,
 				AFAD13942487D8C400058D6A /* ProximityFilterTests.swift in Sources */,
-				97CD79EA257E8B6F00EDE346 /* BluetoothRSSICalibratorTests.swift in Sources */,
 				AF51E4992474475300645356 /* BluetoothProximityPayloadTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -415,6 +479,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -475,6 +540,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -553,6 +619,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

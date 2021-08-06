@@ -15,9 +15,12 @@ class BluetoothPeripheralManagerMock: BluetoothPeripheralManagerProtocol {
 
     weak var delegate: BluetoothPeripheralManagerDelegate?
 
+    var settings: BluetoothSettings
+
     private let dispatchQueue: DispatchQueue
 
-    init(dispatchQueue: DispatchQueue) {
+    init(settings: BluetoothSettings, dispatchQueue: DispatchQueue) {
+        self.settings = settings
         self.dispatchQueue = dispatchQueue
     }
     
@@ -25,13 +28,13 @@ class BluetoothPeripheralManagerMock: BluetoothPeripheralManagerProtocol {
     
     func stop() {}
 
-    func scheduleIncomingWriteRequest(from bluetoothPeripheral: BluetoothPeripheral,
+    func scheduleIncomingWriteRequest(from bluetoothPeripheral: BluetoothPeripheralRSSIInfo,
                                       payload: BluetoothProximityPayload,
                                       after delay: TimeInterval) {
         dispatchQueue.asyncAfter(deadline: .now() + delay) {
             self.delegate?.bluetoothPeripheralManager(self,
-                                                      didReceiveWriteFrom: bluetoothPeripheral,
-                                                      bluetoothProximityPayload: payload)
+                                                      didReceive: payload,
+                                                      from: bluetoothPeripheral)
         }
     }
 }

@@ -10,7 +10,9 @@
 
 import Foundation
 
-protocol BluetoothPeripheralManagerDelegate: class {
+protocol BluetoothPeripheralManagerDelegate: AnyObject {
 
-    func bluetoothPeripheralManager(_ peripheralManager: BluetoothPeripheralManagerProtocol, didReceiveWriteFrom peripheral: BluetoothPeripheral, bluetoothProximityPayload: BluetoothProximityPayload)
+    func bluetoothPeripheralManager(_ peripheralManager: BluetoothPeripheralManagerProtocol,
+                                    didReceive bluetoothProximityPayload: BluetoothProximityPayload,
+                                    from bluetoothPeripheralRSSIInfo: BluetoothPeripheralRSSIInfo)
 }

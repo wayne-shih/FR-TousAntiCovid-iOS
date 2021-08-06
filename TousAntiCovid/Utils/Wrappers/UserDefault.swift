@@ -46,7 +46,7 @@ extension UserDefault where T: ExpressibleByNilLiteral {
 }
 
 extension UserDefault {
-
+    
     enum Key: String {
         case isAppAlreadyInstalled = "isAppAlreadyInstalled_v2"
         case isOnboardingDone = "isOnboardingDone_v2"
@@ -90,8 +90,14 @@ extension UserDefault {
         case isAnalyticsOptIn
         case latestAvailableBuild
         case didAlreadyShowUniversalQrCodeExplanations
+        case didAlreadyShowUserLanguage
         case deleteAnalyticsAfterNextStatus
         case lastInitialCertsBuildNumber
+        case appLanguage
+        case favoriteDccId
+        case keyFiguresOpeningCount
+        case lastBuildNumberForRatingsAlert
+        case didShowRatingsAlert
         
     }
     

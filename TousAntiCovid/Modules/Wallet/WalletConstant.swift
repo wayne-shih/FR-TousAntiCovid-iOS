@@ -15,6 +15,7 @@ enum WalletConstant {
     enum Separator: String {
         case group = "<GS>"
         case unit = "<US>"
+        case declareCode = "%1E"
 
         var ascii: String {
             switch self {
@@ -22,6 +23,8 @@ enum WalletConstant {
                 return String(UnicodeScalar(UInt8(29)))
             case .unit:
                 return String(UnicodeScalar(UInt8(31)))
+            case .declareCode:
+                return String(UnicodeScalar(UInt8(30)))
             }
         }
     }

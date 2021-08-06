@@ -23,6 +23,7 @@ final class FlashWallet2DDocController: FlashCodeController {
     }
     
     override func initUI() {
+        super.initUI()
         explanationLabel.text = "flashDataMatrixCodeController.explanation".localized
         explanationLabel.font = Appearance.Cell.Text.standardFont
         explanationLabel.adjustsFontForContentSizeCategory = true

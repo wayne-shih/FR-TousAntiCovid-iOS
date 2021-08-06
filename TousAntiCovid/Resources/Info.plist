@@ -49,6 +49,8 @@
 	<string>TousAntiCovid needs to access your camera in order to flash a QR code.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>TousAntiCovid needs to add photo to your Library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TousAntiCovid needs to access to your Library.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>SF-Pro-Text-Bold.otf</string>

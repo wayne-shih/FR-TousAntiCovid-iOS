@@ -35,6 +35,7 @@ final class VaccinationCertificate: WalletCertificate {
         do {
             return try signatureString.decodeBase32(padded: signatureString.hasSuffix("="))
         } catch {
+            print(error)
             return nil
         }
     }
@@ -52,7 +53,7 @@ final class VaccinationCertificate: WalletCertificate {
     var completeCycleDosesCount: String? { fields[FieldName.completeCycleDosesCount.rawValue] }
     
     var lastVaccinationDate: Date?
-    var lastVaccinationDateString: String? { lastVaccinationDate?.dayShortMonthYearFormatted() }
+    var lastVaccinationDateString: String? { parse2DDocDateString(dateString: fields[FieldName.lastVaccinationDate.rawValue]) }
 
     var vaccinationCycleState: String? {
         guard let cycleState = fields[FieldName.vaccinationCycleState.rawValue] else { return nil }
@@ -83,7 +84,7 @@ final class VaccinationCertificate: WalletCertificate {
     override init(id: String = UUID().uuidString, value: String, type: WalletConstant.CertificateType) {
         super.init(id: id, value: value, type: type)
         self.fields = parse(value)
-        self.birthDateString = parseBirthDate()
+        self.birthDateString = parse2DDocDateString(dateString: fields[FieldName.birthDate.rawValue])
         self.lastVaccinationDate = parseLastVaccinationDate()
     }
 
@@ -110,11 +111,11 @@ final class VaccinationCertificate: WalletCertificate {
         return captures
     }
     
-    private func parseBirthDate() -> String? {
-        guard let birthDateString = fields[FieldName.birthDate.rawValue], birthDateString.count == 8 else { return nil }
-        let dayString: String = birthDateString[0...1]
-        let monthString: String = birthDateString[2...3]
-        let yearString: String = birthDateString[4...7]
+    private func parse2DDocDateString(dateString: String?) -> String? {
+        guard let dateString = dateString, dateString.count == 8 else { return nil }
+        let dayString: String = dateString[0...1]
+        let monthString: String = dateString[2...3]
+        let yearString: String = dateString[4...7]
         return "\(dayString)/\(monthString)/\(yearString)"
     }
     

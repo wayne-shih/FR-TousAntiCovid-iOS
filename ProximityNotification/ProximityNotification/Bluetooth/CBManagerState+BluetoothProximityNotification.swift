@@ -23,7 +23,9 @@ extension CBManagerState {
             return .unauthorized
         case .unsupported:
             return .unsupported
-        case .unknown, .resetting:
+        case .resetting:
+            return .resetting
+        case .unknown:
             return .unknown
         @unknown default:
             return .unknown

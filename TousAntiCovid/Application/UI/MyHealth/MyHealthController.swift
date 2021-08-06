@@ -83,7 +83,7 @@ final class MyHealthController: CVTableViewController {
         let notificationDate: Date? = RBManager.shared.lastStatusReceivedDate
         let notificationDateString: String? = currentRiskLevel.riskLevel == 0 ? notificationDate?.relativelyFormatted() : nil
         var lastContactDateString: String? = nil
-        if let lastContactDateFrom = RisksUIManager.shared.lastContactDateFrom?.dayShortMonthFormatted(), let lastContactDateTo = RisksUIManager.shared.lastContactDateTo?.dayShortMonthYearFormatted() {
+        if let lastContactDateFrom = RisksUIManager.shared.lastContactDateFrom?.dayShortMonthFormatted(), let lastContactDateTo = RisksUIManager.shared.lastContactDateTo?.dayShortMonthYearFormatted(timeZoneIndependant: true) {
             lastContactDateString = String(format: "myHealthStateHeaderCell.exposureDate.range".localized, lastContactDateFrom, lastContactDateTo)
         } else if let lastContactDate = RisksUIManager.shared.lastContactDateFrom?.dayMonthYearFormatted() {
             lastContactDateString = lastContactDate

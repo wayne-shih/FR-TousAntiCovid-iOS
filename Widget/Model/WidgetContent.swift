@@ -11,7 +11,7 @@
 import Foundation
 import WidgetKit
 
-struct WidgetContent: TimelineEntry, Codable {
+struct WidgetContent: TimelineEntry {
     var date: Date = Date()
     var isProximityActivated: Bool
     var isSick: Bool

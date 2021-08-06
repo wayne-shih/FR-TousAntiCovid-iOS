@@ -67,7 +67,7 @@ struct KeyFigure: Codable {
     
     private let series: [KeyFigureSeriesItem]?
     private let chartType: ChartKind?
-    
+    var isLabelReady: Bool { "\(labelKey).label".localizedOrNil != nil }
     var label: String { "\(labelKey).label".localized.trimmingCharacters(in: .whitespaces) }
     var shortLabel: String { "\(labelKey).shortLabel".localized.trimmingCharacters(in: .whitespaces) }
     var description: String { "\(labelKey).description".localized.trimmingCharacters(in: .whitespaces) }

@@ -13,7 +13,11 @@ import UIKit
 extension Locale {
 
     static var currentAppLanguageCode: String {
-        Constant.supportedLanguageCodes.first { $0 == Locale.current.languageCode } ?? Constant.defaultLanguageCode
+        Constant.supportedLanguageCodes.first { $0 == Constant.appLanguage } ?? Constant.supportedLanguageCodes.first { $0 == Locale.current.languageCode } ?? Constant.defaultLanguageCode
+    }
+    
+    static var isCurrentLanguageSupported: Bool {
+        Constant.supportedLanguageCodes.contains(Locale.current.languageCode ?? "")
     }
     
 }

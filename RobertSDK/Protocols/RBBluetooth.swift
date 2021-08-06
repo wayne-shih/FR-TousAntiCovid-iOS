@@ -16,5 +16,6 @@ public protocol RBBluetooth {
                ebidExtractionHandler: @escaping (_ data: Data) -> Data,
                didReceiveProximity: @escaping (_ proximity: RBReceivedProximity) -> ())
     func stop()
+    func updateSettings()
     
 }

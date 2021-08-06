@@ -12,20 +12,20 @@ import Foundation
 
 class BluetoothRSSICalibrator {
 
-    private let settings: BluetoothSettings
+    var settings: BluetoothSettings
 
     init(settings: BluetoothSettings) {
         self.settings = settings
     }
 
-    func calibrateRSSI(for bluetoothPeripheral: BluetoothPeripheral, from bluetoothProximityPayload: BluetoothProximityPayload) -> Int? {
-        guard let rawRSSI = bluetoothPeripheral.rssi else { return nil }
+    func calibrateRSSI(for bluetoothPeripheralRSSIInfo: BluetoothPeripheralRSSIInfo, from bluetoothProximityPayload: BluetoothProximityPayload) -> Int? {
+        guard let rawRSSI = bluetoothPeripheralRSSIInfo.rssi else { return nil }
 
         var calibratedRSSI: Int
-        if !bluetoothPeripheral.isRSSIFromPayload {
-            calibratedRSSI = rawRSSI - Int(bluetoothProximityPayload.txPowerLevel) - Int(settings.rxCompensationGain)
+        if !bluetoothPeripheralRSSIInfo.isRSSIFromPayload {
+            calibratedRSSI = rawRSSI - Int(bluetoothProximityPayload.txPowerLevel) - Int(settings.dynamicSettings.rxCompensationGain)
         } else {
-            calibratedRSSI = rawRSSI - Int(settings.txCompensationGain)
+            calibratedRSSI = rawRSSI - Int(settings.dynamicSettings.txCompensationGain)
         }
 
         return calibratedRSSI

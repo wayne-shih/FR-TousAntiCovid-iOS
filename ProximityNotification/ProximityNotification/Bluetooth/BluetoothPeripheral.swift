@@ -5,18 +5,49 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Orange / Date - 2020/05/06 - for the TousAntiCovid project
+ * Created by Orange / Date - 2020/11/16 - for the TousAntiCovid project
  */
 
 import Foundation
 
-struct BluetoothPeripheral: Hashable {
-    
-    let peripheralIdentifier: UUID
-    
-    let timestamp: Date
-    
-    let rssi: Int?
+class BluetoothPeripheral {
 
-    let isRSSIFromPayload: Bool
+    enum OperatingSystem: String {
+        case android, iOS
+    }
+
+    let peripheral: CBPeripheralProtocol
+
+    let operatingSystem: OperatingSystem
+
+    var bluetoothProximityPayload: BluetoothProximityPayload?
+
+    var expired = false
+
+    let creationDate: Date
+
+    var lastScannedDate: Date?
+
+    var waitingForConnection = false
+
+    private var connectionTimeoutTimer: Timer?
+
+    init(peripheral: CBPeripheralProtocol, operatingSystem: OperatingSystem) {
+        self.peripheral = peripheral
+        self.operatingSystem = operatingSystem
+        creationDate = Date()
+    }
+
+    deinit {
+        invalidateConnectionTimeoutTimer()
+    }
+
+    func setConnectionTimeoutTimer(_ connectionTimeoutTimer: Timer) {
+        self.connectionTimeoutTimer = connectionTimeoutTimer
+    }
+    
+    func invalidateConnectionTimeoutTimer() {
+        connectionTimeoutTimer?.invalidate()
+        connectionTimeoutTimer = nil
+    }
 }

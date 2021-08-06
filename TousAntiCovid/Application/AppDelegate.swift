@@ -39,6 +39,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         let storageManager: StorageManager = StorageManager()
         AttestationsManager.shared.start(storageManager: storageManager)
         WalletManager.shared.start(storageManager: storageManager)
+        WalletManager.shared.addObserver(self)
         VenuesManager.shared.start(storageManager: storageManager)
         IsolationManager.shared.start(storageManager: storageManager)
         PrivacyManager.shared.start()
@@ -46,12 +47,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         KeyFiguresExplanationsManager.shared.start()
         WalletImagesManager.shared.start()
         DccCertificatesManager.shared.start()
+        DccBlacklistManager.shared.start()
         OrientationManager.shared.start()
         if isOnboardingDone {
             BluetoothStateManager.shared.start()
         }
         InGroupeServer.shared.start(certificateFiles: Constant.Server.convertCertificates,
-                                    convertUrl: { ParametersManager.shared.certificateConversionUrl },
+                                    convertUrl: { Constant.Server.convertUrl },
                                     requestLoggingHandler: { _, _, _, _ in })
 
         CleaServer.shared.start(reportBaseUrl: { Constant.Server.cleaReportBaseUrl },
@@ -80,9 +82,11 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                     StatusManager.shared.status()
                                }, didSaveProximity: { _ in })
         ParametersManager.shared.start()
+        RatingsManager.shared.start()
         AnalyticsManager.shared.start()
         if #available(iOS 14.0, *) {
             WidgetManager.shared.start()
+            WidgetDCCManager.shared.start()
         }
         StatusManager.shared.start(storageManager: storageManager)
         isAppAlreadyInstalled = true
@@ -167,6 +171,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         if #available(iOS 14.0, *) {
             WidgetManager.shared.processUserActivity(userActivity)
+            WidgetDCCManager.shared.processUserActivity(userActivity)
         }
         DeepLinkingManager.shared.appLaunchedFromDeeplinkOrShortcut = true
         DeepLinkingManager.shared.processActivity(userActivity)
@@ -216,6 +221,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                                                                   localizedSubtitle: nil,
                                                                                   icon: UIApplicationShortcutIcon(templateImageName: "qrScan"))
         shortcuts.append(qrScanShortcut)
+        if !WalletManager.shared.favoriteDccId.isNil {
+            let favoriteDccShortcut: UIApplicationShortcutItem = UIApplicationShortcutItem(type: Constant.ShortcutItem.favoriteDcc.rawValue,
+                                                                                      localizedTitle: Constant.ShortcutItem.favoriteDcc.rawValue.localized,
+                                                                                      localizedSubtitle: nil,
+                                                                                      icon: UIApplicationShortcutIcon(templateImageName: "FilledHeart"))
+            shortcuts.append(favoriteDccShortcut)
+        }
         UIApplication.shared.shortcutItems = shortcuts
     }
     
@@ -227,7 +239,18 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             DeepLinkingManager.shared.processFullVenueRecordingUrl()
         } else if shortcutItem.type == Constant.ShortcutItem.qrScan.rawValue {
             DeepLinkingManager.shared.processOpenQrScan()
+        } else if shortcutItem.type == Constant.ShortcutItem.favoriteDcc.rawValue {
+            DeepLinkingManager.shared.processOpenFavoriteCertificateQrCode()
         }
+    }
+
+}
+
+extension AppDelegate: WalletChangesObserver {
+
+    func walletCertificatesDidUpdate() {}
+    func walletFavoriteCertificateDidUpdate() {
+        updateAppShortcut()
     }
 
 }

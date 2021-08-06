@@ -191,6 +191,10 @@ public final class RBManager {
     public func stopProximityDetection() {
         bluetooth.stop()
     }
+
+    public func updateProximityDetectionSettings() {
+        bluetooth.updateSettings()
+    }
     
     @objc private func applicationWillTerminate() {
         storage.stop()

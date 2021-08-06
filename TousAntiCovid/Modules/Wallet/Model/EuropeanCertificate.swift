@@ -16,10 +16,10 @@ final class EuropeanCertificate: WalletCertificate {
     override var signature: Data? { nil }
     override var isSignatureAlreadyEncoded: Bool { false }
 
-    private var fullName: String { hCert.fullName.uppercased() }
-    private var birthDateString: String? {
-        guard let dateString = hCert.get(.dateOfBirth).string else { return nil }
-        return Date.dateFormatter.date(from: dateString)?.shortDateFormatted() ?? dateString
+    private var fullName: String {
+        let first: String? = hCert.get(.firstName).string
+        let last: String? = hCert.get(.lastName).string
+        return [first, last].compactMap { $0?.trimmingCharacters(in: .whitespaces) } .joined(separator: " ")
     }
 
     override var timestamp: Double {
@@ -39,61 +39,111 @@ final class EuropeanCertificate: WalletCertificate {
     override var shortDescription: String? { fullName }
 
     override var fullDescription: String? {
+        var strings: [String?] = []
         switch hCert.type {
         case .vaccine:
-            return fullDescriptionVaccination
+            strings.append(fullDescriptionVaccination(forceEnglishFormat: false))
         case .test:
-            return fullDescriptionTest
+            strings.append(fullDescriptionTest(forceEnglishFormat: false))
         case .recovery:
-            return fullDescriptionRecovery
+            strings.append(fullDescriptionRecovery(forceEnglishFormat: false))
+        }
+        strings.append("wallet.proof.europe.foreignCountryWarning.\(countryCode?.lowercased() ?? "")".localizedOrNil)
+        return strings.compactMap { $0 } .joined(separator: "\n\n")
+    }
+
+    var isForeignCertificate: Bool { countryCode != "FR" }
+
+    var fullDescriptionForFullscreen: String? {
+        switch hCert.type {
+        case .vaccine:
+            return fullDescriptionVaccination(forceEnglishFormat: true)
+        case .test:
+            return fullDescriptionTest(forceEnglishFormat: true)
+        case .recovery:
+            return fullDescriptionRecovery(forceEnglishFormat: true)
         }
     }
 
     var medicalProductCode: String? {
         guard let vaccinationEntry = hCert.vaccineStatements.first else { return nil }
-        return vaccinationEntry.medicalProduct
+        return vaccinationEntry.medicalProduct.trimmingCharacters(in: .whitespaces)
     }
-
+    
     var isLastDose: Bool? {
         guard let vaccinationEntry = hCert.vaccineStatements.first else { return nil }
         return vaccinationEntry.doseNumber == vaccinationEntry.dosesTotal
     }
+    
+    var isTestNegative: Bool? {
+        hCert.testStatements.first?.resultNegative
+    }
 
+    var uniqueHash: String { "\(countryCode?.uppercased() ?? "")\(hCert.uvci)".sha256() }
+
+    private func birthDateString(forceEnglishFormat: Bool) -> String? {
+        hCert.dateOfBirth?.dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
+    }
+    
     private let hCert: HCert
 
-    private var fullDescriptionVaccination: String? {
+    private var countryCode: String? {
+        switch hCert.type {
+        case .vaccine:
+            return hCert.vaccineStatements.first?.countryCode
+        case .test:
+            return hCert.testStatements.first?.countryCode
+        case .recovery:
+            return hCert.recoveryStatements.first?.countryCode
+        }
+    }
+    
+    private func fullDescriptionVaccination(forceEnglishFormat: Bool) -> String? {
         // Still waiting for string format confirmation.
         guard let vaccinationEntry = hCert.vaccineStatements.first else { return nil }
-        return "wallet.proof.europe.vaccine.description".localized
+        
+        let flag: String? = isForeignCertificate && !forceEnglishFormat ? countryCode?.flag() : nil
+        let string: String = forceEnglishFormat ? "europeanCertificate.fullscreen.englishDescription.vaccine" : "wallet.proof.europe.vaccine.description"
+        let date: String = vaccinationEntry.date.dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
+        
+        return [flag, string.localized].compactMap { $0 } .joined(separator: " ")
             .replacingOccurrences(of: "<FULL_NAME>", with: fullName)
-            .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString ?? "")
-            .replacingOccurrences(of: "<VACCINE_NAME>", with: l10n("vac.product.\(vaccinationEntry.medicalProduct)", or: vaccinationEntry.medicalProduct) )
-            .replacingOccurrences(of: "<DATE>", with: vaccinationEntry.date.shortDateFormatted())
+            .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
+            .replacingOccurrences(of: "<VACCINE_NAME>", with: l10n("vac.product.\(medicalProductCode ?? "")", or: medicalProductCode) )
+            .replacingOccurrences(of: "<DATE>", with: date)
     }
-
-    private var fullDescriptionTest: String? {
+    
+    private func fullDescriptionTest(forceEnglishFormat: Bool) -> String? {
         // Still waiting for string format confirmation.
         guard let testEntry = hCert.testStatements.first else { return nil }
-        let testResultKey: String = testEntry.resultNegative ? "negative" : "positive"
-        return "wallet.proof.europe.test.description".localized
+        let testResultKey: String = isTestNegative == true ? "negative" : "positive"
+        let flag: String? = isForeignCertificate && !forceEnglishFormat ? countryCode?.flag() : nil
+        let string: String = forceEnglishFormat ? "europeanCertificate.fullscreen.englishDescription.test" : "wallet.proof.europe.test.description"
+        let fromDate: String = testEntry.sampleTime.dayShortMonthYearTimeFormatted(forceEnglishFormat: forceEnglishFormat)
+        
+        return [flag, string.localized].compactMap { $0 } .joined(separator: " ")
             .replacingOccurrences(of: "<FULL_NAME>", with: fullName)
-            .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString ?? "")
+            .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
             .replacingOccurrences(of: "<ANALYSIS_CODE>", with: l10n("test.man.\(testEntry.type)", or: testEntry.type))
             .replacingOccurrences(of: "<ANALYSIS_RESULT>", with: "wallet.proof.europe.test.\(testResultKey)".localized)
-            .replacingOccurrences(of: "<FROM_DATE>", with: testEntry.sampleTime.dayShortMonthYearTimeFormatted())
+            .replacingOccurrences(of: "<FROM_DATE>", with: fromDate)
             .appending("\n\(validityString)")
     }
-
-    private var fullDescriptionRecovery: String? {
+    
+    private func fullDescriptionRecovery(forceEnglishFormat: Bool) -> String? {
         // Still waiting for string format confirmation.
         guard let recoveryEntry = hCert.recoveryStatements.first else { return nil }
-        return "wallet.proof.europe.recovery.description".localized
+        let firstPositiveDate: Date? = Date(dateString: recoveryEntry.firstPositiveDate)
+        let flag: String? = isForeignCertificate && !forceEnglishFormat ? countryCode?.flag() : nil
+        let string: String = forceEnglishFormat ? "europeanCertificate.fullscreen.englishDescription.recovery" : "wallet.proof.europe.recovery.description"
+        let date: String = firstPositiveDate?.dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat) ?? ""
+        
+        return [flag, string.localized].compactMap { $0 } .joined(separator: " ")
             .replacingOccurrences(of: "<FULL_NAME>", with: fullName)
-            .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString ?? "")
-            .replacingOccurrences(of: "<FROM_DATE>", with: recoveryEntry.validFrom.shortDateFormatted())
-            .replacingOccurrences(of: "<TO_DATE>", with: recoveryEntry.validUntil.shortDateFormatted())
+            .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
+            .replacingOccurrences(of: "<DATE>", with: date)
     }
-
+    
     init(id: String, value: String, type: WalletConstant.CertificateType, hCert: HCert) {
         self.hCert = hCert
         super.init(id: id, value: value, type: type)

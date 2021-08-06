@@ -14,7 +14,7 @@ import UIKit
 final class SymptomsOriginController: CVTableViewController {
     
     var symptomsParams: SymptomsDeclarationParams
-    
+
     override var isModalInPresentation: Bool {
         get { true }
         set { }

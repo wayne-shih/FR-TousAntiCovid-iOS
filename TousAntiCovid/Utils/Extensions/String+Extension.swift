@@ -10,7 +10,9 @@
 
 import UIKit
 import CommonCrypto
+#if !PROXIMITY
 import ZXingObjC
+#endif
 
 extension String {
     
@@ -32,11 +34,11 @@ extension String {
         }
     }
     
-    var isUuidCode: Bool { self ~= "^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$" }
-    var isShortCode: Bool { self ~= "^[A-Za-z0-9]{6}$" }
-    var isPostalCode: Bool { self ~= "^[0-9]{5}$" }
+    var isUuidCode: Bool { self ~> "^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$" }
+    var isShortCode: Bool { self ~> "^[A-Za-z0-9]{6}$" }
+    var isPostalCode: Bool { self ~> "^[0-9]{5}$" }
 
-    static func ~= (lhs: String, rhs: String) -> Bool {
+    static func ~> (lhs: String, rhs: String) -> Bool {
         guard let regex = try? NSRegularExpression(pattern: rhs) else { return false }
         let range: NSRange = NSRange(location: 0, length: lhs.utf16.count)
         return regex.firstMatch(in: lhs, options: [], range: range) != nil
@@ -66,6 +68,15 @@ extension String {
     
     func removingEmojis() -> String {
         components(separatedBy: .symbols).filter { !$0.isEmpty }.joined().trimmingCharacters(in: .whitespaces)
+    }
+
+    func flag() -> String {
+        let base: UInt32 = 127397
+        var s: String = ""
+        for v in self.unicodeScalars {
+            s.unicodeScalars.append(UnicodeScalar(base + v.value)!)
+        }
+        return String(s)
     }
     
     func callPhoneNumber(from controller: UIViewController) {
@@ -123,18 +134,19 @@ extension String {
         return NumberFormatter.localizedString(from: numberValue, number: .spellOut)
     }
     
-    func qrCode() -> UIImage? {
+    func qrCode(small: Bool = false) -> UIImage? {
         guard let data = data(using: .utf8) else { return nil }
         if let filter = CIFilter(name: "CIQRCodeGenerator") {
             filter.setValue(data, forKey: "inputMessage")
-            let transform: CGAffineTransform = CGAffineTransform(scaleX: 5, y: 5)
+            let factor: CGFloat = small ? 1.0 : 5.0
+            let transform: CGAffineTransform = CGAffineTransform(scaleX: factor, y: factor)
             if let output = filter.outputImage?.transformed(by: transform) {
                 return UIImage(ciImage: output)
             }
         }
         return nil
     }
-
+    #if !PROXIMITY
     func dataMatrix() -> UIImage? {
         let writer: ZXMultiFormatWriter = ZXMultiFormatWriter()
         do {
@@ -146,6 +158,7 @@ extension String {
             return nil
         }
     }
+    #endif
     
     func sha256() -> String {
         if let stringData = self.data(using: String.Encoding.utf8) {
@@ -191,6 +204,10 @@ extension String {
             base64.append(String(repeating: "=", count: 4 - base64.count % 4))
         }
         return base64
+    }
+    
+    func trimLowercased() -> String {
+        trimmingCharacters(in: .whitespaces).lowercased()
     }
     
 }

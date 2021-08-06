@@ -22,3 +22,16 @@ public struct ProximityNotificationSettings {
         self.bluetoothSettings = bluetoothSettings
     }
 }
+
+/// A structure containing the dynamic settings for proximity notification.
+public struct ProximityNotificationDynamicSettings {
+
+    /// The Bluetooth dynamic settings.
+    public let bluetoothDynamicSettings: BluetoothDynamicSettings
+
+    /// Creates dynamic settings for proximity notification.
+    /// - Parameter bluetoothDynamicSettings: The Bluetooth dynamic settings.
+    public init(bluetoothDynamicSettings: BluetoothDynamicSettings) {
+        self.bluetoothDynamicSettings = bluetoothDynamicSettings
+    }
+}

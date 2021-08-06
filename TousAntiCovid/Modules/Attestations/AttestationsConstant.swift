@@ -12,6 +12,6 @@ import Foundation
 
 enum AttestationsConstant {
     
-    static let jsonUrl: URL = URL(string: "https://\(Constant.Server.resourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/Attestations/form.json")!
+    static let jsonUrl: URL = URL(string: "https://\(Constant.Server.staticResourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/Attestations/form.json")!
     
 }

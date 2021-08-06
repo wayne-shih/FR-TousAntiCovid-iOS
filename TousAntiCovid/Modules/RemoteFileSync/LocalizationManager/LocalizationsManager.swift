@@ -30,7 +30,7 @@ final class LocalizationsManager: RemoteFileSyncManager {
 
     static let shared: LocalizationsManager = LocalizationsManager()
     var strings: [String: String] = [:]
-    
+
     @UserDefault(key: .lastInitialStringsBuildNumber)
     private var lastInitialStringsBuildNumber: String? = nil
     
@@ -106,8 +106,8 @@ extension LocalizationsManager {
 
 extension String {
     
-    var localized: String { LocalizationsManager.shared.strings[self] ?? self }
-    var localizedOrEmpty: String { LocalizationsManager.shared.strings[self] ?? "" }
-    var localizedOrNil: String? { LocalizationsManager.shared.strings[self] }
+    var localized: String { localizedOrNil ?? self }
+    var localizedOrEmpty: String { localizedOrNil ?? "" }
+    var localizedOrNil: String? { LocalizationsManager.shared.strings[self]?.replacingOccurrences(of: "%s", with: "%@") }
     
 }

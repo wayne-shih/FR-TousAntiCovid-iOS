@@ -55,7 +55,7 @@ final class VaccinationCenterCell: CVTableViewCell, Xibbed {
         openingDateTitleLabel.text = "vaccinationCenterCell.openingDate.title".localized
         if let openingDate = vaccinationCenter.availabilityTimestamp {
             let date: Date = Date(timeIntervalSince1970: openingDate)
-            openingDateLabel.text = "\("vaccinationCenterCell.openingDate.from".localized) \(date.shortDateFormatted())"
+            openingDateLabel.text = "\("vaccinationCenterCell.openingDate.from".localized) \(date.shortDateFormatted(timeZoneIndependant: true))"
         }
         openingTimeLabel.text = vaccinationCenter.planning
     }

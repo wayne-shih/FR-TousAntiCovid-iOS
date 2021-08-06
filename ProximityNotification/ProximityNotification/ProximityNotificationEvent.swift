@@ -18,6 +18,7 @@ enum ProximityNotificationEvent: String {
     case bluetoothPeripheralManagerStartAdvertising
     case bluetoothPeripheralManagerDidUpdateState
     case bluetoothPeripheralManagerWillRestoreState
+    case bluetoothPeripheralManagerAddService
     case bluetoothPeripheralManagerDidAddService
     case bluetoothPeripheralManagerDidStartAdvertising
     case bluetoothPeripheralManagerDidReceiveRead
@@ -30,15 +31,15 @@ enum ProximityNotificationEvent: String {
     case bluetoothCentralManagerStart
     case bluetoothCentralManagerStop
     case bluetoothCentralManagerScanForPeripherals
-    case bluetoothCentralManagerPeripheralAlreadyConnected
+    case bluetoothCentralManagerPeripheralNoNeedToPerformConnection
     case bluetoothCentralManagerConnectingToPeripheral
     case bluetoothCentralManagerConnectionTimeoutToPeripheral
     case bluetoothCentralManagerStartDiscoveringPeripheralServices
     case bluetoothCentralManagerPeripheralServicesAlreadyDiscovered
     case bluetoothCentralManagerPeripheralServiceNotFound
     case bluetoothCentralManagerStartDiscoveringServiceCharacteristics
-    case bluetoothCentralManagerServiceCharacteristicsAlreadyDiscovered
-    case bluetoothCentralManagerServiceCharacteristicNotFound
+    case bluetoothCentralManagerPeripheralCharacteristicsAlreadyDiscovered
+    case bluetoothCentralManagerPeripheralCharacteristicNotFound
     case bluetoothCentralManagerPeripheralWriteValue
     case bluetoothCentralManagerPeripheralReadValue
     case bluetoothCentralManagerCleanPeripheral
@@ -57,4 +58,11 @@ enum ProximityNotificationEvent: String {
     case bluetoothCentralManagerDidReadPeripheralCharacteristic
     case bluetoothCentralManagerDidWriteValueToPeripheralForCharacteristic
     case bluetoothCentralManagerDidModifyServices
+    case bluetoothCentralManagerExpiredPeripheral
+    case bluetoothCentralManagerConnectPeripheral
+    case bluetoothCentralManagerReadRSSI
+
+    case bluetoothPeripheralConnectionManagerAddPeripheral
+    case bluetoothPeripheralConnectionManagerConnectionAttempt
+    case bluetoothPeripheralConnectionManagerConnectionAttemptDone
 }

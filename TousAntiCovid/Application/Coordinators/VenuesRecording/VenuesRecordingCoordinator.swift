@@ -79,9 +79,9 @@ final class VenuesRecordingCoordinator: Coordinator {
                                             didFlash: { [weak self] stringUrl in
             guard let stringUrl = stringUrl else { return false }
             guard let url = URL(string: stringUrl) else { return false }
-            guard VenuesManager.shared.processVenueUrl(url) != nil else { return false }
             guard VenuesManager.shared.isVenueUrlValid(url) else { return false }
             guard !VenuesManager.shared.isVenueUrlExpired(url) else { return false }
+            guard VenuesManager.shared.processVenueUrl(url) != nil else { return false }
             self?.showConfirmation()
             return true
         }, deinitBlock: needDeinit ? { [weak self] in

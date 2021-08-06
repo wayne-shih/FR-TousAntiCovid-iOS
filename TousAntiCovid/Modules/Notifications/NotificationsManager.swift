@@ -121,7 +121,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         let request: UNNotificationRequest = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         requestAuthorization { _ in
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
-            UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+            UNUserNotificationCenter.current().add(request)
         }
     }
     
@@ -244,7 +244,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         requestAuthorization { _ in
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [NotificationsContant.Identifier.ultimate])
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NotificationsContant.Identifier.ultimate])
-            UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+            UNUserNotificationCenter.current().add(request)
         }
     }
     
@@ -259,7 +259,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         requestAuthorization { _ in
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [NotificationsContant.Identifier.proximityReactivation])
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NotificationsContant.Identifier.proximityReactivation])
-            UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+            UNUserNotificationCenter.current().add(request)
         }
     }
     

@@ -11,14 +11,14 @@
 import UIKit
 import ServerSDK
 import PKHUD
-import CoreHaptics
 
 final class CompletedVaccinationController: CVTableViewController {
 
     private let certificate: EuropeanCertificate
     private var confettiView: ConfettiView?
 
-    private lazy var daysAfterCompletion: Int = { ParametersManager.shared.daysAfterCompletion.first(where: { $0.code == certificate.medicalProductCode ?? "" })?.value ?? ParametersManager.shared.daysAfterCompletion.first(where: { $0.code == "DEFAULT" })?.value ?? 0 }()
+    private lazy var daysAfterCompletion: Int = { ParametersManager.shared.daysAfterCompletion.first(where: { $0.code.trimLowercased() == certificate.medicalProductCode?.trimLowercased() ?? "" })?.value ?? ParametersManager.shared.daysAfterCompletion.first(where: { $0.code.trimLowercased() == "default" })?.value ?? 0 }()
+    
     private lazy var completedDate: Date = { Date(timeIntervalSince1970: certificate.timestamp + Double((daysAfterCompletion * 24 * 3600))) }()
     private lazy var isVaccineCompleted = { completedDate <= Date() }()
 

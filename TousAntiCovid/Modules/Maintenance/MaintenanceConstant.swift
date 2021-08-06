@@ -13,7 +13,7 @@ import Foundation
 
 enum MaintenanceConstant {
 
-    static let baseUrl: URL = URL(string: "https://\(Constant.Server.resourcesRootDomain)/maintenance")!
+    static let baseUrl: URL = URL(string: "https://\(Constant.Server.staticResourcesRootDomain)/maintenance")!
     static let fileName: String = "info-maintenance-v2.json"
     static var fileUrl: URL { baseUrl.appendingPathComponent(fileName) }
     static let minDurationBetweenUpdatesInSeconds: Double = 0.0

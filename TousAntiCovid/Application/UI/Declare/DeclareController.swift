@@ -17,10 +17,10 @@ import MessageUI
 
 final class DeclareController: CVTableViewController {
     
-    let didTouchFlash: () -> ()
-    let didTouchTap: () -> ()
-    let didTouchShowVideo: (_ url: URL) -> ()
-    let deinitBlock: () -> ()
+    private let didTouchFlash: () -> ()
+    private let didTouchTap: () -> ()
+    private let didTouchShowVideo: (_ url: URL) -> ()
+    private let deinitBlock: () -> ()
     
     init(didTouchFlash: @escaping () -> (), didTouchTap: @escaping () -> (), didTouchShowVideo: @escaping (_ url: URL) -> (), deinitBlock: @escaping () -> ()) {
         self.didTouchFlash = didTouchFlash

@@ -25,5 +25,6 @@ extension NSNotification.Name {
     static let lastAvailableBuildDidUpdate: NSNotification.Name = NSNotification.Name(rawValue: "lastAvailableBuildDidUpdate")
     static let openQrScan: NSNotification.Name = NSNotification.Name(rawValue: "openQrScan")
     static let didCompletedVaccinationNotification: NSNotification.Name = NSNotification.Name(rawValue: "didCompletedVaccinationNotification")
-
+    static let openWallet: NSNotification.Name = NSNotification.Name(rawValue: "openWallet")
+    static let openCertificateQRCode: Notification.Name = Notification.Name(rawValue: "openCertificateQRCode")
 }

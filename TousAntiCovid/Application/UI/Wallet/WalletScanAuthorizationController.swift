@@ -53,8 +53,10 @@ final class WalletScanAuthorizationController: CVTableViewController {
     override func createRows() -> [CVRow] {
         let imageRow: CVRow = CVRow(image: Asset.Images.wallet.image,
                                     xibName: .imageCell,
-                                    theme: CVRow.Theme(topInset: 40.0,
-                                                       imageRatio: 375.0 / 233.0))
+                                    theme: CVRow.Theme(topInset: 80.0,
+                                                       bottomInset: 40,
+                                                       imageRatio: 375.0 / 116.0,
+                                                       showImageBottomEdging: true))
         let explanationRow: CVRow = CVRow(title: comingFromTheApp ? "confirmWalletQrCodeController.explanation.title.fromUniversalQrScan".localized : "confirmWalletQrCodeController.explanation.title".localized,
                                           xibName: .textCell,
                                           theme: CVRow.Theme(topInset: 40.0,
@@ -71,7 +73,7 @@ final class WalletScanAuthorizationController: CVTableViewController {
                                         theme: CVRow.Theme(topInset: 20.0, bottomInset: 10.0),
                                         selectionAction: { [weak self] in
                                             self?.didAnswer(true)
-        })
+                                        })
         let refuseRow: CVRow = CVRow(title: "common.cancel".localized,
                                         xibName: .buttonCell,
                                         theme: CVRow.Theme(topInset: 10.0,

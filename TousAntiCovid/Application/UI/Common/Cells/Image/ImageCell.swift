@@ -12,6 +12,8 @@ import UIKit
 
 final class ImageCell: CVTableViewCell {
 
+    @IBOutlet private var bottomEdging: UIView?
+
     override var isAccessibilityElement: Bool {
         get { false }
         set { }
@@ -21,5 +23,9 @@ final class ImageCell: CVTableViewCell {
         get { true }
         set { }
     }
-    
+
+    override func setup(with row: CVRow) {
+        super.setup(with: row)
+        bottomEdging?.isHidden = !row.theme.showImageBottomEdging
+    }
 }

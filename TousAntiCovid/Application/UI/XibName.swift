@@ -21,6 +21,7 @@ enum XibName: String {
     // MARK: - Other cells -
     case standardCell = "StandardCell"
     case textCell = "TextCell"
+    case selectableCell = "SelectableCell"
     case textFieldCell = "TextFieldCell"
     case titleCell = "TitleCell"
     case buttonCell = "ButtonCell"
@@ -75,5 +76,6 @@ enum XibName: String {
     case walletAddCertificateCell = "WalletAddCertificateCell"
     case checkDocumentCell = "CheckDocumentCell"
     case zoomableImageCell = "ZoomableImageCell"
+    case favoriteCertificateCell = "FavoriteCertificateCell"
     
 }

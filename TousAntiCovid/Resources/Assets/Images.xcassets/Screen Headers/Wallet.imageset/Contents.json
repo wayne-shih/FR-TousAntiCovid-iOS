@@ -1,7 +1,27 @@
 {
   "images" : [
     {
-      "filename" : "wallet.pdf",
+      "filename" : "PassSanitaire.pdf",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "light"
+        }
+      ],
+      "filename" : "PassSanitaire-1.pdf",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "PassSanitaire-2.pdf",
       "idiom" : "universal"
     }
   ],

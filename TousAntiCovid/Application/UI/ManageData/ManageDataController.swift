@@ -50,6 +50,21 @@ final class ManageDataController: CVTableViewController {
             }]
         rows.append(contentsOf: showInfoNotificationsRows)
         rows.append(blockSeparatorRow())
+        let userLanguageRows: [CVRow] = [
+            sectionHeaderRow(textPrefix: "manageDataController.userLanguage"),
+            selectableRow(title: "manageDataController.languageFR".localized,
+                          isSelected: Locale.currentAppLanguageCode == Constant.Language.french,
+                          selectionBlock: {
+                            Constant.appLanguage =  Constant.Language.french
+                          }),
+            selectableRow(title: "manageDataController.languageEN".localized,
+                          isSelected: Locale.currentAppLanguageCode == Constant.Language.english,
+                          selectionBlock: {
+                            Constant.appLanguage =  Constant.Language.english
+                          })
+        ]
+        rows.append(contentsOf: userLanguageRows)
+        rows.append(blockSeparatorRow())
         let hideStatusRows: [CVRow] = [
             sectionHeaderRow(textPrefix: "manageDataController.hideStatus"),
             switchRow(textPrefix: "manageDataController.hideStatus",
@@ -131,6 +146,10 @@ final class ManageDataController: CVTableViewController {
         return rows
     }
     
+    private func updateLeftBarButton() {
+        navigationItem.leftBarButtonItem?.title = "common.close".localized
+    }
+    
     private func initUI() {
         tableView.contentInset.top = navigationChildController?.navigationBarHeight ?? 0.0
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
@@ -158,25 +177,38 @@ final class ManageDataController: CVTableViewController {
         return textRow
     }
     
+    private func selectableRow(title: String, isSelected: Bool, selectionBlock: @escaping () -> ()) -> CVRow {
+        CVRow(title: title,
+              isOn: isSelected,
+              xibName: .selectableCell,
+              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                 topInset: Appearance.Cell.leftMargin,
+                                 bottomInset: Appearance.Cell.leftMargin,
+                                 textAlignment: .natural,
+                                 titleFont: { Appearance.Cell.Text.standardFont },
+                                 separatorLeftInset: Appearance.Cell.leftMargin,
+                                 separatorRightInset: 0.0),
+              selectionAction: {
+                selectionBlock()
+              })
+    }
+    
     private func switchRow(textPrefix: String, isOn: Bool, dynamicSwitchLabel: Bool, handler: @escaping (_ isOn: Bool) -> ()) -> CVRow {
-        var switchRow: CVRow = CVRow(title: (dynamicSwitchLabel ? (isOn ? "\(textPrefix).switch.on" : "\(textPrefix).switch.off") : "\(textPrefix).button").localized,
-                                     isOn: isOn,
-                                     xibName: .standardSwitchCell,
-                                     theme: CVRow.Theme(topInset: 10.0,
-                                                        bottomInset: 10.0,
-                                                        textAlignment: .left,
-                                                        titleFont: { Appearance.Cell.Text.standardFont },
-                                                        separatorLeftInset: 0.0,
-                                                        separatorRightInset: 0.0),
-                                     valueChanged: { [weak self] value in
-                                        guard let isOn = value as? Bool else { return }
-                                        handler(isOn)
-                                        if dynamicSwitchLabel {
-                                            self?.reloadUI()
-                                        }
-                                     })
-        switchRow.theme.backgroundColor = Appearance.Cell.cardBackgroundColor
-        return switchRow
+        CVRow(title: (dynamicSwitchLabel ? (isOn ? "\(textPrefix).switch.on" : "\(textPrefix).switch.off") : "\(textPrefix).button").localized,
+              isOn: isOn,
+              xibName: .standardSwitchCell,
+              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                 topInset: 10.0,
+                                 bottomInset: 10.0,
+                                 textAlignment: .left,
+                                 titleFont: { Appearance.Cell.Text.standardFont },
+                                 separatorLeftInset: 0.0,
+                                 separatorRightInset: 0.0),
+              valueChanged: { [weak self] value in
+                guard let isOn = value as? Bool else { return }
+                handler(isOn)
+                self?.reloadUI()
+              })
     }
     
     private func buttonRow(textPrefix: String, isDestuctive: Bool = false, handler: @escaping () -> ()) -> CVRow {
@@ -356,6 +388,7 @@ final class ManageDataController: CVTableViewController {
             SVETagManager.shared.clearAllData()
 
             AnalyticsManager.shared.reset()
+            AnalyticsManager.shared.setOptIn(to: true)
             NotificationCenter.default.post(name: .changeAppState, object: RootCoordinator.State.onboarding, userInfo: nil)
         }
     }
@@ -366,6 +399,7 @@ extension ManageDataController: LocalizationsChangesObserver {
     
     func localizationsChanged() {
         updateTitle()
+        updateLeftBarButton()
         reloadUI()
     }
     

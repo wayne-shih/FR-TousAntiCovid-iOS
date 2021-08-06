@@ -10,9 +10,11 @@
 
 import Foundation
 
-protocol BluetoothCentralManagerProtocol: class {
+protocol BluetoothCentralManagerProtocol: AnyObject {
     
     var delegate: BluetoothCentralManagerDelegate? { get set }
+
+    var settings: BluetoothSettings { get set }
     
     var state: ProximityNotificationState { get }
     

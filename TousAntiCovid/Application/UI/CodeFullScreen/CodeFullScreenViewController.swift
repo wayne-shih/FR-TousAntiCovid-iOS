@@ -14,26 +14,30 @@ final class CodeFullScreenViewController: UIViewController {
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var codeBottomLabel: UILabel!
     @IBOutlet private var label: UILabel!
+    @IBOutlet private var footerLabel: UILabel!
     @IBOutlet private var closeButton: UIButton!
     @IBOutlet private var imageLeadingConstraint: NSLayoutConstraint!
-    
-    private var codeImage: UIImage!
-    private var codeBottomText: String?
-    private var text: String!
+    @IBOutlet private var headerImageView: UIImageView!
+    @IBOutlet private var segmentedControl: UISegmentedControl!
+
+    private var codeDetails: [CodeDetail] = []
+    private var showHeaderImage: Bool = false
     private var lastBrightness: CGFloat = 0.0
     private var isFirstLoad: Bool = true
+    private var footerLabelTapGesture: UITapGestureRecognizer?
     
-    static func controller(codeImage: UIImage, text: String, codeBottomText: String? = nil) -> UIViewController {
+    class func controller(codeDetails: [CodeDetail], showHeaderImage: Bool = false) -> UIViewController {
         let fullscreenController: CodeFullScreenViewController = StoryboardScene.CodeFullScreen.codeFullScreenViewController.instantiate()
-        fullscreenController.codeImage = codeImage
-        fullscreenController.text = text
-        fullscreenController.codeBottomText = codeBottomText
+        fullscreenController.codeDetails = codeDetails
+        fullscreenController.showHeaderImage = showHeaderImage
         return fullscreenController
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupBottomLabelTapGesture()
+        updateContent()
         addObservers()
     }
     
@@ -56,19 +60,69 @@ final class CodeFullScreenViewController: UIViewController {
     
     private func setupUI() {
         view.backgroundColor = .white
-        imageView.image = codeImage
         imageLeadingConstraint.constant = 60.0
-        label.text = text
         label.textColor = .black
+
         closeButton.setTitle("common.close".localized, for: .normal)
         closeButton.setTitleColor(.black, for: .normal)
         label.font = .regular(size: 20.0)
-        codeBottomLabel.text = codeBottomText
         codeBottomLabel.font = Appearance.Cell.Text.headTitleFont4
         codeBottomLabel.textColor = .black
-        codeBottomLabel.isHidden = codeBottomText == nil
+
+        segmentedControl.isHidden = codeDetails.count < 2
+        if !segmentedControl.isHidden {
+            segmentedControl.setTitleTextAttributes([.font: { Appearance.SegmentedControl.selectedFont }()], for: .selected)
+            segmentedControl.setTitleTextAttributes([.font: { Appearance.SegmentedControl.normalFont }()], for: .normal)
+            if #available(iOS 13.0, *) {
+                segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.black], for: .selected)
+                segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.black], for: .normal)
+            }
+            setupSegmentedControl()
+        }
+        headerImageView.isHidden = !showHeaderImage
     }
-    
+
+    private func setupSegmentedControl() {
+        segmentedControl.removeAllSegments()
+        (0..<codeDetails.count).forEach { segmentedControl.insertSegment(withTitle: codeDetails[$0].segmentedControlTitle, at: $0, animated: false) }
+        segmentedControl.selectedSegmentIndex = 0
+
+        if #available(iOS 13.0, *) {
+            // We don't modify the segmented tint color for iOS 13+.
+        } else {
+            segmentedControl.tintColor = Appearance.tintColor
+        }
+        segmentedControl.isHidden = codeDetails.count < 1
+    }
+
+    private func updateContent() {
+        let codeDetail: CodeDetail = codeDetails[segmentedControl.selectedSegmentIndex]
+        imageView.image = codeDetail.codeImage
+        label.text = codeDetail.text
+        codeBottomLabel.isHidden = codeDetail.codeBottomText == nil
+        codeBottomLabel.text = codeDetail.codeBottomText
+        footerLabel.text = codeDetail.footerText
+        footerLabel.isHidden = codeDetail.footerText == nil
+        footerLabel.textAlignment = segmentedControl.selectedSegmentIndex == 0 ? .natural : .center
+        footerLabel.textColor = segmentedControl.selectedSegmentIndex == 0 ? .black : .darkGray
+        footerLabel.font = segmentedControl.selectedSegmentIndex == 0 ? .regular(size: 17.0) : .regular(size: 11.0)
+        footerLabelTapGesture?.isEnabled = segmentedControl.selectedSegmentIndex == 1
+    }
+
+    private func setupBottomLabelTapGesture() {
+        footerLabelTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapFooterLabel))
+        footerLabel.addGestureRecognizer(footerLabelTapGesture!)
+    }
+
+    @objc private func didTapFooterLabel() {
+        UIPasteboard.general.string = codeDetails[segmentedControl.selectedSegmentIndex].footerText
+    }
+
+    @IBAction private func didSelectSegment(_ sender: Any) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        updateContent()
+    }
+
     private func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
     }

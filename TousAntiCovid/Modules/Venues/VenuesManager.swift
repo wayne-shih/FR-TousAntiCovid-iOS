@@ -37,6 +37,11 @@ final class VenuesManager: NSObject {
     
     var venuesQrCodes: [VenueQrCodeInfo] { storageManager?.venuesQrCodes() ?? [] }
 
+    #if !PROD
+    @UserDefault(key: .isVenuesTestActivated)
+    var isVenuesTestActivated: Bool = false { didSet { NotificationCenter.default.post(name: .statusDataDidChange, object: nil) } }
+    #endif
+
     @UserDefault(key: .cleaLastIteration)
     private var cleaLastIteration: Int?
     
@@ -173,6 +178,7 @@ extension VenuesManager {
     func extractTlIdFromBase64Url(code: String) -> String? {
         guard let data = Data(base64Encoded: code.base64urlToBase64()) else { return nil }
         var byteArray: [UInt8] = [UInt8](repeating: 0, count: 16)
+        guard data.count > 16 else { return nil }
         data.copyBytes(to: &byteArray, from: Range(NSRange(location: 1, length: 16))!)
         return NSUUID(uuidBytes: byteArray).uuidString.lowercased()
     }

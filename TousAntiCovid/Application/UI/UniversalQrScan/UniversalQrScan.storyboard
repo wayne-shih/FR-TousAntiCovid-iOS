@@ -11,7 +11,7 @@
         <!--Universal Qr Code Explanations Animation Controller-->
         <scene sceneID="hGP-LD-Wdn">
             <objects>
-                <viewController storyboardIdentifier="UniversalQrCodeExplanationsContainerController" id="hGf-3y-jiF" customClass="UniversalQrCodeExplanationsAnimationController" customModule="TAC_Multi_" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="UniversalQrCodeExplanationsContainerController" id="hGf-3y-jiF" customClass="UniversalQrCodeExplanationsAnimationController" customModule="TAC_Prod_Plus" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="xMn-yn-6yz">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -46,12 +46,12 @@
         <!--Universal Qr Scan Controller-->
         <scene sceneID="ngS-PF-pYK">
             <objects>
-                <viewController storyboardIdentifier="UniversalQrScanController" id="VB8-vQ-9tn" customClass="UniversalQrScanController" customModule="TAC_Multi_" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="UniversalQrScanController" id="VB8-vQ-9tn" customClass="UniversalQrScanController" customModule="TAC_Prod_Plus" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="cBr-S5-MsH">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yoK-Eh-EpV" customClass="UniversalScannerView" customModule="TAC_Multi_" customModuleProvider="target">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yoK-Eh-EpV" customClass="UniversalScannerView" customModule="TAC_Prod_Plus" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
@@ -67,6 +67,19 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="invertedGradient" translatesAutoresizingMaskIntoConstraints="NO" id="PAo-tr-unK">
+                                <rect key="frame" x="0.0" y="650" width="414" height="246"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="246" id="IgQ-h1-T0H"/>
+                                </constraints>
+                            </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2id-0N-8yi">
+                                <rect key="frame" x="20" y="812" width="374" height="30"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="didTouchBottomButton:" destination="VB8-vQ-9tn" eventType="touchUpInside" id="C1P-4M-Xbi"/>
+                                </connections>
+                            </button>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="QRCodePlaceholder" translatesAutoresizingMaskIntoConstraints="NO" id="m9E-vf-LM0">
                                 <rect key="frame" x="68" y="309" width="278" height="278"/>
                                 <constraints>
@@ -81,12 +94,18 @@
                             <constraint firstItem="e3l-Ku-2lO" firstAttribute="top" secondItem="cBr-S5-MsH" secondAttribute="top" id="8Ir-mv-nk0"/>
                             <constraint firstItem="m9E-vf-LM0" firstAttribute="top" relation="greaterThanOrEqual" secondItem="hTe-wP-PDP" secondAttribute="bottom" id="Ce7-l9-uqi"/>
                             <constraint firstItem="yoK-Eh-EpV" firstAttribute="leading" secondItem="cBr-S5-MsH" secondAttribute="leading" id="Hdr-i4-4N3"/>
+                            <constraint firstItem="PAo-tr-unK" firstAttribute="centerX" secondItem="cBr-S5-MsH" secondAttribute="centerX" id="HiI-N0-sQP"/>
                             <constraint firstItem="hTe-wP-PDP" firstAttribute="top" secondItem="vIo-9P-Eub" secondAttribute="top" constant="53" id="JN0-i9-Ahu"/>
+                            <constraint firstItem="2id-0N-8yi" firstAttribute="leading" secondItem="cBr-S5-MsH" secondAttribute="leading" constant="20" id="Oq9-lV-DPf"/>
                             <constraint firstItem="m9E-vf-LM0" firstAttribute="centerY" secondItem="cBr-S5-MsH" secondAttribute="centerY" id="PS8-aO-uYq"/>
                             <constraint firstAttribute="trailing" secondItem="e3l-Ku-2lO" secondAttribute="trailing" id="RUo-WQ-Gnx"/>
                             <constraint firstItem="e3l-Ku-2lO" firstAttribute="leading" secondItem="cBr-S5-MsH" secondAttribute="leading" id="RsM-zS-paR"/>
+                            <constraint firstItem="2id-0N-8yi" firstAttribute="centerX" secondItem="cBr-S5-MsH" secondAttribute="centerX" id="Vre-O6-w9M"/>
+                            <constraint firstItem="PAo-tr-unK" firstAttribute="leading" secondItem="cBr-S5-MsH" secondAttribute="leading" id="bXR-85-NPg"/>
                             <constraint firstAttribute="trailing" secondItem="hTe-wP-PDP" secondAttribute="trailing" constant="20" id="gQu-Hc-VVC"/>
                             <constraint firstItem="hTe-wP-PDP" firstAttribute="leading" secondItem="cBr-S5-MsH" secondAttribute="leading" constant="20" id="iTP-uv-twq"/>
+                            <constraint firstAttribute="bottom" secondItem="PAo-tr-unK" secondAttribute="bottom" id="ieJ-Kz-feu"/>
+                            <constraint firstItem="vIo-9P-Eub" firstAttribute="bottom" secondItem="2id-0N-8yi" secondAttribute="bottom" constant="20" id="jyR-Fq-da8"/>
                             <constraint firstItem="yoK-Eh-EpV" firstAttribute="top" secondItem="cBr-S5-MsH" secondAttribute="top" id="qck-4B-zJu"/>
                             <constraint firstItem="m9E-vf-LM0" firstAttribute="centerX" secondItem="cBr-S5-MsH" secondAttribute="centerX" id="qoX-So-TkS"/>
                             <constraint firstAttribute="bottom" secondItem="yoK-Eh-EpV" secondAttribute="bottom" id="s1y-Pk-Jjh"/>
@@ -94,6 +113,8 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bottomButton" destination="2id-0N-8yi" id="st9-pu-NRN"/>
+                        <outlet property="bottomGradientImageView" destination="PAo-tr-unK" id="Llx-QC-tUb"/>
                         <outlet property="explanationLabel" destination="hTe-wP-PDP" id="cla-Mt-QHh"/>
                         <outlet property="scanView" destination="yoK-Eh-EpV" id="Pi6-t9-hZD"/>
                     </connections>
@@ -106,6 +127,7 @@
     <resources>
         <image name="QRCodePlaceholder" width="240" height="240"/>
         <image name="gradient" width="1" height="350"/>
+        <image name="invertedGradient" width="1" height="350"/>
         <image name="qrScan" width="92" height="92"/>
     </resources>
 </document>

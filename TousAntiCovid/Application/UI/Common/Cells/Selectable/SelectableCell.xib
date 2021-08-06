@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="-101" id="raE-II-eTD" customClass="SelectableCell" customModule="TAC_Prod_Plus" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="70"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="raE-II-eTD" id="HX1-tA-dLH">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="70"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <stackView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="RVd-r7-WrH">
+                        <rect key="frame" x="20" y="0.0" width="335" height="70"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3fm-Jl-Ouc">
+                                <rect key="frame" x="0.0" y="0.0" width="335" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="999" verticalCompressionResistancePriority="1000" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zDR-Go-Xsa">
+                                <rect key="frame" x="0.0" y="28.5" width="335" height="41.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                    </stackView>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="RVd-r7-WrH" secondAttribute="trailing" constant="20" id="Tgx-WQ-VPG"/>
+                    <constraint firstItem="RVd-r7-WrH" firstAttribute="top" secondItem="HX1-tA-dLH" secondAttribute="top" id="Ztq-b2-Auq"/>
+                    <constraint firstAttribute="bottom" secondItem="RVd-r7-WrH" secondAttribute="bottom" id="f2V-Te-w0s"/>
+                    <constraint firstItem="RVd-r7-WrH" firstAttribute="leading" secondItem="HX1-tA-dLH" secondAttribute="leading" constant="20" id="qxd-3S-TF9"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="bottomConstraint" destination="f2V-Te-w0s" id="nfO-33-LYx"/>
+                <outlet property="cvSubtitleLabel" destination="zDR-Go-Xsa" id="Ujp-HQ-0lP"/>
+                <outlet property="cvTitleLabel" destination="3fm-Jl-Ouc" id="Lgp-wU-0fo"/>
+                <outlet property="leadingConstraint" destination="qxd-3S-TF9" id="YqO-ma-Dj7"/>
+                <outlet property="topConstraint" destination="Ztq-b2-Auq" id="oZ9-GA-kSb"/>
+                <outlet property="trailingConstraint" destination="Tgx-WQ-VPG" id="3Sc-zA-vsJ"/>
+            </connections>
+            <point key="canvasLocation" x="213.768115942029" y="10.044642857142856"/>
+        </tableViewCell>
+    </objects>
+</document>

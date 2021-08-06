@@ -16,9 +16,7 @@ class RemoteFileSyncManager: NSObject {
     @UserDefault(key: .lastRemoteFileLanguageCode)
     var lastLanguageCode: String? = nil  {
         didSet {
-            guard oldValue != lastLanguageCode else {
-                return
-            }
+            guard oldValue != lastLanguageCode else { return }
             ETagManager.shared.clearAllData()
         }
     }
@@ -27,6 +25,13 @@ class RemoteFileSyncManager: NSObject {
         writeInitialFileIfNeeded()
         loadLocalFile()
         addObserver()
+    }
+    
+    func reloadLanguage() {
+        writeInitialFileIfNeeded()
+        loadLocalFile()
+        notifyObservers()
+        fetchLastFile(languageCode: Locale.currentAppLanguageCode)
     }
     
     func workingDirectoryName() -> String { fatalError("Must be overriden") }
@@ -76,9 +81,7 @@ class RemoteFileSyncManager: NSObject {
                     self.loadLocalFile()
                 }
                 self.lastLanguageCode = Locale.currentAppLanguageCode
-                DispatchQueue.main.async {
-                    self.notifyObservers()
-                }
+                DispatchQueue.main.async { self.notifyObservers() }
             } catch {}
         }
         dataTask.resume()
@@ -98,7 +101,8 @@ class RemoteFileSyncManager: NSObject {
         let destinationFileUrl: URL = createWorkingDirectoryIfNeeded().appendingPathComponent(fileUrl.lastPathComponent)
         let currentBuildNumber: String = UIApplication.shared.buildNumber
         let isNewAppVersion: Bool = lastBuildNumber() != currentBuildNumber
-        if !FileManager.default.fileExists(atPath: destinationFileUrl.path) || RemoteFileConstant.useOnlyLocalStrings || isNewAppVersion {
+        let languageChanged: Bool = lastLanguageCode != Locale.currentAppLanguageCode
+        if !FileManager.default.fileExists(atPath: destinationFileUrl.path) || RemoteFileConstant.useOnlyLocalStrings || isNewAppVersion || languageChanged {
             try? FileManager.default.removeItem(at: destinationFileUrl)
             try? FileManager.default.copyItem(at: fileUrl, to: destinationFileUrl)
             saveLastBuildNumber(currentBuildNumber)

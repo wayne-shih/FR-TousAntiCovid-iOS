@@ -14,44 +14,20 @@ import RobertSDK
 import ServerSDK
 
 final class BluetoothManager: RBBluetooth {
-    
-    private let maxStartTriesCount: Int = 5
-    private var startTriesCount: Int  = 0
+
     private var service: ProximityNotificationService?
     
     func start(helloMessageCreationHandler: @escaping (_ completion: @escaping (_ data: Data?) -> ()) -> (),
                ebidExtractionHandler: @escaping (_ data: Data) -> Data,
                didReceiveProximity: @escaping (_ proximity: RBReceivedProximity) -> ()) {
         guard let serviceUuid = ParametersManager.shared.bleServiceUuid, let characteristicUuid = ParametersManager.shared.bleCharacteristicUuid else { return }
-        let deviceParams: DeviceParameters? = ParametersManager.shared.getDeviceParametersFor(model: UIDevice.current.modelName)
+        let deviceParameters: DeviceParameters? = ParametersManager.shared.getDeviceParametersFor(model: UIDevice.current.modelName)
+        let bluetoothDynamicSettings = BluetoothDynamicSettings(txCompensationGain: Int8(deviceParameters?.txFactor ?? 0.0),
+                                                                rxCompensationGain: Int8(deviceParameters?.rxFactor ?? 0.0))
         let bleSettings = BluetoothSettings(serviceUniqueIdentifier: serviceUuid,
                                             serviceCharacteristicUniqueIdentifier: characteristicUuid,
-                                            txCompensationGain: Int8(deviceParams?.txFactor ?? 0.0),
-                                            rxCompensationGain: Int8(deviceParams?.rxFactor ?? 0.0))
-        let stateChangedHandler: StateChangedHandler = { [weak self] state in
-            guard let self = self else { return }
-            guard [.unsupported, .unknown].contains(state) else {
-                // If we're in an expected working state, we can reset the tries count as we stop the retries loop.
-                self.startTriesCount = 0
-                return
-            }
-            // Then we stop the services.
-            self.stop()
-            // We check here if we can still try to start the services.
-            guard self.startTriesCount < self.maxStartTriesCount else {
-                // If we reached the maximum tries count, we can reset the tries count as we stop the retries loop.
-                self.startTriesCount = 0
-                return
-            }
-            // If we didn't reach the maximum tries count, we can try to start the services again.
-            self.startTriesCount += 1
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                self.start(helloMessageCreationHandler: helloMessageCreationHandler, ebidExtractionHandler: ebidExtractionHandler, didReceiveProximity: didReceiveProximity)
-            }
-        }
-        service = ProximityNotificationService(settings: ProximityNotificationSettings(bluetoothSettings: bleSettings),
-                                               stateChangedHandler: stateChangedHandler,
-                                               logger: BLELogger())
+                                            dynamicSettings: bluetoothDynamicSettings)
+        let stateChangedHandler: StateChangedHandler = { _ in }
         let proximityPayloadProvider: ProximityPayloadProvider = { () -> ProximityPayload? in
             var data: Data?
             let semaphore: DispatchSemaphore = DispatchSemaphore(value: 0)
@@ -76,14 +52,30 @@ final class BluetoothManager: RBBluetooth {
                 didReceiveProximity(proximity)
             }
         }
-        service?.start(proximityPayloadProvider: proximityPayloadProvider,
-                      proximityInfoUpdateHandler: proximityInfoUpdateHandler,
-                      identifierFromProximityPayload: identifierFromProximityPayload)
+
+        if service == nil {
+            service = ProximityNotificationService(settings: ProximityNotificationSettings(bluetoothSettings: bleSettings),
+                                                   proximityPayloadProvider: proximityPayloadProvider,
+                                                   proximityInfoUpdateHandler: proximityInfoUpdateHandler,
+                                                   identifierFromProximityPayload: identifierFromProximityPayload,
+                                                   stateChangedHandler: stateChangedHandler,
+                                                   logger: BLELogger())
+        }
+        
+        service?.start()
     }
     
     func stop() {
         service?.stop()
         service = nil
+    }
+
+    func updateSettings() {
+        guard let deviceParameters = ParametersManager.shared.getDeviceParametersFor(model: UIDevice.current.modelName) else { return }
+
+        let bluetoothDynamicSettings = BluetoothDynamicSettings(txCompensationGain: Int8(deviceParameters.txFactor),
+                                                                rxCompensationGain: Int8(deviceParameters.rxFactor))
+        service?.dynamicSettings = ProximityNotificationDynamicSettings(bluetoothDynamicSettings: bluetoothDynamicSettings)
     }
     
 }

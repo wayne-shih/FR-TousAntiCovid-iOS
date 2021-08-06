@@ -20,21 +20,37 @@ enum Constant {
     static let secondsBeforeStatusRetry: Double = 60.0
     static let proximityReactivationHours: [Int] = [1, 2, 4, 8, 12]
     
+    @UserDefault(key: .appLanguage)
+    static var appLanguage: String? {
+        didSet {
+            LocalizationsManager.shared.reloadLanguage()
+            PrivacyManager.shared.reloadLanguage()
+            LinksManager.shared.reloadLanguage()
+            KeyFiguresExplanationsManager.shared.reloadLanguage()
+        }
+    }
+    
     #if DEBUG
     static let isDebug: Bool = true
     #else
     static let isDebug: Bool = false
     #endif
     
+    enum Language {
+        static let french: String = "fr"
+        static let english: String = "en"
+    }
     enum ShortcutItem: String {
         case newAttestation = "home.moreSection.curfewCertificate"
         case venues = "appShortcut.venues"
         case qrScan = "appShortcut.qrScan"
+        case favoriteDcc = "appShortcut.favoriteDcc"
     }
     
     enum Server {
         
         static let resourcesRootDomain: String = "app.tousanticovid.gouv.fr"
+        static let staticResourcesRootDomain: String = "app-static.tousanticovid.gouv.fr"
 
         static var baseUrl: URL { URL(string: "https://api.tousanticovid.gouv.fr/api/\(ParametersManager.shared.apiVersion.rawValue)")! }
 
@@ -46,7 +62,7 @@ enum Constant {
 
         static var certificates: [Data] { ["certigna-root", "certigna-services"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
 
-        static var dccCertsUrl: URL { URL(string: "https://\(resourcesRootDomain)/json/version-\(jsonVersion)/Certs/dcc-certs.json")! }
+        static var dccCertsUrl: URL { URL(string: "https://\(staticResourcesRootDomain)/json/version-\(jsonVersion)/Certs/dcc-certs.json")! }
 
         static var analyticsCertificates: [Data] { ["certigna-root", "certigna-services"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
 
@@ -54,7 +70,14 @@ enum Constant {
 
         static var convertCertificates: [Data] { ["ISRG-Root-X1", "R3"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
 
-        static let jsonVersion: Int = 33
+        static var convertUrl: URL {
+            ParametersManager.shared.walletConversionApiVersion == 2 ?
+                URL(string: "https://portail.tacv.myservices-ingroupe.com/api/v2/client/convertor/decode/decodeDocument")! :
+                URL(string: "https://portail.tacv.myservices-ingroupe.com/api/client/convertor/decode/decodeDocument")!
+        }
+
+        static let jsonVersion: Int = 35
+
         static let baseJsonUrl: String = "https://\(resourcesRootDomain)/json/version-\(jsonVersion)/Config"
         static let configUrl: URL = URL(string: "\(baseJsonUrl)/config.json")!
 

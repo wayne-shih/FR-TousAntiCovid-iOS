@@ -18,9 +18,7 @@ final class DeepLinkingManager {
     weak var enterCodeController: EnterCodeController?
     
     weak var attestationController: AttestationsViewController?
-    weak var venuesRecordingOnboardingController: VenuesRecordingOnboardingController?
-    weak var flashVenueCodeController: FlashVenueCodeController?
-    weak var walletController: WalletViewController?
+    weak var walletCoordinator: WalletCoordinator?
     
     private var waitingNotification: Notification?
     private(set) var lastDeeplinkScannedDirectlyFromApp: Bool = false
@@ -28,7 +26,29 @@ final class DeepLinkingManager {
     func start() {
         addObservers()
     }
-    
+
+    func deeplinkForCode(_ code: String) -> URL? {
+        if let url = URL(string: code), url.scheme == "https" {
+            return url
+        } else if code.isUuidCode || code.isShortCode {
+            return URL(string: "https://bonjour.tousanticovid.gouv.fr/app/code/\(code)")
+        } else {
+            // In this case it means we scanned a raw DCC certificate.
+            let encodedCode: String = code.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? ""
+            let path: String
+            if code.hasPrefix("DC04") {
+                path = WalletConstant.URLPath.wallet2D.rawValue
+            } else {
+                path = WalletConstant.URLPath.walletDCC.rawValue
+            }
+            return URL(string: "https://bonjour.tousanticovid.gouv.fr\(path)#" + encodedCode)
+        }
+    }
+
+    func isComboDeeplink(_ url: URL) -> Bool {
+        url.absoluteString.contains(WalletConstant.Separator.declareCode.rawValue) && url.absoluteString.contains(WalletConstant.URLPath.walletDCC.rawValue)
+    }
+
     func processActivity(_ activity: NSUserActivity) {
         guard activity.activityType == "NSUserActivityTypeBrowsingWeb" else { return }
         guard let url = activity.webpageURL else { return }
@@ -62,6 +82,15 @@ final class DeepLinkingManager {
         }
         NotificationCenter.default.post(notification)
     }
+
+    func processOpenFavoriteCertificateQrCode() {
+        let notification: Notification = Notification(name: .openCertificateQRCode)
+        guard UIApplication.shared.applicationState == .active else {
+            waitingNotification = notification
+            return
+        }
+        NotificationCenter.default.post(notification)
+    }
     
     func processUrl(_ url: URL, fromApp: Bool = false) {
         lastDeeplinkScannedDirectlyFromApp = fromApp
@@ -71,14 +100,16 @@ final class DeepLinkingManager {
             processCodeUrl(url)
         } else {
             switch url.path {
-            case "/app/code":
-                processCodeUrl(url)
             case "/app/attestation":
                 processAttestationUrl()
             case WalletConstant.URLPath.wallet.rawValue,
                  WalletConstant.URLPath.wallet2D.rawValue,
                  WalletConstant.URLPath.walletDCC.rawValue:
-                processWalletUrl(url)
+                if WalletManager.shared.isWalletActivated {
+                    processWalletUrl(url)
+                } else if let code = getComboCodeFrom(url: url), let codeUrl = deeplinkForCode(code) {
+                    processCodeUrl(codeUrl)
+                }
             default:
                 break
             }
@@ -135,6 +166,12 @@ final class DeepLinkingManager {
             return
         }
         NotificationCenter.default.post(notification)
+    }
+
+    func getComboCodeFrom(url: URL) -> String? {
+        let separator: String = WalletConstant.Separator.declareCode.rawValue
+        guard url.absoluteString.contains(separator) else { return nil }
+        return url.absoluteString.components(separatedBy: separator).last
     }
 
 }

@@ -65,6 +65,30 @@ final class OnboardingWelcomeController: OnboardingController {
         return rows
     }
     
+    override func bottomContainerButtonTouched() {
+        didTouchImIn()
+    }
+    
+    private func didTouchImIn() {
+        if Constant.appLanguage.isNil && !Locale.isCurrentLanguageSupported {
+            let alertController: UIAlertController = UIAlertController(title: "onboarding.userLanguageBottomSheet.title".localized, message: nil, preferredStyle: .actionSheet)
+            alertController.addAction(UIAlertAction(title: "manageDataController.languageEN".localized, style: .default, handler: { [weak self] _ in
+                Constant.appLanguage = Constant.Language.english
+                self?.didContinue?()
+            }))
+            alertController.addAction(UIAlertAction(title: "manageDataController.languageFR".localized, style: .default, handler: { [weak self] _ in
+                Constant.appLanguage = Constant.Language.french
+                self?.didContinue?()
+            }))
+            alertController.addAction(UIAlertAction(title: "common.cancel".localized, style: .cancel, handler: { [weak self] _ in
+                self?.bottomButtonContainerController?.unlockButtons()
+            }))
+            navigationController?.present(alertController, animated: true)
+        } else {
+            self.didContinue?()
+        }
+    }
+    
     private func loadLaunchScreen() {
         guard let launchScreen = UIStoryboard(name: "LaunchScreen", bundle: nil).instantiateInitialViewController() else { return }
         launchScreenController = launchScreen

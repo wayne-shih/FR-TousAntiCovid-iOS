@@ -26,14 +26,14 @@
          "contentType": "addressLine1"
       },
       {
+         "key":"zip",
+         "type":"text",
+         "contentType": "addressPostalCode"
+      },
+      {
          "key":"city",
          "type":"text",
          "contentType": "addressCity"
-      },
-      {
-         "key":"zip",
-         "type":"number",
-         "contentType": "addressPostalCode"
       },
       {
          "key":"country",
@@ -65,13 +65,16 @@
                "code":"reason_curfew.convocation_demarches"
             },
             {
-                "code":"reason_curfew.animaux"
+               "code":"reason_curfew.transit"
+            },
+            {
+	            "code":"reason_curfew.animaux"
             }
          ]
       },
       {
          "key":"reason_lockdown",
-         "dataKey": "reason",
+         "dataKey": "reason",         
          "type":"list",
          "items":[
             {
@@ -84,16 +87,19 @@
                "code":"reason_lockdown.famille"
             },
             {
-                "code":"reason_lockdown.convocation_demarches"
+	            "code":"reason_lockdown.convocation_demarches"
             },
             {
-                "code":"reason_lockdown.demenagement"
+	            "code":"reason_lockdown.demenagement"
             },
             {
-                "code":"reason_lockdown.achats_culte_culturel"
+	            "code":"reason_lockdown.transit"
             },
             {
-                "code":"reason_lockdown.sport"
+	            "code":"reason_lockdown.achats_culte_culturel"
+            },
+            {
+	            "code":"reason_lockdown.sport"
             }
          ]
       }

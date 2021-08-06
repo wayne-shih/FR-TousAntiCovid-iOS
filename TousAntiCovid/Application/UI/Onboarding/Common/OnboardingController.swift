@@ -18,7 +18,7 @@ class OnboardingController: CVTableViewController, LocalizationsChangesObserver 
     var backButtonItem: UIBarButtonItem!
     var bottomButtonTitle: String { fatalError("Must be overriden") }
     
-    private let didContinue: (() -> ())?
+    private(set) var didContinue: (() -> ())?
     private let deinitBlock: (() -> ())?
     
     init(isOpenedFromOnboarding: Bool = true, didContinue: (() -> ())? = nil, deinitBlock: (() -> ())? = nil) {

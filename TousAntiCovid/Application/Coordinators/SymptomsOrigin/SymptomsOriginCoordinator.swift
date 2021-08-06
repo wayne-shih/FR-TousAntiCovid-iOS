@@ -16,7 +16,7 @@ final class SymptomsOriginCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     
     private weak var navigationController: UINavigationController?
-    
+
     init(navigationController: UINavigationController?, parent: Coordinator, symptomsParams: SymptomsDeclarationParams) {
         self.navigationController = navigationController
         self.parent = parent

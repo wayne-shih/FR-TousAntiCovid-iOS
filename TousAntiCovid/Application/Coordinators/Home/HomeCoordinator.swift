@@ -23,7 +23,6 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
     private var launchScreenWindow: UIWindow?
     private var showLaunchScreen: Bool = true
     private var isLoadingAppUpdate: Bool = false
-    private var isFlashingCode: Bool = false
 
     private var animationWindow: UIWindow?
 
@@ -83,12 +82,17 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
         }, didTouchVerifyWalletCertificate: { [weak self] in
             self?.showWalletCertificateVerification()
         }, didTouchUniversalQrScan: { [weak self] in
-            self?.startUniversalCodeFlashing()
+            self?.showUniversalQrScan()
+        }, didTouchCertificate: { [weak self] certificate in
+            self?.showCodeFullscreen(certificate)
         }, showUniversalQrScanExplanation: { [weak self] rect, animationDidEnd in
             self?.showUniversalQrCodeScanningExplanations(initialButtonFrame: rect, animationDidEnd: animationDidEnd)
         }, didEnterCodeFromDeeplink: { [weak self] code in
             self?.didEnterCodeFromDeeplink(code)
-        }, deinitBlock: { [weak self] in
+        }, showUserLanguage: { [weak self] in
+            self?.showUserLanguage()
+        },
+        deinitBlock: { [weak self] in
             self?.didDeinit()
         }))
         let controller: UIViewController = BottomMessageContainerViewController.controller(navigationChildController)
@@ -129,6 +133,11 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
         #endif
     }
     
+    private func showUserLanguage() {
+        let userLanguageCoordinator: UserLanguageCoordinator = UserLanguageCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
+        addChild(coordinator: userLanguageCoordinator)
+    }
+    
     private func showAbout() {
         let aboutCoordinator: AboutCoordinator = AboutCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
         addChild(coordinator: aboutCoordinator)
@@ -151,15 +160,25 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
     }
     
     private func showSanitaryCertificates(_ url: URL?) {
-        if let controller = DeepLinkingManager.shared.walletController {
-            guard let url = url else { return }
-            controller.processExternalUrl(url)
+        if let coordinator = DeepLinkingManager.shared.walletCoordinator {
+            coordinator.processUrl(url: url)
         } else {
-            let sanitaryCertificatesCoordinator: WalletCoordinator = WalletCoordinator(presentingController: navigationController?.topPresentedController,
-                                                                                       url: url,
-                                                                                       parent: self)
-            addChild(coordinator: sanitaryCertificatesCoordinator)
+            dismissAllModalsIfNeeded { [weak self] in
+                guard let self = self else { return }
+                let sanitaryCertificatesCoordinator: WalletCoordinator = WalletCoordinator(presentingController: self.navigationController?.topPresentedController,
+                                                                                           url: url,
+                                                                                           parent: self)
+                self.addChild(coordinator: sanitaryCertificatesCoordinator)
+            }
         }
+    }
+
+    private func dismissAllModalsIfNeeded(_ completion: @escaping () -> ()) {
+        guard navigationController?.presentedViewController != nil else {
+            completion()
+            return
+        }
+        navigationController?.dismiss(animated: true) { completion() }
     }
 
     private func showVenueRecordingConfirmation(url: URL) {
@@ -304,24 +323,33 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
         return animationWindow
     }
 
-    private func startUniversalCodeFlashing() {
-        guard !isFlashingCode else { return }
-        isFlashingCode = true
-        HUD.show(.progress)
-        DispatchQueue.main.async {
-            let controller: UniversalQrScanController = UniversalQrScanController.controller(didFlash: { [weak self] stringUrl in
-                guard let stringUrl = stringUrl else { throw NSError.localizedError(message: "universalQrScanController.error.noCodeFound".localized, code: 0) }
-                guard let url = URL(string: stringUrl) else { throw NSError.localizedError(message: "universalQrScanController.error.wrongUrl".localized, code: 0) }
-                self?.navigationController?.dismiss(animated: true) {
-                    DeepLinkingManager.shared.processUrl(url, fromApp: true)
-                }
-            }, deinitBlock: { [weak self] in
-                self?.isFlashingCode = false
-            })
-            self.navigationController?.topPresentedController.present(CVNavigationController(rootViewController: controller), animated: true) {
-                HUD.hide()
-            }
+    private func showUniversalQrScan() {
+        guard childCoordinators.first(where: { $0 is UniversalQrScanCoordinator }).isNil else { return }
+        let coordinator: UniversalQrScanCoordinator = UniversalQrScanCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
+        addChild(coordinator: coordinator)
+    }
+
+    private func showCodeFullscreen(_ certificate: WalletCertificate) {
+        let codeDetails: [CodeDetail] = prepareCodeFullScreenData(certificate)
+        guard !codeDetails.isEmpty else { return }
+        let isFrenchCertificate: Bool = !((certificate as? EuropeanCertificate)?.isForeignCertificate ?? true)
+        let controller: UIViewController = CodeFullScreenViewController.controller(codeDetails: codeDetails, showHeaderImage: isFrenchCertificate)
+        controller.modalTransitionStyle = .crossDissolve
+        controller.modalPresentationStyle = .fullScreen
+        dismissAllModalsIfNeeded { [weak self] in
+            self?.navigationController?.present(controller, animated: true)
         }
+    }
+
+    private func prepareCodeFullScreenData(_ certificate: WalletCertificate) -> [CodeDetail] {
+        guard let codeImage = certificate.codeImage else { return [] }
+        let footerText: String? = certificate is EuropeanCertificate ? "europeanCertificate.fullscreen.type.minimum.footer".localized : nil
+        var codeDetails: [CodeDetail] = [CodeDetail(segmentedControlTitle: "europeanCertificate.fullscreen.type.minimum".localized, codeImage: codeImage, codeBottomText: certificate.codeImageTitle, text: certificate.shortDescription, footerText: footerText)]
+
+        if let europeanCertificate = certificate as? EuropeanCertificate {
+            codeDetails.append(CodeDetail(segmentedControlTitle: "europeanCertificate.fullscreen.type.border".localized, codeImage: codeImage, codeBottomText: nil, text: europeanCertificate.fullDescriptionForFullscreen, footerText: europeanCertificate.uniqueHash))
+        }
+        return codeDetails
     }
     
     private func loadLaunchScreen() {
@@ -355,10 +383,12 @@ extension HomeCoordinator {
     }
 
     private func didEnterCodeFromDeeplink(_ code: String) {
-        if let controller = DeepLinkingManager.shared.enterCodeController {
-            controller.enterCode(code)
-        } else {
-            showEnterCode(code: code)
+        dismissAllModalsIfNeeded {
+            if let controller = DeepLinkingManager.shared.enterCodeController {
+                controller.enterCode(code)
+            } else {
+                self.showEnterCode(code: code)
+            }
         }
     }
     

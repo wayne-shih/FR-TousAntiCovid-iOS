@@ -12,7 +12,7 @@ import Foundation
 
 enum VaccinationCentersConstant {
     
-    static let jsonBaseUrl: URL = URL(string: "https://\(Constant.Server.resourcesRootDomain)/infos/dep/")!
+    static let jsonBaseUrl: URL = URL(string: "https://\(Constant.Server.staticResourcesRootDomain)/infos/dep/")!
     
     static let vaccinationCentersFileName: String = "centres-vaccination.json"
     static let vaccinationCentersLastUpdateFileName: String = "lastUpdate.json"

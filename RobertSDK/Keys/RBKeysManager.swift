@@ -12,7 +12,7 @@
 import Foundation
 
 final class RBKeysManager {
-    
+
     static func generateKeys() throws -> RBECKeys {
         var publicKeySec: SecKey?
         var privateKeySec: SecKey?
@@ -25,7 +25,7 @@ final class RBKeysManager {
         let publicKeyBase64: String = try publicKey.sec1ToDer().base64EncodedString()
         return RBECKeys(publicKeyBase64: publicKeyBase64, privateKey: privateKey)
     }
-    
+
     static func generateSecret(keys: RBECKeys, serverPublicKey: Data) throws -> RBCryptoKeys {
         let publicSecKey: SecKey = try SecKey.fromPublicDer(data: serverPublicKey)
         var error: Unmanaged<CFError>?
@@ -40,9 +40,9 @@ final class RBKeysManager {
     private static func generateKA(with sharedSecret: Data) throws -> Data {
         Data([109, 97, 99]).hmac(key: sharedSecret)
     }
-    
+
     private static func generateKEA(with sharedSecret: Data) throws -> Data {
         Data([116, 117, 112, 108, 101, 115]).hmac(key: sharedSecret)
     }
-    
+
 }
