@@ -210,7 +210,9 @@ extension Date {
         components.second = 59
         return Calendar.current.date(from: components)
     }
-    
+
+    func dayTimestamp() -> Int { Int(roundingToBeginningOfDay()?.timeIntervalSince1970 ?? 0) }
+
 }
 
 extension Date {

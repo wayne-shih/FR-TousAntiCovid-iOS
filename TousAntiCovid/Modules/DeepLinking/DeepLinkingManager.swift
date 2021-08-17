@@ -19,6 +19,7 @@ final class DeepLinkingManager {
     
     weak var attestationController: AttestationsViewController?
     weak var walletCoordinator: WalletCoordinator?
+    weak var codeFullScreenController: CodeFullScreenViewController?
     
     private var waitingNotification: Notification?
     private(set) var lastDeeplinkScannedDirectlyFromApp: Bool = false

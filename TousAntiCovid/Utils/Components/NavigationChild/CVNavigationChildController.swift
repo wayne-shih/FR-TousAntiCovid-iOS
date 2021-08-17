@@ -15,7 +15,7 @@ final class CVNavigationChildController: UIViewController {
     var navigationBarHeight: CGFloat { navigationBar.frame.height }
 
     @IBOutlet private var navigationBarBackgroundView: UIVisualEffectView!
-    @IBOutlet private var navigationBar: UINavigationBar!
+    @IBOutlet private(set) var navigationBar: UINavigationBar!
     @IBOutlet private var containerView: UIView!
     
     @IBOutlet private var fakeNavigationBar: UINavigationBar!

@@ -83,5 +83,15 @@ class CVTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         cellHeights[indexPath] ?? UITableView.automaticDimension
     }
+
+
+    override func accessibilityPerformEscape() -> Bool {
+        if let navigationController = navigationController, navigationController.viewControllers.first !== self {
+            navigationController.popViewController(animated: true)
+        } else {
+            dismiss(animated: true)
+        }
+        return true
+    }
     
 }

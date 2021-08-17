@@ -111,6 +111,7 @@ final class EnterCodeController: CVTableViewController {
         tableView.keyboardDismissMode = .onDrag
         navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
     func enterCode(_ code: String) {

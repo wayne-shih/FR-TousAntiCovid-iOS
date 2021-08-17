@@ -20,7 +20,7 @@ final class WalletViewController: CVTableViewController {
         case certificates
         case info
     }
-    
+    var deinitBlock: (() -> ())?
     private var isFirstLoad: Bool = true
     private let didTouchFlashCertificate: () -> ()
     private let didTouchTermsOfUse: () -> ()
@@ -29,9 +29,10 @@ final class WalletViewController: CVTableViewController {
     private let didTouchDocumentExplanation: (_ certificateType: WalletConstant.CertificateType) -> ()
     private let didTouchWhenToUse: () -> ()
     private let didTouchConvertToEuropeTermsOfUse: () -> ()
-    private let deinitBlock: () -> ()
     private var mode: Mode = .empty
     private var mustScrollToTopAfterRefresh: Bool = false
+    private weak var currentlyFocusedCertificate: WalletCertificate?
+    private weak var currentlyFocusedCell: CVTableViewCell?
 
     init(didTouchFlashCertificate: @escaping () -> (),
          didTouchTermsOfUse: @escaping () -> (),
@@ -73,7 +74,7 @@ final class WalletViewController: CVTableViewController {
     
     deinit {
         removeObservers()
-        deinitBlock()
+        deinitBlock?()
     }
     
     private func initUI() {
@@ -83,7 +84,9 @@ final class WalletViewController: CVTableViewController {
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
-        (bottomButtonContainerController ?? self).navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        let barButtonItem: UIBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        barButtonItem.accessibilityHint = "accessibility.closeModal.zGesture".localized
+        (bottomButtonContainerController ?? self).navigationItem.leftBarButtonItem = barButtonItem
     }
     
     @objc private func didTouchCloseButton() {
@@ -137,7 +140,10 @@ final class WalletViewController: CVTableViewController {
                                                               topInset: 0.0,
                                                               bottomInset: 0.0,
                                                               textAlignment: .center,
-                                                              titleFont: { Appearance.Cell.Text.headTitleFont }))
+                                                              titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                           accessibilityDidFocusCell: { [weak self] _ in
+                                            self?.clearCurrentlyFocusedCellObjects()
+                                           })
         let documentsRow: CVRow = CVRow(title: "walletController.documents.title".localized,
                                         subtitle: "walletController.documents.subtitle".localized,
                                         accessoryText: "walletController.documents.vaccin".localized,
@@ -150,6 +156,9 @@ final class WalletViewController: CVTableViewController {
                                                            bottomInset: 0.0,
                                                            textAlignment: .center,
                                                            titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                        accessibilityDidFocusCell: { [weak self] _ in
+                                            self?.clearCurrentlyFocusedCellObjects()
+                                        },
                                         secondarySelectionAction: { [weak self] in
                                             self?.didTouchDocumentExplanation(.vaccinationEurope)
                                         },
@@ -165,6 +174,9 @@ final class WalletViewController: CVTableViewController {
                                                            bottomInset: 0.0,
                                                            textAlignment: .center,
                                                            titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                        accessibilityDidFocusCell: { [weak self] _ in
+                                            self?.clearCurrentlyFocusedCellObjects()
+                                        },
                                         secondarySelectionAction: { [weak self] in
                                             self?.didTouchWhenToUse()
                                         })
@@ -178,6 +190,9 @@ final class WalletViewController: CVTableViewController {
                                                        textAlignment: .natural,
                                                        titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
                                                        subtitleFont: { Appearance.Cell.Text.accessoryFont }),
+                                    accessibilityDidFocusCell: { [weak self] _ in
+                                        self?.clearCurrentlyFocusedCellObjects()
+                                    },
                                     selectionAction: { [weak self] in
                                         guard let self = self else { return }
                                         "walletController.phone.number".localized.callPhoneNumber(from: self)
@@ -190,6 +205,16 @@ final class WalletViewController: CVTableViewController {
     }
     
     private func headerRows() -> [CVRow] {
+        var rows: [CVRow] = []
+        if UIAccessibility.isVoiceOverRunning {
+            let addCertificateRow: CVRow = CVRow(title: "walletController.addCertificate".localized,
+                                                 xibName: .buttonCell,
+                                                 theme: CVRow.Theme(topInset: 30.0, bottomInset: 0.0, buttonStyle: .primary),
+                                                 selectionAction: { [weak self] in
+                                                    self?.didTouchFlashCertificate()
+                                                 })
+            rows.append(addCertificateRow)
+        }
         let certificatesModeSelectionAction: () -> () = { [weak self] in
             self?.mode = .certificates
             self?.reloadUI(animated: true, completion: nil)
@@ -208,8 +233,12 @@ final class WalletViewController: CVTableViewController {
                                                                 textAlignment: .natural,
                                                                 titleFont: { Appearance.SegmentedControl.selectedFont },
                                                                 subtitleFont: { Appearance.SegmentedControl.normalFont }),
+                                            accessibilityDidFocusCell: { [weak self] _ in
+                                                self?.clearCurrentlyFocusedCellObjects()
+                                            },
                                             segmentsActions: [certificatesModeSelectionAction, infoModeSelectionAction])
-        return [modeSelectionRow]
+        rows.append(modeSelectionRow)
+        return rows
     }
     
     private func certificatesRows() -> [CVRow] {
@@ -220,13 +249,16 @@ final class WalletViewController: CVTableViewController {
                               xibName: .textCell,
                               theme: CVRow.Theme(topInset: 20.0,
                                                  bottomInset: 0.0,
-                                                 textAlignment: .natural)))
+                                                 textAlignment: .natural),
+                              accessibilityDidFocusCell: { [weak self] _ in
+                                self?.clearCurrentlyFocusedCellObjects()
+                              }))
         }
         
         let favoriteCertificate: WalletCertificate? = WalletManager.shared.favoriteCertificate
         var favoriteEmptyText: String = "walletController.favoriteCertificateSection.subtitle".localized
         if #available(iOS 14.0, *) {
-            favoriteEmptyText +=  "\n\n" + "walletController.favoriteCertificateSection.widget".localized
+            favoriteEmptyText +=  "\n\n" + "walletController.favoriteCertificateSection.widget.ios".localized
         }
         let favoriteCertificateSectionRow: CVRow = CVRow(title: "walletController.favoriteCertificateSection.title".localized,
                                                          subtitle: favoriteCertificate == nil ? favoriteEmptyText : nil,
@@ -234,10 +266,24 @@ final class WalletViewController: CVTableViewController {
                                                          theme: CVRow.Theme(topInset: 20.0,
                                                                             bottomInset: 0.0,
                                                                             textAlignment: .natural,
-                                                                            titleFont: { Appearance.Cell.Text.headTitleFont }))
+                                                                            titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                                         accessibilityDidFocusCell: { [weak self] _ in
+                                                            self?.clearCurrentlyFocusedCellObjects()
+                                                         })
         rows.append(favoriteCertificateSectionRow)
         if let certificate = favoriteCertificate {
             rows.append(contentsOf: certificateRows(certificate: certificate))
+            if #available(iOS 14.0, *) {
+                let favoriteCertificateSectionRow: CVRow = CVRow(subtitle: "walletController.favoriteCertificateSection.widget.ios".localized,
+                                                                 xibName: .textCell,
+                                                                 theme: CVRow.Theme(topInset: 20.0,
+                                                                                    bottomInset: 0.0,
+                                                                                    textAlignment: .natural),
+                                                                 accessibilityDidFocusCell: { [weak self] _ in
+                                                                    self?.clearCurrentlyFocusedCellObjects()
+                                                                 })
+                rows.append(favoriteCertificateSectionRow)
+            }
         }
         
         let recentCertificates: [WalletCertificate] = WalletManager.shared.recentWalletCertificates
@@ -248,7 +294,10 @@ final class WalletViewController: CVTableViewController {
                                                             theme: CVRow.Theme(topInset: 40.0,
                                                                                bottomInset: 0.0,
                                                                                textAlignment: .natural,
-                                                                               titleFont: { Appearance.Cell.Text.headTitleFont }))
+                                                                               titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                                            accessibilityDidFocusCell: { [weak self] _ in
+                                                                self?.clearCurrentlyFocusedCellObjects()
+                                                            })
             rows.append(recentCertificatesSectionRow)
             rows.append(contentsOf: recentCertificates.sorted { $0.timestamp > $1.timestamp }.map { certificateRows(certificate: $0) }.reduce([], +))
         }
@@ -261,7 +310,10 @@ final class WalletViewController: CVTableViewController {
                                                          theme: CVRow.Theme(topInset: recentCertificates.isEmpty ? 20.0 : 40.0,
                                                                             bottomInset: 0.0,
                                                                             textAlignment: .natural,
-                                                                            titleFont: { Appearance.Cell.Text.headTitleFont }))
+                                                                            titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                                         accessibilityDidFocusCell: { [weak self] _ in
+                                                            self?.clearCurrentlyFocusedCellObjects()
+                                                         })
             rows.append(oldCertificatesSectionRow)
             rows.append(contentsOf: oldCertificates.sorted { $0.timestamp > $1.timestamp }.map { certificateRows(certificate: $0) }.reduce([], +))
         }
@@ -269,9 +321,10 @@ final class WalletViewController: CVTableViewController {
     }
     
     private func certificateRows(certificate: WalletCertificate) -> [CVRow] {
+        var rows: [CVRow] = []
         let positiveTestWarning: String? = (certificate as? EuropeanCertificate)?.isTestNegative == false && certificate.type == .sanitaryEurope ? "wallet.proof.europe.test.positiveSidepError".localized : nil
         var subtitle: String = certificate.fullDescription ?? ""
-        if DccBlacklistManager.shared.isBlacklisted(certificate: certificate) { subtitle += "\n\n\("wallet.blacklist.warning".localized)" }
+        if DccBlacklistManager.shared.isBlacklisted(certificate: certificate) || Blacklist2dDocManager.shared.isBlacklisted(certificate: certificate) { subtitle += "\n\n\("wallet.blacklist.warning".localized)" }
         let certificateRow: CVRow = CVRow(title: certificate.codeImageTitle,
                                           subtitle: subtitle,
                                           accessoryText: positiveTestWarning,
@@ -285,8 +338,12 @@ final class WalletViewController: CVTableViewController {
                                                              titleFont: { Appearance.Cell.Text.headTitleFont4 },
                                                              subtitleFont: { Appearance.Cell.Text.subtitleFont },
                                                              accessoryTextFont: { Appearance.Cell.Text.subtitleFont },
-                                                             maskedCorners: .top),
-                                          associatedValue: certificate.id,
+                                                             maskedCorners: UIAccessibility.isVoiceOverRunning ? .all : .top),
+                                          associatedValue: certificate,
+                                          accessibilityDidFocusCell: { [weak self] cell in
+                                            self?.currentlyFocusedCertificate = certificate
+                                            self?.currentlyFocusedCell = cell
+                                          },
                                           selectionActionWithCell: { [weak self] cell in
                                             self?.didTouchCertificateMenuButton(certificate: certificate, cell: cell)
                                           },
@@ -301,26 +358,43 @@ final class WalletViewController: CVTableViewController {
                                                 self.mustScrollToTopAfterRefresh = true
                                                 WalletManager.shared.setFavorite(certificate: certificate)
                                             }
-                                          } : nil)
-        let actionRow: CVRow = CVRow(title: "walletController.favoriteCertificateSection.openFullScreen".localized,
-                                     xibName: .standardCardCell,
-                                     theme:  CVRow.Theme(backgroundColor: Appearance.Button.Secondary.backgroundColor,
-                                                         topInset: 0.0,
-                                                         bottomInset: 0.0,
-                                                         textAlignment: .center,
-                                                         titleFont: { Appearance.Cell.Text.actionTitleFont },
-                                                         titleColor: Appearance.Button.Secondary.titleColor,
-                                                         separatorLeftInset: nil,
-                                                         separatorRightInset: nil,
-                                                         maskedCorners: .bottom),
-                                     selectionAction: { [weak self] in
-                                        self?.didTouchCertificate(certificate)
-                                     },
-                                     willDisplay: { cell in
-                                        cell.selectionStyle = .none
-                                        cell.accessoryType = .none
-                                     })
-        return [certificateRow, actionRow]
+                                          } : nil,
+                                          willDisplay: { [weak self] cell in
+                                            guard let self = self else { return }
+                                            let isFavorite: Bool = certificate.id == WalletManager.shared.favoriteDccId
+                                            var customActions: [UIAccessibilityCustomAction] = [
+                                                UIAccessibilityCustomAction(name: "walletController.favoriteCertificateSection.openFullScreen".localized, target: self, selector: #selector(self.accessibilityDidActivateFullscreenAction)),
+                                                UIAccessibilityCustomAction(name: "accessibility.wallet.dcc.favorite.\(isFavorite ? "remove" : "define")".localized, target: self, selector: #selector(self.accessibilityDidActivateFavoriteAction)),
+                                                UIAccessibilityCustomAction(name: "walletController.menu.share".localized, target: self, selector: #selector(self.accessibilityDidActivateShareAction))
+                                                ]
+                                            if self.canShowConversionOption(for: certificate) {
+                                                customActions.append(UIAccessibilityCustomAction(name: "walletController.menu.convertToEurope".localized, target: self, selector: #selector(self.accessibilityDidActivateConvertAction)))
+                                            }
+                                            customActions.append(UIAccessibilityCustomAction(name: "walletController.menu.delete".localized, target: self, selector: #selector(self.accessibilityDidActivateDeleteAction)))
+                                            cell.accessibilityCustomActions = customActions
+                                          })
+        rows.append(certificateRow)
+        if !UIAccessibility.isVoiceOverRunning {
+            let actionRow: CVRow = CVRow(title: "walletController.favoriteCertificateSection.openFullScreen".localized,
+                                         xibName: .standardCardCell,
+                                         theme:  CVRow.Theme(backgroundColor: Appearance.Button.Secondary.backgroundColor,
+                                                             topInset: 0.0,
+                                                             bottomInset: 0.0,
+                                                             textAlignment: .center,
+                                                             titleFont: { Appearance.Cell.Text.actionTitleFont },
+                                                             titleColor: Appearance.Button.Secondary.titleColor,
+                                                             separatorLeftInset: nil,
+                                                             separatorRightInset: nil,
+                                                             maskedCorners: .bottom),
+                                         accessibilityDidFocusCell: { [weak self] _ in
+                                            self?.clearCurrentlyFocusedCellObjects()
+                                         },
+                                         selectionAction: { [weak self] in
+                                            self?.didTouchCertificate(certificate)
+                                         })
+            rows.append(actionRow)
+        }
+        return rows
     }
     
     private func didTouchCertificateMenuButton(certificate: WalletCertificate, cell: CVTableViewCell) {
@@ -328,7 +402,7 @@ final class WalletViewController: CVTableViewController {
         alertController.addAction(UIAlertAction(title: "walletController.menu.share".localized, style: .default, handler: { [weak self] _ in
             self?.showSanitaryCertificateSharing(image: cell.capture(), text: certificate.fullDescription ?? "")
         }))
-        if ParametersManager.shared.displayCertificateConversion && [.sanitary, .vaccination].contains(certificate.type) {
+        if canShowConversionOption(for: certificate) {
             alertController.addAction(UIAlertAction(title: "walletController.menu.convertToEurope".localized, style: .default, handler: { [weak self] _ in
                 if ParametersManager.shared.certificateConversionSidepOnlyCode.contains((certificate as? SanitaryCertificate)?.analysisRawCode ?? "") {
                     self?.showAntigenicCertificateAlert()
@@ -342,6 +416,10 @@ final class WalletViewController: CVTableViewController {
         }))
         alertController.addAction(UIAlertAction(title: "common.cancel".localized, style: .cancel))
         present(alertController, animated: true)
+    }
+
+    private func canShowConversionOption(for certificate: WalletCertificate) -> Bool {
+        ParametersManager.shared.displayCertificateConversion && [.sanitary, .vaccination].contains(certificate.type) && !Blacklist2dDocManager.shared.isBlacklisted(certificate: certificate)
     }
     
     private func showAntigenicCertificateAlert() {
@@ -428,10 +506,50 @@ final class WalletViewController: CVTableViewController {
     }
 
     private func getIndexPath(for certificate: WalletCertificate) -> IndexPath? {
-        let rowIndex: Int? = rows.firstIndex { ($0.associatedValue as? String) == certificate.id }
+        let rowIndex: Int? = rows.firstIndex { ($0.associatedValue as? WalletCertificate)?.id == certificate.id }
         guard let row = rowIndex else { return nil }
         return IndexPath(row: row, section: 0)
     }
+
+    @objc private func accessibilityDidActivateFullscreenAction() {
+        guard let certificate = currentlyFocusedCertificate else { return }
+        didTouchCertificate(certificate)
+    }
+
+    @objc private func accessibilityDidActivateFavoriteAction() {
+        guard let certificate = currentlyFocusedCertificate else { return }
+        if certificate.id == WalletManager.shared.favoriteDccId {
+            WalletManager.shared.removeFavorite()
+        } else {
+            self.mustScrollToTopAfterRefresh = true
+            WalletManager.shared.setFavorite(certificate: certificate)
+        }
+    }
+
+    @objc private func accessibilityDidActivateShareAction() {
+        guard let certificate = currentlyFocusedCertificate else { return }
+        showSanitaryCertificateSharing(image: currentlyFocusedCell?.capture(), text: certificate.fullDescription ?? "")
+    }
+
+    @objc private func accessibilityDidActivateConvertAction() {
+        guard let certificate = currentlyFocusedCertificate else { return }
+        if ParametersManager.shared.certificateConversionSidepOnlyCode.contains((certificate as? SanitaryCertificate)?.analysisRawCode ?? "") {
+            showAntigenicCertificateAlert()
+        } else {
+            showConvertToEuropeAlert(certificate: certificate)
+        }
+    }
+
+    @objc private func accessibilityDidActivateDeleteAction() {
+        guard let certificate = currentlyFocusedCertificate else { return }
+        showCertificateDeletionAlert(certificate: certificate)
+    }
+
+    private func clearCurrentlyFocusedCellObjects() {
+        currentlyFocusedCertificate = nil
+        currentlyFocusedCell = nil
+    }
+
 }
 
 extension WalletViewController: WalletChangesObserver {

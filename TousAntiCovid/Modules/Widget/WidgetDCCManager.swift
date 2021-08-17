@@ -37,7 +37,7 @@ final class WidgetDCCManager {
     
     #if !WIDGETDCC
     func processUserActivity(_ userActivity: NSUserActivity) {
-        guard userActivity.activityType == "WidgetDCC" && isOnboardingDone else { return }
+        guard userActivity.activityType == "fr.gouv.stopcovid.ios.Widget.dcc" && isOnboardingDone else { return }
         NotificationCenter.default.post(name: WalletManager.shared.favoriteDccId.isNil ? .openWallet : .openCertificateQRCode , object: nil)
     }
     #endif

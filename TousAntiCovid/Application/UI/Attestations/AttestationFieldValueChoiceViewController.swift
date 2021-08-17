@@ -83,6 +83,12 @@ final class AttestationFieldValueChoiceViewController: CVTableViewController {
                     self?.didSelectFieldItem(item)
                   }, willDisplay: { [weak self] cell in
                     cell.accessoryType = item.code == self?.selectedItem?.code ? .checkmark : .none
+                    cell.contentView.isAccessibilityElement = true
+                    cell.accessibilityElements = [cell.contentView]
+                    cell.cvTitleLabel?.isAccessibilityElement = false
+                    cell.cvSubtitleLabel?.isAccessibilityElement = false
+                    cell.contentView.accessibilityLabel = "\(cell.cvTitleLabel?.text ?? ""). \(cell.cvSubtitleLabel?.text ?? "")"
+                    cell.contentView.accessibilityTraits = .button
                   })
         })
         let footerText: String = "attestation.form.\(choiceKey).footer".localizedOrEmpty

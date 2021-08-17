@@ -97,6 +97,7 @@ final class LinksController: CVTableViewController {
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
     @objc private func didTouchCloseButton() {

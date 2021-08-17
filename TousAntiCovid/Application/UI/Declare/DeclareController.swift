@@ -63,7 +63,7 @@ final class DeclareController: CVTableViewController {
         if RBManager.shared.isRegistered {
             let textRow: CVRow = CVRow(title: "declareController.message.testedPositive.title".localized,
                                        subtitle: "declareController.message.testedPositive.subtitle".localized,
-                                       xibName: .cardTextCell,
+                                       xibName: .cardCell,
                                        theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                                           topInset: 0.0,
                                                           bottomInset: 0.0,
@@ -110,6 +110,7 @@ final class DeclareController: CVTableViewController {
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
     @objc private func didTouchCloseButton() {

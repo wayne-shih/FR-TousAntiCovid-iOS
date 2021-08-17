@@ -10,32 +10,29 @@
 
 import UIKit
 
-final class ActivationButtonCell: CVTableViewCell {
+final class ActivationButtonCell: CardCell {
 
     @IBOutlet var button: CVButton!
-    @IBOutlet private var containerView: UIView!
-    
+
     override func setup(with row: CVRow) {
         super.setup(with: row)
         UIView.performWithoutAnimation {
             self.button?.setTitle(row.title, for: .normal)
             self.button?.layoutIfNeeded()
         }
-        button?.accessibilityLabel = row.title?.removingEmojis()
-        button?.accessibilityHint = nil
+        button?.accessibilityHint = row.subtitle
         button?.buttonStyle = row.theme.buttonStyle
         button.alpha = row.enabled ? 1.0 : 0.3
         isUserInteractionEnabled = row.enabled
-        accessoryType = .none
-        selectionStyle = .none
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
     }
     
     @IBAction func didTouchButton(_ sender: Any) {
         currentAssociatedRow?.selectionAction?()
+    }
+
+    override func setupAccessibility() {
+        accessibilityElements = [button].compactMap { $0 }
+        button.isAccessibilityElement = true
     }
     
 }

@@ -104,6 +104,7 @@ final class IsolationFormViewController: CVTableViewController {
         tableView.showsVerticalScrollIndicator = false
         tableView.tintColor = Appearance.tintColor
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
     private func scrollToBottomIfNeeded() {
@@ -133,7 +134,10 @@ extension IsolationFormViewController {
         rows.append(selectableRow(title: "isolationFormController.state.allGood".localized,
                                   isSelected: IsolationManager.shared.currentState == .allGood,
                                   isLastRowInGroup: false,
-                                  selectionBlock: { IsolationManager.shared.updateState(.allGood) }))
+                                  selectionBlock: { [weak self] in
+                                    IsolationManager.shared.updateState(.allGood)
+                                    self?.informVoiceOverAboutFormUpdate()
+                                  }))
         rows.append(selectableRow(title: "isolationFormController.state.symptoms".localized,
                                   isSelected: IsolationManager.shared.currentState == .symptoms,
                                   isLastRowInGroup: false,
@@ -141,16 +145,23 @@ extension IsolationFormViewController {
                                     guard let self = self else { return }
                                     IsolationManager.shared.showSymptomsAlert(on: self) {
                                         IsolationManager.shared.updateState(.symptoms)
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { self.informVoiceOverAboutFormUpdate() }
                                     }
                                   }))
         rows.append(selectableRow(title: "isolationFormController.state.contactCase".localized,
                                   isSelected: IsolationManager.shared.currentState == .contactCase,
                                   isLastRowInGroup: false,
-                                  selectionBlock: { IsolationManager.shared.updateState(.contactCase) }))
+                                  selectionBlock: { [weak self] in
+                                    IsolationManager.shared.updateState(.contactCase)
+                                    self?.informVoiceOverAboutFormUpdate()
+                                  }))
         rows.append(selectableRow(title: "isolationFormController.state.positiveCase".localized,
                                   isSelected: IsolationManager.shared.currentState == .positiveCase,
                                   isLastRowInGroup: true,
-                                  selectionBlock: { IsolationManager.shared.updateState(.positiveCase) }))
+                                  selectionBlock: { [weak self] in
+                                    IsolationManager.shared.updateState(.positiveCase)
+                                    self?.informVoiceOverAboutFormUpdate()
+                                  }))
         return rows
     }
     
@@ -199,6 +210,11 @@ extension IsolationFormViewController {
                                                   answerBlock: { isAnswerYes in IsolationManager.shared.setStillHavingFever(isAnswerYes) }))
         
         return rows
+    }
+
+    private func informVoiceOverAboutFormUpdate() {
+        guard UIAccessibility.isVoiceOverRunning else { return }
+        UIAccessibility.post(notification: .announcement, argument: "accessibility.isolation.formWasUpdated".localized)
     }
 
 }

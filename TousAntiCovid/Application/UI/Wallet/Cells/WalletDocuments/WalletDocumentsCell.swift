@@ -10,13 +10,12 @@
 
 import UIKit
 
-final class WalletDocumentsCell: CVTableViewCell {
+final class WalletDocumentsCell: CardCell {
     
     @IBOutlet private var leftImageView: UIImageView!
     @IBOutlet private var leftLabel: UILabel!
     @IBOutlet private var rightLabel: UILabel!
     @IBOutlet private var rightImageView: UIImageView!
-    @IBOutlet private var containerView: UIView!
 
     override func setup(with row: CVRow) {
         super.setup(with: row)
@@ -26,11 +25,6 @@ final class WalletDocumentsCell: CVTableViewCell {
     }
 
     private func setupUI(with row: CVRow) {
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.maskedCorners = row.theme.maskedCorners
-        containerView.layer.masksToBounds = true
         cvSubtitleLabel?.font = row.theme.subtitleFont()
         cvSubtitleLabel?.textColor = row.theme.subtitleColor
         cvSubtitleLabel?.textAlignment = row.theme.textAlignment
@@ -52,30 +46,17 @@ final class WalletDocumentsCell: CVTableViewCell {
         rightLabel.text = row.footerText
     }
 
-    private func setupAccessibility() {
+    override func setupAccessibility() {
+        super.setupAccessibility()
         leftImageView.accessibilityLabel = leftLabel?.text?.removingEmojis()
         leftImageView.accessibilityTraits = .image
         leftImageView.isAccessibilityElement = true
         rightImageView.accessibilityLabel = rightLabel?.text?.removingEmojis()
         rightImageView.accessibilityTraits = .image
         rightImageView.isAccessibilityElement = true
-        leftLabel.isAccessibilityElement = true
-        rightLabel.isAccessibilityElement = true
-        containerView.isAccessibilityElement = false
-        accessibilityElements = [cvTitleLabel, cvSubtitleLabel, leftImageView, leftLabel, rightImageView, rightLabel].compactMap { $0 }
-    }
-
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        guard currentAssociatedRow?.selectionAction != nil else { return }
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
+        leftLabel.isAccessibilityElement = false
+        rightLabel.isAccessibilityElement = false
+        accessibilityElements = [containerView, leftImageView, leftLabel, rightImageView, rightLabel].compactMap { $0 }
     }
     
     @IBAction private func leftDocumentButtonDidPress() {

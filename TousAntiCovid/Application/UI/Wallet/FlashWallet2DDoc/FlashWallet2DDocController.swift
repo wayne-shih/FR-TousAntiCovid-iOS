@@ -34,6 +34,7 @@ final class FlashWallet2DDocController: FlashCodeController {
         navigationController?.navigationBar.shadowImage = UIImage()
         if navigationController?.viewControllers.first === self {
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+            navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
         }
         #if targetEnvironment(simulator)
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Flash", style: .plain, target: self, action: #selector(didTouchFlashButton))

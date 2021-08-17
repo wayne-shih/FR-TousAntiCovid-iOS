@@ -19,7 +19,6 @@ final class DateCell: TextFieldCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI(with: row)
-        setupAccessibility()
     }
     
     private func setupUI(with row: CVRow) {
@@ -35,6 +34,8 @@ final class DateCell: TextFieldCell {
         datePicker.maximumDate = row.maximumDate
         datePicker.date = row.initialDate ?? Date()
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
+        datePicker.locale = Locale.current
+        datePicker.accessibilityLanguage = Locale.currentAppLanguageCode
         cvTextField.inputView = datePicker
         toolbar.frame = CGRect(x: 0.0, y: 0.0, width: bounds.width, height: 44.0)
         toolbar.items = [UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
@@ -54,11 +55,7 @@ final class DateCell: TextFieldCell {
             cvTextField.becomeFirstResponder()
         }
     }
-    
-    private func setupAccessibility() {
-        accessibilityElements = [cvTitleLabel, cvSubtitleLabel].compactMap { $0 }
-    }
-    
+
     @objc private func doneButtonPressed() {
         cvTextField.resignFirstResponder()
         datePickerValueChanged()

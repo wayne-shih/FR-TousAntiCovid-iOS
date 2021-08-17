@@ -24,8 +24,8 @@ extension WindowedCoordinator {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.backgroundColor = .black
         window?.rootViewController = controller
-        window?.accessibilityViewIsModal = true
         window?.alpha = 0.0
+        window?.accessibilityViewIsModal = true
         window?.makeKeyAndVisible()
     }
     

@@ -33,6 +33,11 @@ final class WalletScanAuthorizationController: CVTableViewController {
         LocalizationsManager.shared.addObserver(self)
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        UIAccessibility.post(notification: .screenChanged, argument: self.navigationController?.navigationBar)
+    }
+
     deinit {
         LocalizationsManager.shared.removeObserver(self)
     }
@@ -53,35 +58,35 @@ final class WalletScanAuthorizationController: CVTableViewController {
     override func createRows() -> [CVRow] {
         let imageRow: CVRow = CVRow(image: Asset.Images.wallet.image,
                                     xibName: .imageCell,
-                                    theme: CVRow.Theme(topInset: 80.0,
-                                                       bottomInset: 40,
+                                    theme: CVRow.Theme(topInset: 30.0,
+                                                       bottomInset: 0.0,
                                                        imageRatio: 375.0 / 116.0,
                                                        showImageBottomEdging: true))
         let explanationRow: CVRow = CVRow(title: comingFromTheApp ? "confirmWalletQrCodeController.explanation.title.fromUniversalQrScan".localized : "confirmWalletQrCodeController.explanation.title".localized,
                                           xibName: .textCell,
-                                          theme: CVRow.Theme(topInset: 40.0,
-                                                             bottomInset: 10.0,
+                                          theme: CVRow.Theme(topInset: 20.0,
+                                                             bottomInset: 0.0,
                                                              textAlignment: .center,
                                                              titleFont: { Appearance.Cell.Text.standardFont }))
         let questionRow: CVRow = CVRow(title: "confirmWalletQrCodeController.explanation.subtitle".localized,
                                        xibName: .textCell,
-                                       theme: CVRow.Theme(topInset: 10.0,
+                                       theme: CVRow.Theme(topInset: 20.0,
                                                           bottomInset: 20.0,
                                                           textAlignment: .center))
         let acceptRow: CVRow = CVRow(title: "confirmWalletQrCodeController.confirm".localized,
-                                        xibName: .buttonCell,
-                                        theme: CVRow.Theme(topInset: 20.0, bottomInset: 10.0),
-                                        selectionAction: { [weak self] in
-                                            self?.didAnswer(true)
-                                        })
+                                     xibName: .buttonCell,
+                                     theme: CVRow.Theme(topInset: 20.0, bottomInset: 10.0),
+                                     selectionAction: { [weak self] in
+                                        self?.didAnswer(true)
+                                     })
         let refuseRow: CVRow = CVRow(title: "common.cancel".localized,
-                                        xibName: .buttonCell,
-                                        theme: CVRow.Theme(topInset: 10.0,
-                                                           bottomInset: 0.0,
-                                                           buttonStyle: .destructive),
-                                        selectionAction: { [weak self] in
-                                            self?.didAnswer(false)
-                                        })
+                                     xibName: .buttonCell,
+                                     theme: CVRow.Theme(topInset: 10.0,
+                                                        bottomInset: 0.0,
+                                                        buttonStyle: .destructive),
+                                     selectionAction: { [weak self] in
+                                        self?.didAnswer(false)
+                                     })
         return [imageRow,
                 explanationRow,
                 questionRow,

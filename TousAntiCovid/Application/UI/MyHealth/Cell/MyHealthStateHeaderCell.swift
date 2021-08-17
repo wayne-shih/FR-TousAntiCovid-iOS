@@ -10,20 +10,17 @@
 
 import UIKit
 
-final class MyHealthStateHeaderCell: CVTableViewCell {
+final class MyHealthStateHeaderCell: CardCell {
 
     @IBOutlet private var exposureDateStackView: UIStackView?
     @IBOutlet private var exposureDateTitleLabel: UILabel?
     @IBOutlet private var exposureDateLabel: UILabel?
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var gradientView: GradientView!
     
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupTheme(with: row)
         setupContent(with: row)
-        accessoryType = .none
-        selectionStyle = .none
     }
     
     private func setupTheme(with row: CVRow) {
@@ -33,9 +30,6 @@ final class MyHealthStateHeaderCell: CVTableViewCell {
         cvAccessoryLabel?.textColor = .white
         exposureDateTitleLabel?.textColor = .white
         exposureDateLabel?.textColor = .white
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
-        containerView.layer.maskedCorners = row.theme.maskedCorners
         gradientView.startColor = currentRiskLevel.color.fromColor
         gradientView.endColor = currentRiskLevel.color.toColor
         exposureDateStackView?.isHidden = row.footerText == nil

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="211" id="ovz-IJ-FqI" customClass="KeyFigureChartCell" customModule="TAC_Multi_" customModuleProvider="target">
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="211" id="ovz-IJ-FqI" customClass="KeyFigureChartCell" customModule="TAC_Prod_Plus" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="495" height="382"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ovz-IJ-FqI" id="kPH-TH-KI7">
@@ -60,7 +60,7 @@
                                     </label>
                                 </subviews>
                             </stackView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d1d-wN-3H9" customClass="ComponentHighlightButton" customModule="TAC_Multi_" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d1d-wN-3H9" customClass="ComponentHighlightButton" customModule="TAC_Prod_Plus" customModuleProvider="target">
                                 <rect key="frame" x="409" y="6" width="40" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="40" id="5oK-IB-fEP"/>
@@ -98,6 +98,7 @@
                 <outlet property="footerLabel" destination="a1S-UM-ygH" id="JDr-T8-oCz"/>
                 <outlet property="leadingConstraint" destination="my4-No-q6a" id="dlV-ZI-6VV"/>
                 <outlet property="legendStackView" destination="XNL-Qv-nMV" id="ChF-Uq-Cj0"/>
+                <outlet property="sharingButton" destination="d1d-wN-3H9" id="Mtd-KS-MbP"/>
                 <outlet property="sharingImageView" destination="jzD-7F-nLm" id="fn6-k2-ha6"/>
                 <outlet property="topConstraint" destination="9WR-Xo-meM" id="1B5-IX-0Uw"/>
                 <outlet property="trailingConstraint" destination="LrM-nr-AY1" id="cDx-Sf-5Z5"/>

@@ -11,11 +11,10 @@
 import UIKit
 import TagListView
 
-final class SanitaryCertificateCell: CVTableViewCell {
+final class SanitaryCertificateCell: CardCell {
 
     @IBOutlet private var favoriteButton: UIButton!
     @IBOutlet private var topRightButton: UIButton!
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var tagListView: TagListView!
     
     override func setup(with row: CVRow) {
@@ -38,13 +37,6 @@ final class SanitaryCertificateCell: CVTableViewCell {
     }
     
     private func setupUI(with row: CVRow) {
-        selectionStyle = .none
-        accessoryType = .none
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.maskedCorners = row.theme.maskedCorners
-        containerView.layer.masksToBounds = true
         topRightButton.tintColor = Appearance.tintColor
         favoriteButton.tintColor = Appearance.tintColor
         favoriteButton.isHidden = row.secondarySelectionAction == nil
@@ -69,31 +61,36 @@ final class SanitaryCertificateCell: CVTableViewCell {
             tag.tagBackgroundColor = Appearance.tintColor
             tag.textColor = Appearance.Button.Primary.titleColor
         }
-        tagListView.isAccessibilityElement = true
+        tagListView.isAccessibilityElement = !(tagListView?.isHidden ?? true)
         tagListView.accessibilityTraits = .staticText
         tagListView.accessibilityLabel = row.accessoryText
         tagListView.tagViews.forEach { $0.isAccessibilityElement = false }
         favoriteButton.setImage(row.isOn == true ? Asset.Images.filledHeart.image : Asset.Images.emptyHeart.image, for: .normal)
         layoutSubviews()
     }
-    
+
+    override func setupAccessibility() {}
+
     private func setupAccessibility(with row: CVRow) {
-        containerView?.accessibilityLabel = "\(row.title?.removingEmojis() ?? "") \(row.segmentsTitles?.joined() ?? "") \(row.subtitle?.removingEmojis() ?? "")"
-        containerView?.accessibilityTraits = .staticText
-        containerView?.isAccessibilityElement = true
-        topRightButton.accessibilityLabel = "\("walletController.menu.share".localized), \("walletController.menu.delete".localized)"
-        topRightButton?.accessibilityTraits = .button
-        topRightButton?.isAccessibilityElement = true
-        favoriteButton.accessibilityLabel = "accessibility.wallet.dcc.favorite.\(row.isOn == true ? "remove": "define")".localized
-        favoriteButton?.accessibilityTraits = .button
-        favoriteButton?.isAccessibilityElement = true
+        let imageType: String?
+        switch (row.associatedValue as? WalletCertificate)?.type.format {
+        case .wallet2DDoc:
+            imageType = "common.2ddoc".localized
+        case .walletDCC:
+            imageType = "common.qrcode".localized
+        case .none:
+            imageType = nil
+        }
+
+        accessibilityLabel = [imageType, "accessibility.fullscreen.activate".localized, cvTitleLabel?.text, row.segmentsTitles?.joined() ?? "", cvSubtitleLabel?.text, cvAccessoryLabel?.text].compactMap { $0 }.joined(separator: ".\n").removingEmojis()
+        accessibilityTraits = .button
+        isAccessibilityElement = true
+        accessibilityElements = []
 
         cvTitleLabel?.isAccessibilityElement = false
         cvSubtitleLabel?.isAccessibilityElement = false
         tagListView?.isAccessibilityElement = false
         cvImageView?.isAccessibilityElement = false
-
-        accessibilityElements = [containerView, favoriteButton, topRightButton].compactMap { $0 }
     }
 
     @IBAction private func favoriteButtonPressed(_ sender: Any) {
@@ -104,19 +101,6 @@ final class SanitaryCertificateCell: CVTableViewCell {
     @IBAction private func topRightButtonPressed(_ sender: Any) {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         currentAssociatedRow?.selectionActionWithCell?(self)
-    }
-    
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        guard currentAssociatedRow?.selectionAction != nil else { return }
-        super.setHighlighted(highlighted, animated: animated)
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
     }
     
 }

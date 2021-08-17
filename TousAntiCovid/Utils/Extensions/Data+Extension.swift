@@ -51,4 +51,13 @@ extension Data {
         return Data(result)
     }
 
+    func sha256() -> String { digest().hexString }
+
+    private func digest() -> Data {
+        let digestLength: Int = Int(CC_SHA256_DIGEST_LENGTH)
+        var hash: [UInt8] = [UInt8](repeating: 0, count: digestLength)
+        CC_SHA256((self as NSData).bytes, UInt32(count), &hash)
+        return NSData(bytes: hash, length: digestLength) as Data
+    }
+
 }

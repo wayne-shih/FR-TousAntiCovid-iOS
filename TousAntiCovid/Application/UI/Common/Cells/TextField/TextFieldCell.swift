@@ -17,7 +17,6 @@ class TextFieldCell: CVTableViewCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI(with: row)
-        setupAccessibility()
     }
     
     private func trimText() {
@@ -40,9 +39,12 @@ class TextFieldCell: CVTableViewCell {
         cvTextField.tag = row.associatedValue as? Int ?? 0
     }
     
-    private func setupAccessibility() {
+    override func setupAccessibility() {
+        super.setupAccessibility()
         accessibilityElements = [cvTextField].compactMap { $0 }
-        cvTextField.accessibilityLabel = cvTitleLabel?.text
+        cvTextField.accessibilityHint = cvTitleLabel?.text
+        cvTextField.accessibilityLabel = cvSubtitleLabel?.text
+        cvTitleLabel?.isAccessibilityElement = false
     }
     
     @IBAction func textFieldValueChanged() {

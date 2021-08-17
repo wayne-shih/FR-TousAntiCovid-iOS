@@ -1,0 +1,10 @@
+/* 
+  Localizable.strings
+  TousAntiCovid
+
+  Created by Nicolas on 05/08/2021.
+  Copyright © 2021 Lunabee Studio. All rights reserved.
+*/
+
+"emptyController.message"= "On your iPhone, add a favorite certificate (test or vaccin) that you will find here.";
+"complication.favorite.displayName" = "Favorite certificate";

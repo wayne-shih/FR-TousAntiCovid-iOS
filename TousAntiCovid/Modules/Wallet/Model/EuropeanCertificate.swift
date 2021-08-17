@@ -52,6 +52,8 @@ final class EuropeanCertificate: WalletCertificate {
         return strings.compactMap { $0 } .joined(separator: "\n\n")
     }
 
+    override var uniqueHash: String { "\(countryCode?.uppercased() ?? "")\(hCert.uvci)".sha256() }
+
     var isForeignCertificate: Bool { countryCode != "FR" }
 
     var fullDescriptionForFullscreen: String? {
@@ -79,8 +81,6 @@ final class EuropeanCertificate: WalletCertificate {
         hCert.testStatements.first?.resultNegative
     }
 
-    var uniqueHash: String { "\(countryCode?.uppercased() ?? "")\(hCert.uvci)".sha256() }
-
     private func birthDateString(forceEnglishFormat: Bool) -> String? {
         hCert.dateOfBirth?.dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
     }
@@ -88,14 +88,16 @@ final class EuropeanCertificate: WalletCertificate {
     private let hCert: HCert
 
     private var countryCode: String? {
+        let countryCode: String?
         switch hCert.type {
         case .vaccine:
-            return hCert.vaccineStatements.first?.countryCode
+            countryCode = hCert.vaccineStatements.first?.countryCode
         case .test:
-            return hCert.testStatements.first?.countryCode
+            countryCode = hCert.testStatements.first?.countryCode
         case .recovery:
-            return hCert.recoveryStatements.first?.countryCode
+            countryCode = hCert.recoveryStatements.first?.countryCode
         }
+        return ["NC", "WF", "PM", "PF"].contains(countryCode) ? "FR" : countryCode
     }
     
     private func fullDescriptionVaccination(forceEnglishFormat: Bool) -> String? {

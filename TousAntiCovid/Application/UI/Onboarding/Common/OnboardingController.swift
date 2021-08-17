@@ -93,10 +93,12 @@ class OnboardingController: CVTableViewController, LocalizationsChangesObserver 
         tableView.separatorStyle = .none
         tableView.showsVerticalScrollIndicator = false
         if !isOpenedFromOnboarding {
+            let barButtonItem: UIBarButtonItem = createCustomLeftBarButtonItem()
+            barButtonItem.accessibilityHint = "accessibility.closeModal.zGesture".localized
             if let controller = navigationChildController {
-                controller.updateLeftBarButtonItem(createCustomLeftBarButtonItem())
+                controller.updateLeftBarButtonItem(barButtonItem)
             } else {
-                navigationItem.leftBarButtonItem = createCustomLeftBarButtonItem()
+                navigationItem.leftBarButtonItem = barButtonItem
             }
         } else if navigationController?.viewControllers.count ?? 0 > 1 {
             backButtonItem = UIBarButtonItem.back(target: self, action: #selector(didTouchBackButton))

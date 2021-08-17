@@ -10,10 +10,9 @@
 
 import UIKit
 
-final class NewPostalCodeCell: CVTableViewCell {
+final class NewPostalCodeCell: CardCell {
 
     @IBOutlet private var button: UIButton!
-    @IBOutlet private var containerView: UIView!
 
     override func setup(with row: CVRow) {
         super.setup(with: row)
@@ -23,15 +22,11 @@ final class NewPostalCodeCell: CVTableViewCell {
     }
 
     private func setupUI() {
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
         cvSubtitleLabel?.font = Appearance.Cell.Text.subtitleFont
         button?.contentHorizontalAlignment = .center
         button?.tintColor = Appearance.Button.Primary.titleColor
         button?.titleLabel?.font = Appearance.Button.linkFont
         button?.titleLabel?.adjustsFontForContentSizeCategory = true
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
     }
 
     private func setupContent(with row: CVRow) {
@@ -39,7 +34,8 @@ final class NewPostalCodeCell: CVTableViewCell {
         button.isHidden = row.buttonTitle == nil
     }
 
-    private func setupAccessibility() {
+    override func setupAccessibility() {
+        super.setupAccessibility()
         accessibilityElements = [cvTitleLabel,
                                  cvSubtitleLabel,
                                  button].compactMap { $0 }
@@ -48,17 +44,4 @@ final class NewPostalCodeCell: CVTableViewCell {
     @IBAction private func buttonPressed(_ sender: Any) {
         currentAssociatedRow?.selectionAction?()
     }
-
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
-    }
-    
 }

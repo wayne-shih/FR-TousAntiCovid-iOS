@@ -10,9 +10,8 @@
 
 import UIKit
 
-final class WhenToUseCell: CVTableViewCell {
+final class WhenToUseCell: CardCell {
 
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var button: UIButton?
 
     override func setup(with row: CVRow) {
@@ -23,11 +22,6 @@ final class WhenToUseCell: CVTableViewCell {
     }
 
     private func setupUI(with row: CVRow) {
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.maskedCorners = row.theme.maskedCorners
-        containerView.layer.masksToBounds = true
         button?.tintColor = Appearance.Button.Tertiary.titleColor
         button?.titleLabel?.font = Appearance.Button.linkFont
         button?.titleLabel?.adjustsFontForContentSizeCategory = true
@@ -42,21 +36,9 @@ final class WhenToUseCell: CVTableViewCell {
         button?.accessibilityHint = nil
     }
 
-    private func setupAccessibility() {
+    override func setupAccessibility() {
+        super.setupAccessibility()
         accessibilityElements = [cvTitleLabel, cvSubtitleLabel, button].compactMap { $0 }
-    }
-
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        guard currentAssociatedRow?.selectionAction != nil else { return }
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
     }
     
     @IBAction private func buttonDidPress() {

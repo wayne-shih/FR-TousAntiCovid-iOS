@@ -11,12 +11,11 @@
 import UIKit
 import TagListView
 
-final class InfoCell: CVTableViewCell {
+final class InfoCell: CardCell {
     
     @IBOutlet private var dateLabel: UILabel!
     @IBOutlet private var tagListView: TagListView!
     @IBOutlet private var button: UIButton!
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var sharingImageView: UIImageView!
     @IBOutlet private var sharingButton: UIButton!
     
@@ -28,8 +27,6 @@ final class InfoCell: CVTableViewCell {
     }
     
     private func setupUI(with row: CVRow) {
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
         dateLabel.font = Appearance.Cell.Text.captionTitleFont
         dateLabel.textColor = Appearance.Cell.Text.captionTitleColor
         tagListView.textFont = Appearance.Tag.font
@@ -44,8 +41,6 @@ final class InfoCell: CVTableViewCell {
         button?.tintColor = Appearance.Button.Tertiary.titleColor
         button?.titleLabel?.font = Appearance.Button.linkFont
         button?.titleLabel?.adjustsFontForContentSizeCategory = true
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
         sharingImageView.tintColor = Appearance.tintColor
         sharingImageView.image = Asset.Images.shareIcon.image
 
@@ -77,7 +72,6 @@ final class InfoCell: CVTableViewCell {
         } else {
             button.setTitle(row.buttonTitle, for: .normal)
         }
-        button.accessibilityLabel = row.buttonTitle
         button.isHidden = row.buttonTitle?.isEmpty != false
         guard let info = row.associatedValue as? Info else {
             tagListView.isHidden = true
@@ -89,7 +83,7 @@ final class InfoCell: CVTableViewCell {
             let tag: TagView = tagListView.addTag($0.label)
             tag.backgroundColor = $0.color
         }
-        tagListView.isAccessibilityElement = true
+        tagListView.isAccessibilityElement = !(tagListView?.isHidden ?? true)
         tagListView.accessibilityTraits = .staticText
         tagListView.accessibilityLabel = info.tags.map { $0.label }.joined(separator: ", ")
         tagListView.tagViews.forEach { $0.isAccessibilityElement = false }
@@ -104,6 +98,13 @@ final class InfoCell: CVTableViewCell {
                                  cvSubtitleLabel,
                                  sharingButton,
                                  button].compactMap { $0 }
+        button.accessibilityLabel = row.buttonTitle
+        button.isAccessibilityElement = info.buttonLabel?.isEmpty == false
+        dateLabel.isAccessibilityElement = true
+        cvTitleLabel?.isAccessibilityElement = true
+        cvSubtitleLabel?.isAccessibilityElement = true
+        tagListView.isAccessibilityElement = true
+        sharingButton.isAccessibilityElement = true
         sharingButton.accessibilityLabel = "accessibility.hint.info.share".localized
         let date: Date = Date(timeIntervalSince1970: Double(info.timestamp))
         dateLabel.accessibilityLabel = date.accessibilityRelativelyFormattedDate()

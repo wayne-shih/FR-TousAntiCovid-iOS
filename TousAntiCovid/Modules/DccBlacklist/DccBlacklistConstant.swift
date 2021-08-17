@@ -14,6 +14,7 @@ enum DccBlacklistConstant {
 
     static let directoryName: String = "CertList"
     static let baseUrl: String = "https://\(Constant.Server.staticResourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/\(directoryName)"
-    static let certListUrl: URL = URL(string: "\(baseUrl)/certlist.json")!
+    static let filename: String = "certlist.json"
+    static let certListUrl: URL = URL(string: "\(baseUrl)/\(filename)")!
 
 }

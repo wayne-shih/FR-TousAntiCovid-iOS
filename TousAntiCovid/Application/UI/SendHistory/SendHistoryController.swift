@@ -36,7 +36,7 @@ final class SendHistoryController: CVTableViewController {
         reloadUI()
         LocalizationsManager.shared.addObserver(self)
     }
-    
+
     deinit {
         LocalizationsManager.shared.removeObserver(self)
     }
@@ -49,7 +49,10 @@ final class SendHistoryController: CVTableViewController {
         let textRow: CVRow = CVRow(title: "sendHistoryController.mainMessage.title".localized,
                                    subtitle: "sendHistoryController.mainMessage.subtitle".localized,
                                    xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 20.0))
+                                   theme: CVRow.Theme(topInset: 20.0),
+                                   willDisplay: { cell in
+                                    cell.accessibilityHint = (cell.accessibilityHint ?? "") + ".\n" + "accessibility.back.zGesture".localized
+                                   })
         return [imageRow, textRow]
     }
     

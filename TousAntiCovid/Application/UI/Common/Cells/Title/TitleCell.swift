@@ -11,13 +11,9 @@
 import UIKit
 
 final class TitleCell: CVTableViewCell {
-
-    override func setup(with row: CVRow) {
-        super.setup(with: row)
-        setupAccessibility()
-    }
     
-    private func setupAccessibility() {
+    override func setupAccessibility() {
+        super.setupAccessibility()
         cvTitleLabel?.accessibilityTraits = [.staticText, .header]
     }
 

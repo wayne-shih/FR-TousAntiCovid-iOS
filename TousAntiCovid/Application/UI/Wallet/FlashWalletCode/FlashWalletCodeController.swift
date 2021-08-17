@@ -49,6 +49,7 @@ final class FlashWalletCodeController: FlashCodeController {
         navigationController?.navigationBar.shadowImage = UIImage()
         if navigationController?.viewControllers.first === self {
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+            navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
         }
         #if targetEnvironment(simulator)
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Flash", style: .plain, target: self, action: #selector(didTouchFlashButton))
@@ -75,7 +76,7 @@ final class FlashWalletCodeController: FlashCodeController {
     
     #if targetEnvironment(simulator)
     @objc private func didTouchFlashButton() {
-        let url: URL = URL(string: Bool.random() ? "https://bonjour.tousanticovid.gouv.fr/app/walletdcc#HC1:6BFOXN%25TSMAHN-HJTK6.Q837FEMYV6NF4LR5+T9YJ1OGIFT2E7V:X9ZLS*4FCV4*XUA2PSGH.+H$NI4L6PUC6VH6ZL4XP:N6ON13:LHNGPF0%25U94OG3W1-N8KK44ZINTICZUIQN*LA%20436IAXPMHQ1*P13W1+ZEAW1OH6TPA-:VH*F/IE%25TE6UG+ZEAT1HQ1BT1VW55NI5K1*TB3:U-1VVS1UU1MX1FTIWMA-RI%20PQVW5/O16%25HAT1Z%25PHOP*SQ%20R1-%25JHQ15SI:TU+MMPZ56Q1ZRR.T1UVI/E2$4JY/K:*KM%25VHLV+3HLS4HBT:KVAWCC%25C3%202NS431TL88F%25DYZQ4H9H-VUU7IS7TRG4PIQJAZGA+1V2:U2E4AO09SOO0BZCWJRU+HA7/NU1QB*B.%20HK/0N87ZWA:667FPTGULTCC4FI5D/KGG1GWYTVXLO1222G+HM3UA6UJ9MN-RB-7RZNNE9325LO-JE8E" :  "https://bonjour.tousanticovid.gouv.fr/app/wallet?v=DC04FR03AV011E791E79L101FRL0PAVOINE%1DL1EUGENE%1DL219081951L3COVID-19%1DL4J07BX03%1DL5MODERNA%1DL6MODERNA%1DL72L82L924032021LATE%1FKWT3FZQ726IFU6RUYD2KLOVYJUS7TMUGRNJNG55DIAN5BTBBM2Q6V3YXGM6YKRZVSD5GZZPY3RH7QNFFW5VZOT5MPULJOJBS7S567IA")!
+        let url: URL = URL(string: "https://bonjour.tousanticovid.gouv.fr/app/walletdcc#HC1:NCFOXN%25TS3DHA%20SA6K85KFI60INA.Q/R8LF62FCKSU3*5I9C2L96LHC%20CZIE%25OM:UC*GPXS40%20LHZATG91PC/.DV2MGDIK3MXGG%20HGMJKB%25GLIA-D8+6JDJN%20XGUEERH9P1JXGGO.KKHG%203MRB8-JEY7A1JAA/CQ.CXCI*ZAVDJ.6LDDJU*INCIL7JRIK:BG26H-GFU4HLEKTSFS-K.-KYUJUECYJM.IA.C8KRDL4O54O4IGUJKPGGYIA%20GEMSH:8E3DE0OA0D9E2LBHHGKLO-K%25FGSKE%20MCTPI8%25MLPIY10UBR:34C3CS03K34XAPFZMXUAM.SY$NIS9N1B%2518J40T8AI%25KIR7./8T%20OG%255TW5A%206%20O6$L69/9L:9EMN*886EO-CRH76.JKTFNK%25C1MD:XERASU%25KBSIPPH88J2PM%20RJLAWQ0GU$CH6H.7LVNTO8B5+M5AVF%20BCXT*$8*GJSCRSKGX5HOLI.N1N-RZPE6PRY7O.40Z-A74")!
         do {
             try didFlash?(url)
         } catch {

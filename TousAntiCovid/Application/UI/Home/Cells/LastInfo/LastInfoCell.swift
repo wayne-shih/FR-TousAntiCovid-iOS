@@ -10,11 +10,10 @@
 
 import UIKit
 
-final class LastInfoCell: CVTableViewCell {
+final class LastInfoCell: CardCell {
     
     @IBOutlet private var dateLabel: UILabel!
     @IBOutlet private var button: UIButton!
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var headerLabel: UILabel!
     @IBOutlet private var headerImageView: UIImageView!
     @IBOutlet private var newInfoAvailableIndicatorView: UIView!
@@ -28,8 +27,6 @@ final class LastInfoCell: CVTableViewCell {
     }
     
     private func setupUI() {
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
         dateLabel.font = Appearance.Cell.Text.captionTitleFont
         dateLabel.textColor = Appearance.Cell.Text.captionTitleColor
         cvTitleLabel?.font = Appearance.Cell.Text.titleFont
@@ -38,8 +35,6 @@ final class LastInfoCell: CVTableViewCell {
         button?.tintColor = Appearance.Button.Tertiary.titleColor
         button?.titleLabel?.font = Appearance.Button.linkFont
         button?.titleLabel?.adjustsFontForContentSizeCategory = true
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
         headerImageView.image = Asset.Images.homeRing.image
         headerImageView.tintColor = Appearance.Cell.Text.headerTitleColor
         headerImageView.tintAdjustmentMode = .normal
@@ -60,28 +55,20 @@ final class LastInfoCell: CVTableViewCell {
         }
     }
     
-    private func setupAccessibility() {
-        accessibilityElements = [headerLabel,
-                                 dateLabel,
-                                 cvTitleLabel,
-                                 cvSubtitleLabel,
-                                 button].compactMap { $0 }
+    override func setupAccessibility() {
+        accessibilityLabel = button.title(for: .normal)
+        accessibilityTraits = .button
+        accessibilityElements = []
+        accessibilityHint = [headerLabel.text, dateLabel.text, cvTitleLabel?.text, cvSubtitleLabel?.text].compactMap { $0 }.joined(separator: ".\n")
+        headerLabel.isAccessibilityElement = false
+        dateLabel.isAccessibilityElement = false
+        cvTitleLabel?.isAccessibilityElement = false
+        cvSubtitleLabel?.isAccessibilityElement = false
+        button.isAccessibilityElement = false
     }
     
     @IBAction private func buttonPressed(_ sender: Any) {
         currentAssociatedRow?.selectionAction?()
-    }
-    
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
     }
     
 }

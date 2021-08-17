@@ -16,4 +16,5 @@ struct CodeDetail {
     var codeBottomText: String? = nil
     var text: String?
     var footerText: String? = nil
+    var hash: String?
 }

@@ -71,7 +71,9 @@ final class PositiveTestStepsController: CVTableViewController {
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
-        (bottomButtonContainerController ?? self).navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        let barButtonItem: UIBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        barButtonItem.accessibilityHint = "accessibility.closeModal.zGesture".localized
+        (bottomButtonContainerController ?? self).navigationItem.leftBarButtonItem = barButtonItem
 
     }
 

@@ -136,6 +136,26 @@ final class ManageDataController: CVTableViewController {
             rows.append(contentsOf: analyticsRows)
             rows.append(blockSeparatorRow())
         }
+        let logsFilesUrls: [URL] = StackLogger.getLogFilesUrls()
+        var subtitle: String = "manageDataController.logFiles.subtitle".localized
+        if logsFilesUrls.isEmpty {
+            subtitle += "\n\n\("manageDataController.logFiles.noLogs".localized)"
+        } else {
+            subtitle += "\n\n\(String(format: "manageDataController.logFiles.logsFilesCount".localized, logsFilesUrls.count))"
+        }
+        var logRows: [CVRow] = [sectionHeaderRow(title: "manageDataController.logFiles.title".localized, subtitle: subtitle)]
+        if !logsFilesUrls.isEmpty {
+            logRows.append(contentsOf: [
+                            buttonRow(textPrefix: "manageDataController.logFiles.share", isDestuctive: false) { [weak self] in
+                                guard let self = self else { return }
+                                logsFilesUrls.share(from: self)
+                            },
+                            buttonRow(textPrefix: "manageDataController.logFiles.delete", isDestuctive: true) { [weak self] in
+                                self?.deleteLogsFilesButtonPressed()
+                            }])
+        }
+        rows.append(contentsOf: logRows)
+        rows.append(blockSeparatorRow())
         let quitRows: [CVRow] = [
             sectionHeaderRow(textPrefix: "manageDataController.quitStopCovid"),
             buttonRow(textPrefix: "manageDataController.quitStopCovid", isDestuctive: true) { [weak self] in
@@ -148,6 +168,7 @@ final class ManageDataController: CVTableViewController {
     
     private func updateLeftBarButton() {
         navigationItem.leftBarButtonItem?.title = "common.close".localized
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
     private func initUI() {
@@ -158,6 +179,7 @@ final class ManageDataController: CVTableViewController {
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
     @objc private func didTouchCloseButton() {
@@ -165,8 +187,13 @@ final class ManageDataController: CVTableViewController {
     }
 
     private func sectionHeaderRow(textPrefix: String) -> CVRow {
-        var textRow: CVRow = CVRow(title: "\(textPrefix).title".localized,
-                                   subtitle: "\(textPrefix).subtitle".localized,
+        sectionHeaderRow(title: "\(textPrefix).title".localized,
+                         subtitle: "\(textPrefix).subtitle".localized)
+    }
+
+    private func sectionHeaderRow(title: String, subtitle: String) -> CVRow {
+        var textRow: CVRow = CVRow(title: title,
+                                   subtitle: subtitle,
                                    xibName: .textCell,
                                    theme: CVRow.Theme(topInset: Appearance.Cell.leftMargin,
                                                       bottomInset: Appearance.Cell.leftMargin,
@@ -176,7 +203,7 @@ final class ManageDataController: CVTableViewController {
         textRow.theme.backgroundColor = Appearance.Cell.cardBackgroundColor
         return textRow
     }
-    
+
     private func selectableRow(title: String, isSelected: Bool, selectionBlock: @escaping () -> ()) -> CVRow {
         CVRow(title: title,
               isOn: isSelected,
@@ -366,6 +393,18 @@ final class ManageDataController: CVTableViewController {
                             self?.processPostUnregisterActions(error, isErrorBlocking: isErrorBlocking)
                         }
                     }
+                  })
+    }
+
+    private func deleteLogsFilesButtonPressed() {
+        showAlert(title: "manageDataController.logFiles.delete.confirmationDialog.title".localized,
+                  message: "manageDataController.logFiles.delete.confirmationDialog.message".localized,
+                  okTitle: "common.yes".localized,
+                  isOkDestructive: true,
+                  cancelTitle: "common.no".localized, handler:  { [weak self] in
+                    StackLogger.deleteAllLogsFiles()
+                    HUD.flash(.success)
+                    self?.reloadUI()
                   })
     }
     

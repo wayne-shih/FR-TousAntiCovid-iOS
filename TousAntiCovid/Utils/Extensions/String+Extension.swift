@@ -72,11 +72,9 @@ extension String {
 
     func flag() -> String {
         let base: UInt32 = 127397
-        var s: String = ""
-        for v in self.unicodeScalars {
-            s.unicodeScalars.append(UnicodeScalar(base + v.value)!)
-        }
-        return String(s)
+        var flagEmoji: String = ""
+        unicodeScalars.forEach { flagEmoji.unicodeScalars.append(UnicodeScalar(base + $0.value)!) }
+        return flagEmoji
     }
     
     func callPhoneNumber(from controller: UIViewController) {
@@ -129,7 +127,7 @@ extension String {
     }
     
     func accessibilityNumberFormattedString() -> String {
-        guard let intValue = Int(self) else { return self }
+        guard let intValue = Int(self.replacingOccurrences(of: "common.thousandsSeparator".localized, with: "")) else { return self }
         let numberValue: NSNumber = NSNumber(integerLiteral: intValue)
         return NumberFormatter.localizedString(from: numberValue, number: .spellOut)
     }
@@ -138,7 +136,7 @@ extension String {
         guard let data = data(using: .utf8) else { return nil }
         if let filter = CIFilter(name: "CIQRCodeGenerator") {
             filter.setValue(data, forKey: "inputMessage")
-            let factor: CGFloat = small ? 1.0 : 5.0
+            let factor: CGFloat = small ? 2.0 : 5.0
             let transform: CGAffineTransform = CGAffineTransform(scaleX: factor, y: factor)
             if let output = filter.outputImage?.transformed(by: transform) {
                 return UIImage(ciImage: output)
@@ -162,28 +160,9 @@ extension String {
     
     func sha256() -> String {
         if let stringData = self.data(using: String.Encoding.utf8) {
-            return hexStringFromData(input: digest(input: stringData as NSData))
+            return stringData.sha256()
         }
         return ""
-    }
-    
-    private func digest(input: NSData) -> NSData {
-        let digestLength: Int = Int(CC_SHA256_DIGEST_LENGTH)
-        var hash: [UInt8] = [UInt8](repeating: 0, count: digestLength)
-        CC_SHA256(input.bytes, UInt32(input.length), &hash)
-        return NSData(bytes: hash, length: digestLength)
-    }
-    
-    private  func hexStringFromData(input: NSData) -> String {
-        var bytes = [UInt8](repeating: 0, count: input.length)
-        input.getBytes(&bytes, length: input.length)
-        
-        var hexString = ""
-        for byte in bytes {
-            hexString += String(format:"%02x", UInt8(byte))
-        }
-        
-        return hexString
     }
     
     func cleaningPEMStrings() -> String {

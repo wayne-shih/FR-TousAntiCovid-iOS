@@ -10,13 +10,12 @@
 
 import UIKit
 
-final class KeyFigureCell: CVTableViewCell, Xibbed {
+final class KeyFigureCell: CardCell, Xibbed {
     
     @IBOutlet private var dateLabel: UILabel!
     @IBOutlet private var valueLabel: UILabel!
     @IBOutlet private var departmentLabel: UILabel!
-    @IBOutlet private var containerView: UIView!
-    
+
     @IBOutlet private var countryStackView: UIStackView!
     @IBOutlet private var countryLabel: UILabel!
     @IBOutlet private var countryValueLabel: UILabel!
@@ -69,8 +68,6 @@ final class KeyFigureCell: CVTableViewCell, Xibbed {
     }
     
     private func setupUI() {
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
         valuesContainerStackView.threshold = contentSizeCategoryThreashold
         valuesContainerStackView.thresholdAxis = .vertical
         valuesContainerStackView.thresholdAlignment = .leading
@@ -86,8 +83,6 @@ final class KeyFigureCell: CVTableViewCell, Xibbed {
         valueLabel.font = Appearance.Cell.Text.headTitleFont2
         sharingImageView.tintColor = Appearance.tintColor
         sharingImageView.image = Asset.Images.shareIcon.image
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
         changeInPreferredContentSize()
     }
     
@@ -122,21 +117,29 @@ final class KeyFigureCell: CVTableViewCell, Xibbed {
             valueLabel.text = keyFigure.valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible()
         }
     }
-    
+
+    override func setupAccessibility() {}
+
     private func setupAccessibility(with row: CVRow) {
         guard let keyFigure = row.associatedValue as? KeyFigure else { return }
         accessibilityElements = [dateLabel!]
         if !departmentLabel.isHidden {
             accessibilityElements?.append(departmentLabel!)
+            departmentLabel.isAccessibilityElement = true
         }
         accessibilityElements?.append(cvTitleLabel!)
+        cvTitleLabel?.isAccessibilityElement = true
+        cvTitleLabel?.accessibilityTraits = .button
         if !countryStackView.isHidden {
             accessibilityElements?.append(countryLabel!)
+            countryLabel?.isAccessibilityElement = true
             let countryValue: String = countryValueLabel.text?.replacingOccurrences(of: " ", with: "") ?? ""
             countryLabel?.accessibilityLabel = "\(countryLabel?.text ?? ""), \(countryValue), \(keyFigure.trend?.accessibilityLabel ?? "")"
         }
         accessibilityElements?.append(cvSubtitleLabel!)
+        cvSubtitleLabel?.isAccessibilityElement = true
         accessibilityElements?.append(sharingButton!)
+        sharingButton?.isAccessibilityElement = true
         let value: String = valueLabel.text?.replacingOccurrences(of: " ", with: "").accessibilityNumberFormattedString() ?? ""
         let trendString: String = (keyFigure.currentDepartmentSpecificKeyFigure == nil ? keyFigure.trend?.accessibilityLabel : keyFigure.currentDepartmentSpecificKeyFigure?.trend?.accessibilityLabel) ?? ""
         cvTitleLabel?.accessibilityLabel = "\(cvTitleLabel?.text ?? ""), \(value), \(trendString)"
@@ -154,19 +157,6 @@ final class KeyFigureCell: CVTableViewCell, Xibbed {
             baselineAlignmentConstraint?.isActive = false
         } else {
             baselineAlignmentConstraint?.isActive = true
-        }
-    }
-    
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        guard currentAssociatedRow?.selectionAction != nil else { return }
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
         }
     }
 

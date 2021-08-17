@@ -13,6 +13,7 @@
 	<array>
 		<string>group.fr.gouv.stopcovid.ios.contents</string>
 		<string>group.fr.gouv.stopcovid.ios.contents.dcc</string>
+		<string>group.fr.gouv.stopcovid.ios.watch</string>
 	</array>
 </dict>
 </plist>

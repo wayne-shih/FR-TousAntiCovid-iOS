@@ -1,0 +1,10 @@
+/* 
+  Localizable.strings
+  TousAntiCovid
+
+  Created by Nicolas on 13/08/2021.
+  Copyright © 2021 Lunabee Studio. All rights reserved.
+*/
+
+"widget.status.description" = "Receive alerts and alert others about exposures to COVID-19";
+"widget.favoriteCertificate.description" = "Your favorite certificate";

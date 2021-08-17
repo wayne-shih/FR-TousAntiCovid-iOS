@@ -35,6 +35,12 @@ final class WalletManager {
     var walletCertificates: [WalletCertificate] {
         get {
             if _walletCertificates.isEmpty { reloadCertificates() }
+
+            let dbCertificatesCount: Int = storageManager.walletCertificates().count
+            if _walletCertificates.isEmpty && dbCertificatesCount > 0 {
+                StackLogger.log(symbols: Thread.callStackSymbolsString, message: "Displaying 0 certificates but having \(dbCertificatesCount) certificates in db.")
+            }
+
             return _walletCertificates
         }
         set { _walletCertificates = newValue }
@@ -44,9 +50,13 @@ final class WalletManager {
     var recentWalletCertificates: [WalletCertificate] { walletCertificates.filter { !$0.isOld } }
     var oldWalletCertificates: [WalletCertificate] { walletCertificates.filter { $0.isOld } }
     var areThereCertificatesNeedingAttention: Bool {
-        !walletCertificates.compactMap { $0 as? EuropeanCertificate }
-            .first { ($0.isTestNegative == false && $0.type == .sanitaryEurope) || DccBlacklistManager.shared.isBlacklisted(certificate: $0) }
-            .isNil
+        !walletCertificates.first {
+            if let europeCertificate = $0 as? EuropeanCertificate {
+                return (europeCertificate.isTestNegative == false && europeCertificate.type == .sanitaryEurope) || DccBlacklistManager.shared.isBlacklisted(certificate: europeCertificate)
+            } else {
+                return Blacklist2dDocManager.shared.isBlacklisted(certificate: $0)
+            }
+        }.isNil
     }
     
     var isWalletActivated: Bool { ParametersManager.shared.displaySanitaryCertificatesWallet }
@@ -77,15 +87,18 @@ final class WalletManager {
     }
     
     func saveCertificate(_ certificate: WalletCertificate) {
+        StackLogger.log(symbols: Thread.callStackSymbolsString, message: "Saving a certificate.")
         storageManager.saveWalletCertificate(RawWalletCertificate(id: certificate.id, value: certificate.value))
     }
-    
+
     func deleteCertificate(id: String) {
+        StackLogger.log(symbols: Thread.callStackSymbolsString, message: "Deleting a certificate.")
         storageManager.deleteWalletCertificate(id: id)
         if favoriteDccId == id { favoriteDccId = nil }
     }
     
     func clearAllData() {
+        StackLogger.log(symbols: Thread.callStackSymbolsString, message: "Deleting all certificates.")
         storageManager.deleteWalletCertificates()
         favoriteDccId = nil
     }
@@ -234,9 +247,7 @@ extension WalletManager {
 
 extension WalletManager: PublicKeyStorageDelegate {
 
-    func getEncodedPublicKeys(for kidStr: String) -> [String] {
-        return DccCertificatesManager.shared.certificates(for: kidStr)
-    }
+    func getEncodedPublicKeys(for kidStr: String) -> [String] { DccCertificatesManager.shared.certificates(for: kidStr) }
 
 }
 

@@ -51,6 +51,7 @@ final class KeyFiguresController: CVTableViewController {
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
         updateRightBarButtonItem()
     }
     
@@ -109,10 +110,6 @@ final class KeyFiguresController: CVTableViewController {
                          },
                          selectionAction: { [weak self] in
                             self?.didTouchKeyFigure(keyFigure)
-                         },
-                         willDisplay: { cell in
-                            cell.accessoryType = .none
-                            cell.selectionStyle = .none
                          })
         }
         rows.append(contentsOf: keyFiguresHealthRows)
@@ -139,10 +136,6 @@ final class KeyFiguresController: CVTableViewController {
                          },
                          selectionAction: { [weak self] in
                             self?.didTouchKeyFigure(keyFigure)
-                         },
-                         willDisplay: { cell in
-                            cell.accessoryType = .none
-                            cell.selectionStyle = .none
                          })
         }
         rows.append(contentsOf: keyFiguresAppRows)

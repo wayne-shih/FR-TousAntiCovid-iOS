@@ -17,7 +17,6 @@ final class StandardSwitchCell: CVTableViewCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI(with: row)
-        setupAccessibility()
     }
     
     private func setupUI(with row: CVRow) {
@@ -25,7 +24,8 @@ final class StandardSwitchCell: CVTableViewCell {
         cvSwitch.isOn = row.isOn ?? false
     }
     
-    private func setupAccessibility() {
+    override func setupAccessibility() {
+        super.setupAccessibility()
         accessibilityElements = [cvSwitch].compactMap { $0 }
         cvSwitch.accessibilityLabel = cvTitleLabel?.text
     }

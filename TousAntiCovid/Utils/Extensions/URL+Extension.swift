@@ -33,3 +33,15 @@ extension URL {
     }
     
 }
+
+extension Array where Element == URL {
+
+    func share(from controller: UIViewController, fromButton: UIButton? = nil) {
+        let activityController: UIActivityViewController = UIActivityViewController(activityItems: self, applicationActivities: nil)
+        if let button = fromButton {
+            activityController.popoverPresentationController?.setSourceButton(button)
+        }
+        controller.present(activityController, animated: true, completion: nil)
+    }
+
+}

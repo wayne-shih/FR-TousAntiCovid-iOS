@@ -50,6 +50,8 @@ class WalletCertificate {
         }
     }
 
+    var uniqueHash: String? { message?.sha256() }
+
     var isOld: Bool {
         guard let oldCertificateThreshold = ParametersManager.shared.walletOldCertificateThresholdInDays(certificateType: type.rawValue) else { return false }
         return Date().timeIntervalSince1970 - timestamp >= Double(oldCertificateThreshold) * 86400.0

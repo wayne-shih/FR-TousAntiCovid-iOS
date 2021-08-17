@@ -28,6 +28,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     private var remoteNotificationCompletionId: String?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        initExceptionsCatching()
         initAppearance()
         initUrlCache()
         NotificationsManager.shared.start()
@@ -48,6 +49,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         WalletImagesManager.shared.start()
         DccCertificatesManager.shared.start()
         DccBlacklistManager.shared.start()
+        Blacklist2dDocManager.shared.start()
         OrientationManager.shared.start()
         if isOnboardingDone {
             BluetoothStateManager.shared.start()
@@ -95,6 +97,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         DeepLinkingManager.shared.start()
         HUD.leadingMargin = 8.0
         HUD.trailingMargin = 8.0
+        WatchConnectivityManager.shared.start()
         UIApplication.shared.registerForRemoteNotifications()
         if let shortcutItem = launchOptions?[UIApplication.LaunchOptionsKey.shortcutItem] as? UIApplicationShortcutItem {
             processShortcutItem(shortcutItem)
@@ -242,6 +245,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         } else if shortcutItem.type == Constant.ShortcutItem.favoriteDcc.rawValue {
             DeepLinkingManager.shared.processOpenFavoriteCertificateQrCode()
         }
+    }
+
+    private func initExceptionsCatching() {
+        NSSetUncaughtExceptionHandler { StackLogger.log(exception: $0) }
     }
 
 }

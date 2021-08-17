@@ -10,25 +10,16 @@
 
 import UIKit
 
-final class LoadingCardCell: CVTableViewCell {
+final class LoadingCardCell: CardCell {
 
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
 
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI(with: row)
-        setupAccessibility()
     }
 
     private func setupUI(with row: CVRow) {
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
-        selectionStyle = .none
-        accessoryType = .none
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.maskedCorners = row.theme.maskedCorners
-        containerView.layer.masksToBounds = true
         activityIndicator.startAnimating()
         activityIndicator.color = .gray
         if #available(iOS 13.0, *) {
@@ -36,21 +27,9 @@ final class LoadingCardCell: CVTableViewCell {
         }
     }
 
-    private func setupAccessibility() {
+    override func setupAccessibility() {
+        super.setupAccessibility()
         accessibilityElements = []
-    }
-
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        guard currentAssociatedRow?.selectionAction != nil else { return }
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
     }
 
 }

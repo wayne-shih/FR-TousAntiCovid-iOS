@@ -20,4 +20,15 @@ class SelectableCell: CVTableViewCell {
     private func setupContent(with row: CVRow) {
         self.accessoryType = row.isOn ?? false ? .checkmark : .none
     }
+
+    override func setupAccessibility() {
+        accessibilityLabel = cvTitleLabel?.text?.removingEmojis()
+        accessibilityHint = [cvSubtitleLabel?.text, cvAccessoryLabel?.text].compactMap { $0 }.joined(separator: ".\n").removingEmojis()
+        accessibilityTraits = .button
+        accessibilityElements = []
+        isAccessibilityElement = true
+        cvAccessoryLabel?.isAccessibilityElement = false
+        cvTitleLabel?.isAccessibilityElement = false
+        cvSubtitleLabel?.isAccessibilityElement = false
+    }
 }

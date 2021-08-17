@@ -39,6 +39,10 @@ class CVTableViewCell: UITableViewCell {
     func capture() -> UIImage? {
        return screenshot()
     }
+
+    override func accessibilityElementDidBecomeFocused() {
+        currentAssociatedRow?.accessibilityDidFocusCell?(self)
+    }
     
     private func setupTheme(with row: CVRow) {
         selectionStyle = row.selectionAction == nil ? .none : .default
@@ -120,13 +124,13 @@ class CVTableViewCell: UITableViewCell {
         }
     }
     
-    private func setupAccessibility() {
+    func setupAccessibility() {
         cvImageView?.isAccessibilityElement = false
         
         cvTitleLabel?.isAccessibilityElement = true
         cvTitleLabel?.accessibilityLabel = cvTitleLabel?.text?.removingEmojis()
-        cvTitleLabel?.accessibilityTraits = .staticText
-        
+        cvTitleLabel?.accessibilityTraits = cvTitleLabel?.font == Appearance.Cell.Text.headTitleFont ? .header : .staticText
+
         cvSubtitleLabel?.isAccessibilityElement = true
         cvSubtitleLabel?.accessibilityLabel = cvSubtitleLabel?.text?.removingEmojis()
         cvSubtitleLabel?.accessibilityTraits = .staticText

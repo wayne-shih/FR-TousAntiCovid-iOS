@@ -64,18 +64,21 @@ extension UIViewController {
         HUD.flash(success ? .success : .error, onView: self.view.window, delay: 0.8)
     }
     
-    func showTextFieldAlert(_ title: String? = nil, message: String? = nil, textFieldPlaceHolder: String? = nil, textFieldDefaultValue: String? = nil, keyboardType: UIKeyboardType = UIKeyboardType.default, completion: @escaping (_ newValue: String) -> Void) {
+    func showTextFieldAlert(_ title: String? = nil, message: String? = nil, textFieldPlaceHolder: String? = nil, textFieldDefaultValue: String? = nil, keyboardType: UIKeyboardType = UIKeyboardType.default, isSecure: Bool = false, cancelHandler: (() -> Void)? = nil, completion: @escaping (_ newValue: String) -> Void) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addTextField(configurationHandler: { textField in
             textField.text = textFieldDefaultValue
             textField.placeholder = textFieldPlaceHolder
             textField.keyboardType = keyboardType
+            textField.isSecureTextEntry = isSecure
         })
-        alert.addAction(UIAlertAction(title: "common.ok".localized, style: .default, handler: { (_) -> Void in
+        alert.addAction(UIAlertAction(title: "common.ok".localized, style: .default, handler: { _ in
             let textField = alert.textFields![0] as UITextField
             completion(textField.text ?? textFieldDefaultValue ?? "")
         }))
-        alert.addAction(UIAlertAction(title: "common.cancel".localized, style: UIAlertAction.Style.cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "common.cancel".localized, style: UIAlertAction.Style.cancel, handler: { _ in
+            cancelHandler?()
+        }))
         topPresentedController.present(alert, animated: true, completion: nil)
     }
 }

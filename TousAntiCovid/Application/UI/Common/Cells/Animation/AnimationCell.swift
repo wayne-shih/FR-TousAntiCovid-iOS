@@ -21,11 +21,11 @@ final class AnimationCell: CVTableViewCell {
     override func setup(with row: CVRow) {
         super.setup(with: row)
         animationView?.backgroundColor = .clear
-        setupAccessibility()
         setOnWaving(animation: row.animation)
     }
 
-    private func setupAccessibility() {
+    override func setupAccessibility() {
+        super.setupAccessibility()
         isAccessibilityElement = false
         accessibilityElements = []
         accessibilityElementsHidden = true

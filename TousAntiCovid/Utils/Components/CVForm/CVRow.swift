@@ -71,6 +71,7 @@ struct CVRow {
     var maximumDate: Date?
     var initialDate: Date?
     var datePickerMode: UIDatePicker.Mode?
+    var accessibilityDidFocusCell: ((_ cell: CVTableViewCell) -> ())?
     var selectionActionWithCell: ((_ cell: CVTableViewCell) -> ())?
     var selectionAction: (() -> ())?
     var secondarySelectionAction: (() -> ())?

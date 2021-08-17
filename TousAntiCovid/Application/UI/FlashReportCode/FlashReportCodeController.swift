@@ -29,6 +29,7 @@ final class FlashReportCodeController: FlashCodeController {
         explanationLabel.adjustsFontForContentSizeCategory = true
         navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
 
     override func processScannedQRCode(code: String?) {

@@ -25,12 +25,18 @@ final class WalletCoordinator: Coordinator {
     private var initialUrlToProcess: URL?
 
     private var isFlashingCode: Bool = false
+    private var wasVoiceOverActivated: Bool = UIAccessibility.isVoiceOverRunning
     
     init(presentingController: UIViewController?, url: URL?, parent: Coordinator) {
         self.presentingController = presentingController
         self.initialUrlToProcess = url
         self.parent = parent
+        addObserver()
         start()
+    }
+
+    deinit {
+        removeObserver()
     }
 
     func processUrl(url: URL?) {
@@ -43,13 +49,22 @@ final class WalletCoordinator: Coordinator {
         }
     }
 
+    private func addObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(voiceOverStatusDidChange), name: UIAccessibility.voiceOverStatusDidChangeNotification, object: nil)
+    }
+
+    private func removeObserver() {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     private func start() {
         DeepLinkingManager.shared.walletCoordinator = self
         let areThereLoadedCertificates: Bool = WalletManager.shared.areThereLoadedCertificates
         if !areThereLoadedCertificates { HUD.show(.progress) }
         let walletController: WalletViewController = createWalletController()
         walletViewController = walletController
-        let navigationController: CVNavigationController = CVNavigationController(rootViewController: BottomButtonContainerController.controller(walletController))
+        let innerController: UIViewController = UIAccessibility.isVoiceOverRunning ? walletController : BottomButtonContainerController.controller(walletController)
+        let navigationController: CVNavigationController = CVNavigationController(rootViewController: innerController)
         self.navigationController = navigationController
         presentingController?.present(navigationController, animated: true) { [weak self] in
             if !areThereLoadedCertificates { HUD.hide() }
@@ -77,6 +92,20 @@ final class WalletCoordinator: Coordinator {
             self?.didDeinit()
         }
     }
+
+    private func updateCurrentController() {
+        walletViewController?.deinitBlock = nil
+        let walletController: WalletViewController = createWalletController()
+        walletViewController = walletController
+        let innerController: UIViewController = UIAccessibility.isVoiceOverRunning ? walletController : BottomButtonContainerController.controller(walletController)
+        navigationController?.setViewControllers([innerController], animated: false)
+    }
+
+    @objc private func voiceOverStatusDidChange() {
+        guard wasVoiceOverActivated != UIAccessibility.isVoiceOverRunning else { return }
+        wasVoiceOverActivated = UIAccessibility.isVoiceOverRunning
+        updateCurrentController()
+    }
     
     private func openTermsOfUse() {
         URL(string: "walletController.termsOfUse.url".localized)?.openInSafari()
@@ -88,20 +117,25 @@ final class WalletCoordinator: Coordinator {
     private func showCodeFullscreen(_ certificate: WalletCertificate) {
         let codeDetails: [CodeDetail] = prepareCodeFullScreenData(certificate)
         guard !codeDetails.isEmpty else { return }
-        let isFrenchCertificate: Bool = !((certificate as? EuropeanCertificate)?.isForeignCertificate ?? true)
-        let controller: UIViewController = CodeFullScreenViewController.controller(codeDetails: codeDetails, showHeaderImage: isFrenchCertificate)
-        controller.modalTransitionStyle = .crossDissolve
-        controller.modalPresentationStyle = .fullScreen
-        navigationController?.present(controller, animated: true)
+        let isForeignCertificate: Bool = (certificate as? EuropeanCertificate)?.isForeignCertificate ?? true
+        if let controller = DeepLinkingManager.shared.codeFullScreenController {
+            controller.update(codeDetails: codeDetails, showHeaderImage: !isForeignCertificate)
+        } else {
+            let controller: CodeFullScreenViewController = CodeFullScreenViewController.controller(codeDetails: codeDetails, showHeaderImage: !isForeignCertificate)
+            controller.modalTransitionStyle = .crossDissolve
+            controller.modalPresentationStyle = .fullScreen
+            DeepLinkingManager.shared.codeFullScreenController = controller
+            navigationController?.present(controller, animated: true)
+        }
     }
 
     private func prepareCodeFullScreenData(_ certificate: WalletCertificate) -> [CodeDetail] {
         guard let codeImage = certificate.codeImage else { return [] }
         let footerText: String? = certificate is EuropeanCertificate ? "europeanCertificate.fullscreen.type.minimum.footer".localized : nil
-        var codeDetails: [CodeDetail] = [CodeDetail(segmentedControlTitle: "europeanCertificate.fullscreen.type.minimum".localized, codeImage: codeImage, codeBottomText: certificate.codeImageTitle, text: certificate.shortDescription, footerText: footerText)]
+        var codeDetails: [CodeDetail] = [CodeDetail(segmentedControlTitle: "europeanCertificate.fullscreen.type.minimum".localized, codeImage: codeImage, codeBottomText: certificate.codeImageTitle, text: certificate.shortDescription, footerText: footerText, hash: certificate.uniqueHash)]
 
         if let europeanCertificate = certificate as? EuropeanCertificate {
-            codeDetails.append(CodeDetail(segmentedControlTitle: "europeanCertificate.fullscreen.type.border".localized, codeImage: codeImage, codeBottomText: nil, text: europeanCertificate.fullDescriptionForFullscreen, footerText: europeanCertificate.uniqueHash))
+            codeDetails.append(CodeDetail(segmentedControlTitle: "europeanCertificate.fullscreen.type.border".localized, codeImage: codeImage, codeBottomText: nil, text: europeanCertificate.fullDescriptionForFullscreen, footerText: nil, hash: europeanCertificate.uniqueHash))
         }
         return codeDetails
     }
@@ -152,7 +186,7 @@ final class WalletCoordinator: Coordinator {
     private func showWarningAlertIfNeeded(certificate: WalletCertificate, handler: @escaping () -> (), cancelHandler: @escaping () -> ()) {
         var warningMessages: [String] = []
         var okTitle: String = "common.ok".localized
-        if DccBlacklistManager.shared.isBlacklisted(certificate: certificate) {
+        if DccBlacklistManager.shared.isBlacklisted(certificate: certificate) || Blacklist2dDocManager.shared.isBlacklisted(certificate: certificate) {
             warningMessages.append("wallet.blacklist.warning".localized)
         }
         if WalletManager.shared.isDuplicatedCertificate(certificate) {

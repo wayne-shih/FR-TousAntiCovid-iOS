@@ -34,7 +34,11 @@ final class DccBlacklistManager: NSObject {
     private var hashes: [String] = []
     private var observers: [DccBlacklistObserverWrapper] = []
 
+    @UserDefault(key: .lastInitialDccBlacklistBuildNumber)
+    private var lastInitialDccBlacklistBuildNumber: String? = nil
+
     func start() {
+        writeInitialFileIfNeeded()
         loadLocalCertList()
         addObserver()
     }
@@ -75,9 +79,13 @@ extension DccBlacklistManager {
 // MARK: - Local files management -
 extension DccBlacklistManager {
 
+    private func initialFileUrl() -> URL {
+        Bundle.main.url(forResource: DccBlacklistConstant.filename, withExtension: nil)!
+    }
+
     private func localCertListUrl() -> URL {
         let directoryUrl: URL = self.createWorkingDirectoryIfNeeded()
-        return directoryUrl.appendingPathComponent("certlist.json")
+        return directoryUrl.appendingPathComponent(DccBlacklistConstant.filename)
     }
 
     private func loadLocalCertList() {
@@ -93,6 +101,18 @@ extension DccBlacklistManager {
             try? FileManager.default.createDirectory(at: directoryUrl, withIntermediateDirectories: false, attributes: nil)
         }
         return directoryUrl
+    }
+
+    private func writeInitialFileIfNeeded() {
+        let fileUrl: URL = initialFileUrl()
+        let destinationFileUrl: URL = createWorkingDirectoryIfNeeded().appendingPathComponent(fileUrl.lastPathComponent)
+        let currentBuildNumber: String = UIApplication.shared.buildNumber
+        let isNewAppVersion: Bool = lastInitialDccBlacklistBuildNumber != currentBuildNumber
+        if !FileManager.default.fileExists(atPath: destinationFileUrl.path) || isNewAppVersion {
+            try? FileManager.default.removeItem(at: destinationFileUrl)
+            try? FileManager.default.copyItem(at: fileUrl, to: destinationFileUrl)
+            lastInitialDccBlacklistBuildNumber = currentBuildNumber
+        }
     }
 
 }

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="18122" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="YJr-i2-8IB">
+    <device id="watch44"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="18022"/>
+    </dependencies>
+    <scenes>
+        <!--EmptyController-->
+        <scene sceneID="aou-V4-d1y">
+            <objects>
+                <controller identifier="EmptyController" initiallyAnimated="NO" animationDuration="1" fullScreen="YES" id="AgC-eL-Hgc" customClass="EmptyController" customModule="Watch" customModuleProvider="target"/>
+            </objects>
+            <point key="canvasLocation" x="779" y="194"/>
+        </scene>
+        <!--QRCodeController-->
+        <scene sceneID="8DM-ew-xDC">
+            <objects>
+                <controller identifier="QRCodeController" fullScreen="YES" id="eIj-LU-gre" customClass="QRCodeController" customModule="Watch" customModuleProvider="target"/>
+            </objects>
+            <point key="canvasLocation" x="1074" y="194"/>
+        </scene>
+        <!--SplashscreenController-->
+        <scene sceneID="nqs-eB-Z1J">
+            <objects>
+                <controller identifier="SplashscreenController" id="YJr-i2-8IB">
+                    <items>
+                        <imageView width="1" height="1" heightAdjustment="-20" alignment="center" verticalAlignment="center" image="Splashscreen" contentMode="scaleAspectFit" id="oW8-Qy-h0U"/>
+                    </items>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="490" y="194"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Splashscreen" width="211.5" height="318.5"/>
+    </resources>
+</document>

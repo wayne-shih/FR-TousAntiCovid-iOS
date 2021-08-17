@@ -19,6 +19,7 @@ public final class SVETagManager {
 
     @SVUserDefault(key: "lastCacheCleaningDate")
     private var lastCacheCleaningData: Date = Date()
+
     private var cacheLifeTimeInDays: Int = 10
 
     func eTag(for url: String) -> String? {

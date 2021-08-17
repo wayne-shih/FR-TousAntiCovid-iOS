@@ -34,6 +34,7 @@ final class FlashVenueCodeController: FlashCodeController {
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "common.moreInfo".localized, style: .plain, target: self, action: #selector(didTouchMoreInfoButton))
         #if targetEnvironment(simulator)
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Flash", style: .plain, target: self, action: #selector(didTouchFlashButton))

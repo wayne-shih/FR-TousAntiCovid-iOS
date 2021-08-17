@@ -41,7 +41,7 @@ enum XibName: String {
     case keyFiguresCell = "KeyFiguresCell"
     case declareCell = "DeclareCell"
     case contactStatusCell = "ContactStatusCell"
-    case cardTextCell = "CardTextCell"
+    case cardCell = "CardCell"
     case paragraphCell = "ParagraphCell"
     case imageCell = "ImageCell"
     case keyFigureCell = "KeyFigureCell"
@@ -64,7 +64,6 @@ enum XibName: String {
     case loadingCardCell = "LoadingCardCell"
     case vaccinationCenterCell = "VaccinationCenterCell"
     case centeredImageCardCell = "CenteredImageCardCell"
-    case standardCardSwitchCell = "StandardCardSwitchCell"
     case sanitaryCertificateCell = "SanitaryCertificateCell"
     case sanitaryCertificatesWalletCell = "SanitaryCertificatesWalletCell"
     case updateAppCell = "UpdateAppCell"
@@ -77,5 +76,4 @@ enum XibName: String {
     case checkDocumentCell = "CheckDocumentCell"
     case zoomableImageCell = "ZoomableImageCell"
     case favoriteCertificateCell = "FavoriteCertificateCell"
-    
 }

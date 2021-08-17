@@ -14,13 +14,9 @@ final class OnboardingGovernmentCell: CVTableViewCell {
 
     @IBOutlet private var leftImage: UIImageView?
     @IBOutlet private var rightImage: UIImageView?
-
-    override func setup(with row: CVRow) {
-        super.setup(with: row)
-        setupAccessibility()
-    }
     
-    private func setupAccessibility() {
+    override func setupAccessibility() {
+        super.setupAccessibility()
         leftImage?.isAccessibilityElement = false
         rightImage?.isAccessibilityElement = false
     }

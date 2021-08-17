@@ -10,10 +10,9 @@
 
 import UIKit
 
-final class KeyFiguresCell: CVTableViewCell {
+final class KeyFiguresCell: CardCell {
     
     @IBOutlet private var button: UIButton!
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var headerLabel: UILabel!
     @IBOutlet private var headerImageView: UIImageView!
     
@@ -38,14 +37,10 @@ final class KeyFiguresCell: CVTableViewCell {
     private func setupUI() {
         cvAccessoryLabel?.font = Appearance.Cell.Text.captionTitleFont
         cvAccessoryLabel?.textColor = Appearance.Cell.Text.captionTitleColor
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
         button?.contentHorizontalAlignment = .left
         button?.tintColor = Appearance.Button.Tertiary.titleColor
         button?.titleLabel?.font = Appearance.Button.linkFont
         button?.titleLabel?.adjustsFontForContentSizeCategory = true
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
         headerImageView.image = Asset.Images.compass.image
         headerImageView.tintColor = Appearance.Cell.Text.errorColor
         headerImageView.tintAdjustmentMode = .normal
@@ -123,45 +118,34 @@ final class KeyFiguresCell: CVTableViewCell {
         }
     }
     
-    private func setupAccessibility() {
-        accessibilityElements = [headerLabel].compactMap { $0 }
+    override func setupAccessibility() {
+        super.setupAccessibility()
+        accessibilityLabel = headerLabel.text
+
+        var cellTexts: [String?] = []
+
         if let cvAccessoryLabel = cvAccessoryLabel, !cvAccessoryLabel.isHidden {
-            accessibilityElements?.append(cvAccessoryLabel)
+            cellTexts.append(cvAccessoryLabel.text)
         }
         if KeyFiguresManager.shared.displayDepartmentLevel && KeyFiguresManager.shared.currentPostalCode != nil {
-            accessibilityElements?.append(titleHeaderSecondaryLabel!)
-            accessibilityElements?.append(contentsOf: titleSecondaryLabels)
+            cellTexts.append(titleHeaderSecondaryLabel?.text)
+            (0..<titleSecondaryLabels.count).forEach {
+                let value: String = valueSecondaryLabels[$0].text?.replacingOccurrences(of: " ", with: "").accessibilityNumberFormattedString() ?? ""
+                let isValueAvailable: Bool = value != "-"
+                cellTexts.append("\(titleSecondaryLabels[$0].text ?? ""), \(isValueAvailable ? value : "accessibility.keyFigures.noValueAvailable".localized)")
+            }
         }
-        accessibilityElements?.append(titleHeaderLabel!)
-        accessibilityElements?.append(contentsOf: titleLabels)
-        accessibilityElements?.append(button!)
-        
+        cellTexts.append(titleHeaderLabel?.text)
         (0..<titleLabels.count).forEach {
             let value: String = valueLabels[$0].text?.replacingOccurrences(of: " ", with: "").accessibilityNumberFormattedString() ?? ""
             let isValueAvailable: Bool = value != "-"
-            titleLabels[$0].accessibilityLabel = "\(titleLabels[$0].text ?? ""), \(isValueAvailable ? value : "accessibility.keyFigures.noValueAvailable".localized)"
+            cellTexts.append("\(titleLabels[$0].text ?? ""), \(isValueAvailable ? value : "accessibility.keyFigures.noValueAvailable".localized)")
         }
-        (0..<titleSecondaryLabels.count).forEach {
-            let value: String = valueSecondaryLabels[$0].text?.replacingOccurrences(of: " ", with: "").accessibilityNumberFormattedString() ?? ""
-            let isValueAvailable: Bool = value != "-"
-            titleSecondaryLabels[$0].accessibilityLabel = "\(titleSecondaryLabels[$0].text ?? ""), \(isValueAvailable ? value : "accessibility.keyFigures.noValueAvailable".localized)"
-        }
+        accessibilityHint = cellTexts.compactMap { $0 }.joined(separator: ".\n")
     }
     
     @IBAction private func buttonPressed(_ sender: Any) {
         currentAssociatedRow?.selectionAction?()
-    }
-    
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
     }
     
 }

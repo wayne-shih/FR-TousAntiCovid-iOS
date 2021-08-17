@@ -25,7 +25,6 @@ final class UniversalQrScanCoordinator: Coordinator {
     }
     
     private func start() {
-        HUD.show(.progress)
         let controller: UniversalQrScanController = UniversalQrScanController.controller(didFlash: { [weak self] url in
             guard let url = url else { throw NSError.localizedError(message: "universalQrScanController.error.noCodeFound".localized, code: 0) }
             self?.navigationController?.dismiss(animated: true) {
@@ -40,6 +39,6 @@ final class UniversalQrScanCoordinator: Coordinator {
         })
         let navigationController: CVNavigationController = CVNavigationController(rootViewController: controller)
         self.navigationController = navigationController
-        presentingController?.present(navigationController, animated: true) { HUD.hide() }
+        presentingController?.present(navigationController, animated: true)
     }
 }

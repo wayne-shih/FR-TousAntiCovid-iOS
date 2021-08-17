@@ -55,6 +55,7 @@ final class VaccinationController: CVTableViewController {
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
     override func createRows() -> [CVRow] {
@@ -169,10 +170,6 @@ final class VaccinationController: CVTableViewController {
                                          imageTintColor: Appearance.Cell.Text.headerTitleColor),
                      selectionAction: { [weak self] in
                         self?.didTouchUpdateLocation()
-                     },
-                     willDisplay: { cell in
-                        cell.selectionStyle = .none
-                        cell.accessoryType = .none
                      })
     }
     
@@ -189,10 +186,6 @@ final class VaccinationController: CVTableViewController {
                                                              imageTintColor: Appearance.Cell.Text.headerTitleColor),
                                          selectionAction: { [weak self] in
                                             self?.didTouchRefresh()
-                                         },
-                                         willDisplay: { cell in
-                                            cell.selectionStyle = .none
-                                            cell.accessoryType = .none
                                          })
         return postalCodeRow
     }

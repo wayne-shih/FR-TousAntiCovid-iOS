@@ -181,7 +181,7 @@ final class MyHealthController: CVTableViewController {
                                      bottomInset: 20.0,
                                      textAlignment: .left,
                                      titleFont: { Appearance.Cell.Text.headTitleFont }),
-                  selectionAction: { [weak self] in
+                  selectionAction: section.link == nil ? nil : { [weak self] in
                     self?.didTouchRisksUILevelSectionLink(section.link)
                   })
         }
@@ -216,11 +216,7 @@ final class MyHealthController: CVTableViewController {
                                                    imageTintColor: Appearance.Button.Primary.titleColor,
                                                    separatorLeftInset: Appearance.Cell.leftMargin,
                                                    separatorRightInset: Appearance.Cell.leftMargin,
-                                                   maskedCorners: .top),
-                               willDisplay: { cell in
-                                    cell.selectionStyle = .none
-                                    cell.accessoryType = .none
-                               })
+                                                   maskedCorners: .top))
         return row
     }
 
@@ -238,10 +234,6 @@ final class MyHealthController: CVTableViewController {
                                                    maskedCorners: isLastAction ? .bottom : .none),
                                selectionAction: {
                                 actionBlock()
-                               },
-                               willDisplay: { cell in
-                                cell.selectionStyle = .none
-                                cell.accessoryType = .none
                                })
         return row
     }
@@ -261,6 +253,7 @@ final class MyHealthController: CVTableViewController {
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
     @objc private func didTouchCloseButton() {

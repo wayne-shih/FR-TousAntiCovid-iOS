@@ -10,11 +10,10 @@
 
 import UIKit
 
-final class ContactStatusCell: CVTableViewCell {
+final class ContactStatusCell: CardCell {
     
     private var isParallaxConfigurated: Bool = false
     
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var gradientView: GradientView!
     @IBOutlet private weak var effectView: UIImageView!
     
@@ -29,9 +28,6 @@ final class ContactStatusCell: CVTableViewCell {
         cvSubtitleLabel?.font = Appearance.Cell.Text.subtitleFont
         cvAccessoryLabel?.font = Appearance.Cell.Text.accessoryFont
         cvAccessoryLabel?.textColor = .white
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
-        containerView.layer.maskedCorners = row.theme.maskedCorners
         setupParallaxEffect()
     }
     
@@ -47,17 +43,5 @@ final class ContactStatusCell: CVTableViewCell {
         gradientView.endColor = gradientColors.endColor
         effectView.alpha = gradientColors.effectAlpha
     }
-    
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
-    }
-    
+
 }

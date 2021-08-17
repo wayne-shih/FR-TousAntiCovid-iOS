@@ -135,8 +135,7 @@ final class WidgetManager {
     }
     
     func processUserActivity(_ userActivity: NSUserActivity) {
-        let widgetKinds: [String] = ["TousAntiCovidWidget"]
-        guard widgetKinds.contains(userActivity.activityType) && isOnboardingDone && !isSick else { return }
+        guard userActivity.activityType == "fr.gouv.stopcovid.ios.Widget.status" && isOnboardingDone && !isSick else { return }
         guard !RBManager.shared.isRegistered else { return }
         NotificationCenter.default.post(name: .widgetDidRequestRegister, object: nil)
     }

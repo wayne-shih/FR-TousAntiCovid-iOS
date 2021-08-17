@@ -10,9 +10,8 @@
 
 import UIKit
 
-final class IsolationInitialCaseSafeCell: CVTableViewCell {
+final class IsolationInitialCaseSafeCell: CardCell {
     
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var headerImageView: UIImageView!
     
     override func setup(with row: CVRow) {
@@ -22,33 +21,15 @@ final class IsolationInitialCaseSafeCell: CVTableViewCell {
     }
     
     private func setupUI() {
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
         cvTitleLabel?.font = Appearance.Cell.Text.titleFont
         cvSubtitleLabel?.font = Appearance.Cell.Text.subtitleFont
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
         headerImageView.image = Asset.Images.badge.image
         headerImageView.tintColor = Appearance.Cell.Text.titleColor
     }
-    
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
-    }
 
-    private func setupAccessibility() {
-        accessibilityElements = [cvTitleLabel].compactMap { $0 }
-        if let cvSubtitleLabel = cvSubtitleLabel, !cvSubtitleLabel.isHidden {
-            accessibilityElements?.append(cvSubtitleLabel)
-        }
+    override func setupAccessibility() {
+        super.setupAccessibility()
+        headerImageView.isAccessibilityElement = false
     }
     
 }

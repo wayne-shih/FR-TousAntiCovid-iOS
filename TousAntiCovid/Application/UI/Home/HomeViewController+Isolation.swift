@@ -42,9 +42,6 @@ extension HomeViewController {
                                                   textAlignment: .natural),
                                selectionAction: { [weak self] in
                                 self?.didTouchOpenIsolationForm()
-                               }, willDisplay: { cell in
-                                cell.selectionStyle = .none
-                                cell.accessoryType = .none
                                })
         
         return row
@@ -80,10 +77,6 @@ extension HomeViewController {
                                                    maskedCorners: followedByActions ? .top : .all),
                                selectionAction: { [weak self] in
                                     self?.didTouchOpenIsolationForm()
-                               },
-                               willDisplay: { cell in
-                                    cell.selectionStyle = .none
-                                    cell.accessoryType = .none
                                })
         return row
     }
@@ -239,10 +232,6 @@ extension HomeViewController {
                                                    maskedCorners: isLastAction ? .bottom : .none),
                                selectionAction: {
                                 actionBlock()
-                               },
-                               willDisplay: { cell in
-                                cell.selectionStyle = .none
-                                cell.accessoryType = .none
                                })
         return row
     }

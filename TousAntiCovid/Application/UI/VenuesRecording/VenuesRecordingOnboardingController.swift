@@ -69,6 +69,7 @@ final class VenuesRecordingOnboardingController: CVTableViewController {
         tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
         bottomButtonContainerController?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        bottomButtonContainerController?.navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
 
         bottomButtonContainerController?.updateButton(title: "venuesRecording.onboardingController.button.participate".localized) { [weak self] in
             self?.didContinue()

@@ -52,7 +52,10 @@ final class SymptomsOriginController: CVTableViewController {
         let textRow: CVRow = CVRow(title: "symptomsOriginController.explanation.title".localized,
                                    subtitle: "symptomsOriginController.explanation.subtitle".localized,
                                    xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 40.0, bottomInset: 30.0, separatorLeftInset: nil))
+                                   theme: CVRow.Theme(topInset: 40.0, bottomInset: 30.0, separatorLeftInset: nil),
+                                   willDisplay: { cell in
+                                    cell.accessibilityHint = (cell.accessibilityHint ?? "") + ".\n" + "accessibility.back.zGesture".localized
+                                   })
         rows.append(textRow)
 
         let noSymptomsRow: CVRow = CVRow(title: "symptomsOriginController.noSymptoms".localized,
@@ -88,8 +91,8 @@ final class SymptomsOriginController: CVTableViewController {
                                             titleFont: { Appearance.Cell.Text.standardFont },
                                             separatorLeftInset: Appearance.Cell.leftMargin),
                          selectionAction: { [weak self] in
-                self?.didSelectOrigin(date: date)
-            })
+                            self?.didSelectOrigin(date: date)
+                         })
         }
         let dontKnowRow: CVRow = CVRow(title: "common.iDontKnow".localized,
                                        xibName: .standardCell,
@@ -99,8 +102,8 @@ final class SymptomsOriginController: CVTableViewController {
                                                           titleFont: { Appearance.Cell.Text.standardFont },
                                                           separatorLeftInset: Appearance.Cell.leftMargin),
                                        selectionAction: { [weak self] in
-            self?.didSelectOrigin(date: nil)
-        })
+                                        self?.didSelectOrigin(date: nil)
+                                       })
         rows.append(contentsOf: originRows)
         rows.append(dontKnowRow)
         return rows

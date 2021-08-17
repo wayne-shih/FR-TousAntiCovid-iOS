@@ -187,6 +187,7 @@ final class CaptchaViewController: CVTableViewController {
         tableView.keyboardDismissMode = .onDrag
         navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "captchaController.button.title".localized, style: .plain, target: self, action: #selector(didTouchConfirm))
     }
     

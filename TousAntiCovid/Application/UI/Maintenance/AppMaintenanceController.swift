@@ -41,7 +41,7 @@ final class AppMaintenanceController: CVTableViewController, MaintenanceControll
         initUI()
         reloadUI()
     }
-    
+
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = []
         let imageRow: CVRow = CVRow(image: Asset.Images.maintenance.image,

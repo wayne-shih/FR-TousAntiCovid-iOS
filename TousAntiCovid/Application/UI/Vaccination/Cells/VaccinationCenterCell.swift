@@ -10,9 +10,8 @@
 
 import UIKit
 
-final class VaccinationCenterCell: CVTableViewCell, Xibbed {
+final class VaccinationCenterCell: CardCell, Xibbed {
 
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var addressLabel: UILabel!
     @IBOutlet private var openingDateTitleLabel: UILabel!
     @IBOutlet private var openingDateLabel: UILabel!
@@ -27,10 +26,6 @@ final class VaccinationCenterCell: CVTableViewCell, Xibbed {
 
     private func setupUI(with row: CVRow) {
         guard let vaccinationCenter = row.associatedValue as? VaccinationCenter else { return }
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
-        selectionStyle = .none
-        accessoryType = .none
         addressLabel.font = Appearance.Cell.Text.subtitleFont
         addressLabel.textColor = Appearance.Cell.Text.subtitleColor
         openingDateTitleLabel.isHidden = vaccinationCenter.availabilityTimestamp == nil && (vaccinationCenter.planning ?? "").isEmpty
@@ -42,9 +37,6 @@ final class VaccinationCenterCell: CVTableViewCell, Xibbed {
         openingTimeLabel.isHidden = (vaccinationCenter.planning ?? "").isEmpty
         openingTimeLabel?.textColor = Appearance.Cell.Text.titleColor
         openingTimeLabel?.font = Appearance.Cell.Text.subtitleFont
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.maskedCorners = row.theme.maskedCorners
-        containerView.layer.masksToBounds = true
     }
 
     private func setupContent(with row: CVRow) {
@@ -56,6 +48,8 @@ final class VaccinationCenterCell: CVTableViewCell, Xibbed {
         if let openingDate = vaccinationCenter.availabilityTimestamp {
             let date: Date = Date(timeIntervalSince1970: openingDate)
             openingDateLabel.text = "\("vaccinationCenterCell.openingDate.from".localized) \(date.shortDateFormatted(timeZoneIndependant: true))"
+        } else {
+            openingDateLabel.text = nil
         }
         openingTimeLabel.text = vaccinationCenter.planning
     }
@@ -66,26 +60,30 @@ final class VaccinationCenterCell: CVTableViewCell, Xibbed {
        return [firstLineAddress, secondLineAddress].filter { !$0.isEmpty } .joined(separator: "\n")
     }
 
+    override func setupAccessibility() {}
+
     private func setupAccessibility(with row: CVRow) {
         guard let vaccinationCenter = row.associatedValue as? VaccinationCenter else { return }
-        accessibilityElements = [cvTitleLabel!, cvSubtitleLabel!, addressLabel!, openingDateTitleLabel!, openingDateLabel!]
+        var openingDateHint: String? = nil
         if let availabilityTimestamp = vaccinationCenter.availabilityTimestamp {
             let openingDate: Date = Date(timeIntervalSince1970: availabilityTimestamp)
-            openingDateLabel.accessibilityLabel = openingDate.accessibilityRelativelyFormattedDate(prefixStringKey: "vaccinationCenterCell.openingDate.from")
+            openingDateHint = openingDate.accessibilityRelativelyFormattedDate(prefixStringKey: "vaccinationCenterCell.openingDate.from")
         }
+        accessibilityLabel = cvTitleLabel?.text?.removingEmojis()
+        accessibilityHint = [addressLabel?.text, openingDateTitleLabel?.text, openingDateHint, openingTimeLabel?.text].compactMap { $0 }.joined(separator: ".\n").removingEmojis()
+        accessibilityTraits = currentAssociatedRow?.selectionAction != nil ? .button : .staticText
+        accessibilityElements = []
+        isAccessibilityElement = true
+        containerView.isAccessibilityElement = false
+        cvAccessoryLabel?.isAccessibilityElement = false
+        cvTitleLabel?.isAccessibilityElement = false
+        cvSubtitleLabel?.isAccessibilityElement = false
+        cvImageView?.isAccessibilityElement = false
+        cvImageView?.accessibilityTraits = []
+        cvImageView?.isUserInteractionEnabled = false
+        addressLabel?.isAccessibilityElement = false
+        openingDateTitleLabel?.isAccessibilityElement = false
+        openingDateLabel?.isAccessibilityElement = false
+        openingTimeLabel?.isAccessibilityElement = false
     }
-
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        guard currentAssociatedRow?.selectionAction != nil else { return }
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
-    }
-
 }

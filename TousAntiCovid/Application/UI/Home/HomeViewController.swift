@@ -284,6 +284,9 @@ final class HomeViewController: CVTableViewController {
         var rows: [CVRow] = []
         let titleRow: CVRow = CVRow.titleRow(title: title) { [weak self] cell in
             self?.navigationChildController?.updateLabel(titleLabel: cell.cvTitleLabel, containerView: cell)
+            cell.isAccessibilityElement = false
+            cell.accessibilityElements = []
+            cell.accessibilityElementsHidden = true
         }
         rows.append(titleRow)
         let stateRow: CVRow = CVRow(xibName: .stateAnimationCell,
@@ -338,6 +341,8 @@ final class HomeViewController: CVTableViewController {
         let scanBarButtonItem: UIBarButtonItem = UIBarButtonItem(image: Asset.Images.qrScanItem.image, style: .plain, target: self, action: #selector(scanQrButtonPressed))
         scanBarButtonItem.accessibilityLabel = "home.qrScan.button.title".localized
         navigationChildController?.updateRightBarButtonItem(scanBarButtonItem)
+        navigationChildController?.navigationBar.isAccessibilityElement = false
+
     }
 
     private func updateTableViewBottomInset() {
@@ -382,6 +387,7 @@ final class HomeViewController: CVTableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(didCompletedVaccinationNotification), name: .didCompletedVaccinationNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(openWallet), name: .openWallet, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(openCertificateQRCode), name: .openCertificateQRCode, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(voiceOverStatusDidChange), name: UIAccessibility.voiceOverStatusDidChangeNotification, object: nil)
     }
     
     private func removeObservers() {
@@ -694,6 +700,7 @@ final class HomeViewController: CVTableViewController {
 extension HomeViewController {
     
     private func activationButtonRow(isRegistered: Bool) -> CVRow {
+        let buttonAccessibilityLabel: String = isActivated ? "accessibility.home.mainButton.deactivate".localized : "accessibility.home.mainButton.activate".localized
         if isRegistered {
             let activationTitle: String = isActivated ? "home.mainButton.deactivate".localized : "home.mainButton.activate".localized
             let activationButtonRow: CVRow = CVRow(title: RBManager.shared.isImmune ? "common.readMore".localized : activationTitle,
@@ -707,7 +714,10 @@ extension HomeViewController {
                                                     } else {
                                                         self.didChangeSwitchValue(isOn: !self.isActivated)
                                                     }
-            })
+                                                   }, willDisplay: { cell in
+                                                    guard let buttonCell = cell as? ButtonCell else { return }
+                                                    buttonCell.button.accessibilityLabel = buttonAccessibilityLabel
+                                                   })
             return activationButtonRow
         } else {
             let activationButtonRow: CVRow = CVRow(title: isActivated ? "home.mainButton.deactivate".localized : "home.mainButton.activate".localized,
@@ -722,6 +732,9 @@ extension HomeViewController {
                                                    selectionAction: { [weak self] in
                                                     guard let self = self else { return }
                                                     self.didChangeSwitchValue(isOn: !self.isActivated)
+                                                   }, willDisplay: { cell in
+                                                    guard let buttonCell = cell as? ActivationButtonCell else { return }
+                                                    buttonCell.button.accessibilityLabel = buttonAccessibilityLabel
                                                    })
             return activationButtonRow
         }
@@ -750,9 +763,6 @@ extension HomeViewController {
                                  textAlignment: .natural),
               selectionAction: { [weak self] in
                 self?.didTouchAppUpdate()
-              }, willDisplay: { cell in
-                cell.selectionStyle = .none
-                cell.accessoryType = .none
               })
     }
     
@@ -803,9 +813,6 @@ extension HomeViewController {
                                                              textAlignment: .natural),
                                           selectionAction: { [weak self] in
                                             self?.didTouchDeclare()
-                                          }, willDisplay: { cell in
-                                            cell.selectionStyle = .none
-                                            cell.accessoryType = .none
                                           })
             
             rows.append(declareRow)
@@ -823,9 +830,6 @@ extension HomeViewController {
                                                                  imageTintColor: Asset.Colors.gradientEndGreen.color),
                                               selectionAction: { [weak self] in
                                                 self?.didTouchVaccination()
-                                              }, willDisplay: { cell in
-                                                cell.selectionStyle = .none
-                                                cell.accessoryType = .none
                                               })
             
             rows.append(vaccinationRow)
@@ -857,9 +861,6 @@ extension HomeViewController {
                                             associatedValue: (startColor, endColor, effectAlpha),
                                             selectionAction: { [weak self] in
                                                 self?.didTouchHealth()
-                                            }, willDisplay: { cell in
-                                                cell.selectionStyle = .none
-                                                cell.accessoryType = .none
                                             })
         return contactStatusRow
     }
@@ -874,9 +875,6 @@ extension HomeViewController {
               associatedValue: currentRiskLevel,
               selectionAction: { [weak self] in
                 self?.didTouchHealth()
-              }, willDisplay: { cell in
-                cell.selectionStyle = .none
-                cell.accessoryType = .none
               })
         
     }
@@ -925,9 +923,6 @@ extension HomeViewController {
                                                 }
                                             }
                                         }
-                                     }, willDisplay: { cell in
-                                        cell.selectionStyle = .none
-                                        cell.accessoryType = .none
                                      })
         rows.append(recordRow)
         return rows
@@ -946,8 +941,8 @@ extension HomeViewController {
         let highlightedKeyFigure: KeyFigure? = KeyFiguresManager.shared.highlightedKeyFigure
         if let highlightedKeyFigure = highlightedKeyFigure, highlightedKeyFigure.isLabelReady {
             let highlightedKeyFigureRow: CVRow = CVRow(title: ["home.infoSection.newCases".localized, "(\("common.country.france".localized))"].joined(separator: " "),
-                                                       subtitle: "keyfigure.dailyUpdates".localized,
-                                                       accessoryText: highlightedKeyFigure.valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible(),
+                                                       subtitle: highlightedKeyFigure.valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible(),
+                                                       accessoryText: "keyfigure.dailyUpdates".localized,
                                                        image: Asset.Images.flag.image,
                                                        xibName: .highlightedKeyFigureCell,
                                                        theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
@@ -955,17 +950,13 @@ extension HomeViewController {
                                                                           bottomInset: Appearance.Cell.leftMargin,
                                                                           textAlignment: .natural,
                                                                           titleColor: highlightedKeyFigure.color,
-                                                                          subtitleFont: { Appearance.Cell.Text.captionTitleFont },
-                                                                          subtitleColor: Appearance.Cell.Text.captionTitleColor,
-                                                                          accessoryTextFont: { Appearance.Cell.Text.headTitleFont3 },
-                                                                          accessoryTextColor: Appearance.Cell.Text.titleColor,
+                                                                          subtitleFont: { Appearance.Cell.Text.headTitleFont3 },
+                                                                          subtitleColor: Appearance.Cell.Text.titleColor,
+                                                                          accessoryTextFont: { Appearance.Cell.Text.captionTitleFont },
+                                                                          accessoryTextColor: Appearance.Cell.Text.captionTitleColor,
                                                                           imageTintColor: highlightedKeyFigure.color),
                                                        selectionAction: { [weak self] in
                                                         self?.didTouchKeyFigure(highlightedKeyFigure)
-                                                       },
-                                                       willDisplay: { cell in
-                                                        cell.selectionStyle = .none
-                                                        cell.accessoryType = .none
                                                        })
             rows.append(highlightedKeyFigureRow)
         }
@@ -981,10 +972,6 @@ extension HomeViewController {
                                              associatedValue: KeyFiguresManager.shared.featuredKeyFigures.filter { $0.isLabelReady },
                                              selectionAction: { [weak self] in
                                                 self?.didTouchKeyFigures()
-                                             },
-                                             willDisplay: { cell in
-                                                cell.selectionStyle = .none
-                                                cell.accessoryType = .none
                                              })
             rows.append(keyFiguresRow)
         }
@@ -1004,10 +991,14 @@ extension HomeViewController {
                                                                            imageTintColor: Appearance.Cell.Text.headerTitleColor),
                                                        selectionAction: { [weak self] in
                                                         self?.didTouchUpdateLocation()
-                                                       },
-                                                       willDisplay: { cell in
-                                                        cell.selectionStyle = .none
-                                                        cell.accessoryType = .none
+                                                       }, willDisplay: { [weak self] cell in
+                                                        guard let self = self else { return }
+                                                        cell.accessibilityLabel = title
+                                                        cell.accessibilityTraits = []
+                                                        cell.accessibilityCustomActions = [
+                                                            UIAccessibilityCustomAction(name: "common.updatePostalCode.end".localized, target: self, selector: #selector(self.accessibilityDidActivateChangeLocation)),
+                                                            UIAccessibilityCustomAction(name: "common.delete".localized, target: self, selector: #selector(self.accessibilityDidActivateDeleteLocation))
+                                                        ]
                                                        })
                 rows.append(updatePostalCodeRow)
             } else {
@@ -1024,20 +1015,22 @@ extension HomeViewController {
                                                                         imageTintColor: Appearance.Button.Primary.titleColor,
                                                                         separatorLeftInset: Appearance.Cell.leftMargin,
                                                                         separatorRightInset: Appearance.Cell.leftMargin,
-                                                                        maskedCorners: .top),
+                                                                        maskedCorners: UIAccessibility.isVoiceOverRunning ? .all : .top),
                                                     selectionAction: { [weak self] in
                                                         self?.didTouchUpdateLocation()
-                                                    },
-                                                    willDisplay: { cell in
-                                                        cell.selectionStyle = .none
-                                                        cell.accessoryType = .none
                                                     })
                 rows.append(newPostalCodeRow)
-                let addActionRow: CVRow = actionRow(title: "home.infoSection.newPostalCode.button".localized,
-                                                    isLastAction: true) { [weak self] in
-                    self?.didTouchUpdateLocation()
+                if !UIAccessibility.isVoiceOverRunning {
+                    var addActionRow: CVRow = actionRow(title: "home.infoSection.newPostalCode.button".localized,
+                                                        isLastAction: true) { [weak self] in
+                        self?.didTouchUpdateLocation()
+                    }
+                    addActionRow.willDisplay = { cell in
+                        cell.isAccessibilityElement = false
+                        cell.accessibilityElementsHidden = true
+                    }
+                    rows.append(addActionRow)
                 }
-                rows.append(addActionRow)
             }
         }
         if let info = InfoCenterManager.shared.info.sorted(by: { $0.timestamp > $1.timestamp }).first {
@@ -1047,16 +1040,13 @@ extension HomeViewController {
                                            buttonTitle: "home.infoSection.readAll".localized,
                                            xibName: .lastInfoCell,
                                            theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                              topInset: 0.0,
+                                                              topInset: UIAccessibility.isVoiceOverRunning ? Appearance.Cell.leftMargin : 0.0,
                                                               bottomInset: 0.0,
                                                               textAlignment: .natural),
                                            associatedValue: InfoCenterManager.shared.didReceiveNewInfo,
                                            selectionAction: { [weak self] in
                                             InfoCenterManager.shared.didReceiveNewInfo = false
                                             self?.didTouchInfo()
-                                           }, willDisplay: { cell in
-                                            cell.selectionStyle = .none
-                                            cell.accessoryType = .none
                                            })
             rows.append(lastInfoRow)
         }
@@ -1068,7 +1058,7 @@ extension HomeViewController {
         let attestationSectionRow: CVRow = CVRow(title: "home.attestationsSection.title".localized,
                                                  xibName: .textCell,
                                                  theme: CVRow.Theme(topInset: 30.0,
-                                                                    bottomInset: 0.0,
+                                                                    bottomInset: 10.0,
                                                                     textAlignment: .natural,
                                                                     titleFont: { Appearance.Cell.Text.headTitleFont }))
         let attestationsCount: Int = AttestationsManager.shared.attestations.filter { !$0.isExpired }.count
@@ -1087,69 +1077,66 @@ extension HomeViewController {
                                           image: Asset.Images.attestationCard.image,
                                           xibName: .attestationCell,
                                           theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                             topInset: 10.0,
+                                                             topInset: 0.0,
                                                              bottomInset: 0.0,
                                                              textAlignment: .natural),
                                           selectionAction: { [weak self] in
                                             self?.didTouchDocument()
-                                          }, willDisplay: { cell in
-                                            cell.selectionStyle = .none
-                                            cell.accessoryType = .none
                                           })
         return [attestationSectionRow, attestationRow]
     }
 
     private func walletSectionRows() -> [CVRow] {
+        guard WalletManager.shared.isWalletActivated else { return [] }
         var rows: [CVRow] = []
         let attestationSectionRow: CVRow = CVRow(title: "home.walletSection.title".localized,
                                                  xibName: .textCell,
                                                  theme: CVRow.Theme(topInset: 30.0,
-                                                                    bottomInset: 0.0,
+                                                                    bottomInset: 10.0,
                                                                     textAlignment: .natural,
                                                                     titleFont: { Appearance.Cell.Text.headTitleFont }))
         rows.append(attestationSectionRow)
-        if WalletManager.shared.isWalletActivated {
-            if let certificate = WalletManager.shared.favoriteCertificate {
-                let favoriteCertificateRow: CVRow = CVRow(title: "home.walletSection.favoriteCertificate.cell.title".localized,
-                                                          subtitle: "home.walletSection.favoriteCertificate.cell.subtitle".localized,
-                                                          image: certificate.value.qrCode(small: true),
-                                                          xibName: .favoriteCertificateCell,
-                                                          theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                                             topInset: rows.count == 1 ? 10.0 : Appearance.Cell.leftMargin,
-                                                                             bottomInset: 0.0,
-                                                                             textAlignment: .natural),
-                                                          selectionAction: { [weak self] in
-                                                            self?.didTouchCertificate(certificate)
-                                                          },
-                                                          willDisplay: { cell in
-                                                            cell.selectionStyle = .none
-                                                            cell.accessoryType = .none
-                                                          })
-                rows.append(favoriteCertificateRow)
-            }
-            let sanitaryCertificatesRow: CVRow = CVRow(title: "home.attestationSection.sanitaryCertificates.cell.title".localized,
-                                                       subtitle: "home.attestationSection.sanitaryCertificates.cell.subtitle".localized,
-                                                       image: Asset.Images.walletCard.image,
-                                                       xibName: .sanitaryCertificatesWalletCell,
-                                                       theme: CVRow.Theme(backgroundColor: Appearance.tintColor,
-                                                                          topInset: rows.count == 1 ? 10.0 : Appearance.Cell.leftMargin,
-                                                                          bottomInset: 0.0,
-                                                                          textAlignment: .natural,
-                                                                          titleColor: Appearance.Button.Primary.titleColor,
-                                                                          subtitleColor: Appearance.Button.Primary.titleColor),
-                                                       selectionAction: { [weak self] in
-                                                        self?.didTouchSanitaryCertificates(nil)
-                                                       }, willDisplay: { cell in
-                                                        cell.selectionStyle = .none
-                                                        cell.accessoryType = .none
-                                                       })
-            rows.append(sanitaryCertificatesRow)
+        if let certificate = WalletManager.shared.favoriteCertificate {
+            let favoriteCertificateRow: CVRow = CVRow(title: "home.walletSection.favoriteCertificate.cell.title".localized,
+                                                      subtitle: "home.walletSection.favoriteCertificate.cell.subtitle".localized,
+                                                      image: certificate.value.qrCode(small: true),
+                                                      xibName: .favoriteCertificateCell,
+                                                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                                                         topInset: 0.0,
+                                                                         bottomInset: Appearance.Cell.leftMargin,
+                                                                         textAlignment: .natural),
+                                                      selectionAction: { [weak self] in
+                                                        self?.didTouchCertificate(certificate)
+                                                      })
+            rows.append(favoriteCertificateRow)
         }
-        return rows.count == 1 ? [] : rows
+        let sanitaryCertificatesRow: CVRow = CVRow(title: "home.attestationSection.sanitaryCertificates.cell.title".localized,
+                                                   subtitle: "home.attestationSection.sanitaryCertificates.cell.subtitle".localized,
+                                                   image: Asset.Images.walletCard.image,
+                                                   xibName: .sanitaryCertificatesWalletCell,
+                                                   theme: CVRow.Theme(backgroundColor: Appearance.tintColor,
+                                                                      topInset: 0.0,
+                                                                      bottomInset: 0.0,
+                                                                      textAlignment: .natural,
+                                                                      titleColor: Appearance.Button.Primary.titleColor,
+                                                                      subtitleColor: Appearance.Button.Primary.titleColor),
+                                                   selectionAction: { [weak self] in
+                                                    self?.didTouchSanitaryCertificates(nil)
+                                                   })
+        rows.append(sanitaryCertificatesRow)
+        return rows
     }
 
     private func didTouchUpdateLocation() {
         KeyFiguresManager.shared.updateLocation(from: self)
+    }
+
+    @objc private func accessibilityDidActivateChangeLocation() {
+        KeyFiguresManager.shared.defineNewPostalCode(from: self)
+    }
+
+    @objc private func accessibilityDidActivateDeleteLocation() {
+        KeyFiguresManager.shared.deletePostalCode()
     }
 
     private func moreSectionRows() -> [CVRow] {
@@ -1159,7 +1146,10 @@ extension HomeViewController {
                                           theme: CVRow.Theme(topInset: 30.0,
                                                              bottomInset: 10.0,
                                                              textAlignment: .natural,
-                                                             titleFont: { Appearance.Cell.Text.headTitleFont }))
+                                                             titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                          willDisplay: { cell in
+                                            cell.accessibilityLabel = "accessibility.home.otherOptions".localized
+                                          })
         rows.append(moreSectionRow)
 
         var menuEntries: [GroupedMenuEntry] = [GroupedMenuEntry(image: Asset.Images.usefulLinks.image,
@@ -1230,7 +1220,7 @@ extension HomeViewController {
         return rows
     }
 
-    func standardCardRow(title: String, subtitle: String? = nil, image: UIImage, actionBlock: @escaping () -> ()) -> CVRow {
+    private func standardCardRow(title: String, subtitle: String? = nil, image: UIImage, actionBlock: @escaping () -> ()) -> CVRow {
         let row: CVRow = CVRow(title: title,
                                subtitle: subtitle,
                                image: image,
@@ -1244,12 +1234,12 @@ extension HomeViewController {
                                                    imageTintColor: Appearance.Cell.Text.headerTitleColor),
                                selectionAction: {
                                 actionBlock()
-                               },
-                               willDisplay: { cell in
-                                cell.selectionStyle = .none
-                                cell.accessoryType = .none
                                })
         return row
+    }
+
+    @objc private func voiceOverStatusDidChange() {
+        reloadUI()
     }
 
 }

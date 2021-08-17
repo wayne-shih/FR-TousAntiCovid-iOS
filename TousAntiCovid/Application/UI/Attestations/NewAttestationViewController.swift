@@ -208,7 +208,12 @@ final class NewAttestationViewController: CVTableViewController {
                                                              titleFont: { Appearance.Cell.Text.footerFont },
                                                              titleColor: Appearance.Cell.Text.captionTitleColor,
                                                              separatorLeftInset: 0.0,
-                                                             separatorRightInset: 0.0))
+                                                             separatorRightInset: 0.0),
+                                         willDisplay: { cell in
+                                            cell.accessibilityElements = []
+                                            cell.accessibilityElementsHidden = true
+                                            cell.isAccessibilityElement = false
+                                         })
             rows.append(headerRow)
         }
         
@@ -296,6 +301,9 @@ final class NewAttestationViewController: CVTableViewController {
                                     }
                                 }, willDisplay: { [weak self] cell in
                                     cell.cvSubtitleLabel?.textColor = self?.fieldSelectedItems[field.dataKeyValue]?[field.key] == nil ? Appearance.Cell.Text.placeholderColor : Appearance.Cell.Text.subtitleColor
+                                    cell.cvSubtitleLabel?.accessibilityHint = cell.cvTitleLabel?.text?.removingEmojis()
+                                    cell.cvSubtitleLabel?.accessibilityTraits = .button
+                                    cell.accessibilityElements = [cell.cvSubtitleLabel].compactMap { $0 }
                                 })
                 default:
                     row = CVRow(title: field.name,
@@ -355,6 +363,12 @@ final class NewAttestationViewController: CVTableViewController {
                                      willDisplay: { [weak self] cell in
                                         guard let self = self else { return }
                                         (cell as? StandardSwitchCell)?.cvSwitch.isOn = self.currentSaveMyData
+                                        let generateAction: UIAccessibilityCustomAction = UIAccessibilityCustomAction(
+                                            name: "accessibility.attestation.generate".localized,
+                                            target: self,
+                                            selector: #selector(self.didTouchGenerateButton)
+                                        )
+                                        cell.accessibilityCustomActions = [generateAction]
                                      }, valueChanged: { [weak self] value in
                                         guard let isOn = value as? Bool else { return }
                                         self?.currentSaveMyData = isOn

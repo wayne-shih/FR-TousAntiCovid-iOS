@@ -8,6 +8,7 @@
 //  Created by Lunabee Studio / Date - 29/10/2020 - for the TousAntiCovid project.
 //
 import UIKit
+import PKHUD
 
 final class CodeFullScreenViewController: UIViewController {
 
@@ -22,11 +23,11 @@ final class CodeFullScreenViewController: UIViewController {
 
     private var codeDetails: [CodeDetail] = []
     private var showHeaderImage: Bool = false
-    private var lastBrightness: CGFloat = 0.0
+    private var lastBrightness: CGFloat?
     private var isFirstLoad: Bool = true
     private var footerLabelTapGesture: UITapGestureRecognizer?
     
-    class func controller(codeDetails: [CodeDetail], showHeaderImage: Bool = false) -> UIViewController {
+    class func controller(codeDetails: [CodeDetail], showHeaderImage: Bool = false) -> CodeFullScreenViewController {
         let fullscreenController: CodeFullScreenViewController = StoryboardScene.CodeFullScreen.codeFullScreenViewController.instantiate()
         fullscreenController.codeDetails = codeDetails
         fullscreenController.showHeaderImage = showHeaderImage
@@ -57,7 +58,14 @@ final class CodeFullScreenViewController: UIViewController {
     deinit {
         removeObservers()
     }
-    
+
+    func update(codeDetails: [CodeDetail], showHeaderImage: Bool = false) {
+        self.codeDetails = codeDetails
+        self.showHeaderImage = showHeaderImage
+        setupUI()
+        updateContent()
+    }
+
     private func setupUI() {
         view.backgroundColor = .white
         imageLeadingConstraint.constant = 60.0
@@ -101,12 +109,15 @@ final class CodeFullScreenViewController: UIViewController {
         label.text = codeDetail.text
         codeBottomLabel.isHidden = codeDetail.codeBottomText == nil
         codeBottomLabel.text = codeDetail.codeBottomText
-        footerLabel.text = codeDetail.footerText
-        footerLabel.isHidden = codeDetail.footerText == nil
-        footerLabel.textAlignment = segmentedControl.selectedSegmentIndex == 0 ? .natural : .center
-        footerLabel.textColor = segmentedControl.selectedSegmentIndex == 0 ? .black : .darkGray
-        footerLabel.font = segmentedControl.selectedSegmentIndex == 0 ? .regular(size: 17.0) : .regular(size: 11.0)
-        footerLabelTapGesture?.isEnabled = segmentedControl.selectedSegmentIndex == 1
+        footerLabel.text = codeDetail.footerText ?? codeDetail.hash
+        footerLabel.isHidden = footerLabel.text == nil
+        let canDisplayHash: Bool = segmentedControl.selectedSegmentIndex > 0 || (codeDetail.footerText == nil && codeDetail.hash != nil)
+        footerLabel.textAlignment = canDisplayHash ? .center : .natural
+        footerLabel.textColor = canDisplayHash ? .darkGray : .black
+        footerLabel.font = canDisplayHash ? .regular(size: 11.0) : .regular(size: 17.0)
+        footerLabel.isAccessibilityElement = !canDisplayHash
+        footerLabelTapGesture?.isEnabled = canDisplayHash
+        setupAccessibility()
     }
 
     private func setupBottomLabelTapGesture() {
@@ -114,8 +125,16 @@ final class CodeFullScreenViewController: UIViewController {
         footerLabel.addGestureRecognizer(footerLabelTapGesture!)
     }
 
+    private func setupAccessibility() {
+        closeButton.accessibilityHint = "accessibility.closeModal.zGesture".localized
+        footerLabel.accessibilityLabel = footerLabel.text?.removingEmojis()
+        label.accessibilityLabel = label.text?.removingEmojis()
+    }
+
     @objc private func didTapFooterLabel() {
-        UIPasteboard.general.string = codeDetails[segmentedControl.selectedSegmentIndex].footerText
+        guard let hash = codeDetails[segmentedControl.selectedSegmentIndex].hash else { return }
+        UIPasteboard.general.string = hash
+        HUD.flash(.labeledSuccess(title: "common.copied".localized, subtitle: nil))
     }
 
     @IBAction private func didSelectSegment(_ sender: Any) {
@@ -125,6 +144,7 @@ final class CodeFullScreenViewController: UIViewController {
 
     private func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
     }
     
     private func removeObservers() {
@@ -132,12 +152,12 @@ final class CodeFullScreenViewController: UIViewController {
     }
     
     private func updateBrightnessForQRCodeReadability() {
-        lastBrightness = UIScreen.main.brightness
-        UIScreen.main.brightness = CGFloat(1.0)
+        if lastBrightness == nil { lastBrightness = round(UIScreen.main.brightness * 100.0) / 100.0 }
+        UIScreen.main.brightness = 1.0
     }
     
     private func putBrightnessBackToOriginalValue() {
-        UIScreen.main.brightness = lastBrightness
+        lastBrightness.map { UIScreen.main.brightness = $0 }
     }
     
     @IBAction func closeButtonPressed(_ sender: Any) {
@@ -146,6 +166,15 @@ final class CodeFullScreenViewController: UIViewController {
     
     @objc private func appDidBecomeActive() {
         updateBrightnessForQRCodeReadability()
+    }
+
+    @objc private func appWillResignActive() {
+        putBrightnessBackToOriginalValue()
+    }
+
+    override func accessibilityPerformEscape() -> Bool {
+        dismiss(animated: true)
+        return true
     }
     
 }

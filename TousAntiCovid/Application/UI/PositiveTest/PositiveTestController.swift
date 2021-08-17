@@ -48,7 +48,10 @@ final class PositiveTestController: CVTableViewController {
         let textRow: CVRow = CVRow(title: "positiveTestController.explanation.title".localized,
                                    subtitle: "positiveTestController.explanation.subtitle".localized,
                                    xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 40.0, bottomInset: 30.0, separatorLeftInset: nil))
+                                   theme: CVRow.Theme(topInset: 40.0, bottomInset: 30.0, separatorLeftInset: nil),
+                                   willDisplay: { cell in
+                                    cell.accessibilityHint = (cell.accessibilityHint ?? "") + ".\n" + "accessibility.back.zGesture".localized
+                                   })
         rows.append(textRow)
 
         

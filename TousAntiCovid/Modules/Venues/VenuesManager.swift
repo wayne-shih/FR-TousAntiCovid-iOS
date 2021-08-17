@@ -37,11 +37,6 @@ final class VenuesManager: NSObject {
     
     var venuesQrCodes: [VenueQrCodeInfo] { storageManager?.venuesQrCodes() ?? [] }
 
-    #if !PROD
-    @UserDefault(key: .isVenuesTestActivated)
-    var isVenuesTestActivated: Bool = false { didSet { NotificationCenter.default.post(name: .statusDataDidChange, object: nil) } }
-    #endif
-
     @UserDefault(key: .cleaLastIteration)
     private var cleaLastIteration: Int?
     

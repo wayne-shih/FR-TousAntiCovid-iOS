@@ -8,9 +8,9 @@
 //  Created by Lunabee Studio / Date - 08/04/2020 - for the TousAntiCovid project.
 //
 
-import UIKit
+import Foundation
 
-protocol PrivacyChangesObserver: class {
+protocol PrivacyChangesObserver: AnyObject {
     
     func privacyChanged()
     

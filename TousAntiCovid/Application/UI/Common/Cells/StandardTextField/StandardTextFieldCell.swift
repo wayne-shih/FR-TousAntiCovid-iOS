@@ -12,10 +12,6 @@
 import UIKit
 
 final class StandardTextFieldCell: TextFieldCell {
-
-    override func setup(with row: CVRow) {
-        super.setup(with: row)
-    }
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: true)

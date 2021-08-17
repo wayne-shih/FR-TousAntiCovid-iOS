@@ -10,9 +10,8 @@
 
 import UIKit
 
-final class StatusVerificationCell: CVTableViewCell {
+final class StatusVerificationCell: CardCell {
 
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var gradientView: GradientView!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
 
@@ -25,28 +24,11 @@ final class StatusVerificationCell: CVTableViewCell {
         cvTitleLabel?.font = Appearance.Cell.Text.subtitleFont
         cvTitleLabel?.textColor = .white
         activityIndicator.color = .white
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
-        containerView.layer.maskedCorners = row.theme.maskedCorners
         guard let currentRiskLevel = row.associatedValue as? RisksUILevel else { return }
         gradientView.startColor = currentRiskLevel.color.fromColor
         gradientView.endColor = currentRiskLevel.color.toColor
-        containerView.backgroundColor = .black
         gradientView.alpha = 0.95
         activityIndicator.startAnimating()
-    }
-
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        guard currentAssociatedRow?.selectionAction != nil else { return }
-        super.setHighlighted(highlighted, animated: animated)
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
     }
 
 }

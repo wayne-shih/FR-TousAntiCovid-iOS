@@ -98,7 +98,9 @@ extension UserDefault {
         case keyFiguresOpeningCount
         case lastBuildNumberForRatingsAlert
         case didShowRatingsAlert
-        
+        case lastInitialBlacklist2dDocBuildNumber
+        case lastInitialDccBlacklistBuildNumber
+        case isWatchAppInstalled
     }
     
 }

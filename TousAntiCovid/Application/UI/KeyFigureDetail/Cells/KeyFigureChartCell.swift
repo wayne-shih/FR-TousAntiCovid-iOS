@@ -11,26 +11,22 @@
 import UIKit
 import Charts
 
-final class KeyFigureChartCell: CVTableViewCell {
+final class KeyFigureChartCell: CardCell {
 
-    @IBOutlet private var containerView: UIView!
     @IBOutlet private var chartContainerView: UIView!
     @IBOutlet private var legendStackView: UIStackView!
     @IBOutlet private var footerLabel: UILabel!
     @IBOutlet private var sharingImageView: UIImageView!
-    
+    @IBOutlet weak var sharingButton: UIButton!
+
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI(with: row)
         setupContent(with: row)
+        setupAccessibility()
     }
 
     private func setupUI(with row: CVRow) {
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.maskedCorners = row.theme.maskedCorners
-        containerView.layer.masksToBounds = true
         footerLabel.font = Appearance.Cell.Text.captionTitleFont
         footerLabel.textColor = Appearance.Cell.Text.captionTitleColor
         sharingImageView.image = Asset.Images.shareIcon.image
@@ -68,6 +64,17 @@ final class KeyFigureChartCell: CVTableViewCell {
     
     @IBAction private func didTouchSharingButton(_ sender: Any) {
         currentAssociatedRow?.selectionActionWithCell?(self)
+    }
+
+    override func setupAccessibility() {
+        sharingButton?.isAccessibilityElement = true
+        sharingButton?.accessibilityLabel = "accessibility.hint.keyFigureChart.share".localized
+        containerView?.accessibilityLabel = "accessibility.hint.keyFigureChart.label".localized
+        chartContainerView?.isAccessibilityElement = false
+        chartContainerView?.isUserInteractionEnabled = false
+        legendStackView.isAccessibilityElement = false
+        legendStackView?.isUserInteractionEnabled = false
+        accessibilityElements = [footerLabel, sharingButton].compactMap { $0 }
     }
     
     private func limiteLine(chartData: KeyFigureChartData, position: ChartLimitLine.LabelPosition) -> ChartLimitLine {
@@ -119,7 +126,6 @@ extension KeyFigureChartCell {
            transformer: lineChartView.getTransformer(forAxis: .left)
         )
         lineChartView.leftYAxisRenderer = yAxisRenderer
-        
         chartContainerView.subviews.forEach { $0.removeFromSuperview() }
         chartContainerView.addSubview(lineChartView)
         lineChartView.translatesAutoresizingMaskIntoConstraints = false

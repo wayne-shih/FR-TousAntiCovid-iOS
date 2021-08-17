@@ -45,7 +45,9 @@ final class OnboardingPrivacyController: OnboardingController {
         if isOpenedFromOnboarding {
             return UIBarButtonItem.back(target: self, action: #selector(didTouchBackButton))
         } else {
-            return UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+            let barButtonItem: UIBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+            barButtonItem.accessibilityHint = "accessibility.closeModal.zGesture".localized
+            return barButtonItem
         }
     }
     

@@ -10,11 +10,10 @@
 
 import UIKit
 
-final class QRCodeCell: CVTableViewCell {
+final class QRCodeCell: CardCell {
 
     @IBOutlet private var topRightButton: UIButton!
-    @IBOutlet private var containerView: UIView!
-    
+
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI()
@@ -29,35 +28,22 @@ final class QRCodeCell: CVTableViewCell {
     }
     
     private func setupUI() {
-        selectionStyle = .none
-        accessoryType = .none
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
         topRightButton.tintColor = Appearance.tintColor
     }
     
-    private func setupAccessibility() {
-        accessibilityElements = [cvTitleLabel, topRightButton].compactMap { $0 }
-        topRightButton.accessibilityLabel = "attestationsController.menu.share".localized
+    override func setupAccessibility() {
+        super.setupAccessibility()
+        containerView?.accessibilityLabel = ["common.qrcode".localized,
+                                             "accessibility.fullscreen.activate".localized,
+                                             containerView?.accessibilityLabel].compactMap { $0 }.joined(separator: "\n").removingEmojis()
+
+        topRightButton.accessibilityLabel = "accessibility.menu.moreoptions".localized
+        topRightButton.isAccessibilityElement = !topRightButton.isHidden
+
+        accessibilityElements = [containerView, topRightButton].compactMap { $0 }
     }
     
     @IBAction private func topRightButtonPressed(_ sender: Any) {
         currentAssociatedRow?.selectionActionWithCell?(self)
-    }
-    
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        guard currentAssociatedRow?.selectionAction != nil else { return }
-        super.setHighlighted(highlighted, animated: animated)
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
-    }
-    
+    }    
 }

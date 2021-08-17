@@ -48,6 +48,7 @@ final class UniversalQrScanController: FlashCodeController {
         navigationController?.navigationBar.shadowImage = UIImage()
         if navigationController?.viewControllers.first === self {
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+            navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
         }
     }
     

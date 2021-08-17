@@ -10,11 +10,10 @@
 
 import UIKit
 
-final class ParagraphCell: CVTableViewCell {
+final class ParagraphCell: CardCell {
     
     @IBOutlet private var button: UIButton!
-    @IBOutlet private var containerView: UIView!
-    
+
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI()
@@ -22,17 +21,11 @@ final class ParagraphCell: CVTableViewCell {
     }
     
     private func setupUI() {
-        containerView.backgroundColor = backgroundColor
-        backgroundColor = .clear
-        selectionStyle = .none
-        accessoryType = .none
         cvSubtitleLabel?.font = Appearance.Cell.Text.subtitleFont
         button?.contentHorizontalAlignment = .left
         button?.tintColor = Appearance.Button.Tertiary.titleColor
         button?.titleLabel?.font = Appearance.Button.linkFont
         button?.titleLabel?.adjustsFontForContentSizeCategory = true
-        containerView.layer.cornerRadius = 10.0
-        containerView.layer.masksToBounds = true
     }
     
     private func setupContent(with row: CVRow) {
@@ -51,18 +44,5 @@ final class ParagraphCell: CVTableViewCell {
     @IBAction private func buttonPressed(_ sender: Any) {
         currentAssociatedRow?.selectionAction?()
     }
-    
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        guard currentAssociatedRow?.selectionAction != nil else { return }
-        if highlighted {
-            contentView.layer.removeAllAnimations()
-            contentView.alpha = 0.6
-        } else {
-            UIView.animate(withDuration: 0.3) {
-                self.contentView.alpha = 1.0
-            }
-        }
-    }
-    
+
 }

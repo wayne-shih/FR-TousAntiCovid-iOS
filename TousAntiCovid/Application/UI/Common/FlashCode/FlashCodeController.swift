@@ -76,6 +76,11 @@ class FlashCodeController: UIViewController {
         menu.addAction(UIAlertAction(title: "common.cancel".localized, style: .cancel))
         present(menu, animated: true)
     }
+
+    override func accessibilityPerformEscape() -> Bool {
+        dismiss(animated: true)
+        return true
+    }
     
 }
 
@@ -87,7 +92,7 @@ extension FlashCodeController: QRScannerViewDelegate {
     func qrScanningSucceededWithCode(_ str: String?) {
         processScannedQRCode(code: str)
     }
-    
+
 }
 
 extension FlashCodeController: UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIAdaptivePresentationControllerDelegate {
@@ -159,7 +164,13 @@ extension FlashCodeController: UIDocumentPickerDelegate {
             if let image = UIImage(data: data) {
                 self?.processScannedQRCode(code: image.getQRCodeValue())
             } else {
-                self?.processScannedQRCode(code: CGPDFDocument.getQrCodesInPdf(at: url).first)
+                CGPDFDocument.getQrCodesInPdf(at: url, controller: self) { codes in
+                    if let codes = codes {
+                        self?.processScannedQRCode(code: codes.first)
+                    } else {
+                        self?.restartScanning()
+                    }
+                }
             }
             HUD.hide()
             self?.didPickMedia = false

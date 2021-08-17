@@ -156,14 +156,14 @@ final class KeyFiguresManager: NSObject {
         alertController.addAction(UIAlertAction(title: "home.infoSection.updatePostalCode.alert.newPostalCode".localized, style: .default, handler: { [weak self] _ in
             self?.defineNewPostalCode(from: viewController)
         }))
-        alertController.addAction(UIAlertAction(title: "home.infoSection.updatePostalCode.alert.deletePostalCode".localized, style: .destructive, handler: { _ in
-            KeyFiguresManager.shared.currentPostalCode = nil
+        alertController.addAction(UIAlertAction(title: "home.infoSection.updatePostalCode.alert.deletePostalCode".localized, style: .destructive, handler: { [weak self] _ in
+            self?.deletePostalCode()
         }))
         alertController.addAction(UIAlertAction(title: "common.cancel".localized, style: .cancel))
         viewController.present(alertController, animated: true, completion: nil)
     }
 
-    private func defineNewPostalCode(from viewController: UIViewController, defaultValue: String? = nil) {
+    func defineNewPostalCode(from viewController: UIViewController, defaultValue: String? = nil) {
         viewController.showTextFieldAlert("home.infoSection.newPostalCode.alert.title".localized, message: "home.infoSection.newPostalCode.alert.subtitle".localized, textFieldPlaceHolder: "home.infoSection.newPostalCode.alert.placeholder".localized, textFieldDefaultValue: defaultValue, keyboardType: UIKeyboardType.numberPad) { [weak self] textFieldValue in
             guard textFieldValue.isPostalCode else {
                 viewController.showAlert(title: "home.infoSection.newPostalCode.alert.wrongPostalCode".localized, okTitle: "common.ok".localized, handler:  { [weak self] in
@@ -182,15 +182,19 @@ final class KeyFiguresManager: NSObject {
             viewController.showFlash()
         }
     }
-    
+
+    func deletePostalCode() {
+        KeyFiguresManager.shared.currentPostalCode = nil
+    }
+
     private func addObserver() {
         NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
     }
-    
+
     @objc private func appDidBecomeActive() {
         fetchAllFiles()
     }
-    
+
 }
 
 // MARK: - All fetching methods -
