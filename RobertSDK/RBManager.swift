@@ -26,8 +26,8 @@ public final class RBManager {
     public var isInitialized: Bool { storage != nil }
     public var isRegistered: Bool { storage.areKeysStored() && storage.getLastEpoch() != nil }
     public var isProximityActivated: Bool {
-        get { storage.isProximityActivated() }
-        set { storage.save(proximityActivated: newValue) }
+        get { storage?.isProximityActivated() ?? false }
+        set { storage?.save(proximityActivated: newValue) }
     }
     public var isImmune: Bool {
         guard let reportDate = storage.reportDate() else { return false }
@@ -140,7 +140,7 @@ public final class RBManager {
         }
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
     }
-    
+
     public func startProximityDetection() {
         guard let ka = ka else { return }
         bluetooth.start(helloMessageCreationHandler: { completion in

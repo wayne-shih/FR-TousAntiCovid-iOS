@@ -23,12 +23,6 @@ struct QRCodeView: View {
                     .aspectRatio(contentMode: .fit)
                     .background(Color(.clear))
                     .padding(20.0)
-            } else {
-                Color(.black)
-                Image(uiImage: UIImage(named: "noQrPlaceholder")!)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .background(Color(.clear))
             }
         }
         .edgesIgnoringSafeArea(.all)

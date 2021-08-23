@@ -17,6 +17,7 @@ final class CVButton: UIButton {
         case secondary
         case tertiary
         case quaternary
+        case quinary
         case destructive
     }
     
@@ -53,6 +54,9 @@ final class CVButton: UIButton {
         case .quaternary:
             backgroundColor = Appearance.Button.Quaternary.backgroundColor
             setTitleColor(Appearance.Button.Quaternary.titleColor, for: .normal)
+        case .quinary:
+            backgroundColor = Appearance.Button.Quinary.backgroundColor
+            setTitleColor(Appearance.Button.Quinary.titleColor, for: .normal)
         case .destructive:
             backgroundColor = Appearance.Button.Destructive.backgroundColor
             setTitleColor(Appearance.Button.Destructive.titleColor, for: .normal)

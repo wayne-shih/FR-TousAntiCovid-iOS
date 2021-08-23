@@ -472,16 +472,14 @@ final class WalletViewController: CVTableViewController {
     
     private func processConvertToEurope(_ certificate: WalletCertificate) {
         HUD.show(.progress)
-        AnalyticsManager.shared.reportAppEvent(.e20)
         WalletManager.shared.convertToEurope(certificate: certificate) { [weak self] result in
             switch result {
             case let .success(certificate):
                 HUD.flash(.success)
-                AnalyticsManager.shared.reportAppEvent(.e21)
                 self?.didConvertToEuropeanCertifcate(certificate)
             case let .failure(error):
                 HUD.hide()
-                AnalyticsManager.shared.reportError(serviceName: "certificateConversion", apiVersion: ParametersManager.shared.inGroupApiVersion, code: (error as NSError).code, desc: "\(error.localizedDescription) (\((error as NSError).code))")
+                AnalyticsManager.shared.reportError(serviceName: "certificateConversion", apiVersion: ParametersManager.shared.inGroupApiVersion, code: (error as NSError).code)
                 let message: String = "walletController.convertCertificate.error.message".localized
                 self?.showConvertToEuropeErrorAlert(message: message)
             }

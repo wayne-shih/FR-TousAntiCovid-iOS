@@ -211,6 +211,13 @@ extension Date {
         return Calendar.current.date(from: components)
     }
 
+    func roundingToHour() -> Date? {
+        var components: DateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: self)
+        components.minute = 0
+        components.second = 0
+        return Calendar.current.date(from: components)
+    }
+
     func dayTimestamp() -> Int { Int(roundingToBeginningOfDay()?.timeIntervalSince1970 ?? 0) }
 
 }

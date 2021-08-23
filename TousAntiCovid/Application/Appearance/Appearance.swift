@@ -53,6 +53,11 @@ enum Appearance {
             static var backgroundColor: UIColor { .clear }
             static var titleColor: UIColor { Asset.Colors.secondaryButtonLabel.color }
         }
+
+        enum Quinary {
+            static var backgroundColor: UIColor { .clear }
+            static var titleColor: UIColor { .white }
+        }
         
         enum Destructive {
             static var backgroundColor: UIColor { .clear }

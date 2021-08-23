@@ -196,7 +196,6 @@ extension StatusManager {
                         }
                         AnalyticsManager.shared.statusDidSucceed()
                         NotificationsManager.shared.scheduleUltimateNotification(minHour: ParametersManager.shared.minHourContactNotif, maxHour: ParametersManager.shared.maxHourContactNotif)
-
                         completion?(.success(info))
                     case let .failure(error):
                         let code: Int = (error as NSError).code
@@ -409,7 +408,6 @@ extension StatusManager {
             mustNotifyLastRiskLevelChange = (newRiskLevelInfo.riskLevel > currentStatusRiskLevel?.riskLevel ?? 0.0) || (newRiskLevelInfo.riskLevel != 0.0 && newRiskLevelInfo.riskLevel == currentStatusRiskLevel?.riskLevel && newRiskLevelInfo.lastRiskScoringDate ?? .distantPast > currentStatusRiskLevel?.lastRiskScoringDate ?? .distantPast)
             mustShowAlertAboutLastRiskLevelChange = newRiskLevelInfo.lastRiskScoringDate != currentStatusRiskLevel?.lastRiskScoringDate
             if mustNotifyLastRiskLevelChange || mustShowAlertAboutLastRiskLevelChange {
-                AnalyticsManager.shared.reportAppEvent(.e2)
                 AnalyticsManager.shared.reportHealthEvent(.eh2, description: "\(newRiskLevelInfo.riskLevel)")
             }
         }

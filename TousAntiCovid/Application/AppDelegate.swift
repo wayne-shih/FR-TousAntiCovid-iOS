@@ -54,6 +54,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         if isOnboardingDone {
             BluetoothStateManager.shared.start()
         }
+        ParametersManager.shared.start(configUrl: Constant.Server.configUrl,
+                                       configCertificateFiles: Constant.Server.resourcesCertificates)
         InGroupeServer.shared.start(certificateFiles: Constant.Server.convertCertificates,
                                     convertUrl: { Constant.Server.convertUrl },
                                     requestLoggingHandler: { _, _, _, _ in })
@@ -67,8 +69,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                server: Server(baseUrl: { Constant.Server.baseUrl },
                                               publicKey: Constant.Server.publicKey,
                                               certificateFiles: Constant.Server.certificates,
-                                              configUrl: Constant.Server.configUrl,
-                                              configCertificateFiles: Constant.Server.resourcesCertificates,
                                               deviceTimeNotAlignedToServerTimeDetected: {
                                                 if UIApplication.shared.applicationState != .active {
                                                     NotificationsManager.shared.triggerDeviceTimeErrorNotification()
@@ -83,7 +83,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                }, didReceiveProximityHandler: {
                                     StatusManager.shared.status()
                                }, didSaveProximity: { _ in })
-        ParametersManager.shared.start()
         RatingsManager.shared.start()
         AnalyticsManager.shared.start()
         if #available(iOS 14.0, *) {

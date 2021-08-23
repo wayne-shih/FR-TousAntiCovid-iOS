@@ -11,6 +11,7 @@
 import UIKit
 import PKHUD
 import RobertSDK
+import ServerSDK
 
 final class WalletCoordinator: Coordinator {
 
@@ -249,24 +250,39 @@ final class WalletCoordinator: Coordinator {
     }
 
     private func requestToSaveCertificate(_ certificate: WalletCertificate, _ completion: @escaping (_ granted: Bool) -> ()) {
-        self.showWarningAlertIfNeeded(certificate: certificate, handler: { [weak self] in
-            if (certificate as? EuropeanCertificate)?.isForeignCertificate == true {
-                self?.showforeignCertificateAlert(handler: {
+        showQuantityWarningControllerIfNeeded { [weak self] in
+            self?.showWarningAlertIfNeeded(certificate: certificate, handler: {
+                if (certificate as? EuropeanCertificate)?.isForeignCertificate == true {
+                    self?.showforeignCertificateAlert(handler: {
+                        completion(true)
+                    }, cancelHandler: {
+                        completion(false)
+                    })
+                } else {
                     completion(true)
-                }, cancelHandler: {
-                    completion(false)
-                })
-            } else {
-                completion(true)
-            }
-        }, cancelHandler: {
-            completion(false)
-        })
+                }
+            }, cancelHandler: {
+                completion(false)
+            })
+        }
+    }
+
+    private func showQuantityWarningControllerIfNeeded(_ continueCompletion: @escaping () -> ()) {
+        guard WalletManager.shared.walletCertificates.count >= ParametersManager.shared.maxCertBeforeWarning else {
+            continueCompletion()
+            return
+        }
+        let controller: WalletQuantityWarningViewController = WalletQuantityWarningViewController {
+            continueCompletion()
+        } didCancel: { [weak self] in
+            self?.navigationController?.topPresentedController.dismiss(animated: true)
+        }
+        controller.modalPresentationStyle = .fullScreen
+        navigationController?.topPresentedController.present(controller, animated: true)
     }
 
     private func saveAndScrollToCertificate(certificate: WalletCertificate) {
         WalletManager.shared.saveCertificate(certificate)
-        AnalyticsManager.shared.reportAppEvent(.e13)
         HUD.flash(.success)
         walletViewController?.scrollTo(certificate)
     }

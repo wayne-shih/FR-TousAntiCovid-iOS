@@ -25,7 +25,6 @@ final class AnalyticsAppEvent: Object, Encodable {
     
     enum EventName: String {
         case e1
-        case e2
         case e3
         case e4
         case e5
@@ -36,15 +35,12 @@ final class AnalyticsAppEvent: Object, Encodable {
         case e10
         case e11
         case e12
-        case e13
         case e14
         case e15
         case e16
         case e17
         case e18
         case e19
-        case e20
-        case e21
     }
     
     init(name: String, timestamp: String, desc: String?) {

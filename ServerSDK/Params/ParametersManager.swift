@@ -73,7 +73,9 @@ public final class ParametersManager: NSObject {
     public var isolationDuration: Double { valueFor(name: "app.isolation.duration") as? Double ?? 604800.0 }
     public var isolationCovidDuration: Double { valueFor(name: "app.isolation.durationCovid") as? Double ?? 864000.0 }
     public var postIsolationDuration: Double { valueFor(name: "app.postIsolation.duration") as? Double ?? 604800.0 }
-    
+
+    public var maxCertBeforeWarning: Int { valueFor(name: "app.wallet.maxCertBeforeWarning") as? Int ?? 15 }
+
     var appAvailability: Bool? { valueFor(name: "app.appAvailability") as? Bool }
     var preSymptomsSpan: Int {
         Int(valueFor(name: "app.preSymptomsSpan") as? Double ?? 2)
@@ -179,6 +181,7 @@ public final class ParametersManager: NSObject {
     public let defaultCleaUrl: String = "https://s3.fr-par.scw.cloud/clea-batch/"
 
     private var cleaUrls: [String] { valueFor(name: "app.cleaUrls") as? [String] ?? [] }
+
     private var config: [[String: Any]] = [] {
         didSet { distributeUpdatedConfig() }
     }
@@ -193,7 +196,9 @@ public final class ParametersManager: NSObject {
         return URLSession(configuration: backgroundConfiguration, delegate: self, delegateQueue: .main)
     }()
     
-    public func start() {
+    public func start(configUrl: URL, configCertificateFiles: [Data]) {
+        url = configUrl
+        certificateFiles = configCertificateFiles
         writeInitialFileIfNeeded()
         loadLocalConfig()
     }
@@ -269,7 +274,7 @@ public final class ParametersManager: NSObject {
             UIApplication.shared.setMinimumBackgroundFetchInterval(interval)
         }
     }
-    
+
     private func writeInitialFileIfNeeded() {
         let fileUrl: URL = Bundle(for: ParametersManager.self).url(forResource: url.deletingPathExtension().lastPathComponent, withExtension: url.pathExtension)!
         let destinationFileUrl: URL = createWorkingDirectoryIfNeeded().appendingPathComponent("config.json")
@@ -278,7 +283,7 @@ public final class ParametersManager: NSObject {
             try? FileManager.default.copyItem(at: fileUrl, to: destinationFileUrl)
         }
     }
-    
+
     private func createWorkingDirectoryIfNeeded() -> URL {
         let directoryUrl: URL = FileManager.svLibraryDirectory().appendingPathComponent("config")
         if !FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: nil) {
@@ -286,11 +291,11 @@ public final class ParametersManager: NSObject {
         }
         return directoryUrl
     }
-    
+
     private func localFileUrl() -> URL {
         createWorkingDirectoryIfNeeded().appendingPathComponent("config.json")
     }
-    
+
 }
 
 extension ParametersManager: URLSessionDelegate, URLSessionDataDelegate {
@@ -311,7 +316,7 @@ extension ParametersManager: URLSessionDelegate, URLSessionDataDelegate {
             }
         }
     }
-    
+
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         let requestId: String = task.taskDescription ?? ""
         guard let completion = completions[requestId] else { return }

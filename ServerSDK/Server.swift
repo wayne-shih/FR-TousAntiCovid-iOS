@@ -41,14 +41,12 @@ public final class Server: NSObject, RBServer {
     private var completions: [String: ProcessRequestCompletion] = [:]
     private let taskLoggingHandler: TaskLoggingHandler
     
-    public init(baseUrl: @escaping () -> URL, publicKey: Data, certificateFiles: [Data], configUrl: URL, configCertificateFiles: [Data], deviceTimeNotAlignedToServerTimeDetected: @escaping () -> (), taskLoggingHandler: @escaping TaskLoggingHandler) {
+    public init(baseUrl: @escaping () -> URL, publicKey: Data, certificateFiles: [Data], deviceTimeNotAlignedToServerTimeDetected: @escaping () -> (), taskLoggingHandler: @escaping TaskLoggingHandler) {
         self.baseUrl = baseUrl
         self.publicKey = publicKey
         self.certificateFiles = certificateFiles
         self.deviceTimeNotAlignedToServerTimeDetected = deviceTimeNotAlignedToServerTimeDetected
         self.taskLoggingHandler = taskLoggingHandler
-        ParametersManager.shared.url = configUrl
-        ParametersManager.shared.certificateFiles = configCertificateFiles
     }
     
     public func register(captcha: String, captchaId: String, publicKey: String, completion: @escaping (_ result: Result<RBRegisterResponse, Error>) -> ()) {

@@ -677,8 +677,7 @@ final class HomeViewController: CVTableViewController {
         ParametersManager.shared.proximityReactivationReminderHours.forEach { hours in
             let hoursString: String = hours == 1 ? "home.deactivate.actionSheet.hours.singular" : "home.deactivate.actionSheet.hours.plural"
             alertController.addAction(UIAlertAction(title: String(format: hoursString.localized, Int(hours)), style: .default) { [weak self] _ in
-                var hoursToUse: Double = Double(hours)
-                self?.triggerReactivationReminder(hours: hoursToUse)
+                self?.triggerReactivationReminder(hours: Double(hours))
             })
         }
         alertController.addAction(UIAlertAction(title: "home.deactivate.actionSheet.noReminder".localized, style: .cancel) { [weak self] _ in
@@ -1195,7 +1194,6 @@ extension HomeViewController {
                                                          actionBlock: { [weak self] in
                                                             self?.didTouchAbout()
                                                          })])
-
         rows.append(contentsOf: menuRowsForEntries(menuEntries))
         return rows
     }

@@ -15,7 +15,7 @@ extension AnalyticsManager {
     
     func reportAppEvent(_ eventName: AnalyticsAppEvent.EventName, description: String? = nil) {
         guard isOptIn else { return }
-        let event: AnalyticsAppEvent = AnalyticsAppEvent(name: eventName.rawValue, timestamp: Date().universalDateFormatted(), desc: description)
+        let event: AnalyticsAppEvent = AnalyticsAppEvent(name: eventName.rawValue, timestamp: Date().roundingToHour()?.universalDateFormatted() ?? "", desc: description)
         let realm: Realm = try! Realm.analyticsDb()
         try! realm.write {
             realm.add(event)
@@ -24,7 +24,7 @@ extension AnalyticsManager {
     
     func reportHealthEvent(_ eventName: AnalyticsHealthEvent.EventName, description: String? = nil) {
         guard isOptIn else { return }
-        let event: AnalyticsHealthEvent = AnalyticsHealthEvent(name: eventName.rawValue, timestamp: Date().universalDateFormatted(), desc: description)
+        let event: AnalyticsHealthEvent = AnalyticsHealthEvent(name: eventName.rawValue, timestamp: Date().roundingToHour()?.universalDateFormatted() ?? "", desc: description)
         let realm: Realm = try! Realm.analyticsDb()
         try! realm.write {
             realm.add(event)

@@ -151,7 +151,7 @@ final class WalletManager {
             return false
         }
     }
-    
+
 }
 
 extension WalletManager {
