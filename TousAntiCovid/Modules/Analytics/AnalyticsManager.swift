@@ -39,6 +39,11 @@ final class AnalyticsManager: NSObject {
     private typealias ProcessRequestCompletion = (_ result: Result<Data, Error>) -> ()
     private lazy var session: URLSession = {
         let backgroundConfiguration: URLSessionConfiguration = URLSessionConfiguration.background(withIdentifier: "fr.gouv.tousanticovid.ios.Analytics")
+        backgroundConfiguration.timeoutIntervalForRequest = 30.0
+        backgroundConfiguration.timeoutIntervalForResource = 30.0
+        backgroundConfiguration.sessionSendsLaunchEvents = true
+        backgroundConfiguration.shouldUseExtendedBackgroundIdleMode = true
+        backgroundConfiguration.httpShouldUsePipelining = true
         return URLSession(configuration: backgroundConfiguration, delegate: self, delegateQueue: .main)
     }()
     private var receivedData: [String: Data] = [:]
@@ -79,7 +84,6 @@ final class AnalyticsManager: NSObject {
         }
         let delay: Double = Double((500...2000).randomElement() ?? 500) / 1000.0
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            guard !self.healthEvents.isEmpty else { return }
             self.sendHealthAnalytics { error in
                 guard error == nil || (error as NSError?)?.code == 413 else { return }
                 self.resetHealthEvents()
@@ -249,7 +253,7 @@ extension AnalyticsManager: URLSessionDelegate, URLSessionDataDelegate {
     }
     
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.analyticsCertificates) { validated, credential in
+        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.certificates) { validated, credential in
             validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }

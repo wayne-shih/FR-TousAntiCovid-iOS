@@ -50,6 +50,7 @@ enum Constant {
     enum Server {
         
         static let resourcesRootDomain: String = "app.tousanticovid.gouv.fr"
+
         static let staticResourcesRootDomain: String = "app-static.tousanticovid.gouv.fr"
 
         static var baseUrl: URL { URL(string: "https://api.tousanticovid.gouv.fr/api/\(ParametersManager.shared.apiVersion.rawValue)")! }
@@ -64,10 +65,6 @@ enum Constant {
 
         static var dccCertsUrl: URL { URL(string: "https://\(staticResourcesRootDomain)/json/version-\(jsonVersion)/Certs/dcc-certs.json")! }
 
-        static var analyticsCertificates: [Data] { ["certigna-root", "certigna-services"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
-
-        static var resourcesCertificates: [Data] { ["certigna-root", "certigna-services"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
-
         static var convertCertificates: [Data] { ["ISRG-Root-X1", "R3"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
 
         static var convertUrl: URL {
@@ -75,6 +72,8 @@ enum Constant {
                 URL(string: "https://portail.tacv.myservices-ingroupe.com/api/v2/client/convertor/decode/decodeDocument")! :
                 URL(string: "https://portail.tacv.myservices-ingroupe.com/api/client/convertor/decode/decodeDocument")!
         }
+
+        static var activityCertificateGenerationUrl: URL? { nil }
 
         static let jsonVersion: Int = 35
 

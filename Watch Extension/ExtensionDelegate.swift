@@ -14,8 +14,6 @@ import ClockKit
 
 final class ExtensionDelegate: NSObject, WKExtensionDelegate {
 
-    private var connectivityBackgroundTask: WKWatchConnectivityRefreshBackgroundTask?
-
     func applicationDidFinishLaunching() {
         WatchConnectivityManager.shared.start()
         WatchConnectivityManager.shared.addObserver(self)
@@ -38,7 +36,11 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
                 switchTo(.splashscreen)
                 snapshotTask.setTaskCompleted(restoredDefaultState: true, estimatedSnapshotExpiration: Date.distantFuture, userInfo: nil)
             case let connectivityTask as WKWatchConnectivityRefreshBackgroundTask:
-                connectivityBackgroundTask = connectivityTask
+                if WatchConnectivityManager.shared.hasSessionContentPending {
+                    WatchConnectivityManager.shared.connectivityBackgroundTask = connectivityTask
+                } else {
+                    connectivityTask.setTaskCompletedWithSnapshot(false)
+                }
             case let urlSessionTask as WKURLSessionRefreshBackgroundTask:
                 urlSessionTask.setTaskCompletedWithSnapshot(false)
             case let relevantShortcutTask as WKRelevantShortcutRefreshBackgroundTask:
@@ -77,8 +79,8 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
 extension ExtensionDelegate: WatchConnectivityObserver {
 
     func watchConnectivityDidReceiveApplicationContext() {
-        connectivityBackgroundTask?.setTaskCompletedWithSnapshot(false)
-        if WKExtension.shared().applicationState == .active { updateCurrentController() }
+        guard WKExtension.shared().applicationState == .active else { return }
+        updateCurrentController()
     }
 
 }

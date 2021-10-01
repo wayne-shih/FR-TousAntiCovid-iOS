@@ -28,7 +28,7 @@ final class VaccinationCenterObserverWrapper: NSObject {
     
 }
 
-final class VaccinationCenterManager: NSObject {
+final class VaccinationCenterManager {
     
     static let shared: VaccinationCenterManager = VaccinationCenterManager()
     
@@ -131,11 +131,9 @@ final class VaccinationCenterManager: NSObject {
     }
     
     private func fetchVaccinationCentersFile(departmentCode: String, completion: @escaping (_ error: Error?) -> ()) {
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         let url: URL = VaccinationCentersConstant.jsonBaseUrl.appendingPathComponent(departmentCode)
                                                              .appendingPathComponent(VaccinationCentersConstant.vaccinationCentersFileName)
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: url) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: url) { data, response, error in
             guard let data = data else {
                 DispatchQueue.main.async {
                     completion(error ?? NSError.localizedError(message: "Missing data", code: 400))
@@ -158,11 +156,9 @@ final class VaccinationCenterManager: NSObject {
     }
     
     private func fetchLastUpdate(departmentCode: String, completion: @escaping (_ result: Result<VaccinationCenterLastUpdate, Error>) -> ()) {
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         let url: URL = VaccinationCentersConstant.jsonBaseUrl.appendingPathComponent(departmentCode)
                                                              .appendingPathComponent(VaccinationCentersConstant.vaccinationCentersLastUpdateFileName)
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: url) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: url) { data, response, error in
             guard let data = data else {
                 DispatchQueue.main.async {
                     completion(.failure(error ?? NSError.localizedError(message: "Missing data", code: 400)))
@@ -307,14 +303,4 @@ extension VaccinationCenterManager: KeyFiguresChangesObserver {
         fetchNeededFiles()
     }
     
-}
-
-extension VaccinationCenterManager: URLSessionDelegate {
-    
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
-            validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
-        }
-    }
-     
 }

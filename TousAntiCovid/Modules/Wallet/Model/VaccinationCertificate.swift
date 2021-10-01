@@ -63,7 +63,12 @@ final class VaccinationCertificate: WalletCertificate {
     override var timestamp: Double { lastVaccinationDate?.timeIntervalSince1970 ?? 0.0 }
 
 
-    override var pillTitles: [String] { ["wallet.proof.vaccinationCertificate.pillTitle".localized, vaccinationCycleState].compactMap { $0 } }
+    override var pillTitles: [(text: String, backgroundColor: UIColor)] {
+        ["wallet.proof.vaccinationCertificate.pillTitle".localized, vaccinationCycleState].compactMap {
+            guard let string = $0 else { return nil }
+            return (string, Appearance.tintColor)
+        }
+    }
     override var shortDescription: String? { [firstName, name].compactMap { $0 }.joined(separator: " ") }
     override var fullDescription: String? {
         var text: String = "wallet.proof.vaccinationCertificate.description".localized

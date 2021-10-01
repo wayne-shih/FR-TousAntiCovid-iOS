@@ -9,6 +9,7 @@
 //
 
 import UIKit
+import Charts
 
 final class KeyFigureDetailCoordinator: Coordinator {
 
@@ -27,11 +28,26 @@ final class KeyFigureDetailCoordinator: Coordinator {
     }
 
     private func start() {
-        let navigationController: CVNavigationController = CVNavigationController(rootViewController: KeyFigureDetailController(keyFigure: keyFigure, deinitBlock: { [weak self] in
+        let navigationController: CVNavigationController = CVNavigationController(rootViewController: KeyFigureDetailController(keyFigure: keyFigure, didTouchChart: { [weak self] chartDatas in
+            self?.showFullscreenChart(chartDatas: chartDatas)
+        }, deinitBlock: { [weak self] in
             self?.didDeinit()
         }))
         self.navigationController = navigationController
         presentingController?.present(navigationController, animated: true)
+    }
+
+    private func showFullscreenChart(chartDatas: [KeyFigureChartData]) {
+        let chartController: KeyFigureChartController = KeyFigureChartController.controller(chartDatas: chartDatas) { [weak self] in
+            self?.closeFullscreenChart()
+        }
+        chartController.modalTransitionStyle = .crossDissolve
+        chartController.modalPresentationStyle = .fullScreen
+        navigationController?.present(chartController, animated: true)
+    }
+
+    private func closeFullscreenChart() {
+        navigationController?.dismiss(animated: true)
     }
 
 }

@@ -29,144 +29,115 @@
 import Foundation
 
 // swiftlint:disable line_length
-let euDgcSchemaV1 = """
+public let euDgcSchemaV1 = """
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://id.uvci.eu/DCC.combined-schema.json",
-  "title": "EU DCC",
-  "description": "EU Digital Covid Certificate",
-  "$comment": "Schema version 1.3.0",
-  "type": "object",
-  "oneOf": [
-    {
-      "required": [
-        "ver",
-        "nam",
-        "dob",
-        "v"
-      ]
-    },
-    {
-      "required": [
-        "ver",
-        "nam",
-        "dob",
-        "t"
-      ]
-    },
-    {
-      "required": [
-        "ver",
-        "nam",
-        "dob",
-        "r"
-      ]
-    }
+  "$id": "https://id.uvci.eu/DGC.combined-schema.json",
+  "title": "EU DGC",
+  "description": "EU Digital Green Certificate",
+  "$comment": "Schema version 1.x",
+  "required": [
+    "ver",
+    "nam",
+    "dob"
   ],
+  "type": "object",
   "properties": {
     "ver": {
       "title": "Schema version",
       "description": "Version of the schema, according to Semantic versioning (ISO, https://semver.org/ version 2.0.0 or newer)",
-      "type": "string",
+      "type": ["null","string"],
       "pattern": "^\\\\d+.\\\\d+.\\\\d+$",
       "examples": [
-        "1.3.0"
+        "1.0.0"
       ]
     },
     "nam": {
-      "description": "Surname(s), forename(s) - in that order",
+      "description": "Surname(s), given name(s) - in that order",
       "$ref": "#/$defs/person_name"
     },
     "dob": {
       "title": "Date of birth",
-      "description": "Date of Birth of the person addressed in the DCC. ISO 8601 date format restricted to range 1900-2099 or empty",
-      "type": "string",
-      "pattern": "^((19|20)\\\\d\\\\d(-\\\\d\\\\d){0,2}){0,1}$",
+      "description": "Date of Birth of the person addressed in the DGC. ISO 8601 date format restricted to range 1900-2099",
+      "type": ["null","string"],
       "examples": [
         "1979-04-14",
-        "1950",
-        "1901-08",
-        ""
+        "1979-04",
+        "1979",
+        "",
+        "1979-04-14T00:00:00"
       ]
     },
     "v": {
       "description": "Vaccination Group",
-      "type": "array",
+      "type": ["null", "array"],
       "items": {
         "$ref": "#/$defs/vaccination_entry"
       },
-      "minItems": 1,
-      "maxItems": 1
     },
     "t": {
       "description": "Test Group",
-      "type": "array",
+      "type": ["null", "array"],
       "items": {
         "$ref": "#/$defs/test_entry"
       },
-      "minItems": 1,
-      "maxItems": 1
     },
     "r": {
       "description": "Recovery Group",
-      "type": "array",
+      "type": ["null", "array"],
       "items": {
         "$ref": "#/$defs/recovery_entry"
-      },
-      "minItems": 1,
-      "maxItems": 1
+      }
     }
   },
   "$defs": {
     "dose_posint": {
-      "description": "Dose Number / Total doses in Series: positive integer",
-      "type": "integer",
-      "minimum": 1
+      "description": "Dose Number / Total doses in Series: positive integer, range: [1,9]",
+      "type": ["null","integer"]
+    },
+    "country_vt": {
+      "description": "Country of Vaccination / Test, ISO 3166 where possible",
+      "type": ["null","string"]
     },
     "issuer": {
       "description": "Certificate Issuer",
-      "type": "string",
-      "maxLength": 80
+      "type": ["null","string"]
     },
     "person_name": {
-      "description": "Person name: Surname(s), forename(s) - in that order",
+      "description": "Person name: Surname(s), given name(s) - in that order",
       "required": [
         "fnt"
       ],
       "type": "object",
       "properties": {
         "fn": {
-          "title": "Surname",
-          "description": "The surname or primary name(s) of the person addressed in the certificate",
-          "type": "string",
-          "maxLength": 80,
+          "title": "Family name",
+          "description": "The family or primary name(s) of the person addressed in the certificate",
+          "type": ["null","string"],
           "examples": [
             "d'Červenková Panklová"
           ]
         },
         "fnt": {
-          "title": "Standardised surname",
-          "description": "The surname(s) of the person, transliterated ICAO 9303",
-          "type": "string",
-          "maxLength": 80,
+          "title": "Standardised family name",
+          "description": "The family name(s) of the person transliterated",
+          "type": ["null","string"],
           "examples": [
             "DCERVENKOVA<PANKLOVA"
           ]
         },
         "gn": {
-          "title": "Forename",
-          "description": "The forename(s) of the person addressed in the certificate",
-          "type": "string",
-          "maxLength": 80,
+          "title": "Given name",
+          "description": "The given name(s) of the person addressed in the certificate",
+          "type": ["null","string"],
           "examples": [
             "Jiřina-Maria Alena"
           ]
         },
         "gnt": {
-          "title": "Standardised forename",
-          "description": "The forename(s) of the person, transliterated ICAO 9303",
-          "type": "string",
-          "maxLength": 80,
+          "title": "Standardised given name",
+          "description": "The given name(s) of the person transliterated",
+          "type": ["null","string"],
           "examples": [
             "JIRINA<MARIA<ALENA"
           ]
@@ -175,8 +146,7 @@ let euDgcSchemaV1 = """
     },
     "certificate_id": {
       "description": "Certificate Identifier, format as per UVCI: Annex 2 in  https://ec.europa.eu/health/sites/health/files/ehealth/docs/vaccination-proof_interoperability-guidelines_en.pdf",
-      "type": "string",
-      "maxLength": 80
+      "type": ["null","string"]
     },
     "vaccination_entry": {
       "description": "Vaccination Entry",
@@ -192,7 +162,7 @@ let euDgcSchemaV1 = """
         "is",
         "ci"
       ],
-      "type": "object",
+      "type": ["null","object"],
       "properties": {
         "tg": {
           "description": "disease or agent targeted",
@@ -219,9 +189,9 @@ let euDgcSchemaV1 = """
           "$ref": "#/$defs/dose_posint"
         },
         "dt": {
-          "description": "ISO8601 complete date: Date of Vaccination",
-          "type": "string",
-          "format": "date"
+          "description": "Date of Vaccination",
+          "type": ["null","string"],
+          "$comment": "SemanticSG: constrain to specific date range?"
         },
         "co": {
           "description": "Country of Vaccination",
@@ -248,19 +218,18 @@ let euDgcSchemaV1 = """
         "is",
         "ci"
       ],
-      "type": "object",
+      "type": ["null","object"],
       "properties": {
         "tg": {
           "$ref": "#/$defs/disease-agent-targeted"
         },
         "tt": {
           "description": "Type of Test",
-          "$ref": "#/$defs/test-type"
+          "type": ["null","string"]
         },
         "nm": {
           "description": "NAA Test Name",
-          "type": "string",
-          "maxLength": 80
+          "type": ["null","string"]
         },
         "ma": {
           "description": "RAT Test name and manufacturer",
@@ -268,8 +237,11 @@ let euDgcSchemaV1 = """
         },
         "sc": {
           "description": "Date/Time of Sample Collection",
-          "type": "string",
-          "format": "date-time"
+          "type": ["null","string"]
+        },
+        "dr": {
+          "description": "Date/Time of Test Result",
+          "type": ["null","string"]
         },
         "tr": {
           "description": "Test Result",
@@ -277,8 +249,7 @@ let euDgcSchemaV1 = """
         },
         "tc": {
           "description": "Testing Centre",
-          "type": "string",
-          "maxLength": 80
+          "type": ["null","string"]
         },
         "co": {
           "description": "Country of Test",
@@ -305,15 +276,14 @@ let euDgcSchemaV1 = """
         "du",
         "ci"
       ],
-      "type": "object",
+      "type": ["null","object"],
       "properties": {
         "tg": {
           "$ref": "#/$defs/disease-agent-targeted"
         },
         "fr": {
-          "description": "ISO 8601 complete date of first positive NAA test result",
-          "type": "string",
-          "format": "date"
+          "description": "ISO 8601 Date of First Positive Test Result",
+          "type": ["null","string"]
         },
         "co": {
           "description": "Country of Test",
@@ -324,14 +294,12 @@ let euDgcSchemaV1 = """
           "$ref": "#/$defs/issuer"
         },
         "df": {
-          "description": "ISO 8601 complete date: Certificate Valid From",
-          "type": "string",
-          "format": "date"
+          "description": "ISO 8601 Date: Certificate Valid From",
+          "type": ["null","string"]
         },
         "du": {
-          "description": "ISO 8601 complete date: Certificate Valid Until",
-          "type": "string",
-          "format": "date"
+          "description": "Certificate Valid Until",
+          "type": ["null","string"]
         },
         "ci": {
           "description": "Unique Certificate Identifier, UVCI",
@@ -340,45 +308,34 @@ let euDgcSchemaV1 = """
       }
     },
     "disease-agent-targeted": {
-      "description": "EU eHealthNetwork: Value Sets for Digital Covid Certificates. version 1.0, 2021-04-16, section 2.1",
-      "type": "string",
+      "description": "EU eHealthNetwork: Value Sets for Digital Green Certificates. version 1.0, 2021-04-16, section 2.1",
+      "type": ["null","string"],
       "valueset-uri": "valuesets/disease-agent-targeted.json"
     },
     "vaccine-prophylaxis": {
-      "description": "EU eHealthNetwork: Value Sets for Digital Covid Certificates. version 1.0, 2021-04-16, section 2.2",
-      "type": "string",
+      "description": "EU eHealthNetwork: Value Sets for Digital Green Certificates. version 1.0, 2021-04-16, section 2.2",
+      "type": ["null","string"],
       "valueset-uri": "valuesets/vaccine-prophylaxis.json"
     },
     "vaccine-medicinal-product": {
-      "description": "EU eHealthNetwork: Value Sets for Digital Covid Certificates. version 1.0, 2021-04-16, section 2.3",
-      "type": "string",
+      "description": "EU eHealthNetwork: Value Sets for Digital Green Certificates. version 1.0, 2021-04-16, section 2.3",
+      "type": ["null","string"],
       "valueset-uri": "valuesets/vaccine-medicinal-product.json"
     },
     "vaccine-mah-manf": {
-      "description": "EU eHealthNetwork: Value Sets for Digital Covid Certificates. version 1.0, 2021-04-16, section 2.4",
-      "type": "string",
+      "description": "EU eHealthNetwork: Value Sets for Digital Green Certificates. version 1.0, 2021-04-16, section 2.4",
+      "type": ["null","string"],
       "valueset-uri": "valuesets/vaccine-mah-manf.json"
     },
-    "country_vt": {
-      "description": "Country of Vaccination / Test, ISO 3166 alpha-2 where possible",
-      "type": "string",
-      "pattern": "[A-Z]{1,10}",
-      "valueset-uri": "valuesets/country-2-codes.json"
-    },
     "test-manf": {
-      "description": "EU eHealthNetwork: Value Sets for Digital Covid Certificates. version 1.0, 2021-04-16, section 2.8",
-      "type": "string",
+      "description": "EU eHealthNetwork: Value Sets for Digital Green Certificates. version 1.0, 2021-04-16, section 2.8",
+      "type": ["null","string"],
       "valueset-uri": "valuesets/test-manf.json"
     },
     "test-result": {
-      "description": "EU eHealthNetwork: Value Sets for Digital Covid Certificates. version 1.0, 2021-04-16, section 2.9",
-      "type": "string",
-      "valueset-uri": "valuesets/test-result.json"
-    },
-    "test-type": {
-      "description": "EU eHealthNetwork: Value Sets for Digital Covid Certificates. version 1.0, 2021-04-16, section 2.7",
-      "type": "string",
-      "valueset-uri": "valuesets/test-type.json"
+      "description": "EU eHealthNetwork: Value Sets for Digital Green Certificates. version 1.0, 2021-04-16, section 2.9",
+      "type": ["null","string"],
+      "valueset-uri": "valuesets/test-results.json"
     }
   }
 }

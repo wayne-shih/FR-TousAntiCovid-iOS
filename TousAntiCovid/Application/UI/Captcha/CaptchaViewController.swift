@@ -179,9 +179,8 @@ final class CaptchaViewController: CVTableViewController {
     }
     
     private func initUI() {
+        tableView.tableHeaderView = UIView(frame: .zero)
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.keyboardDismissMode = .onDrag

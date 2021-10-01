@@ -34,7 +34,7 @@ public extension SwiftyJSON.JSON {
     self = SwiftyJSON.JSON(parseJSON: json)
   }
 
-    mutating func merge(other: SwiftyJSON.JSON) {
+  mutating func merge(other: SwiftyJSON.JSON) {
     if self.type == other.type {
       switch self.type {
       case .dictionary:
@@ -49,7 +49,7 @@ public extension SwiftyJSON.JSON {
     }
   }
 
-    func mergeAndOverride(other: SwiftyJSON.JSON) -> SwiftyJSON.JSON {
+  func mergeAndOverride(other: SwiftyJSON.JSON) -> SwiftyJSON.JSON {
     var merged = self
     merged.merge(other: other)
     return merged

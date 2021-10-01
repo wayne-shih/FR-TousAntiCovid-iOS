@@ -10,88 +10,200 @@
 
 import Foundation
 import WidgetKit
-#if !WIDGETDCC
+#if !WIDGET
 import UIKit
+import PKHUD
 #endif
 
 @available(iOS 14.0, *)
 final class WidgetDCCManager {
-    
-    static let shared: WidgetDCCManager = WidgetDCCManager()
-    
-    static let scheme: String = "tousanticovid"
-    
-    @WidgetDCCUserDefault(key: .bottomText)
-    private var bottomText: String = ""
-    
-    @WidgetDCCUserDefault(key: .noCertificateText)
-    var noCertificateText: String = ""
-    
-    @WidgetDCCUserDefault(key: .certificateQrCodeData)
-    private var certificateQrCodeData: Data?
 
+    static let shared: WidgetDCCManager = WidgetDCCManager()
+
+    static let scheme: String = "tousanticovid"
+
+    @WidgetDCCUserDefault(key: .bottomText)
+    private(set) var bottomText: String = ""
+
+    @WidgetDCCUserDefault(key: .bottomTextActivityPass)
+    private(set) var bottomTextActivityPass: String = ""
+
+    @WidgetDCCUserDefault(key: .noCertificateText)
+    private(set) var noCertificateText: String = ""
+
+    @WidgetDCCUserDefault(key: .certificateQrCodeData)
+    private(set) var certificateQrCodeData: Data?
+
+    @WidgetDCCUserDefault(key: .certificateActivityQrCodeData)
+    private(set) var certificateActivityQrCodeData: Data?
+
+    @WidgetDCCUserDefault(key: .certificateActivityExpiryTimestamp)
+    private(set) var certificateActivityExpiryTimestamp: Double?
+
+    @WidgetDCCUserDefault(key: .currentlyDisplayedActivityCertificateTimestamp)
+    var currentlyDisplayedActivityCertificateTimestamp: Double?
+
+#if !WIDGET
     @WidgetDCCUserDefault(key: .isOnboardingDone)
     var isOnboardingDone: Bool = false
-    
+
+    private var needActivityCertificateRefreshAfterTouch: Bool = false
+
+    private var certificateEligibleToActivityPass: Bool {
+        guard let certificate = currentCertificate else { return false }
+        return certificate.isEligibleToActivityCertificateGeneration && !DccBlacklistManager.shared.isBlacklisted(certificate: certificate)
+    }
+
+    private var timer: Timer?
+    private var currentCertificate: EuropeanCertificate?
+    private var currentActivityCertificate: ActivityCertificate?
+    private var isHavingActivityCertificate: Bool { currentActivityCertificate != nil }
+    private var wasCertificateValid: Bool = false
+#endif
+
     private init() {}
-    
-    #if !WIDGETDCC
+
+#if !WIDGET
     func processUserActivity(_ userActivity: NSUserActivity) {
         guard userActivity.activityType == "fr.gouv.stopcovid.ios.Widget.dcc" && isOnboardingDone else { return }
         NotificationCenter.default.post(name: WalletManager.shared.favoriteDccId.isNil ? .openWallet : .openCertificateQRCode , object: nil)
+        if certificateEligibleToActivityPass && currentlyDisplayedActivityCertificateTimestamp ?? 0.0 < Date().timeIntervalSince1970 {
+            needActivityCertificateRefreshAfterTouch = true
+        }
     }
-    #endif
-    
+
     func start() {
-        #if !WIDGETDCC
+        addObservers()
+        updateCertificate()
+        reloadData()
+    }
+
+    func showActivityCertificateRefreshConfirmationIfNeeded() {
+        guard needActivityCertificateRefreshAfterTouch else { return }
+        needActivityCertificateRefreshAfterTouch = false
+        HUD.flash(.labeledSuccess(title: "activityPass.fullscreen.upToDate".localized, subtitle: nil), delay: 2.0)
+    }
+
+    private func addObservers() {
         LocalizationsManager.shared.addObserver(self)
         WalletManager.shared.addObserver(self)
-        initializeCertificateIfNeeded()
-        reloadData()
-        #endif
-    }
-    
-    #if !WIDGETDCC
-    private func initializeCertificateIfNeeded() {
-        guard certificateQrCodeData.isNil && !WalletManager.shared.favoriteDccId.isNil else { return }
-        updateCertificate()
+        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
     private func updateCertificate() {
-        if WalletManager.shared.favoriteDccId.isNil {
-            certificateQrCodeData = nil
+        if let certificate = WalletManager.shared.favoriteCertificate as? EuropeanCertificate {
+            currentCertificate = certificate
+            certificateQrCodeData = certificate.codeImage?.jpegData(compressionQuality: 1.0)
+            if let activityCertificate = WalletManager.shared.activityCertificateFor(certificate: certificate) {
+                if activityCertificate.isValid {
+                    currentActivityCertificate = activityCertificate
+                    certificateActivityQrCodeData = activityCertificate.codeImage?.jpegData(compressionQuality: 1.0)
+                    certificateActivityExpiryTimestamp = activityCertificate.endDate.timeIntervalSince1970
+                } else {
+                    currentActivityCertificate = nil
+                    certificateActivityQrCodeData = nil
+                    certificateActivityExpiryTimestamp = nil
+                }
+                startTimer()
+            } else {
+                currentActivityCertificate = nil
+                certificateActivityQrCodeData = nil
+                certificateActivityExpiryTimestamp = nil
+                stopTimer()
+            }
         } else {
-            certificateQrCodeData = WalletManager.shared.favoriteCertificate?.codeImage?.jpegData(compressionQuality: 1.0)
+            currentCertificate = nil
+            currentActivityCertificate = nil
+            certificateQrCodeData = nil
+            certificateActivityQrCodeData = nil
+            certificateActivityExpiryTimestamp = nil
+            stopTimer()
         }
     }
-    #endif
+
+    @objc private func appDidBecomeActive() {
+        updateCertificate()
+        reloadData()
+    }
+
+    @objc private func appDidEnterBackground() {
+        stopTimer()
+    }
+
+    @objc private func appWillEnterForeground() {
+        if isHavingActivityCertificate { startTimer() }
+    }
+#endif
 
 }
 
-#if !WIDGETDCC
+#if !WIDGET
 @available(iOS 14.0, *)
 extension WidgetDCCManager: LocalizationsChangesObserver {
-    
+
     func localizationsChanged() {
         reloadData()
     }
-    
+
     func reloadData() {
-        bottomText = "widget.dcc.full".localized
+        bottomText = certificateEligibleToActivityPass && WalletManager.shared.isActivityPassActivated ? "widget.dcc.full.activityPass".localized : "widget.dcc.full".localized
         noCertificateText = "widget.dcc.empty".localized
+        if let timestamp = certificateActivityExpiryTimestamp {
+            let date: Date = Date(timeIntervalSince1970: timestamp)
+            bottomTextActivityPass = String(format: "widget.dcc.activityPass".localized, date.dayNameShortDayMonthFormatted(), date.timeFormatted())
+        }
         WidgetCenter.shared.reloadAllTimelines()
     }
-}
-#endif
 
-#if !WIDGETDCC
+}
+
 @available(iOS 14.0, *)
 extension WidgetDCCManager: WalletChangesObserver {
+
     func walletCertificatesDidUpdate() {}
+
+    func walletActivityCertificateDidUpdate() {
+        updateCertificate()
+        reloadData()
+    }
 
     func walletFavoriteCertificateDidUpdate() {
         updateCertificate()
         reloadData()
     }
+
+}
+
+@available(iOS 14.0, *)
+extension WidgetDCCManager {
+
+    private func startTimer() {
+        print("⏰ Start Widget Timer")
+        timer?.invalidate()
+        timer = Timer(timeInterval: 1.0, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+        RunLoop.main.add(timer!, forMode: .common)
+    }
+
+    @objc private func timerFired() {
+        print("⏰ Timer Widget fired")
+        if WalletManager.shared.activityCertificateIdFor(certificate: currentCertificate) != currentActivityCertificate?.id {
+            updateCertificate()
+            wasCertificateValid = currentActivityCertificate?.isValid == true
+            reloadData()
+            if !isHavingActivityCertificate { stopTimer() }
+        } else if !wasCertificateValid && currentActivityCertificate?.isValid == true {
+            wasCertificateValid = true
+            reloadData()
+        }
+    }
+
+    private func stopTimer() {
+        print("⏰ Stop Widget Timer")
+        timer?.invalidate()
+        timer = nil
+    }
+
 }
 #endif

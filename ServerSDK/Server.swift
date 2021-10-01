@@ -27,20 +27,20 @@ public final class Server: NSObject, RBServer {
     private let baseUrl: () -> URL
     private let certificateFiles: [Data]
     private let deviceTimeNotAlignedToServerTimeDetected: () -> ()
-    
+
     private lazy var session: URLSession = {
-        let backgroundConfiguration: URLSessionConfiguration = URLSessionConfiguration.background(withIdentifier: "fr.gouv.stopcovid.ios.ServerSDK")
+        let backgroundConfiguration: URLSessionConfiguration = URLSessionConfiguration.background(withIdentifier: "fr.gouv.tousanticovid.ios.ServerSDK")
         backgroundConfiguration.timeoutIntervalForRequest = ServerConstant.timeout
         backgroundConfiguration.timeoutIntervalForResource = ServerConstant.timeout
-        backgroundConfiguration.waitsForConnectivity = true
         backgroundConfiguration.sessionSendsLaunchEvents = true
         backgroundConfiguration.shouldUseExtendedBackgroundIdleMode = true
+        backgroundConfiguration.httpShouldUsePipelining = true
         return URLSession(configuration: backgroundConfiguration, delegate: self, delegateQueue: .main)
     }()
     private var receivedData: [String: Data] = [:]
     private var completions: [String: ProcessRequestCompletion] = [:]
     private let taskLoggingHandler: TaskLoggingHandler
-    
+
     public init(baseUrl: @escaping () -> URL, publicKey: Data, certificateFiles: [Data], deviceTimeNotAlignedToServerTimeDetected: @escaping () -> (), taskLoggingHandler: @escaping TaskLoggingHandler) {
         self.baseUrl = baseUrl
         self.publicKey = publicKey

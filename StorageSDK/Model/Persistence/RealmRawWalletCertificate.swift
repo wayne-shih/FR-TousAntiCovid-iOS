@@ -15,15 +15,23 @@ final class RealmRawWalletCertificate: Object {
     
     @objc dynamic var id: String!
     @objc dynamic var certificateValue: String!
+    @objc dynamic var expiryDate: Date? // Used only in storage to allow us to sort certificates without having to parse them all.
+    @objc dynamic var parentId: String?
+    @objc dynamic var didGenerateAllActivityCertificates: Bool = false
+    @objc dynamic var didAlreadyGenerateActivityCertificates: Bool = false
     
-    convenience init(id: String = UUID().uuidString, certificateValue: String) {
+    convenience init(id: String = UUID().uuidString, certificateValue: String, expiryDate: Date?, parentId: String?, didGenerateAllActivityCertificates: Bool, didAlreadyGenerateActivityCertificates: Bool) {
         self.init()
         self.id = id
         self.certificateValue = certificateValue
+        self.expiryDate = expiryDate
+        self.parentId = parentId
+        self.didGenerateAllActivityCertificates = didGenerateAllActivityCertificates
+        self.didAlreadyGenerateActivityCertificates = didAlreadyGenerateActivityCertificates
     }
     
     static func from(rawCertificate: RawWalletCertificate) -> RealmRawWalletCertificate {
-        RealmRawWalletCertificate(id: rawCertificate.id, certificateValue: rawCertificate.value)
+        RealmRawWalletCertificate(id: rawCertificate.id, certificateValue: rawCertificate.value, expiryDate: rawCertificate.expiryDate, parentId: rawCertificate.parentId, didGenerateAllActivityCertificates: rawCertificate.didGenerateAllActivityCertificates, didAlreadyGenerateActivityCertificates: rawCertificate.didAlreadyGenerateActivityCertificates)
     }
     
     override class func primaryKey() -> String? {
@@ -35,7 +43,7 @@ final class RealmRawWalletCertificate: Object {
     }
     
     func toRawWalletCertificate() -> RawWalletCertificate {
-        RawWalletCertificate(id: id, value: certificateValue)
+        RawWalletCertificate(id: id, value: certificateValue, expiryDate: expiryDate, parentId: parentId, didGenerateAllActivityCertificates: didGenerateAllActivityCertificates, didAlreadyGenerateActivityCertificates: didAlreadyGenerateActivityCertificates)
     }
     
 }

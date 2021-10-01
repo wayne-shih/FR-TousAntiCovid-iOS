@@ -12,6 +12,7 @@ import Foundation
 
 struct KeyFigureChartData {
 
+    let id: String = UUID().uuidString
     let legend: KeyFigureChartLegend
     let series: [KeyFigureSeriesItem]
     let currentValueToDisplay: String?

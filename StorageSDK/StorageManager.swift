@@ -494,7 +494,7 @@ public final class StorageManager: RBStorage {
         notifyStatusDataChanged()
     }
     
-    // MARK: - Data cleraing -
+    // MARK: - Data clearing -
     public func clearLocalEpochs() {
        guard let realm = realm else { return }
         try! realm.write {
@@ -521,6 +521,30 @@ public final class StorageManager: RBStorage {
         deleteAllAttestationFields()
         deleteDb(includingFile: includingDBKey)
         notifyStatusDataChanged()
+    }
+    
+    public func clearRobertData() {
+        // Delete Realm data
+        guard let realm = realm else { return }
+        try! realm.write {
+            realm.delete(realm.objects(RealmLocalProximity.self))
+            realm.delete(realm.objects(RealmEpoch.self))
+        }
+        // Delete keychain data
+        keychain.delete(KeychainKey.ka.rawValue)
+        keychain.delete(KeychainKey.kea.rawValue)
+        keychain.delete(KeychainKey.epochTimeStart.rawValue)
+        keychain.delete(KeychainKey.isAtRisk.rawValue)
+        keychain.delete(KeychainKey.lastRobertRiskStatusLevel.rawValue)
+        keychain.delete(KeychainKey.lastStatusErrorDate.rawValue)
+        keychain.delete(KeychainKey.lastStatusReceivedDate.rawValue)
+        keychain.delete(KeychainKey.lastExposureTimeFrame.rawValue)
+        keychain.delete(KeychainKey.lastRiskReceivedDate.rawValue)
+        keychain.delete(KeychainKey.proximityActivated.rawValue)
+        keychain.delete(KeychainKey.reportDate.rawValue)
+        keychain.delete(KeychainKey.reportToken.rawValue)
+        keychain.delete(KeychainKey.declarationToken.rawValue)
+        keychain.delete(KeychainKey.analyticsToken.rawValue)
     }
     
     private func deleteDb(includingFile: Bool) {
@@ -700,6 +724,15 @@ public extension StorageManager {
         }
         notifyWalletCertificateDataChanged()
     }
+
+    func saveWalletCertificates(_  certificates: [RawWalletCertificate]) {
+        guard let realm = realm else { return }
+        let realmRawWalletCertificates: [RealmRawWalletCertificate] = certificates.map { RealmRawWalletCertificate.from(rawCertificate: $0) }
+        try! realm.write {
+            realm.add(realmRawWalletCertificates, update: .all)
+        }
+        notifyWalletCertificateDataChanged()
+    }
     
     func walletCertificates() -> [RawWalletCertificate] {
         guard let realm = realm else { return [] }
@@ -712,6 +745,15 @@ public extension StorageManager {
             try! realm.write {
                 realm.delete(realmRawWalletCertificate)
             }
+        }
+        notifyWalletCertificateDataChanged()
+    }
+
+    func deleteWalletCertificates(ids: [String]) {
+        guard let realm = realm else { return }
+        let realmRawWalletCertificates: [RealmRawWalletCertificate] = realm.objects(RealmRawWalletCertificate.self).filter { ids.contains($0.id) }
+        try! realm.write {
+            realm.delete(realmRawWalletCertificates)
         }
         notifyWalletCertificateDataChanged()
     }
@@ -786,7 +828,7 @@ private extension Realm {
                                       RealmVenueQrCodeInfo.self,
                                       RealmRawWalletCertificate.self]
         let databaseUrl: URL = dbsDirectoryUrl().appendingPathComponent("db.realm")
-        let userConfig: Realm.Configuration = Realm.Configuration(fileURL: databaseUrl, encryptionKey: key, schemaVersion: 19, migrationBlock: { _, _ in }, objectTypes: classes)
+        let userConfig: Realm.Configuration = Realm.Configuration(fileURL: databaseUrl, encryptionKey: key, schemaVersion: 23, migrationBlock: { _, _ in }, objectTypes: classes)
         return userConfig
     }
     

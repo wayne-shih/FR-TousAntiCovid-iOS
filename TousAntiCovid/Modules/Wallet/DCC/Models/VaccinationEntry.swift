@@ -55,7 +55,7 @@ struct VaccinationEntry: HCertEntry {
     case uvci = "ci"
   }
 
-    init?(body: SwiftyJSON.JSON) {
+  init?(body: SwiftyJSON.JSON) {
     guard
       let diseaseTargeted = body[Fields.diseaseTargeted.rawValue].string,
       let vaccineOrProphylaxis = body[Fields.vaccineOrProphylaxis.rawValue].string,

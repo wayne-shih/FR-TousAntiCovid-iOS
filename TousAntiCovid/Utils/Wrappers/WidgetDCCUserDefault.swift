@@ -51,8 +51,12 @@ extension WidgetDCCUserDefault {
     
     enum Key: String {
         case bottomText
+        case bottomTextActivityPass
         case noCertificateText
         case certificateQrCodeData
+        case certificateActivityQrCodeData
+        case certificateActivityExpiryTimestamp
+        case currentlyDisplayedActivityCertificateTimestamp
         case isOnboardingDone
     }
     

@@ -160,7 +160,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
             content.sound = .default
             let request: UNNotificationRequest = UNNotificationRequest(identifier: NotificationsContant.Identifier.deviceTimeError, content: content, trigger: nil)
             self.requestAuthorization { _ in
-                UNUserNotificationCenter.current().add(request) { _ in }
+                UNUserNotificationCenter.current().add(request)
             }
         }
     }
@@ -173,7 +173,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         content.sound = .default
         let request: UNNotificationRequest = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         requestAuthorization { _ in
-            UNUserNotificationCenter.current().add(request) { _ in }
+            UNUserNotificationCenter.current().add(request)
         }
     }
 
@@ -185,7 +185,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         content.sound = .default
         let request: UNNotificationRequest = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         requestAuthorization { _ in
-            UNUserNotificationCenter.current().add(request) { _ in }
+            UNUserNotificationCenter.current().add(request)
         }
     }
     
@@ -198,7 +198,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         content.sound = .default
         let request: UNNotificationRequest = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         requestAuthorization { _ in
-            UNUserNotificationCenter.current().add(request) { _ in }
+            UNUserNotificationCenter.current().add(request)
         }
     }
     
@@ -208,6 +208,10 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
 
     func scheduleCompletedVaccination(triggerDate: Date) {
         scheduleNotification(minHour: nil, maxHour: nil, triggerDate: triggerDate, title: "vaccineCompletionNotification.title".localized, body: "vaccineCompletionNotification.message".localized, identifier: NotificationsContant.Identifier.completedVaccination)
+    }
+
+    func scheduleActivityPassAvailable(triggerDate: Date) {
+        scheduleNotification(minHour: nil, maxHour: nil, triggerDate: triggerDate, title: "activityPass.notification.title".localized, body: "activityPass.notification.message".localized, identifier: NotificationsContant.Identifier.activityPassAvailable)
     }
     
     func scheduleUltimateNotification(minHour: Int?, maxHour: Int?) {

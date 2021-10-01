@@ -11,7 +11,9 @@
 import UIKit
 
 final class CVNavigationChildController: UIViewController {
-    
+
+    override var childForStatusBarHidden: UIViewController? { embeddedController }
+
     var navigationBarHeight: CGFloat { navigationBar.frame.height }
 
     @IBOutlet private var navigationBarBackgroundView: UIVisualEffectView!
@@ -80,6 +82,13 @@ final class CVNavigationChildController: UIViewController {
         fakeNavigationBar.shadowImage = UIImage()
         fakeNavigationBar.tintColor = Asset.Colors.tint.color
         fakeNavigationBar.tintAdjustmentMode = .normal
+        if #available(iOS 15, *) {
+            let appearance: UINavigationBarAppearance = UINavigationBarAppearance()
+            appearance.configureWithTransparentBackground()
+            appearance.backgroundColor = .clear
+            fakeNavigationBar.standardAppearance = appearance
+            navigationBar.standardAppearance = appearance
+        }
     }
     
     private func setupEmbeddedController() {

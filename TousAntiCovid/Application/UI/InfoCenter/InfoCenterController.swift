@@ -45,8 +45,6 @@ final class InfoCenterController: CVTableViewController {
     private func initUI() {
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 10.0))
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -70,7 +68,7 @@ final class InfoCenterController: CVTableViewController {
         InfoCenterManager.shared.removeObserver(self)
     }
     
-    override func reloadUI(animated: Bool = false, completion: (() -> ())? = nil) {
+    override func reloadUI(animated: Bool = false, animatedView: UIView? = nil, completion: (() -> ())? = nil) {
         updateEmptyView()
         super.reloadUI(animated: animated, completion: completion)
     }

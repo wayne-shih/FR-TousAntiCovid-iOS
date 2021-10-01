@@ -51,14 +51,14 @@ final class SanitaryCertificateCell: CardCell {
     
     private func setupContent(with row: CVRow) {
         tagListView.removeAllTags()
-        guard let texts = row.segmentsTitles else {
+        guard let certificate = row.associatedValue as? WalletCertificate, !certificate.pillTitles.isEmpty else {
             tagListView.isHidden = true
             return
         }
         tagListView.isHidden = false
-        texts.forEach {
-            let tag: TagView = tagListView.addTag($0)
-            tag.tagBackgroundColor = Appearance.tintColor
+        certificate.pillTitles.forEach {
+            let tag: TagView = tagListView.addTag($0.text)
+            tag.tagBackgroundColor = $0.backgroundColor
             tag.textColor = Appearance.Button.Primary.titleColor
         }
         tagListView.isAccessibilityElement = !(tagListView?.isHidden ?? true)
@@ -76,7 +76,7 @@ final class SanitaryCertificateCell: CardCell {
         switch (row.associatedValue as? WalletCertificate)?.type.format {
         case .wallet2DDoc:
             imageType = "common.2ddoc".localized
-        case .walletDCC:
+        case .walletDCC, .walletDCCACT:
             imageType = "common.qrcode".localized
         case .none:
             imageType = nil

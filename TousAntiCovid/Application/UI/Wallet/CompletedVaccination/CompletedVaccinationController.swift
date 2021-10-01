@@ -19,8 +19,11 @@ final class CompletedVaccinationController: CVTableViewController {
 
     private lazy var daysAfterCompletion: Int = { ParametersManager.shared.daysAfterCompletion.first(where: { $0.code.trimLowercased() == certificate.medicalProductCode?.trimLowercased() ?? "" })?.value ?? ParametersManager.shared.daysAfterCompletion.first(where: { $0.code.trimLowercased() == "default" })?.value ?? 0 }()
     
+    private lazy var noWaitDoses: Int = { ParametersManager.shared.noWaitDoses.first(where: { $0.code.trimLowercased() == certificate.medicalProductCode?.trimLowercased() ?? "" })?.value ?? ParametersManager.shared.noWaitDoses.first(where: { $0.code.trimLowercased() == "default" })?.value ?? 0 }()
+    private lazy var shouldShowNoWaitWarning: Bool = { noWaitDoses > 0 && certificate.dosesNumber ?? 0 >= noWaitDoses }()
+    
     private lazy var completedDate: Date = { Date(timeIntervalSince1970: certificate.timestamp + Double((daysAfterCompletion * 24 * 3600))) }()
-    private lazy var isVaccineCompleted = { completedDate <= Date() }()
+    private lazy var isVaccineCompleted = { completedDate <= Date() || shouldShowNoWaitWarning }()
 
     init(certificate: EuropeanCertificate) {
         self.certificate = certificate
@@ -43,9 +46,8 @@ final class CompletedVaccinationController: CVTableViewController {
     }
 
     private func initUI() {
+        tableView.tableHeaderView = UIView(frame: .zero)
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -75,10 +77,11 @@ final class CompletedVaccinationController: CVTableViewController {
                                                              imageTintColor: Appearance.tintColor,
                                                              imageSize: CGSize(width: 90, height: 90)))
         let title: String
-        let message: String
+        var message: String
         if isVaccineCompleted {
-            title =  "vaccineCompletionController.completed.explanation.title".localized
-            message =  "vaccineCompletionController.completed.explanation.body".localized
+            title = "vaccineCompletionController.completed.explanation.title".localized
+            message = shouldShowNoWaitWarning ? "\(String(format: "vaccineCompletionController.noWait.explanation.body".localized, "\((certificate.dosesNumber ?? 0) - 1)"))\n\n" : ""
+            message += "vaccineCompletionController.completed.explanation.body".localized
         } else {
             title = String(format: "vaccineCompletionController.pending.explanation.title".localized, completedDate.dayMonthYearFormatted())
             message = String(format: "vaccineCompletionController.pending.explanation.body".localized, completedDate.dayMonthYearFormatted())

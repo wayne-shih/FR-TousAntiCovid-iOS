@@ -11,24 +11,42 @@
 import SwiftUI
 
 struct QRCodeView: View {
-    var content: DccWidgetContent
+
     var image: UIImage
-    
+    var bottomText: String
+
+    @Environment(\.widgetFamily) private var family
+
     var body: some View {
         VStack {
             HeaderView(separatorColor: Color("lightSeparator"))
-            Spacer(minLength: 18)
-            VStack(alignment: .center) {
+            containerView {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                 Spacer(minLength: 10)
-                Text(content.bottomText)
+                Text(bottomText)
                     .font(SwiftUI.Font(FontFamily.SFProText.regular.font(size: 12)))
-                Spacer(minLength: 14)
+                    .lineLimit(3)
+                    .multilineTextAlignment(family == .systemLarge ? .center : .leading)
+                Spacer()
             }
         }
         .background(Color.white)
         .foregroundColor(.black)
+    }
+
+    @ViewBuilder
+    func containerView<T: View>(@ViewBuilder content: () -> T) -> some View {
+        if family == .systemLarge {
+            Spacer(minLength: 20)
+            VStack(alignment: .center, content: content)
+            Spacer(minLength: 20)
+        } else {
+            Spacer()
+            HStack(alignment: .center, content: content)
+                .padding(EdgeInsets(top: 0.0, leading: 10.0, bottom: 0.0, trailing: 10.0))
+            Spacer()
+        }
     }
 }

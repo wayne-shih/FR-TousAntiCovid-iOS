@@ -11,10 +11,10 @@
 import UIKit
 
 final class LegendView: UIView, Xibbed {
- 
+
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var label: UILabel!
-    
+
     static func view(legend: KeyFigureChartLegend) -> UIView {
         let legendView: LegendView = instantiate()
         legendView.setupUI(legend: legend)

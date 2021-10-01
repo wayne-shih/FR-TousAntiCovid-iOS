@@ -14,6 +14,8 @@ public enum RBConstants {
 
     public static let epochDurationInSeconds: Int = 15 * 60
     
+    public static let statusEndHttpCode: Int = 430
+    
     enum Prefix {
         static let c1: UInt8 = 0b00000001
         static let c2: UInt8 = 0b00000010

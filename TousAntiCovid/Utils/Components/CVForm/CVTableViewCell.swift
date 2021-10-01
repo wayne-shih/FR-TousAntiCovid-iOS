@@ -91,7 +91,7 @@ class CVTableViewCell: UITableViewCell {
         if let bottomInset = row.theme.bottomInset {
             bottomConstraint?.constant = bottomInset
         }
-        if let imageWidthConstraint = imageWidthConstraint, let imageHeightConstraint = imageHeightConstraint{
+        if let imageWidthConstraint = imageWidthConstraint, let imageHeightConstraint = imageHeightConstraint {
             if let ratio = row.theme.imageRatio {
                 if let imageView = cvImageView {
                     let existingConstraint: NSLayoutConstraint? = imageView.constraints.filter { $0.firstAnchor == imageView.widthAnchor && $0.secondAnchor == imageView.heightAnchor }.first

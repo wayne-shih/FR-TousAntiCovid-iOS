@@ -14,7 +14,10 @@ import Charts
 final class ChartsDateFormatter: IAxisValueFormatter {
 
     func stringForValue(_ value: Double, axis: AxisBase?) -> String {
-        Date(timeIntervalSince1970: value).dayShortMonthFormatted()
+        let date: Date = Date(timeIntervalSince1970: value)
+        let year: Int = Calendar.current.component(.year, from: date)
+        let currentYear: Int = Calendar.current.component(.year, from: Date())
+        return year != currentYear ? date.dateFormatted() : date.shortDayMonthFormatted()
     }
 
 }

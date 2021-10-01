@@ -51,9 +51,6 @@ final class FlashWalletCodeController: FlashCodeController {
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
             navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
         }
-        #if targetEnvironment(simulator)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Flash", style: .plain, target: self, action: #selector(didTouchFlashButton))
-        #endif
     }
 
     override func processScannedQRCode(code: String?) {
@@ -73,17 +70,6 @@ final class FlashWalletCodeController: FlashCodeController {
         }
         navigationController?.dismiss(animated: true) { completion() }
     }
-    
-    #if targetEnvironment(simulator)
-    @objc private func didTouchFlashButton() {
-        let url: URL = URL(string: "https://bonjour.tousanticovid.gouv.fr/app/walletdcc#HC1:NCFOXN%25TS3DHA%20SA6K85KFI60INA.Q/R8LF62FCKSU3*5I9C2L96LHC%20CZIE%25OM:UC*GPXS40%20LHZATG91PC/.DV2MGDIK3MXGG%20HGMJKB%25GLIA-D8+6JDJN%20XGUEERH9P1JXGGO.KKHG%203MRB8-JEY7A1JAA/CQ.CXCI*ZAVDJ.6LDDJU*INCIL7JRIK:BG26H-GFU4HLEKTSFS-K.-KYUJUECYJM.IA.C8KRDL4O54O4IGUJKPGGYIA%20GEMSH:8E3DE0OA0D9E2LBHHGKLO-K%25FGSKE%20MCTPI8%25MLPIY10UBR:34C3CS03K34XAPFZMXUAM.SY$NIS9N1B%2518J40T8AI%25KIR7./8T%20OG%255TW5A%206%20O6$L69/9L:9EMN*886EO-CRH76.JKTFNK%25C1MD:XERASU%25KBSIPPH88J2PM%20RJLAWQ0GU$CH6H.7LVNTO8B5+M5AVF%20BCXT*$8*GJSCRSKGX5HOLI.N1N-RZPE6PRY7O.40Z-A74")!
-        do {
-            try didFlash?(url)
-        } catch {
-            didGetCertificateError?(url.absoluteString, error)
-        }
-    }
-    #endif
     
     @objc private func didTouchCloseButton() {
         dismiss(animated: true, completion: nil)

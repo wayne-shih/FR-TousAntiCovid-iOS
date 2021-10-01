@@ -11,7 +11,7 @@
 import UIKit
 import ServerSDK
 
-final class CaptchaManager: NSObject {
+final class CaptchaManager {
 
     static let shared: CaptchaManager = CaptchaManager()
     
@@ -116,8 +116,7 @@ final class CaptchaManager: NSObject {
                 let bodyData: Data = try body.toData()
                 request.httpBody = bodyData
             }
-            let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-            let task: URLSessionDataTask = session.dataTask(with: request) { data, response, error in
+            let task: URLSessionDataTask = UrlSessionManager.shared.session.dataTask(with: request) { data, response, error in
                 DispatchQueue.main.async {
                     if let error = error {
                         completion(.failure(error))
@@ -134,14 +133,6 @@ final class CaptchaManager: NSObject {
         } catch {
             completion(.failure(error))
         }
-    }
-
-}
-
-extension CaptchaManager: URLSessionDelegate {
-
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
     }
 
 }

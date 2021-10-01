@@ -9,6 +9,7 @@
 //
 
 import Foundation
+import WatchKit
 import WatchConnectivity
 
 protocol WatchConnectivityObserver: AnyObject {
@@ -30,6 +31,10 @@ final class WatchConnectivityObserverWrapper: NSObject {
 final class WatchConnectivityManager: NSObject {
 
     static let shared: WatchConnectivityManager = WatchConnectivityManager()
+
+    var connectivityBackgroundTask: WKWatchConnectivityRefreshBackgroundTask?
+
+    var hasSessionContentPending: Bool { session.hasContentPending }
     private var session: WCSession { WCSession.default }
 
     private var observers: [WatchConnectivityObserverWrapper] = []
@@ -70,7 +75,9 @@ extension WatchConnectivityManager: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         didAlreadyRequestInitialData = true
         FavoriteManager.shared.qrData = applicationContext["qr"] as? Data
-        notifyReceivedApplicationContext()
+        connectivityBackgroundTask?.setTaskCompletedWithSnapshot(false)
+        connectivityBackgroundTask = nil
+        if WKExtension.shared().applicationState == .active { notifyReceivedApplicationContext() }
     }
 
 }

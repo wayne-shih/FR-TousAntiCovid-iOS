@@ -58,10 +58,9 @@ final class VenuesRecordingConfirmationController: CVTableViewController {
 
     private func initUI() {
         bottomButtonContainerController?.title = "venuesRecording.confirmationController.title".localized
+        tableView.tableHeaderView = UIView(frame: .zero)
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.separatorStyle = .none
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
         bottomButtonContainerController?.navigationItem.setHidesBackButton(true, animated: false)

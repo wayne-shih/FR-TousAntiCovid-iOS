@@ -21,3 +21,16 @@ extension Int {
     }
     
 }
+
+extension Int64 {
+
+    var formattedSize: String {
+        let formatter: ByteCountFormatter = ByteCountFormatter()
+        formatter.allowedUnits = .useAll
+        formatter.countStyle = .binary
+        formatter.includesUnit = true
+        formatter.isAdaptive = true
+        return formatter.string(fromByteCount: self)
+    }
+
+}

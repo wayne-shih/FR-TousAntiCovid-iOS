@@ -41,15 +41,15 @@ public extension RawRepresentable where RawValue == String {
 }
 
 public func country(for code: String) -> String {
-    l10n("country." + code, or: code)
+  l10n("country." + code, or: code)
 }
 
 class L10N {
-    static var bundle: Bundle {
-        #if SWIFT_PACKAGE
-        Bundle.module
-        #else
-        Bundle(for: Self.self)
-        #endif
-    }
+  static var bundle: Bundle {
+    #if SWIFT_PACKAGE
+    Bundle.module
+    #else
+    Bundle(for: Self.self)
+    #endif
+  }
 }

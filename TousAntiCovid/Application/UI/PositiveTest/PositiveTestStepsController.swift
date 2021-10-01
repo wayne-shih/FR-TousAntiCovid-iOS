@@ -65,9 +65,8 @@ final class PositiveTestStepsController: CVTableViewController {
 
     private func initUI() {
         tableView.tintColor = Appearance.tintColor
+        tableView.tableHeaderView = UIView(frame: .zero)
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
@@ -149,13 +148,13 @@ extension PositiveTestStepsController {
     }
 
     private func footerRow(title: String) -> CVRow {
-    CVRow(title: title,
-          xibName: .textCell,
-          theme:  CVRow.Theme(topInset: 10.0,
-          bottomInset: 8.0,
-          textAlignment: .natural,
-          titleFont: { Appearance.Cell.Text.footerFont },
-          titleColor: Appearance.Cell.Text.captionTitleColor))
+        CVRow(title: title,
+              xibName: .textCell,
+              theme:  CVRow.Theme(topInset: 10.0,
+                                  bottomInset: 8.0,
+                                  textAlignment: .natural,
+                                  titleFont: { Appearance.Cell.Text.footerFont },
+                                  titleColor: Appearance.Cell.Text.captionTitleColor))
     }
 }
 

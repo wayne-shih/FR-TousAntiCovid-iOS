@@ -16,15 +16,16 @@ public final class CleaServer: NSObject {
     public static let shared: CleaServer = CleaServer()
     typealias CleaProcessRequestCompletion = (_ result: Result<Data, Error>) -> ()
 
+    private var certificateFiles: [Data] = []
     private var reportBaseUrl: (() -> URL)!
     private var statusBaseUrl: (() -> URL)!
     private var statusBaseFallbackUrl: (() -> URL)!
 
     private lazy var session: URLSession = {
-        let backgroundConfiguration: URLSessionConfiguration = URLSessionConfiguration.background(withIdentifier: "fr.gouv.stopcovid.ios.ServerSDK-Warning")
-        backgroundConfiguration.waitsForConnectivity = true
+        let backgroundConfiguration: URLSessionConfiguration = URLSessionConfiguration.background(withIdentifier: "fr.gouv.tousanticovid.ios.ServerSDK-Warning")
         backgroundConfiguration.sessionSendsLaunchEvents = true
         backgroundConfiguration.shouldUseExtendedBackgroundIdleMode = true
+        backgroundConfiguration.httpShouldUsePipelining = true
         return URLSession(configuration: backgroundConfiguration, delegate: self, delegateQueue: .main)
     }()
     private var receivedData: [String: Data] = [:]
@@ -46,7 +47,8 @@ public final class CleaServer: NSObject {
         return pivotDate
     }
     
-    public func start(reportBaseUrl: @escaping () -> URL, statusBaseUrl: @escaping () -> URL, statusBaseFallbackUrl: @escaping () -> URL, taskLoggingHandler: @escaping Server.TaskLoggingHandler) {
+    public func start(certificateFiles: [Data], reportBaseUrl: @escaping () -> URL, statusBaseUrl: @escaping () -> URL, statusBaseFallbackUrl: @escaping () -> URL, taskLoggingHandler: @escaping Server.TaskLoggingHandler) {
+        self.certificateFiles = certificateFiles
         self.reportBaseUrl = reportBaseUrl
         self.statusBaseUrl = statusBaseUrl
         self.statusBaseFallbackUrl = statusBaseFallbackUrl
@@ -189,7 +191,7 @@ extension CleaServer: URLSessionDelegate, URLSessionDownloadDelegate {
                     self.taskLoggingHandler?(task, data, nil)
                     completion(.success(data))
                 } else {
-                    let error: Error = NSError.svLocalizedError(message: "common.error.unknown".lowercased(), code: 0)
+                    let error: Error = NSError.svLocalizedError(message: NSLocalizedString("common.error.unknown", comment: ""), code: 0)
                     self.taskLoggingHandler?(task, nil, error)
                     completion(.failure(error))
                 }
@@ -219,6 +221,12 @@ extension CleaServer: URLSessionDelegate, URLSessionDownloadDelegate {
         guard let data = try? Data(contentsOf: location) else { return }
         try? FileManager.default.removeItem(at: location)
         receivedData[requestId] = data
+    }
+
+    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        CertificatePinning.validateChallenge(challenge, certificateFiles: certificateFiles) { validated, credential in
+            validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
+        }
     }
     
 }

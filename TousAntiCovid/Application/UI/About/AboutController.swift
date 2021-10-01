@@ -36,6 +36,21 @@ final class AboutController: CVTableViewController {
         LocalizationsManager.shared.removeObserver(self)
         deinitBlock?()
     }
+
+    private func updateTitle() {
+        title = "aboutController.title".localized
+    }
+
+    private func initUI() {
+        tableView.tableHeaderView = UIView(frame: .zero)
+        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
+        tableView.backgroundColor = Appearance.Controller.backgroundColor
+        tableView.showsVerticalScrollIndicator = false
+        tableView.separatorStyle = .singleLine
+        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
+    }
     
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = []
@@ -54,70 +69,55 @@ final class AboutController: CVTableViewController {
                                    theme: CVRow.Theme(topInset: 40.0, bottomInset: 20.0, textAlignment: .natural, separatorLeftInset: nil))
         rows.append(textRow)
         let contactRow: CVRow = CVRow(title: "aboutController.contactUsByEmail".localized,
-                                   xibName: .standardCell,
-                                   theme: CVRow.Theme(topInset: 15.0,
-                                                      bottomInset: 15.0,
-                                                      textAlignment: .natural,
-                                                      titleFont: { Appearance.Cell.Text.standardFont },
-                                                      titleColor: Asset.Colors.tint.color,
-                                                      separatorLeftInset: Appearance.Cell.leftMargin),
-                                   selectionAction: {
-                                    URL(string: "contactUs.url".localized)?.openInSafari()
-                                   })
+                                      xibName: .standardCell,
+                                      theme: CVRow.Theme(topInset: 15.0,
+                                                         bottomInset: 15.0,
+                                                         textAlignment: .natural,
+                                                         titleFont: { Appearance.Cell.Text.standardFont },
+                                                         titleColor: Asset.Colors.tint.color,
+                                                         separatorLeftInset: Appearance.Cell.leftMargin),
+                                      selectionAction: {
+            URL(string: "contactUs.url".localized)?.openInSafari()
+        })
         rows.append(contactRow)
         let faqRow: CVRow = CVRow(title: "aboutController.faq".localized,
-                                   xibName: .standardCell,
-                                   theme: CVRow.Theme(topInset: 15.0,
-                                                      bottomInset: 15.0,
-                                                      textAlignment: .natural,
-                                                      titleFont: { Appearance.Cell.Text.standardFont },
-                                                      titleColor: Asset.Colors.tint.color,
-                                                      separatorLeftInset: Appearance.Cell.leftMargin),
-                                   selectionAction: {
-                                    URL(string: "aboutController.faqUrl".localized)?.openInSafari()
-                                   })
+                                  xibName: .standardCell,
+                                  theme: CVRow.Theme(topInset: 15.0,
+                                                     bottomInset: 15.0,
+                                                     textAlignment: .natural,
+                                                     titleFont: { Appearance.Cell.Text.standardFont },
+                                                     titleColor: Asset.Colors.tint.color,
+                                                     separatorLeftInset: Appearance.Cell.leftMargin),
+                                  selectionAction: {
+            URL(string: "aboutController.faqUrl".localized)?.openInSafari()
+        })
         rows.append(faqRow)
         let opinionRow: CVRow = CVRow(title: "aboutController.opinion".localized,
-                                   xibName: .standardCell,
-                                   theme: CVRow.Theme(topInset: 15.0,
-                                                      bottomInset: 15.0,
-                                                      textAlignment: .natural,
-                                                      titleFont: { Appearance.Cell.Text.standardFont },
-                                                      titleColor: Asset.Colors.tint.color,
-                                                      separatorLeftInset: 0.0),
-                                   selectionAction: {
-                                    URL(string: "aboutController.opinionUrl".localized)?.openInSafari()
-                                   })
+                                      xibName: .standardCell,
+                                      theme: CVRow.Theme(topInset: 15.0,
+                                                         bottomInset: 15.0,
+                                                         textAlignment: .natural,
+                                                         titleFont: { Appearance.Cell.Text.standardFont },
+                                                         titleColor: Asset.Colors.tint.color,
+                                                         separatorLeftInset: Appearance.Cell.leftMargin),
+                                      selectionAction: {
+            URL(string: "aboutController.opinionUrl".localized)?.openInSafari()
+        })
         rows.append(opinionRow)
         let internetRow: CVRow = CVRow(title: "aboutController.webpage".localized,
-                                   xibName: .standardCell,
-                                   theme: CVRow.Theme(topInset: 15.0,
-                                                      bottomInset: 15.0,
-                                                      textAlignment: .natural,
-                                                      titleFont: { Appearance.Cell.Text.standardFont },
-                                                      titleColor: Asset.Colors.tint.color,
-                                                      separatorLeftInset: Appearance.Cell.leftMargin),
-                                   selectionAction: {
-                                    URL(string: "aboutController.webpageUrl".localized)?.openInSafari()
-                                   })
+                                       xibName: .standardCell,
+                                       theme: CVRow.Theme(topInset: 15.0,
+                                                          bottomInset: 15.0,
+                                                          textAlignment: .natural,
+                                                          titleFont: { Appearance.Cell.Text.standardFont },
+                                                          titleColor: Asset.Colors.tint.color,
+                                                          separatorLeftInset: 0.0),
+                                       selectionAction: {
+            URL(string: "aboutController.webpageUrl".localized)?.openInSafari()
+        })
         rows.append(internetRow)
         rows.append(.empty)
         return rows
-    }
-    
-    private func updateTitle() {
-        title = "aboutController.title".localized
-    }
-    
-    private func initUI() {
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.backgroundColor = Appearance.Controller.backgroundColor
-        tableView.showsVerticalScrollIndicator = false
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
-        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
     @objc private func didTouchCloseButton() {

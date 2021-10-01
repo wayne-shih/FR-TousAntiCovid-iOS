@@ -243,7 +243,7 @@ extension RBManager {
                         completion(.failure(error))
                     }
                 case let .failure(error):
-                    if (error as NSError).code != NSError.lostConnectionCode {
+                    if (error as NSError).code != URLError.backgroundSessionWasDisconnected.rawValue {
                         self.storage.saveLastStatusErrorDate(Date())
                     }
                     completion(.failure(error))
@@ -329,7 +329,7 @@ extension RBManager {
             let ntpTimestamp: Int = Date().timeIntervalSince1900
             let unregisterMessage: RBUnregisterMessage = try RBMessageGenerator.generateUnregisterMessage(for: epoch, ntpTimestamp: ntpTimestamp, key: ka)
             server.unregister(epochId: unregisterMessage.epochId, ebid: unregisterMessage.ebid, time: unregisterMessage.time, mac: unregisterMessage.mac, completion: { error in
-                if let error = error, (error as NSError).code == -1001 {
+                if let error = error, (error as NSError).code == URLError.timedOut.rawValue {
                     completion(error, true)
                 } else {
                     self.isProximityActivated = false
@@ -341,6 +341,12 @@ extension RBManager {
         } catch {
             completion(error, false)
         }
+    }
+    
+    public func clearRobert() {
+        isProximityActivated = false
+        stopProximityDetection()
+        clearRobertData()
     }
     
     public func deleteExposureHistory(_ completion: @escaping (_ error: Error?) -> ()) {
@@ -386,6 +392,10 @@ extension RBManager {
     public func clearOldLocalProximities() {
         guard let retentionDuration = proximitiesRetentionDurationInDays else { return }
         storage.clearProximityList(before: Date().rbDateByAddingDays(-retentionDuration))
+    }
+    
+    public func clearRobertData() {
+        storage.clearRobertData()
     }
 
 }

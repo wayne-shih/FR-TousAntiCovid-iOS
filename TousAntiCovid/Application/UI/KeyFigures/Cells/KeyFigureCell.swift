@@ -20,8 +20,6 @@ final class KeyFigureCell: CardCell, Xibbed {
     @IBOutlet private var countryLabel: UILabel!
     @IBOutlet private var countryValueLabel: UILabel!
     
-    @IBOutlet private var mainTrendImageView: UIImageView!
-    @IBOutlet private var countryTrendImageView: UIImageView!
     @IBOutlet private var sharingImageView: UIImageView!
     
     @IBOutlet private var valuesContainerStackView: DynamicContentStackView!
@@ -91,7 +89,7 @@ final class KeyFigureCell: CardCell, Xibbed {
         valueLabel.textColor = keyFigure.color
         cvTitleLabel?.textColor = keyFigure.color
         countryValueLabel?.textColor = keyFigure.color
-        if let departmentKeyFigure = keyFigure.currentDepartmentSpecificKeyFigure {
+        if let departmentKeyFigure = keyFigure.currentDepartmentSpecificKeyFigure, KeyFiguresManager.shared.canShowCurrentlyNeededFile {
             dateLabel.text = departmentKeyFigure.formattedDate
             departmentLabel?.text = departmentKeyFigure.label.uppercased()
             departmentLabel?.isHidden = false
@@ -99,20 +97,14 @@ final class KeyFigureCell: CardCell, Xibbed {
             countryLabel?.text = "france".localized.uppercased()
             countryValueLabel.text = keyFigure.valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible()
             countryStackView?.isHidden = false
-            mainTrendImageView.image = departmentKeyFigure.trend?.image
-            mainTrendImageView.isHidden = departmentKeyFigure.trend?.image == nil
-            countryTrendImageView.image = keyFigure.trend?.image
-            countryTrendImageView.isHidden = keyFigure.trend?.image == nil
         } else {
             dateLabel.text = keyFigure.formattedDate
-            if KeyFiguresManager.shared.currentFormattedDepartmentNameAndPostalCode == nil || keyFigure.category == .app {
+            if KeyFiguresManager.shared.currentFormattedDepartmentNameAndPostalCode == nil || keyFigure.category == .app || !KeyFiguresManager.shared.canShowCurrentlyNeededFile {
                 departmentLabel?.isHidden = true
             } else {
                 departmentLabel?.text = "common.country.france".localized.uppercased()
                 departmentLabel?.isHidden = false
             }
-            mainTrendImageView.image = keyFigure.trend?.image
-            mainTrendImageView.isHidden = keyFigure.trend?.image == nil
             countryStackView?.isHidden = true
             valueLabel.text = keyFigure.valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible()
         }
@@ -134,15 +126,14 @@ final class KeyFigureCell: CardCell, Xibbed {
             accessibilityElements?.append(countryLabel!)
             countryLabel?.isAccessibilityElement = true
             let countryValue: String = countryValueLabel.text?.replacingOccurrences(of: " ", with: "") ?? ""
-            countryLabel?.accessibilityLabel = "\(countryLabel?.text ?? ""), \(countryValue), \(keyFigure.trend?.accessibilityLabel ?? "")"
+            countryLabel?.accessibilityLabel = "\(countryLabel?.text ?? ""), \(countryValue))"
         }
         accessibilityElements?.append(cvSubtitleLabel!)
         cvSubtitleLabel?.isAccessibilityElement = true
         accessibilityElements?.append(sharingButton!)
         sharingButton?.isAccessibilityElement = true
         let value: String = valueLabel.text?.replacingOccurrences(of: " ", with: "").accessibilityNumberFormattedString() ?? ""
-        let trendString: String = (keyFigure.currentDepartmentSpecificKeyFigure == nil ? keyFigure.trend?.accessibilityLabel : keyFigure.currentDepartmentSpecificKeyFigure?.trend?.accessibilityLabel) ?? ""
-        cvTitleLabel?.accessibilityLabel = "\(cvTitleLabel?.text ?? ""), \(value), \(trendString)"
+        cvTitleLabel?.accessibilityLabel = "\(cvTitleLabel?.text ?? ""), \(value)"
         sharingButton.accessibilityLabel = "accessibility.hint.keyFigure.share".localized
         let date: Date = Date(timeIntervalSince1970: Double(keyFigure.extractDate))
         dateLabel.accessibilityLabel = date.accessibilityRelativelyFormattedDate(prefixStringKey: "keyFigures.update")

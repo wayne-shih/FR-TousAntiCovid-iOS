@@ -12,9 +12,6 @@ import Foundation
 
 extension NSError {
     
-    static var lostConnectionCode: Int { -997 }
-    static var timeoutCode: Int { -1001 }
-    
     static func rbLocalizedError(message: String, code: Int) -> Error {
         return NSError(domain: "Robert-SDK", code: code, userInfo: [NSLocalizedDescriptionKey: message])
     }

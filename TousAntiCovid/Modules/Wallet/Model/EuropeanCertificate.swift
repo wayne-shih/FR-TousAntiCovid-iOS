@@ -9,12 +9,20 @@
 //
 
 import UIKit
+import ServerSDK
+import StorageSDK
 
 final class EuropeanCertificate: WalletCertificate {
 
     override var message: Data? { nil }
     override var signature: Data? { nil }
     override var isSignatureAlreadyEncoded: Bool { false }
+    
+    var isEligibleToActivityCertificateGeneration: Bool {
+        !isTestCertificateTooOld() && !didGenerateAllActivityCertificates && hCert.exp > Date() && dosesNumber == dosesTotal
+    }
+    var didGenerateAllActivityCertificates: Bool
+    var didAlreadyGenerateActivityCertificates: Bool
 
     private var fullName: String {
         let first: String? = hCert.get(.firstName).string
@@ -31,11 +39,19 @@ final class EuropeanCertificate: WalletCertificate {
             date = hCert.testStatements.first?.sampleTime
         case .recovery:
             date = hCert.recoveryStatements.first?.validFrom
+        case .exemption:
+            date = hCert.exemptionStatement?.validFrom
+        case .unknown:
+            break
         }
         return (date ?? hCert.iat).timeIntervalSince1970
     }
 
-    override var pillTitles: [String] { [hCert.certTypeString.trimmingCharacters(in: .whitespaces)] }
+    override var pillTitles: [(text: String, backgroundColor: UIColor)] {
+        var pills: [(String, UIColor)] = [(hCert.certTypeString.trimmingCharacters(in: .whitespaces), Appearance.tintColor)]
+        if isExpired { pills.append(("wallet.expired.pillTitle".localized, Asset.Colors.error.color)) }
+        return pills
+    }
     override var shortDescription: String? { fullName }
 
     override var fullDescription: String? {
@@ -47,16 +63,24 @@ final class EuropeanCertificate: WalletCertificate {
             strings.append(fullDescriptionTest(forceEnglishFormat: false))
         case .recovery:
             strings.append(fullDescriptionRecovery(forceEnglishFormat: false))
+        case .exemption:
+            strings.append(fullDescriptionExemption(forceEnglishFormat: false))
+        case .unknown:
+            break
         }
         strings.append("wallet.proof.europe.foreignCountryWarning.\(countryCode?.lowercased() ?? "")".localizedOrNil)
         return strings.compactMap { $0 } .joined(separator: "\n\n")
     }
 
     override var uniqueHash: String { "\(countryCode?.uppercased() ?? "")\(hCert.uvci)".sha256() }
+    
+    var dosesNumber: Int? { hCert.vaccineStatements.first?.doseNumber }
+    var dosesTotal: Int? { hCert.vaccineStatements.first?.dosesTotal }
 
     var isForeignCertificate: Bool { countryCode != "FR" }
+    var isExpired: Bool { hCert.exp.timeIntervalSince1970 < Date().timeIntervalSince1970 }
 
-    var fullDescriptionForFullscreen: String? {
+    override var fullDescriptionForFullscreen: String? {
         switch hCert.type {
         case .vaccine:
             return fullDescriptionVaccination(forceEnglishFormat: true)
@@ -64,6 +88,10 @@ final class EuropeanCertificate: WalletCertificate {
             return fullDescriptionTest(forceEnglishFormat: true)
         case .recovery:
             return fullDescriptionRecovery(forceEnglishFormat: true)
+        case .exemption:
+            return fullDescriptionExemption(forceEnglishFormat: true)
+        case .unknown:
+            return nil
         }
     }
 
@@ -81,10 +109,10 @@ final class EuropeanCertificate: WalletCertificate {
         hCert.testStatements.first?.resultNegative
     }
 
-    private func birthDateString(forceEnglishFormat: Bool) -> String? {
-        hCert.dateOfBirth?.dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
+    var isAutoTest: Bool {
+        hCert.testStatements.first?.manufacturer?.lowercased() == "autotest"
     }
-    
+
     private let hCert: HCert
 
     private var countryCode: String? {
@@ -96,10 +124,29 @@ final class EuropeanCertificate: WalletCertificate {
             countryCode = hCert.testStatements.first?.countryCode
         case .recovery:
             countryCode = hCert.recoveryStatements.first?.countryCode
+        case .exemption:
+            countryCode = hCert.exemptionStatement?.countryCode
+        case .unknown:
+            countryCode = nil
         }
         return ["NC", "WF", "PM", "PF"].contains(countryCode) ? "FR" : countryCode
     }
-    
+
+    init(id: String, value: String, type: WalletConstant.CertificateType, hCert: HCert, didGenerateAllActivityCertificates: Bool, didAlreadyGenerateActivityCertificates: Bool) {
+        self.hCert = hCert
+        self.didGenerateAllActivityCertificates = didGenerateAllActivityCertificates
+        self.didAlreadyGenerateActivityCertificates = didAlreadyGenerateActivityCertificates
+        super.init(id: id, value: value, type: type)
+    }
+
+    override func toRawCertificate() -> RawWalletCertificate {
+        RawWalletCertificate(id: id, value: value, expiryDate: hCert.exp, parentId: nil, didGenerateAllActivityCertificates: didGenerateAllActivityCertificates, didAlreadyGenerateActivityCertificates: didAlreadyGenerateActivityCertificates)
+    }
+
+    private func birthDateString(forceEnglishFormat: Bool) -> String? {
+        Date(dateString: hCert.dateOfBirth)?.dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
+    }
+
     private func fullDescriptionVaccination(forceEnglishFormat: Bool) -> String? {
         // Still waiting for string format confirmation.
         guard let vaccinationEntry = hCert.vaccineStatements.first else { return nil }
@@ -133,7 +180,6 @@ final class EuropeanCertificate: WalletCertificate {
     }
     
     private func fullDescriptionRecovery(forceEnglishFormat: Bool) -> String? {
-        // Still waiting for string format confirmation.
         guard let recoveryEntry = hCert.recoveryStatements.first else { return nil }
         let firstPositiveDate: Date? = Date(dateString: recoveryEntry.firstPositiveDate)
         let flag: String? = isForeignCertificate && !forceEnglishFormat ? countryCode?.flag() : nil
@@ -145,10 +191,24 @@ final class EuropeanCertificate: WalletCertificate {
             .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
             .replacingOccurrences(of: "<DATE>", with: date)
     }
+
+    private func fullDescriptionExemption(forceEnglishFormat: Bool) -> String? {
+        guard let exemptionEntry = hCert.exemptionStatement else { return nil }
+        let flag: String? = isForeignCertificate && !forceEnglishFormat ? countryCode?.flag() : nil
+        let string: String = forceEnglishFormat ? "europeanCertificate.fullscreen.englishDescription.exemption" : "wallet.proof.europe.exemption.description"
+        let dateFromStr: String = exemptionEntry.validFrom.dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
+        let dateUntilStr: String = exemptionEntry.validUntil.dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
+        return [flag, string.localized].compactMap { $0 } .joined(separator: " ")
+            .replacingOccurrences(of: "<FULL_NAME>", with: fullName)
+            .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
+            .replacingOccurrences(of: "<FROM_DATE>", with: dateFromStr)
+            .replacingOccurrences(of: "<TO_DATE>", with: dateUntilStr)
+    }
     
-    init(id: String, value: String, type: WalletConstant.CertificateType, hCert: HCert) {
-        self.hCert = hCert
-        super.init(id: id, value: value, type: type)
+    private func isTestCertificateTooOld() -> Bool {
+        guard hCert.testStatements.first?.resultNegative == true else { return false }
+        let durationThresholdForEligiblility: Double = Double(ParametersManager.shared.activityPassSkipNegTestHours) * 3600.0
+        return timestamp + durationThresholdForEligiblility < Date().timeIntervalSince1970
     }
 
 }

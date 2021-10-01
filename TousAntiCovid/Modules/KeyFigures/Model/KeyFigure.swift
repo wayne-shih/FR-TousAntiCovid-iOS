@@ -12,39 +12,10 @@ import UIKit
 
 struct KeyFigure: Codable {
     
-    enum Category: String, Codable {
+    enum Category: String, Codable, CaseIterable {
+        case vaccine
         case health
         case app
-    }
-    
-    enum Trend: Int, Codable {
-        
-        case decrease = -1
-        case same = 0
-        case increase = 1
-        
-        var image: UIImage {
-            switch self {
-            case .decrease:
-                return Asset.Images.trendDown.image
-            case .same:
-                return Asset.Images.trendSteady.image
-            case .increase:
-                return Asset.Images.trendUp.image
-            }
-        }
-        
-        var accessibilityLabel: String {
-            switch self {
-            case .decrease:
-                return "accessibility.hint.keyFigure.valueDown".localized
-            case .same:
-                return "accessibility.hint.keyFigure.valueSteady".localized
-            case .increase:
-                return "accessibility.hint.keyFigure.valueUp".localized
-            }
-        }
-        
     }
     
     enum ChartKind: String, Codable {
@@ -53,20 +24,19 @@ struct KeyFigure: Codable {
     }
     
     let labelKey: String
-    let category: Category
+    let category: Category?
     let valueGlobalToDisplay: String
     let valueGlobal: Double?
     let isFeatured: Bool
     let isHighlighted: Bool?
     let extractDate: Int
-    let trend: Trend?
     let valuesDepartments: [KeyFigureDepartment]?
     let displayOnSameChart: Bool
     let avgSeries: [KeyFigureSeriesItem]?
     let limitLine: Double?
     
-    private let series: [KeyFigureSeriesItem]?
-    private let chartType: ChartKind?
+    let series: [KeyFigureSeriesItem]?
+    let chartType: ChartKind?
     var isLabelReady: Bool { "\(labelKey).label".localizedOrNil != nil }
     var label: String { "\(labelKey).label".localized.trimmingCharacters(in: .whitespaces) }
     var shortLabel: String { "\(labelKey).shortLabel".localized.trimmingCharacters(in: .whitespaces) }
@@ -77,34 +47,23 @@ struct KeyFigure: Codable {
         let colorCode: String = UIColor.isDarkMode ? "\(labelKey).colorCode.dark".localized : "\(labelKey).colorCode.light".localized
         return UIColor(hexString: colorCode)
     }
-    var currentTrend: Trend { trend ?? .same }
     var ascendingSeries: [KeyFigureSeriesItem]? { series?.sorted { $0.date < $1.date } }
     var chartKind: ChartKind { chartType ?? .line }
     
     var formattedDate: String {
         switch category {
-        case .health:
+        case .vaccine, .health:
             return Date(timeIntervalSince1970: Double(extractDate)).relativelyFormattedDay(prefixStringKey: "keyFigures.update")
         case .app:
             return Date(timeIntervalSince1970: Double(extractDate)).relativelyFormatted(prefixStringKey: "keyFigures.update")
+        default:
+            return ""
         }
     }
     
     var currentDepartmentSpecificKeyFigure: KeyFigureDepartment? {
         guard KeyFiguresManager.shared.displayDepartmentLevel else { return nil }
-        return departmentSpecificKeyFigureForPostalCode(KeyFiguresManager.shared.currentPostalCode)
-    }
-    
-    func departmentSpecificKeyFigureForPostalCode(_ postalCode: String?) -> KeyFigureDepartment? {
-        guard KeyFiguresManager.shared.displayDepartmentLevel else { return nil }
-        guard let postalCode = postalCode else { return nil }
-        var departmentNumber: String = "\(postalCode.prefix(2))"
-        if departmentNumber == "20" {
-            departmentNumber = ["200", "201"].contains(postalCode.prefix(3)) ? "2A" : "2B"
-        } else if ["97", "98"].contains(postalCode.prefix(2)) {
-            departmentNumber = "\(postalCode.prefix(3))"
-        }
-        return valuesDepartments?.first { $0.number == departmentNumber }
+        return valuesDepartments?.first
     }
     
 }

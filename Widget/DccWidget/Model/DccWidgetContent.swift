@@ -15,6 +15,9 @@ import UIKit
 struct DccWidgetContent: TimelineEntry {
     var date: Date = Date()
     var certificateQRCodeData: Data?
+    var certificateActivityQrCodeData: Data?
+    var certificateActivityExpiryTimestamp: Double?
     var noCertificatText: String
     var bottomText: String
+    var bottomTextActivityPass: String
 }

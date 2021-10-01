@@ -27,7 +27,7 @@ final class InfoCenterObserverWrapper: NSObject {
     
 }
 
-final class InfoCenterManager: NSObject {
+final class InfoCenterManager {
     
     static let shared: InfoCenterManager = InfoCenterManager()
     
@@ -119,9 +119,7 @@ extension InfoCenterManager {
     }
     
     private func fetchLastUpdatedAtFile(_ completion: @escaping (_ areUpdatesAvailable: Bool, _ languageChanged: Bool, _ lastUpdatedAt: Int, _ informAboutNews: Bool) -> ()) {
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: InfoCenterConstant.lastUpdatedAtUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: InfoCenterConstant.lastUpdatedAtUrl) { data, response, error in
             guard error == nil else {
                 DispatchQueue.main.async {
                     completion(false, false, 0, false)
@@ -153,9 +151,7 @@ extension InfoCenterManager {
     }
     
     private func fetchTagsFile(_ completion: @escaping () -> ()) {
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: InfoCenterConstant.tagsUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: InfoCenterConstant.tagsUrl) { data, response, error in
             guard let data = data else {
                 DispatchQueue.main.async {
                     completion()
@@ -178,9 +174,7 @@ extension InfoCenterManager {
     }
     
     private func fetchInfoCenterFile(_ completion: @escaping () -> ()) {
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: InfoCenterConstant.infoCenterUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: InfoCenterConstant.infoCenterUrl) { data, response, error in
             guard let data = data else {
                 DispatchQueue.main.async {
                     completion()
@@ -204,9 +198,7 @@ extension InfoCenterManager {
     
     private func fetchLabelsFile(languageCode: String, completion: @escaping () -> ()) {
         let url: URL = labelsUrl(for: languageCode)
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: url) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: url) { data, response, error in
             guard let data = data else {
                 DispatchQueue.main.async {
                     completion()
@@ -305,17 +297,6 @@ extension InfoCenterManager {
         observers.forEach { $0.observer?.infoCenterDidUpdate() }
     }
     
-}
-
-
-extension InfoCenterManager: URLSessionDelegate {
-    
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
-            validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
-        }
-    }
-     
 }
 
 extension String {

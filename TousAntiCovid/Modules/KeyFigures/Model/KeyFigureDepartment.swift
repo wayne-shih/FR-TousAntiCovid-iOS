@@ -17,10 +17,8 @@ struct KeyFigureDepartment: Codable {
     let extractDate: Int
     let value: Double?
     let valueToDisplay: String
-    let trend: KeyFigure.Trend?
     let series: [KeyFigureSeriesItem]?
-    
-    var currentTrend: KeyFigure.Trend { trend ?? .same }
+
     var ascendingSeries: [KeyFigureSeriesItem]? { series?.sorted { $0.date < $1.date } }
     
     var formattedDate: String {
@@ -33,7 +31,6 @@ struct KeyFigureDepartment: Codable {
         case extractDate
         case value
         case valueToDisplay
-        case trend
         case series
     }
     

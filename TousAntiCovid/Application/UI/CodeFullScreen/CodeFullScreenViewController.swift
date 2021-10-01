@@ -10,6 +10,7 @@
 import UIKit
 import PKHUD
 
+@available(iOS, deprecated: 14.0, message: "Use FullscreenCodeViewController instead.")
 final class CodeFullScreenViewController: UIViewController {
 
     @IBOutlet private var imageView: UIImageView!
@@ -26,14 +27,15 @@ final class CodeFullScreenViewController: UIViewController {
     private var lastBrightness: CGFloat?
     private var isFirstLoad: Bool = true
     private var footerLabelTapGesture: UITapGestureRecognizer?
-    
+
+    @available(iOS, deprecated: 14.0, message: "Use FullscreenCodeViewController instead.")
     class func controller(codeDetails: [CodeDetail], showHeaderImage: Bool = false) -> CodeFullScreenViewController {
         let fullscreenController: CodeFullScreenViewController = StoryboardScene.CodeFullScreen.codeFullScreenViewController.instantiate()
         fullscreenController.codeDetails = codeDetails
         fullscreenController.showHeaderImage = showHeaderImage
         return fullscreenController
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -41,7 +43,7 @@ final class CodeFullScreenViewController: UIViewController {
         updateContent()
         addObservers()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if isFirstLoad {

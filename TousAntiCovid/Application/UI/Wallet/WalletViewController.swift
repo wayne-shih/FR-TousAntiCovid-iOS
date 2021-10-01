@@ -15,19 +15,20 @@ import ServerSDK
 
 final class WalletViewController: CVTableViewController {
     
-    enum Mode {
+    private enum Mode {
         case empty
         case certificates
         case info
     }
+
     var deinitBlock: (() -> ())?
-    private var isFirstLoad: Bool = true
     private let didTouchFlashCertificate: () -> ()
     private let didTouchTermsOfUse: () -> ()
     private let didTouchCertificate: (_ certificate: WalletCertificate) -> ()
     private let didConvertToEuropeanCertifcate: (_ certificate: EuropeanCertificate) -> ()
     private let didTouchDocumentExplanation: (_ certificateType: WalletConstant.CertificateType) -> ()
     private let didTouchWhenToUse: () -> ()
+    private let didTouchContinueOnFraud: () -> ()
     private let didTouchConvertToEuropeTermsOfUse: () -> ()
     private var mode: Mode = .empty
     private var mustScrollToTopAfterRefresh: Bool = false
@@ -40,6 +41,7 @@ final class WalletViewController: CVTableViewController {
          didConvertToEuropeanCertifcate: @escaping (_ certificate: EuropeanCertificate) -> (),
          didTouchDocumentExplanation: @escaping (_ certificateType: WalletConstant.CertificateType) -> (),
          didTouchWhenToUse: @escaping () -> (),
+         didTouchContinueOnFraud: @escaping () -> (),
          didTouchConvertToEuropeTermsOfUse: @escaping () -> (),
          deinitBlock: @escaping () -> ()) {
         self.didTouchFlashCertificate = didTouchFlashCertificate
@@ -48,6 +50,7 @@ final class WalletViewController: CVTableViewController {
         self.didConvertToEuropeanCertifcate = didConvertToEuropeanCertifcate
         self.didTouchDocumentExplanation = didTouchDocumentExplanation
         self.didTouchWhenToUse = didTouchWhenToUse
+        self.didTouchContinueOnFraud = didTouchContinueOnFraud
         self.didTouchConvertToEuropeTermsOfUse = didTouchConvertToEuropeTermsOfUse
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
@@ -66,21 +69,14 @@ final class WalletViewController: CVTableViewController {
         updateBottomBarButton()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        guard isFirstLoad else {  return }
-        isFirstLoad = false
-    }
-    
     deinit {
         removeObservers()
         deinitBlock?()
     }
     
     private func initUI() {
+        tableView.tableHeaderView = UIView(frame: .zero)
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -179,7 +175,22 @@ final class WalletViewController: CVTableViewController {
                                         },
                                         secondarySelectionAction: { [weak self] in
                                             self?.didTouchWhenToUse()
-                                        })
+        })
+        let fraudRow: CVRow = CVRow(title: "walletController.info.fraud.title".localized,
+                                        subtitle: "walletController.info.fraud.explanation".localized,
+                                        buttonTitle: "walletController.info.fraud.button".localized,
+                                        xibName: .whenToUseCell,
+                                        theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                                           topInset: 15.0,
+                                                           bottomInset: 0.0,
+                                                           textAlignment: .center,
+                                                           titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                        accessibilityDidFocusCell: { [weak self] _ in
+            self?.clearCurrentlyFocusedCellObjects()
+        },
+                                        secondarySelectionAction: { [weak self] in
+            self?.didTouchContinueOnFraud()
+        })
         let phoneRow: CVRow = CVRow(title: "walletController.phone.title".localized,
                                     subtitle: "walletController.phone.subtitle".localized,
                                     image: Asset.Images.walletPhone.image,
@@ -201,6 +212,7 @@ final class WalletViewController: CVTableViewController {
                 explanationsRow,
                 documentsRow,
                 whenToUseRow,
+                fraudRow,
                 phoneRow]
     }
     
@@ -226,7 +238,7 @@ final class WalletViewController: CVTableViewController {
         let modeSelectionRow: CVRow = CVRow(segmentsTitles: [String(format: "walletController.mode.myCertificates".localized, WalletManager.shared.walletCertificates.count),
                                                              "walletController.mode.info".localized],
                                             selectedSegmentIndex: mode == .certificates ? 0 : 1,
-                                            xibName: .walletModeSelectionCell,
+                                            xibName: .segmentedCell,
                                             theme:  CVRow.Theme(backgroundColor: .clear,
                                                                 topInset: 30.0,
                                                                 bottomInset: 4.0,
@@ -324,13 +336,15 @@ final class WalletViewController: CVTableViewController {
         var rows: [CVRow] = []
         let positiveTestWarning: String? = (certificate as? EuropeanCertificate)?.isTestNegative == false && certificate.type == .sanitaryEurope ? "wallet.proof.europe.test.positiveSidepError".localized : nil
         var subtitle: String = certificate.fullDescription ?? ""
-        if DccBlacklistManager.shared.isBlacklisted(certificate: certificate) || Blacklist2dDocManager.shared.isBlacklisted(certificate: certificate) { subtitle += "\n\n\("wallet.blacklist.warning".localized)" }
+        if DccBlacklistManager.shared.isBlacklisted(certificate: certificate) || Blacklist2dDocManager.shared.isBlacklisted(certificate: certificate) {
+            subtitle += "\n\n\("wallet.blacklist.warning".localized)"
+        }
+        if (certificate as? EuropeanCertificate)?.isAutoTest == true { subtitle += "\n\n\("wallet.autotest.warning".localized)" }
         let certificateRow: CVRow = CVRow(title: certificate.codeImageTitle,
                                           subtitle: subtitle,
                                           accessoryText: positiveTestWarning,
                                           image: certificate.codeImage,
                                           isOn: certificate.id == WalletManager.shared.favoriteDccId,
-                                          segmentsTitles: certificate.pillTitles,
                                           xibName: .sanitaryCertificateCell,
                                           theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                                              topInset: 20.0,
@@ -556,6 +570,8 @@ extension WalletViewController: WalletChangesObserver {
         mode = calculateNewMode()
         reloadUI(animated: true)
     }
+
+    func walletActivityCertificateDidUpdate() {}
     
     func walletFavoriteCertificateDidUpdate() {
         reloadUI(animated: false) { [weak self] in

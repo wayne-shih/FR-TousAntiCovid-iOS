@@ -9,18 +9,31 @@
 //
 
 import UIKit
+import Charts
 
 final class KeyFigureDetailController: CVTableViewController {
-    
-    private let keyFigure: KeyFigure
+
+    override var childForStatusBarHidden: UIViewController? { children.first }
+
+    private enum ChartRange: Int, CaseIterable {
+        case year = 1000
+        case threeMonth = 90
+        case month = 30
+    }
+
+    private var keyFigure: KeyFigure
+    private let didTouchChart: (_ chartDatas: [KeyFigureChartData]) -> ()
     private let deinitBlock: () -> ()
-    
-    init(keyFigure: KeyFigure, deinitBlock: @escaping () -> ()) {
+    private var currentChartRange: ChartRange = .year
+    private var chartViews: [String: ChartViewBase] = [:]
+
+    init(keyFigure: KeyFigure, didTouchChart: @escaping (_ chartDatas: [KeyFigureChartData]) -> (), deinitBlock: @escaping () -> ()) {
         self.keyFigure = keyFigure
+        self.didTouchChart = didTouchChart
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("Must use default init() method.")
     }
@@ -41,8 +54,6 @@ final class KeyFigureDetailController: CVTableViewController {
     private func initUI() {
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 10.0))
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -59,19 +70,19 @@ final class KeyFigureDetailController: CVTableViewController {
             navigationItem.rightBarButtonItem = nil
         }
     }
-    
+
     @objc private func didTouchCloseButton() {
         dismiss(animated: true, completion: nil)
     }
-    
+
     private func addObservers() {
         KeyFiguresManager.shared.addObserver(self)
     }
-    
+
     private func removeObservers() {
         KeyFiguresManager.shared.removeObserver(self)
     }
-    
+
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = []
         rows.append(createKeyFigureRow())
@@ -80,20 +91,20 @@ final class KeyFigureDetailController: CVTableViewController {
         let learnMoreSectionRow: CVRow = CVRow(title: "keyFigureDetailController.section.learnmore.title".localized,
                                                xibName: .textCell,
                                                theme: CVRow.Theme(topInset: 30.0,
-                                                                  bottomInset: 12.0,
+                                                                  bottomInset: 0.0,
                                                                   textAlignment: .natural,
                                                                   titleFont: { Appearance.Cell.Text.headTitleFont }))
         rows.append(learnMoreSectionRow)
         let learnMoreRow: CVRow = CVRow(subtitle: keyFigure.learnMore,
                                         xibName: .standardCardCell,
                                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                           topInset: 0.0,
-                                                           bottomInset: 20.0,
+                                                           topInset: 20.0,
+                                                           bottomInset: 0.0,
                                                            textAlignment: .natural))
         rows.append(learnMoreRow)
         return rows
     }
-    
+
     private func createKeyFigureRow() -> CVRow {
         CVRow(title: keyFigure.label,
               subtitle: keyFigure.description,
@@ -113,57 +124,111 @@ final class KeyFigureDetailController: CVTableViewController {
         let chartSectionRow: CVRow =  CVRow(title: "keyFigureDetailController.section.evolution.title".localized,
                                           xibName: .textCell,
                                           theme: CVRow.Theme(topInset: 30.0,
-                                                             bottomInset: 12.0,
+                                                             bottomInset: 0.0,
                                                              textAlignment: .natural,
                                                              titleFont: { Appearance.Cell.Text.headTitleFont }))
         rows.append(chartSectionRow)
-        
-        let chartDatas: [KeyFigureChartData] = KeyFiguresManager.shared.generateChartData(from: keyFigure)
+        rangeSelectionRow().map { rows.append($0) }
+        let chartDatas: [KeyFigureChartData] = KeyFiguresManager.shared.generateChartData(from: keyFigure, daysCount: currentChartRange.rawValue)
+        chartViews = [:]
         if keyFigure.displayOnSameChart {
+            let data: [KeyFigureChartData] = [KeyFigureChartData](chartDatas.prefix(2))
+            let chartView: ChartViewBase? = ChartViewBase.create(chartDatas: data, allowInteractions: false)
+            chartViews["bothCharts"] = chartView
             let chartsRow: CVRow = CVRow(xibName: .keyFigureChartCell,
                                          theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                            topInset: 0.0,
-                                                            bottomInset: 20.0,
+                                                            topInset: 20.0,
+                                                            bottomInset: 0.0,
                                                             textAlignment: .natural),
-                                         associatedValue: [KeyFigureChartData](chartDatas.prefix(2)),
+                                         associatedValue: data,
                                          selectionActionWithCell: { [weak self] cell in
                                             self?.didTouchSharingFor(cell: cell)
+                                         },
+                                         selectionAction: { [weak self] in
+                                            self?.didTouchChart(data)
+                                         },
+                                         willDisplay: { [weak self] cell in
+                                            guard let view = self?.chartViews["bothCharts"] else { return }
+                                            (cell as? KeyFigureChartCell)?.setupChartView(view)
                                          })
             rows.append(chartsRow)
         } else {
-            let chartRows: [CVRow] = chartDatas.filter { !$0.isAverage }.map {
-                CVRow(xibName: .keyFigureChartCell,
-                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                         topInset: 0.0,
-                                         bottomInset: 20.0,
-                                         textAlignment: .natural),
-                      associatedValue: [$0],
-                      selectionActionWithCell: { [weak self] cell in
-                        self?.didTouchSharingFor(cell: cell)
-                      })
+            let chartRows: [CVRow] = chartDatas.filter { !$0.isAverage }.map { chartData in
+                let chartView: ChartViewBase? = ChartViewBase.create(chartDatas: [chartData], allowInteractions: false)
+                chartViews[chartData.id] = chartView
+                return CVRow(xibName: .keyFigureChartCell,
+                             theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                                topInset: 20.0,
+                                                bottomInset: 0.0,
+                                                textAlignment: .natural),
+                             associatedValue: [chartData],
+                             selectionActionWithCell: { [weak self] cell in
+                                self?.didTouchSharingFor(cell: cell)
+                             },
+                             selectionAction: { [weak self] in
+                                self?.didTouchChart([chartData])
+                             },
+                             willDisplay: { [weak self] cell in
+                                guard let view = self?.chartViews[chartData.id] else { return }
+                                (cell as? KeyFigureChartCell)?.setupChartView(view)
+                             })
             }
             rows.append(contentsOf: chartRows)
         }
         if let chartData = chartDatas.filter({ $0.isAverage }).first {
+            let chartView: ChartViewBase? = ChartViewBase.create(chartDatas: [chartData], allowInteractions: false)
+            chartViews[chartData.id] = chartView
             let chartRow: CVRow = CVRow(xibName: .keyFigureChartCell,
                                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                           topInset: 0.0,
-                                                           bottomInset: 20.0,
+                                                           topInset: 20.0,
+                                                           bottomInset: 0.0,
                                                            textAlignment: .natural),
                                         associatedValue: [chartData],
                                         selectionActionWithCell: { [weak self] cell in
                                             self?.didTouchSharingFor(cell: cell)
+                                        },
+                                        selectionAction: { [weak self] in
+                                            self?.didTouchChart([chartData])
+                                        },
+                                        willDisplay: { [weak self] cell in
+                                            guard let view = self?.chartViews[chartData.id] else { return }
+                                            (cell as? KeyFigureChartCell)?.setupChartView(view)
                                         })
             rows.append(chartRow)
         }
-        
         return rows
     }
-    
+
+    private func rangeSelectionRow() -> CVRow? {
+        let seriesCount: Int = keyFigure.ascendingSeries?.count ?? 0
+        var chartRanges: [KeyFigureDetailController.ChartRange] = []
+        if seriesCount > ChartRange.threeMonth.rawValue {
+            chartRanges = [.year, .threeMonth, .month]
+        } else if seriesCount > ChartRange.month.rawValue {
+            chartRanges = [.threeMonth, .month]
+        }
+        guard !chartRanges.isEmpty else { return nil }
+        return CVRow(segmentsTitles: chartRanges.map { "keyFigureDetailController.chartRange.segmentTitle.\($0.rawValue)".localized },
+                     selectedSegmentIndex: chartRanges.firstIndex(of: currentChartRange) ?? 0,
+                     xibName: .segmentedCell,
+                     theme:  CVRow.Theme(backgroundColor: .clear,
+                                         topInset: 20.0,
+                                         bottomInset: 4.0,
+                                         textAlignment: .natural,
+                                         titleFont: { Appearance.SegmentedControl.selectedFont },
+                                         subtitleFont: { Appearance.SegmentedControl.normalFont }),
+                     segmentsActions: chartRanges.map { chartRange in
+                        { [weak self] in
+                            self?.currentChartRange = chartRange
+                            self?.reloadUI(animated: true, completion: nil)
+                        }
+                     })
+    }
+
     @objc private func didTouchLocationButton() {
         KeyFiguresManager.shared.updateLocation(from: self)
     }
-    
+
     private func didTouchSharingFor(cell: CVTableViewCell) {
         var activityItems: [Any?] = []
         if cell is KeyFigureCell {
@@ -198,11 +263,12 @@ extension KeyFigureDetailController: KeyFiguresChangesObserver {
         reloadNextToKeyFiguresUpdate()
     }
     
-    func postalCodeDidUpdate(_ postalCode: String?) {
-        reloadNextToKeyFiguresUpdate()
-    }
+    func postalCodeDidUpdate(_ postalCode: String?) {}
     
     private func reloadNextToKeyFiguresUpdate() {
+        if let currentKeyFigure = KeyFiguresManager.shared.keyFigures.first(where: { $0.labelKey == keyFigure.labelKey }) {
+            keyFigure = currentKeyFigure
+        }
         updateRightBarButtonItem()
         reloadUI(animated: true)
     }

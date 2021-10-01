@@ -21,13 +21,14 @@ class CVTableViewController: UITableViewController {
     }
     
     func createRows() -> [CVRow] { [] }
-    
-    func reloadUI(animated: Bool = false, completion: (() -> ())? = nil) {
+    func makeRows(@CVRowsBuilder _ content: () -> [CVRow]) -> [CVRow] { content() }
+
+    func reloadUI(animated: Bool = false, animatedView: UIView? = nil, completion: (() -> ())? = nil) {
         rows = createRows()
         registerXibs()
         if #available(iOS 13.0, *) {
             if animated {
-                UIView.transition(with: tableView, duration: 0.2, options: [.transitionCrossDissolve], animations: {
+                UIView.transition(with: animatedView ?? tableView, duration: 0.2, options: [.transitionCrossDissolve], animations: {
                     self.tableView.reloadData()
                 }) { _ in
                     completion?()

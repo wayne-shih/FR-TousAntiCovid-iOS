@@ -62,6 +62,12 @@ public final class ParametersManager: NSObject {
     public var walletConversionPublicKey: (key: String, value: String)? {
         (valueFor(name: "app.wallet.conversionPublicKey") as? [String: String])?.first
     }
+    public var activityPassGenerationServerPublicKey: String? { valueFor(name: "app.activityPass.generationServerPublicKey") as? String }
+    public var activityPassSkipNegTestHours: Int { valueFor(name: "app.activityPass.skipNegTestHours") as? Int ?? 48}
+    public var activityPassRenewThreshold: Int { valueFor(name: "app.activityPass.renewThreshold") as? Int ?? 3}
+
+    public var displayActivityPass: Bool { valueFor(name: "app.displayActivityPass") as? Bool ?? false }
+    public var activityPassAutoRenewable: Bool { valueFor(name: "app.activtyPass.autoRenewable") as? Bool ?? false }
 
     public var displayIsolation: Bool { valueFor(name: "app.displayIsolation") as? Bool ?? false }
     public var isolationMinRiskLevel: Double { valueFor(name: "app.isolationMinRiskLevel") as? Double ?? 4.0 }
@@ -154,6 +160,18 @@ public final class ParametersManager: NSObject {
             return []
         }
     }
+    
+    public var noWaitDoses: [NoWaitDosesEntry] {
+        guard let value = valueFor(name: "app.wallet.vaccin.noWaitDoses") as? [[String: Any]] else {
+            return []
+        }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode([NoWaitDosesEntry].self, from: jsonData)
+        } catch {
+            return []
+        }
+    }
 
     public var confettiBirthRate: Double { valueFor(name: "app.wallet.confettiBirthRate") as? Double ?? 10.0 }
 
@@ -181,7 +199,6 @@ public final class ParametersManager: NSObject {
     public let defaultCleaUrl: String = "https://s3.fr-par.scw.cloud/clea-batch/"
 
     private var cleaUrls: [String] { valueFor(name: "app.cleaUrls") as? [String] ?? [] }
-
     private var config: [[String: Any]] = [] {
         didSet { distributeUpdatedConfig() }
     }
@@ -190,9 +207,10 @@ public final class ParametersManager: NSObject {
     private var completions: [String: RequestCompletion] = [:]
     
     private lazy var session: URLSession = {
-        let backgroundConfiguration: URLSessionConfiguration = URLSessionConfiguration.background(withIdentifier: "fr.gouv.stopcovid.ios.ServerSDK-Config")
+        let backgroundConfiguration: URLSessionConfiguration = URLSessionConfiguration.background(withIdentifier: "fr.gouv.tousanticovid.ios.ServerSDK-Config")
         backgroundConfiguration.timeoutIntervalForRequest = ServerConstant.timeout
         backgroundConfiguration.timeoutIntervalForResource = ServerConstant.timeout
+        backgroundConfiguration.httpShouldUsePipelining = true
         return URLSession(configuration: backgroundConfiguration, delegate: self, delegateQueue: .main)
     }()
     

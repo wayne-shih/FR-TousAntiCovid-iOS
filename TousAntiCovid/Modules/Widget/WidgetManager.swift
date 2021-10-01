@@ -137,13 +137,13 @@ final class WidgetManager {
     func processUserActivity(_ userActivity: NSUserActivity) {
         guard userActivity.activityType == "fr.gouv.stopcovid.ios.Widget.status" && isOnboardingDone && !isSick else { return }
         guard !RBManager.shared.isRegistered else { return }
-        NotificationCenter.default.post(name: .widgetDidRequestRegister, object: nil)
+        NotificationCenter.default.post(name: .requestRegister, object: nil)
     }
     
     private func triggerProximityActivation() {
         guard !RBManager.shared.isImmune else { return }
         if !RBManager.shared.isRegistered {
-            NotificationCenter.default.post(name: .widgetDidRequestRegister, object: nil)
+            NotificationCenter.default.post(name: .requestRegister, object: nil)
         } else if !RBManager.shared.isProximityActivated {
             RBManager.shared.isProximityActivated = true
             RBManager.shared.startProximityDetection()

@@ -119,9 +119,9 @@ extension AnalyticsManager {
         try! realm.write {
             infos.os = UIDevice.current.systemName
             infos.riskLevel = StatusManager.shared.currentStatusRiskLevel?.riskLevel ?? 0.0
-            infos.dateSample = RBManager.shared.reportPositiveTestDate?.universalDateFormatted()
-            infos.dateFirstSymptoms = RBManager.shared.reportSymptomsStartDate?.universalDateFormatted()
-            infos.dateLastContactNotification = StatusManager.shared.currentStatusRiskLevel?.lastContactDate?.universalDateFormatted()
+            infos.dateSample = RBManager.shared.reportPositiveTestDate?.roundingToNoon()?.universalDateFormatted()
+            infos.dateFirstSymptoms = RBManager.shared.reportSymptomsStartDate?.roundingToNoon()?.universalDateFormatted()
+            infos.dateLastContactNotification = StatusManager.shared.currentStatusRiskLevel?.lastContactDate?.roundingToNoon()?.universalDateFormatted()
         }
         
         updateInfoTracingDuration()

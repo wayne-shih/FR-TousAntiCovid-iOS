@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Bottom Button Container Controller-->
         <scene sceneID="Xv1-Su-lSX">
             <objects>
-                <viewController storyboardIdentifier="BottomButtonContainerController" id="EJz-Ia-0cC" customClass="BottomButtonContainerController" customModule="Stop_Covid_France" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BottomButtonContainerController" id="EJz-Ia-0cC" customClass="BottomButtonContainerController" customModule="Proximity_France" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="YFY-K1-OAR">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -32,14 +33,14 @@
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="8fH-dP-hFm">
                                                 <rect key="frame" x="20" y="20" width="374" height="108"/>
                                                 <subviews>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JtL-Cr-MSr" customClass="CVButton" customModule="Stop_Covid_France" customModuleProvider="target">
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JtL-Cr-MSr" customClass="CVButton" customModule="Proximity_France" customModuleProvider="target">
                                                         <rect key="frame" x="0.0" y="0.0" width="374" height="58"/>
                                                         <inset key="contentEdgeInsets" minX="0.0" minY="20" maxX="0.0" maxY="20"/>
                                                         <connections>
                                                             <action selector="didTouchButton:" destination="EJz-Ia-0cC" eventType="touchUpInside" id="aUe-mj-Thx"/>
                                                         </connections>
                                                     </button>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vj5-rh-Pw4">
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vj5-rh-Pw4">
                                                         <rect key="frame" x="0.0" y="78" width="374" height="30"/>
                                                         <connections>
                                                             <action selector="didTouchSecondaryButton:" destination="EJz-Ia-0cC" eventType="touchUpInside" id="R3p-6x-wtB"/>
@@ -72,7 +73,8 @@
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="kJK-Rf-Eda"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="yap-L7-URr" firstAttribute="top" secondItem="2RV-Tl-X7h" secondAttribute="bottom" id="3FW-fP-JcM"/>
                             <constraint firstItem="2RV-Tl-X7h" firstAttribute="leading" secondItem="YFY-K1-OAR" secondAttribute="leading" id="E3a-JC-y20"/>
@@ -83,10 +85,10 @@
                             <constraint firstItem="yap-L7-URr" firstAttribute="leading" secondItem="YFY-K1-OAR" secondAttribute="leading" id="s3U-gc-eBu"/>
                             <constraint firstAttribute="trailing" secondItem="2RV-Tl-X7h" secondAttribute="trailing" id="w4I-oM-xVE"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="kJK-Rf-Eda"/>
                     </view>
                     <connections>
                         <outlet property="bottomBarView" destination="yap-L7-URr" id="99G-gi-DeR"/>
+                        <outlet property="bottomConstraint" destination="pXU-vB-99u" id="LJl-f8-jm4"/>
                         <outlet property="button" destination="JtL-Cr-MSr" id="pEJ-Fz-1pk"/>
                         <outlet property="containerView" destination="2RV-Tl-X7h" id="ac4-zg-AgC"/>
                         <outlet property="secondaryButton" destination="vj5-rh-Pw4" id="hda-jP-aCw"/>
@@ -98,4 +100,9 @@
             <point key="canvasLocation" x="142" y="157"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

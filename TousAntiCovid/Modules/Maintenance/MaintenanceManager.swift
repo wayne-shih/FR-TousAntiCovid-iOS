@@ -12,7 +12,7 @@
 import UIKit
 import ServerSDK
 
-final class MaintenanceManager: NSObject {
+final class MaintenanceManager {
 
     static let shared: MaintenanceManager = MaintenanceManager()
     private var coordinator: MaintenanceSupportingCoordinator!
@@ -25,7 +25,7 @@ final class MaintenanceManager: NSObject {
     @UserDefault(key: .latestAvailableBuild)
     private var latestAvailableBuild: Int?
     
-    override private init() {}
+    private init() {}
     
     func start(coordinator: MaintenanceSupportingCoordinator) {
         self.coordinator = coordinator
@@ -35,8 +35,7 @@ final class MaintenanceManager: NSObject {
     func checkMaintenanceState(_ completion: (() -> ())? = nil) {
         var request: URLRequest = URLRequest(url: MaintenanceConstant.fileUrl)
         request.httpMethod = "GET"
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        let task: URLSessionDataTask = session.dataTask(with: request) { data, response, error in
+        let task: URLSessionDataTask = UrlSessionManager.shared.session.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
                     self.processCheckError(error: error, completion: completion)
@@ -99,16 +98,6 @@ final class MaintenanceManager: NSObject {
     private func canUpdateMaintenanceInfo() -> Bool {
         let now: Date = Date()
         return now.timeIntervalSince1970 - lastUpdateDate.timeIntervalSince1970 >= MaintenanceConstant.minDurationBetweenUpdatesInSeconds
-    }
-    
-}
-
-extension MaintenanceManager: URLSessionDelegate {
-    
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
-            validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
-        }
     }
     
 }

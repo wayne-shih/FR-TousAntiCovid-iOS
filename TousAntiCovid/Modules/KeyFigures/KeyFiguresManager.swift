@@ -9,7 +9,10 @@
 //
 
 import UIKit
+import PKHUD
 import ServerSDK
+import SwiftProtobuf
+import Gzip
 
 protocol KeyFiguresChangesObserver: AnyObject {
     
@@ -28,7 +31,7 @@ final class KeyFiguresObserverWrapper: NSObject {
     
 }
 
-final class KeyFiguresManager: NSObject {
+final class KeyFiguresManager {
     
     static let shared: KeyFiguresManager = KeyFiguresManager()
     
@@ -37,9 +40,7 @@ final class KeyFiguresManager: NSObject {
     var featuredKeyFigures: [KeyFigure] { [KeyFigure](keyFigures.filter { $0.isFeatured && ($0.isHighlighted != true) }.prefix(3)) }
     
     var displayDepartmentLevel: Bool { ParametersManager.shared.displayDepartmentLevel }
-    
-    @UserDefault(key: .isOnboardingDone)
-    private var isOnboardingDone: Bool = false
+    var canShowCurrentlyNeededFile: Bool { localFileExists() }
 
     @UserDefault(key: .currentPostalCode)
     var currentPostalCode: String? {
@@ -57,26 +58,26 @@ final class KeyFiguresManager: NSObject {
         guard let departmentName = currentDepartmentName, let postalCode = currentPostalCode else { return nil }
         return "\(departmentName) - \(postalCode)".uppercased()
     }
+
+    @UserDefault(key: .isOnboardingDone)
+    private var isOnboardingDone: Bool = false
     
     private var observers: [KeyFiguresObserverWrapper] = []
+    private var canNotifyPostalCodeUpdates: Bool = true
     
     func start() {
         loadLocalKeyFigures()
         addObserver()
     }
     
-    func fetchKeyFigures() {
-        fetchAllFiles()
-    }
-    
-    func isDepartmentSupportedForPostalCode(_ postalCode: String) -> Bool {
-        !keyFigures.compactMap { $0.departmentSpecificKeyFigureForPostalCode(postalCode) }.isEmpty
+    func fetchKeyFigures(_ completion: (() -> ())? = nil) {
+        fetchAllFiles(completion)
     }
     
     func departmentNameForPostalCode(_ postalCode: String?) -> String? {
         var departmentName: String?
         for keyFigure in keyFigures {
-            if let departmentKeyFigure = keyFigure.departmentSpecificKeyFigureForPostalCode(postalCode) {
+            if let departmentKeyFigure = keyFigure.valuesDepartments?.first {
                 departmentName = departmentKeyFigure.label
                 break
             }
@@ -92,11 +93,11 @@ final class KeyFiguresManager: NSObject {
         }
     }
     
-    func generateChartData(from keyFigure: KeyFigure) -> [KeyFigureChartData] {
+    func generateChartData(from keyFigure: KeyFigure, daysCount: Int) -> [KeyFigureChartData] {
         var chartDatas: [KeyFigureChartData] = []
         if let series = keyFigure.ascendingSeries, !series.isEmpty {
             var color: UIColor = keyFigure.color
-            if keyFigure.currentDepartmentSpecificKeyFigure?.ascendingSeries?.isEmpty == false && keyFigure.displayOnSameChart {
+            if keyFigure.currentDepartmentSpecificKeyFigure?.ascendingSeries?.isEmpty == false && keyFigure.displayOnSameChart && canShowCurrentlyNeededFile {
                 color = keyFigure.color.add(overlay: UIColor.white.withAlphaComponent(0.6))
             }
             let legend: KeyFigureChartLegend = KeyFigureChartLegend(title: "common.country.france".localized,
@@ -105,14 +106,14 @@ final class KeyFiguresManager: NSObject {
             let lastDate: Date = Date(timeIntervalSince1970: series.last!.date)
             let globalFigureToDisplay: String = keyFigure.valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible()
             chartDatas.append(KeyFigureChartData(legend: legend,
-                                                 series: series,
+                                                 series: series.suffix(daysCount),
                                                  currentValueToDisplay: keyFigure.valueGlobalToDisplay,
                                                  footer: String(format: "keyFigureDetailController.section.evolution.subtitle".localized, keyFigure.label, lastDate.dayMonthFormatted(), globalFigureToDisplay),
                                                  limitLineValue: keyFigure.limitLine,
                                                  limitLineLabel: keyFigure.limitLineLabel,
                                                  chartKind: keyFigure.displayOnSameChart ? .line : keyFigure.chartKind))
         }
-        if let departmentKeyFigure = keyFigure.currentDepartmentSpecificKeyFigure, let departmentSeries = departmentKeyFigure.ascendingSeries, !departmentSeries.isEmpty {
+        if let departmentKeyFigure = keyFigure.currentDepartmentSpecificKeyFigure, let departmentSeries = departmentKeyFigure.ascendingSeries, !departmentSeries.isEmpty, canShowCurrentlyNeededFile {
             let departmentLegend: KeyFigureChartLegend = KeyFigureChartLegend(title: departmentKeyFigure.label,
                                                                               image: Asset.Images.chartLegend.image,
                                                                               color: keyFigure.color)
@@ -126,7 +127,7 @@ final class KeyFiguresManager: NSObject {
                 footer = String(format: "keyFigureDetailController.section.evolution.subtitle2Charts".localized, keyFigure.label, lastDate.dayMonthFormatted(), departmentKeyFigureToDisplay, globalFigureToDisplay)
             }
             chartDatas.insert(KeyFigureChartData(legend: departmentLegend,
-                                                 series: departmentSeries,
+                                                 series: departmentSeries.suffix(daysCount),
                                                  currentValueToDisplay: departmentKeyFigure.valueToDisplay,
                                                  footer: footer,
                                                  limitLineValue: keyFigure.displayOnSameChart ? nil : keyFigure.limitLine,
@@ -140,7 +141,7 @@ final class KeyFiguresManager: NSObject {
                                                                     image: Asset.Images.chartLegend.image,
                                                                     color: color)
             chartDatas.append(KeyFigureChartData(legend: legend,
-                                                 series: averageSeries,
+                                                 series: averageSeries.sorted { $0.date < $1.date }.suffix(daysCount),
                                                  currentValueToDisplay: keyFigure.valueGlobalToDisplay,
                                                  footer: String(format: "keyFigureDetailController.section.evolutionAvg.subtitle".localized, keyFigure.label),
                                                  isAverage: true,
@@ -171,20 +172,24 @@ final class KeyFiguresManager: NSObject {
                 })
                 return
             }
-            guard KeyFiguresManager.shared.isDepartmentSupportedForPostalCode(textFieldValue) else {
-                viewController.showAlert(title: "home.infoSection.newPostalCode.alert.unknownPostalCode".localized, okTitle: "common.ok".localized, handler:  { [weak self] in
-                    self?.defineNewPostalCode(from: viewController, defaultValue: textFieldValue)
-                })
-                return
-
+            self?.currentPostalCode = textFieldValue
+            HUD.show(.progress)
+            self?.fetchKeyFiguresFile {
+                self?.loadLocalKeyFigures()
+                self?.notifyKeyFiguresUpdate()
+                HUD.hide()
             }
-            KeyFiguresManager.shared.currentPostalCode = textFieldValue
-            viewController.showFlash()
         }
     }
 
     func deletePostalCode() {
-        KeyFiguresManager.shared.currentPostalCode = nil
+        currentPostalCode = nil
+        HUD.show(.progress)
+        fetchKeyFiguresFile { [weak self] in
+            self?.loadLocalKeyFigures()
+            self?.notifyKeyFiguresUpdate()
+            HUD.hide()
+        }
     }
 
     private func addObserver() {
@@ -195,44 +200,54 @@ final class KeyFiguresManager: NSObject {
         fetchAllFiles()
     }
 
+    private func departmentCode(for postalCode: String) -> String {
+        var departmentCode: String = "\(postalCode.prefix(2))"
+        if departmentCode == "20" {
+            departmentCode = ["200", "201"].contains(postalCode.prefix(3)) ? "2A" : "2B"
+        } else if ["97", "98"].contains(postalCode.prefix(2)) {
+            departmentCode = "\(postalCode.prefix(3))"
+        }
+        return departmentCode
+    }
+
 }
 
 // MARK: - All fetching methods -
 extension KeyFiguresManager {
-    
-    private func fetchAllFiles() {
+
+    private func fetchAllFiles(_ completion: (() -> ())? = nil) {
         fetchKeyFiguresFile {
-            DispatchQueue.main.async {
-                self.notifyKeyFiguresUpdate()
-            }
+            self.notifyKeyFiguresUpdate()
+            completion?()
         }
     }
-    
+
     private func fetchKeyFiguresFile(_ completion: @escaping () -> ()) {
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: KeyFiguresConstant.jsonUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: remoteFileUrl()) { data, response, error in
             guard let data = data else {
-                DispatchQueue.main.async {
-                    completion()
-                }
+                DispatchQueue.main.async { completion() }
                 return
             }
             do {
-                self.keyFigures = try JSONDecoder().decode([KeyFigure].self, from: data)
-                try data.write(to: self.localKeyFiguresUrl())
-                DispatchQueue.main.async {
-                    completion()
-                }
+                let uncompressedData: Data = try data.gunzipped()
+                let keyNumbers: KeyNumbers = try KeyNumbers(serializedData: uncompressedData)
+                self.keyFigures = keyNumbers.toAppModel()
+                try uncompressedData.write(to: self.localKeyFiguresUrl())
+                DispatchQueue.main.async { completion() }
             } catch {
-                DispatchQueue.main.async {
-                    completion()
-                }
+                DispatchQueue.main.async { completion() }
             }
         }
         dataTask.resume()
     }
-    
+
+    private func remoteFileUrl() -> URL {
+        let defaultUrl: URL = KeyFiguresConstant.baseUrl.appendingPathComponent("key-figures-nat.pb.gz")
+        guard let postalCode = currentPostalCode else { return defaultUrl }
+        let departmentCode: String = departmentCode(for: postalCode)
+        return KeyFiguresConstant.baseUrl.appendingPathComponent(departmentCode).appendingPathComponent("key-figures-\(departmentCode).pb.gz")
+    }
+
 }
 
 // MARK: - Local files management -
@@ -240,14 +255,24 @@ extension KeyFiguresManager {
     
     private func localKeyFiguresUrl() -> URL {
         let directoryUrl: URL = self.createWorkingDirectoryIfNeeded()
-        return directoryUrl.appendingPathComponent("keyFigures.json")
+        return directoryUrl.appendingPathComponent(remoteFileUrl().lastPathComponent.replacingOccurrences(of: ".gz", with: ""))
+    }
+
+    private func localFileExists() -> Bool {
+        FileManager.default.fileExists(atPath: localKeyFiguresUrl().path)
     }
     
     private func loadLocalKeyFigures() {
-        let localUrl: URL = localKeyFiguresUrl()
-        guard FileManager.default.fileExists(atPath: localUrl.path) else { return }
-        guard let data = try? Data(contentsOf: localUrl) else { return }
-        keyFigures = (try? JSONDecoder().decode([KeyFigure].self, from: data)) ?? []
+        let localUrl: URL?
+        if FileManager.default.fileExists(atPath: localKeyFiguresUrl().path) {
+            localUrl = localKeyFiguresUrl()
+        } else {
+            localUrl = (try? FileManager.default.contentsOfDirectory(at: createWorkingDirectoryIfNeeded(), includingPropertiesForKeys: nil, options: []))?.sorted { $0.modificationDate ?? .distantPast > $1.modificationDate ?? .distantPast }.first
+        }
+        guard let url = localUrl else { return }
+        guard let data = try? Data(contentsOf: url) else { return }
+        guard let keyNumbers = try? KeyNumbers(serializedData: data) else { return }
+        self.keyFigures = keyNumbers.toAppModel()
     }
     
     private func createWorkingDirectoryIfNeeded() -> URL {
@@ -277,6 +302,7 @@ extension KeyFiguresManager {
     }
     
     private func notifyPostalCodeUpdate(_ postalCode: String?) {
+        guard canNotifyPostalCodeUpdates else { return }
         observers.forEach { $0.observer?.postalCodeDidUpdate(postalCode) }
     }
     
@@ -284,14 +310,4 @@ extension KeyFiguresManager {
         observers.forEach { $0.observer?.keyFiguresDidUpdate() }
     }
     
-}
-
-extension KeyFiguresManager: URLSessionDelegate {
-    
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
-            validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
-        }
-    }
-     
 }

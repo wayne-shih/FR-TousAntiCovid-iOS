@@ -52,6 +52,11 @@ internal enum StoryboardScene {
 
     internal static let flashWalletCodeController = SceneType<TousAntiCovid.FlashWalletCodeController>(storyboard: FlashWalletCode.self, identifier: "FlashWalletCodeController")
   }
+  internal enum KeyFigureChart: StoryboardType {
+    internal static let storyboardName = "KeyFigureChart"
+
+    internal static let keyFigureChartController = SceneType<TousAntiCovid.KeyFigureChartController>(storyboard: KeyFigureChart.self, identifier: "KeyFigureChartController")
+  }
   internal enum ModalContainer: StoryboardType {
     internal static let storyboardName = "ModalContainer"
 

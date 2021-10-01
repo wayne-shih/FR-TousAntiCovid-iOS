@@ -82,11 +82,21 @@ final class ManageDataController: CVTableViewController {
         rows.append(contentsOf: attestationRows)
         rows.append(blockSeparatorRow())
         if WalletManager.shared.isWalletActivated {
-            let walletRows: [CVRow] = [
-                sectionHeaderRow(textPrefix: "manageDataController.walletData"),
-                buttonRow(textPrefix: "manageDataController.walletData") { [weak self] in
-                    self?.eraseWalletDataButtonPressed()
-                }]
+            let buttonRow = buttonRow(textPrefix: "manageDataController.walletData", separatorLeftInset: Appearance.Cell.leftMargin) { [weak self] in
+                self?.eraseWalletDataButtonPressed()
+            }
+            let walletRows: [CVRow] = WalletManager.shared.isActivityPassActivated && ParametersManager.shared.activityPassAutoRenewable ?
+                [
+                    sectionHeaderRow(textPrefix: "manageDataController.walletDataAndActivityPass"),
+                    buttonRow,
+                    switchRow(textPrefix: "manageDataController.activityPass", isOn: WalletManager.shared.activityPassAutoRenewalActivated, dynamicSwitchLabel: false) { [weak self] isOn in
+                        WalletManager.shared.activityPassAutoRenewalActivated = isOn
+                        self?.reloadUI()
+                    }
+                ] : [
+                    sectionHeaderRow(textPrefix: "manageDataController.walletData"),
+                    buttonRow
+                ]
             rows.append(contentsOf: walletRows)
             rows.append(blockSeparatorRow())
         }
@@ -172,10 +182,8 @@ final class ManageDataController: CVTableViewController {
     }
     
     private func initUI() {
-        tableView.contentInset.top = navigationChildController?.navigationBarHeight ?? 0.0
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: navigationChildController?.navigationBarHeight ?? 0.0))
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
@@ -220,7 +228,7 @@ final class ManageDataController: CVTableViewController {
               })
     }
     
-    private func switchRow(textPrefix: String, isOn: Bool, dynamicSwitchLabel: Bool, handler: @escaping (_ isOn: Bool) -> ()) -> CVRow {
+    private func switchRow(textPrefix: String, separatorLeftInset: CGFloat = 0.0, isOn: Bool, dynamicSwitchLabel: Bool, handler: @escaping (_ isOn: Bool) -> ()) -> CVRow {
         CVRow(title: (dynamicSwitchLabel ? (isOn ? "\(textPrefix).switch.on" : "\(textPrefix).switch.off") : "\(textPrefix).button").localized,
               isOn: isOn,
               xibName: .standardSwitchCell,
@@ -229,7 +237,7 @@ final class ManageDataController: CVTableViewController {
                                  bottomInset: 10.0,
                                  textAlignment: .left,
                                  titleFont: { Appearance.Cell.Text.standardFont },
-                                 separatorLeftInset: 0.0,
+                                 separatorLeftInset: separatorLeftInset,
                                  separatorRightInset: 0.0),
               valueChanged: { [weak self] value in
                 guard let isOn = value as? Bool else { return }
@@ -238,7 +246,7 @@ final class ManageDataController: CVTableViewController {
               })
     }
     
-    private func buttonRow(textPrefix: String, isDestuctive: Bool = false, handler: @escaping () -> ()) -> CVRow {
+    private func buttonRow(textPrefix: String, separatorLeftInset: CGFloat = 0.0, isDestuctive: Bool = false, handler: @escaping () -> ()) -> CVRow {
         var buttonRow: CVRow = CVRow(title: "\(textPrefix).button".localized,
                                      xibName: .standardCell,
                                      theme: CVRow.Theme(topInset: 15.0,
@@ -246,7 +254,7 @@ final class ManageDataController: CVTableViewController {
                                                         textAlignment: .natural,
                                                         titleFont: { Appearance.Cell.Text.standardFont },
                                                         titleColor: isDestuctive ? Asset.Colors.error.color : Asset.Colors.tint.color,
-                                                        separatorLeftInset: 0.0,
+                                                        separatorLeftInset: separatorLeftInset,
                                                         separatorRightInset: 0.0),
                                      selectionAction: { handler() },
                                      willDisplay: { cell in

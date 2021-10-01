@@ -12,6 +12,7 @@ import UIKit
 import RobertSDK
 import ServerSDK
 import StorageSDK
+import PKHUD
 
 protocol StatusChangesObserver: AnyObject {
     
@@ -87,10 +88,6 @@ final class StatusManager {
     }
     
     func status(showNotifications: Bool = false, force: Bool = false, completion: ((_ error: Error?) -> ())? = nil) {
-        guard RBManager.shared.isRegistered else {
-            completion?(nil)
-            return
-        }
         let nowTimestamp: TimeInterval = Date().timeIntervalSince1970
         guard nowTimestamp - lastStatusTriggerEventTimestamp > Constant.secondsBeforeStatusRetry || force else {
             let error: Error = NSError.localizedError(message: "lastStatusTriggerEventTimestamp registered less than \(Int(Constant.secondsBeforeStatusRetry)) seconds ago", code: 0)
@@ -103,10 +100,13 @@ final class StatusManager {
         var cleaStatusInfo: Result<RBStatusRiskLevelInfo?, Error> = .success(nil)
 
         let dispatchGroup: DispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
-        triggerStatusRequestIfNeeded(showNotifications: showNotifications, force: force) { statusResult in
-            robertStatusInfo = statusResult
-            dispatchGroup.leave()
+        
+        if RBManager.shared.isRegistered {
+            dispatchGroup.enter()
+            triggerStatusRequestIfNeeded(showNotifications: showNotifications, force: force) { statusResult in
+                robertStatusInfo = statusResult
+                dispatchGroup.leave()
+            }
         }
         dispatchGroup.enter()
         triggerCleaStatusRequestIfNeeded(force: force) { cleaStatusResult in
@@ -115,7 +115,15 @@ final class StatusManager {
         }
         dispatchGroup.notify(queue: .main) {
             self.isStatusOnGoing = false
-            self.processReceivedStatusInfo(statusInfo: robertStatusInfo, cleaStatusInfo: cleaStatusInfo)
+            
+            // If we receive a statusEndHttpCode http error code, clear Robert associated data and calculate risk level with clea result only
+            if case let .failure(error) = robertStatusInfo, (error as NSError).code == RBConstants.statusEndHttpCode {
+                RBManager.shared.clearRobert()
+                NotificationCenter.default.post(name: .gotRobert430Error, object: nil)
+                self.processReceivedStatusInfo(statusInfo: .success(nil), cleaStatusInfo: cleaStatusInfo)
+            } else {
+                self.processReceivedStatusInfo(statusInfo: robertStatusInfo, cleaStatusInfo: cleaStatusInfo)
+            }
 
             var error: Error?
             if case let .failure(robertError) = robertStatusInfo {
@@ -199,7 +207,7 @@ extension StatusManager {
                         completion?(.success(info))
                     case let .failure(error):
                         let code: Int = (error as NSError).code
-                        if ![-997, -1001].contains(code) {
+                        if ![URLError.backgroundSessionWasDisconnected.rawValue, URLError.timedOut.rawValue].contains(code) {
                             AnalyticsManager.shared.reportError(serviceName: "status", apiVersion: ParametersManager.shared.apiVersion, code: code)
                         }
                         if showNotifications {
@@ -411,7 +419,6 @@ extension StatusManager {
                 AnalyticsManager.shared.reportHealthEvent(.eh2, description: "\(newRiskLevelInfo.riskLevel)")
             }
         }
-
         currentStatusRiskLevel = newRiskLevelInfo
 
         if UIApplication.shared.applicationState == .active {

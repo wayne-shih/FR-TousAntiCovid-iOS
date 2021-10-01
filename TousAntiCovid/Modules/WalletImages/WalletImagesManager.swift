@@ -11,7 +11,7 @@
 import UIKit
 import ServerSDK
 
-final class WalletImagesManager: NSObject {
+final class WalletImagesManager {
     
     enum ImageName: String, CaseIterable {
         case testCertificate = "test-certificate"
@@ -95,8 +95,7 @@ final class WalletImagesManager: NSObject {
     private func fetchLastFile(with name: String, languageCode: String) {
         let fileName: String = self.fileName(baseName: name, languageCode: languageCode)
         let url: URL = WalletImagesConstant.baseUrl.appendingPathComponent(fileName)
-        let sesssion: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        let dataTask: URLSessionDataTask = sesssion.dataTaskWithETag(with: url) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: url) { data, response, error in
             guard let data = data else {
                 return
             }
@@ -147,15 +146,5 @@ final class WalletImagesManager: NSObject {
     }
     
     private func fileName(baseName: String, languageCode: String) -> String { "\(baseName)-\(languageCode).png" }
-    
-}
-
-extension WalletImagesManager: URLSessionDelegate {
-    
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
-            validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
-        }
-    }
     
 }

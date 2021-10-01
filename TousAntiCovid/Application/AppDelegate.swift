@@ -55,15 +55,18 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             BluetoothStateManager.shared.start()
         }
         ParametersManager.shared.start(configUrl: Constant.Server.configUrl,
-                                       configCertificateFiles: Constant.Server.resourcesCertificates)
-        InGroupeServer.shared.start(certificateFiles: Constant.Server.convertCertificates,
-                                    convertUrl: { Constant.Server.convertUrl },
-                                    requestLoggingHandler: { _, _, _, _ in })
-
-        CleaServer.shared.start(reportBaseUrl: { Constant.Server.cleaReportBaseUrl },
+                                       configCertificateFiles: Constant.Server.certificates)
+        ConversionServer.shared.start(session: UrlSessionManager.shared.session,
+                                      convertUrl: { Constant.Server.convertUrl },
+                                      requestLoggingHandler: { request, response, responseData, error in })
+        ActivityCertificateServer.shared.start(session: URLSession.shared,
+                                               serverUrl: { Constant.Server.activityCertificateGenerationUrl },
+                                               requestLoggingHandler: { request, response, responseData, error in })
+        CleaServer.shared.start(certificateFiles: Constant.Server.certificates,
+                                reportBaseUrl: { Constant.Server.cleaReportBaseUrl },
                                 statusBaseUrl: { Constant.Server.cleaStatusBaseUrl() },
                                 statusBaseFallbackUrl: { Constant.Server.cleaStatusBaseUrl(fallbackUrl: true) },
-                                taskLoggingHandler: { _, _, _ in })
+                                taskLoggingHandler: { task, responseData, error in })
         
         RBManager.shared.start(isFirstInstall: !isAppAlreadyInstalled,
                                server: Server(baseUrl: { Constant.Server.baseUrl },
@@ -73,7 +76,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                                 if UIApplication.shared.applicationState != .active {
                                                     NotificationsManager.shared.triggerDeviceTimeErrorNotification()
                                                 }
-                                              }, taskLoggingHandler: { _, _, _ in }),
+                                              }, taskLoggingHandler: { task, responseData, error in }),
                                storage: storageManager,
                                bluetooth: BluetoothManager(),
                                filter: FilteringManager(),
@@ -82,7 +85,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                     NotificationsManager.shared.triggerRestartNotification()
                                }, didReceiveProximityHandler: {
                                     StatusManager.shared.status()
-                               }, didSaveProximity: { _ in })
+                               }, didSaveProximity: { proximity in })
         RatingsManager.shared.start()
         AnalyticsManager.shared.start()
         if #available(iOS 14.0, *) {
@@ -112,17 +115,14 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         ConfigManager.shared.fetch { _ in
             self.updateAppShortcut()
         }
-        UIApplication.shared.clearBadge()
-        RBManager.shared.clearOldLocalProximities()
-        AnalyticsManager.shared.reportAppEvent(.e3)
-    }
-    
-    func applicationWillEnterForeground(_ application: UIApplication) {
         StatusManager.shared.status { error in
             if let error = error, (error as NSError).code == -1 {
                 NotificationsManager.shared.triggerDeviceTimeErrorNotification()
             }
         }
+        UIApplication.shared.clearBadge()
+        RBManager.shared.clearOldLocalProximities()
+        AnalyticsManager.shared.reportAppEvent(.e3)
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
@@ -190,6 +190,12 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     
     private func initAppearance() {
         UINavigationBar.appearance().tintColor = Asset.Colors.tint.color
+        //Fix Nav Bar tint issue in iOS 15.0 or later - is transparent w/o code below
+        if #available(iOS 15, *) {
+            let appearance: UINavigationBarAppearance = UINavigationBarAppearance()
+            appearance.configureWithDefaultBackground()
+            UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        }
     }
     
     private func initUrlCache() {
@@ -255,6 +261,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate: WalletChangesObserver {
 
     func walletCertificatesDidUpdate() {}
+    func walletActivityCertificateDidUpdate() {}
     func walletFavoriteCertificateDidUpdate() {
         updateAppShortcut()
     }

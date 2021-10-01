@@ -21,37 +21,42 @@ struct DccWidget: Widget {
         }
         .configurationDisplayName("TousAntiCovid")
         .description(NSLocalizedString("widget.favoriteCertificate.description", comment: ""))
-        .supportedFamilies([.systemLarge])
+        .supportedFamilies([.systemLarge, .systemMedium])
     }
 
 }
 
 struct DccProvider: TimelineProvider {
     public typealias Entry = DccWidgetContent
-
-    @WidgetDCCUserDefault(key: .bottomText)
-    private var bottomText: String = ""
     
-    @WidgetDCCUserDefault(key: .noCertificateText)
-    var noCertificateText: String = ""
-    
-    @WidgetDCCUserDefault(key: .certificateQrCodeData)
-    private var certificateQrCodeData: Data? = nil
-    
-    func getSnapshot(in context: Context, completion: @escaping (DccWidgetContent) -> ()) {
-        let entry: DccWidgetContent = DccWidgetContent(date: Date(), certificateQRCodeData: certificateQrCodeData, noCertificatText: noCertificateText, bottomText: bottomText)
-        completion(entry)
-    }
+    func getSnapshot(in context: Context, completion: @escaping (DccWidgetContent) -> ()) { completion(createEntry(Date())) }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<DccWidgetContent>) -> Void) {
-        let entry: DccWidgetContent? = DccWidgetContent(date: Date(), certificateQRCodeData: certificateQrCodeData, noCertificatText: noCertificateText, bottomText: bottomText)
-        var tomorrow: Date = Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: Date())!
-        tomorrow.addTimeInterval(24.0 * 3600.0)
-        let timeline = Timeline(entries: [entry].compactMap { $0 }, policy: .after(tomorrow))
+        let date: Date
+        if let timestamp = WidgetDCCManager.shared.certificateActivityExpiryTimestamp, timestamp > Date().timeIntervalSince1970 {
+            WidgetDCCManager.shared.currentlyDisplayedActivityCertificateTimestamp = timestamp
+            date = Date(timeIntervalSince1970: timestamp)
+        } else {
+            WidgetDCCManager.shared.currentlyDisplayedActivityCertificateTimestamp = nil
+            date = Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: Date())!.addingTimeInterval(24.0 * 3600.0)
+        }
+        let remainingTime: Double = date.timeIntervalSince1970 - Date().timeIntervalSince1970
+        let adjustedEndDate: Date = date.addingTimeInterval(remainingTime > 3600.0 ? -20.0 * 60.0 : 0.0)
+        let entry: DccWidgetContent = createEntry(adjustedEndDate)
+        let timeline: Timeline = Timeline(entries: [entry], policy: .after(adjustedEndDate))
         completion(timeline)
     }
-    
-    func placeholder(in context: Context) -> DccWidgetContent {
-        DccWidgetContent(date: Date(), certificateQRCodeData: certificateQrCodeData, noCertificatText: noCertificateText, bottomText: bottomText)
+
+    func placeholder(in context: Context) -> DccWidgetContent { createEntry(Date()) }
+
+    private func createEntry(_ date: Date) -> DccWidgetContent {
+        DccWidgetContent(date: date,
+                         certificateQRCodeData: WidgetDCCManager.shared.certificateQrCodeData,
+                         certificateActivityQrCodeData: WidgetDCCManager.shared.certificateActivityQrCodeData,
+                         certificateActivityExpiryTimestamp: WidgetDCCManager.shared.certificateActivityExpiryTimestamp,
+                         noCertificatText: WidgetDCCManager.shared.noCertificateText,
+                         bottomText: WidgetDCCManager.shared.bottomText,
+                         bottomTextActivityPass: WidgetDCCManager.shared.bottomTextActivityPass)
     }
+
 }

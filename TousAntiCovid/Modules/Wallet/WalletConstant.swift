@@ -29,6 +29,11 @@ enum WalletConstant {
         }
     }
 
+    enum DccPrefix: String {
+        case activityCertificate = "HCFR1:"
+        case exemptionCertificate = "EX1:"
+    }
+
     enum URLPath: String {
         case wallet = "/app/wallet"
         case wallet2D = "/app/wallet2d"
@@ -41,10 +46,14 @@ enum WalletConstant {
         case sanitaryEurope = "test"
         case vaccinationEurope = "vaccine"
         case recoveryEurope = "recovery"
+        case activityEurope = "activity"
+        case exemptionEurope = "exemption"
+        case unknown = "unknown"
 
         enum Format: String {
             case wallet2DDoc = "DEUX_D_DOC"
             case walletDCC = "DGCA"
+            case walletDCCACT = "DCC_ACT"
         }
 
         var textKey: String {
@@ -59,6 +68,12 @@ enum WalletConstant {
                 return "vaccinationEurope"
             case .recoveryEurope:
                 return "recoveryEurope"
+            case .activityEurope:
+                return "activityEurope"
+            case .exemptionEurope:
+                return "exemptionEurope"
+            case .unknown:
+                return ""
             }
         }
         
@@ -102,7 +117,7 @@ enum WalletConstant {
                     "LA(?<LA>[A-Z\\d]{2})" + // We capture the field LA. It can only contain 2 uppercased letters or digits.
                     "\\x1F{1}" + // This character is separating the message from its signature.
                     "[A-Z\\d\\=]+$" // This is the message signature.
-            case .sanitaryEurope, .vaccinationEurope, .recoveryEurope:
+            case .activityEurope, .recoveryEurope, .sanitaryEurope, .vaccinationEurope, .exemptionEurope, .unknown:
                 return ""
             }
         }
@@ -123,7 +138,7 @@ enum WalletConstant {
                     "(?<certificateId>[A-Z\\d]{4})" + // Charatcers 8 to 11 represent the id of the certificate used to sign the document.
                     "[A-Z\\d]{8}" + // Characters 12 to 19 are ignored.
                     "L1" // Characters 20 and 21 represent the wallet certificate type (sanitary, ...)
-            case .sanitaryEurope, .vaccinationEurope, .recoveryEurope:
+            case .activityEurope, .recoveryEurope, .sanitaryEurope, .vaccinationEurope, .exemptionEurope, .unknown:
                 return ""
             }
         }
@@ -132,8 +147,10 @@ enum WalletConstant {
             switch self {
             case .sanitary, .vaccination:
                 return .wallet2DDoc
-            case .sanitaryEurope, .vaccinationEurope, .recoveryEurope:
+            case .sanitaryEurope, .vaccinationEurope, .recoveryEurope, .exemptionEurope, .unknown:
                 return .walletDCC
+            case .activityEurope:
+                return .walletDCCACT
             }
         }
     }

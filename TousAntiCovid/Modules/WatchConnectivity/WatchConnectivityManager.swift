@@ -32,7 +32,13 @@ final class WatchConnectivityManager: NSObject {
         if let favoriteCertificate = WalletManager.shared.favoriteCertificate {
             guard let qrCode = favoriteCertificate.value.qrCode(small: true) else { return }
             guard let qrCodeData = qrCode.jpegData(compressionQuality: 1.0) else { return }
-            try? session.updateApplicationContext(["id": favoriteCertificate.id, "qr": qrCodeData])
+            var context: [String: Any] = ["id": favoriteCertificate.id, "qr": qrCodeData]
+            if let activityCertificate = WalletManager.shared.activityCertificateFor(certificate: favoriteCertificate as? EuropeanCertificate),
+               let qrCodeData = activityCertificate.value.qrCode(small: true)?.jpegData(compressionQuality: 1.0) {
+                context["qrAct"] = qrCodeData
+                context["exp"] = activityCertificate.endDate.timeIntervalSince1970
+            }
+            try? session.updateApplicationContext(context)
         } else {
             clearApplicationContext()
         }
@@ -97,6 +103,10 @@ extension WatchConnectivityManager: WCSessionDelegate {
 extension WatchConnectivityManager: WalletChangesObserver {
 
     func walletCertificatesDidUpdate() {}
+
+    func walletActivityCertificateDidUpdate() {
+        updateApplicationContext()
+    }
 
     func walletFavoriteCertificateDidUpdate() {
         updateApplicationContext()

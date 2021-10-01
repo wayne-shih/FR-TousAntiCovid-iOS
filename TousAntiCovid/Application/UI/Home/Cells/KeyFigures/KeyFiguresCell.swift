@@ -100,7 +100,7 @@ final class KeyFiguresCell: CardCell {
         }
         let departmentKeyFigures: [KeyFigureDepartment?] = keyFigures.map { $0.currentDepartmentSpecificKeyFigure }
         let filteredDepartmentKeyFigures: [KeyFigureDepartment] = departmentKeyFigures.compactMap { $0 }
-        let hideDepartmentKeyFigures: Bool = filteredDepartmentKeyFigures.isEmpty
+        let hideDepartmentKeyFigures: Bool = filteredDepartmentKeyFigures.isEmpty || !KeyFiguresManager.shared.canShowCurrentlyNeededFile
         titleHeaderLabel.isHidden = hideDepartmentKeyFigures
         secondaryStackView.isHidden = hideDepartmentKeyFigures
         titleHeaderSecondaryLabel.text = filteredDepartmentKeyFigures.last?.label.uppercased()

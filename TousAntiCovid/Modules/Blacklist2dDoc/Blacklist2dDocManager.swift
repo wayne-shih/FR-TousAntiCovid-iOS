@@ -62,9 +62,7 @@ final class Blacklist2dDocManager: NSObject {
 extension Blacklist2dDocManager {
 
     private func fetchCertList() {
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: Blacklist2dDocConstant.certListUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: Blacklist2dDocConstant.certListUrl) { data, response, error in
             guard let data = data else { return }
             do {
                 self.hashes = try JSONDecoder().decode([String].self, from: data)
@@ -135,16 +133,6 @@ extension Blacklist2dDocManager {
 
     private func notifyObservers() {
         observers.forEach { $0.observer?.blacklist2dDocDidUpdate() }
-    }
-
-}
-
-extension Blacklist2dDocManager: URLSessionDelegate {
-
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
-            validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
-        }
     }
 
 }

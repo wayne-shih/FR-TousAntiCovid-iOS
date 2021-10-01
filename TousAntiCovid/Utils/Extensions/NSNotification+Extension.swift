@@ -17,7 +17,7 @@ extension NSNotification.Name {
     static let didTouchProximityReactivationNotification: NSNotification.Name = NSNotification.Name(rawValue: "didTouchProximityReactivationNotification")
     static let didEnterCodeFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "didEnterCodeFromDeeplink")
     static let newAttestationFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newAttestationFromDeeplink")
-    static let widgetDidRequestRegister: NSNotification.Name = NSNotification.Name(rawValue: "widgetDidRequestRegister")
+    static let requestRegister: NSNotification.Name = NSNotification.Name(rawValue: "requestRegister")
     static let dismissAllAndShowRecommandations: NSNotification.Name = NSNotification.Name(rawValue: "dismissAllAndShowRecommandations")
     static let newVenueRecordingFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "newVenueRecordingFromDeeplink")
     static let openFullVenueRecordingFlowFromDeeplink: NSNotification.Name = NSNotification.Name(rawValue: "openFullVenueRecordingFlowFromDeeplink")
@@ -27,4 +27,5 @@ extension NSNotification.Name {
     static let didCompletedVaccinationNotification: NSNotification.Name = NSNotification.Name(rawValue: "didCompletedVaccinationNotification")
     static let openWallet: NSNotification.Name = NSNotification.Name(rawValue: "openWallet")
     static let openCertificateQRCode: Notification.Name = Notification.Name(rawValue: "openCertificateQRCode")
+    static let gotRobert430Error: Notification.Name = Notification.Name(rawValue: "gotRobert430Error")
 }

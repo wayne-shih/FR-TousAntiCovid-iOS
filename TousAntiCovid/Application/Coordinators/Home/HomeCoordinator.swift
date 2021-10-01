@@ -249,15 +249,18 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
     }
     
     private func showCaptchaChallenge(captcha: Captcha, didEnterCaptcha: @escaping (_ id: String, _ answer: String) -> (), didCancelCaptcha: @escaping () -> ()) {
-        let captchaCoordinator: CaptchaCoordinator = CaptchaCoordinator(presentingController: navigationController?.topPresentedController, parent: self, captcha: captcha, didEnterCaptcha: { [weak self] id, answer in
-            self?.navigationController?.topPresentedController.dismiss(animated: true) {
-                didEnterCaptcha(id, answer)
-            }
-        }, didCancelCaptcha: { [weak self] in
-            self?.navigationController?.topPresentedController.dismiss(animated: true)
-            didCancelCaptcha()
-        })
-        addChild(coordinator: captchaCoordinator)
+        dismissAllModalsIfNeeded { [weak self] in
+            guard let self = self else { return }
+            let captchaCoordinator: CaptchaCoordinator = CaptchaCoordinator(presentingController: self.navigationController?.topPresentedController, parent: self, captcha: captcha, didEnterCaptcha: { [weak self] id, answer in
+                self?.navigationController?.topPresentedController.dismiss(animated: true) {
+                    didEnterCaptcha(id, answer)
+                }
+            }, didCancelCaptcha: { [weak self] in
+                self?.navigationController?.topPresentedController.dismiss(animated: true)
+                didCancelCaptcha()
+            })
+            self.addChild(coordinator: captchaCoordinator)
+        }
     }
 
     private func showEnterCode(code: String?) {
@@ -331,31 +334,17 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
     }
 
     private func showCodeFullscreen(_ certificate: WalletCertificate) {
-        let codeDetails: [CodeDetail] = prepareCodeFullScreenData(certificate)
-        guard !codeDetails.isEmpty else { return }
-        let isForeignCertificate: Bool = (certificate as? EuropeanCertificate)?.isForeignCertificate ?? true
-        if let controller = DeepLinkingManager.shared.codeFullScreenController {
-            controller.update(codeDetails: codeDetails, showHeaderImage: !isForeignCertificate)
-        } else {
-            let controller: CodeFullScreenViewController = CodeFullScreenViewController.controller(codeDetails: codeDetails, showHeaderImage: !isForeignCertificate)
-            controller.modalTransitionStyle = .crossDissolve
-            controller.modalPresentationStyle = .fullScreen
-            DeepLinkingManager.shared.codeFullScreenController = controller
-            dismissAllModalsIfNeeded { [weak self] in
-                self?.navigationController?.present(controller, animated: true)
-            }
+        if let coordinator = childCoordinators.first(where: { $0 is FullscreenCertificateCoordinator }) as? FullscreenCertificateCoordinator {
+            coordinator.updateCertificate(certificate)
+        } else if let walletCoordinator = childCoordinators.first(where: { $0 is WalletCoordinator }) as? WalletCoordinator,
+                  let coordinator = walletCoordinator.childCoordinators.first(where: { $0 is FullscreenCertificateCoordinator }) as? FullscreenCertificateCoordinator {
+            coordinator.updateCertificate(certificate)
+        } else  {
+            let coordinator: FullscreenCertificateCoordinator = FullscreenCertificateCoordinator(presentingController: navigationController?.topPresentedController,
+                                                                                                 parent: self,
+                                                                                                 certificate: certificate)
+            addChild(coordinator: coordinator)
         }
-    }
-
-    private func prepareCodeFullScreenData(_ certificate: WalletCertificate) -> [CodeDetail] {
-        guard let codeImage = certificate.codeImage else { return [] }
-        let footerText: String? = certificate is EuropeanCertificate ? "europeanCertificate.fullscreen.type.minimum.footer".localized : nil
-        var codeDetails: [CodeDetail] = [CodeDetail(segmentedControlTitle: "europeanCertificate.fullscreen.type.minimum".localized, codeImage: codeImage, codeBottomText: certificate.codeImageTitle, text: certificate.shortDescription, footerText: footerText, hash: certificate.uniqueHash)]
-
-        if let europeanCertificate = certificate as? EuropeanCertificate {
-            codeDetails.append(CodeDetail(segmentedControlTitle: "europeanCertificate.fullscreen.type.border".localized, codeImage: codeImage, codeBottomText: nil, text: europeanCertificate.fullDescriptionForFullscreen, footerText: nil, hash: europeanCertificate.uniqueHash))
-        }
-        return codeDetails
     }
     
     private func loadLaunchScreen() {

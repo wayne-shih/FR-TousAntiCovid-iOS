@@ -16,7 +16,7 @@ final class ComplicationController: NSObject, CLKComplicationDataSource {
     // MARK: - Complication Configuration
     func getComplicationDescriptors(handler: @escaping ([CLKComplicationDescriptor]) -> Void) {
         let descriptors: [CLKComplicationDescriptor] = [
-            CLKComplicationDescriptor(identifier: "complication", displayName: NSLocalizedString("complication.favorite.displayName" , comment: ""), supportedFamilies: [.circularSmall, .graphicCorner, .graphicCircular, .utilitarianSmall])
+            CLKComplicationDescriptor(identifier: "complication", displayName: NSLocalizedString("complication.favorite.displayName" , comment: ""), supportedFamilies: [.circularSmall, .graphicCorner, .graphicCircular, .utilitarianSmall, .modularSmall])
         ]
         handler(descriptors)
     }
@@ -65,6 +65,8 @@ extension ComplicationController {
             return CLKComplicationTemplateCircularSmallSimpleImage(imageProvider: CLKImageProvider(onePieceImage: UIImage(named: "Complication/Circular")!))
         case .utilitarianSmall:
             return CLKComplicationTemplateUtilitarianSmallSquare(imageProvider: CLKImageProvider(onePieceImage: UIImage(named: "Complication/Utilitarian")!))
+        case .modularSmall:
+            return CLKComplicationTemplateModularSmallSimpleImage(imageProvider: CLKImageProvider(onePieceImage: UIImage(named: "Complication/Modular")!))
         default:
             return nil
         }

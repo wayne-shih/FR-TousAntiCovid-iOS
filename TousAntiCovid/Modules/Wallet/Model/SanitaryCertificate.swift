@@ -59,7 +59,7 @@ final class SanitaryCertificate: WalletCertificate {
 
     override var timestamp: Double { analysisDate?.timeIntervalSince1970 ?? 0.0 }
 
-    override var pillTitles: [String] { ["wallet.proof.sanitaryCertificate.pillTitle".localized] }
+    override var pillTitles: [(text: String, backgroundColor: UIColor)] { [("wallet.proof.sanitaryCertificate.pillTitle".localized, Appearance.tintColor)] }
     override var shortDescription: String? { [firstName, name].compactMap { $0 }.joined(separator: " ") }
     override var fullDescription: String? {
         var text: String = "wallet.proof.sanitaryCertificate.description".localized

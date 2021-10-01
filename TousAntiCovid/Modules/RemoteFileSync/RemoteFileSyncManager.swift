@@ -11,7 +11,7 @@
 import UIKit
 import ServerSDK
 
-class RemoteFileSyncManager: NSObject {
+class RemoteFileSyncManager {
     
     @UserDefault(key: .lastRemoteFileLanguageCode)
     var lastLanguageCode: String? = nil  {
@@ -67,8 +67,7 @@ class RemoteFileSyncManager: NSObject {
     
     private func fetchLastFile(languageCode: String) {
         let url: URL = remoteFileUrl(for: languageCode)
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: url) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: url) { data, response, error in
             guard let data = data else {
                 return
             }
@@ -106,16 +105,6 @@ class RemoteFileSyncManager: NSObject {
             try? FileManager.default.removeItem(at: destinationFileUrl)
             try? FileManager.default.copyItem(at: fileUrl, to: destinationFileUrl)
             saveLastBuildNumber(currentBuildNumber)
-        }
-    }
-    
-}
-
-extension RemoteFileSyncManager: URLSessionDelegate {
-    
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
-            validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }
     

@@ -11,6 +11,13 @@
 import Foundation
 
 extension Date {
+
+    func dateFormatted() -> String {
+        let formatter: DateFormatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .none
+        return formatter.string(from: self)
+    }
     
     func timeFormatted() -> String {
         let formatter: DateFormatter = DateFormatter()
@@ -68,10 +75,31 @@ extension Date {
         formatter.setLocalizedDateFormatFromTemplate("dMMMyyyyHHmm")
         return formatter.string(from: self)
     }
+
+    func dayMonthYearTimeFormatted(forceEnglishFormat: Bool = false) -> String {
+        let formatter: DateFormatter = DateFormatter()
+        if forceEnglishFormat {
+            formatter.locale = Locale(identifier: "en-GB")
+        }
+        formatter.setLocalizedDateFormatFromTemplate("dMMMMyyyyHHmm")
+        return formatter.string(from: self)
+    }
     
     func fullDayMonthFormatted() -> String {
         let formatter: DateFormatter = DateFormatter()
         formatter.dateFormat = "EEEE d MMMM"
+        return formatter.string(from: self)
+    }
+
+    func dayNameShortDayMonthFormatted() -> String {
+        let formatter: DateFormatter = DateFormatter()
+        formatter.dateFormat = "EEEE dd/MM"
+        return formatter.string(from: self)
+    }
+
+    func shortDayMonthFormatted() -> String {
+        let formatter: DateFormatter = DateFormatter()
+        formatter.setLocalizedDateFormatFromTemplate("ddMM")
         return formatter.string(from: self)
     }
     
@@ -208,6 +236,14 @@ extension Date {
         components.hour = 23
         components.minute = 59
         components.second = 59
+        return Calendar.current.date(from: components)
+    }
+
+    func roundingToNoon() -> Date? {
+        var components: DateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: self)
+        components.hour = 12
+        components.minute = 0
+        components.second = 0
         return Calendar.current.date(from: components)
     }
 

@@ -21,6 +21,7 @@ enum NotificationsContant {
         static let proximityReactivation: String = "proximityReactivationNotification"
         static let stillHavingFever: String = "stillHavingFever"
         static let completedVaccination: String = "completedVaccination"
+        static let activityPassAvailable: String = "activityPassAvailable"
     }
     
 }

@@ -10,10 +10,12 @@
 
 import UIKit
 import StorageSDK
+import ServerSDK
 
 final class UniversalQrScanController: FlashCodeController {
     
     private var didFlash: ((_ url: URL?) throws -> ())?
+    private var confettiView: ConfettiView?
     
     static func controller(didFlash: @escaping (_ url: URL?) throws -> Void, deinitBlock: (() -> ())? = nil) -> UniversalQrScanController {
         let flashCodeController: UniversalQrScanController = StoryboardScene.UniversalQrScan.universalQrScanController.instantiate()
@@ -54,7 +56,12 @@ final class UniversalQrScanController: FlashCodeController {
     
     override func processScannedQRCode(code: String?) {
         do {
-            try didFlash?(DeepLinkingManager.shared.deeplinkForCode(code ?? ""))
+            if code == "https://bonjour.tousanticovid.gouv.fr" {
+                startConfettiWithHaptic()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { self.restartScanning() }
+            } else {
+                try didFlash?(DeepLinkingManager.shared.deeplinkForCode(code ?? ""))
+            }
         } catch {
             let alertTitle: String = "universalQrScanController.error.title".localized
             let alertMessage: String = error.localizedDescription
@@ -72,4 +79,34 @@ final class UniversalQrScanController: FlashCodeController {
         URL(string: "universalQrScanController.footer.link.ios".localized)?.openInSafari()
     }
     
+}
+
+extension UniversalQrScanController {
+    private func startConfettiWithHaptic() {
+        stopConfetti()
+        confettiView = ConfettiView(frame: view.bounds)
+        guard let confettiView = confettiView else { return }
+        view.window?.addSubview(confettiView)
+        confettiView.startConfetti(birthRate: ParametersManager.shared.confettiBirthRate)
+        haptic()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            confettiView.stopConfetti()
+        }
+    }
+
+    private func stopConfetti() {
+        if let oldConfetti = confettiView {
+            oldConfetti.removeFromSuperview()
+            confettiView = nil
+        }
+    }
+
+    private func haptic() {
+        if #available(iOS 13.0, *) {
+            HapticManager.shared.hapticFirework()
+        } else {
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+        }
+    }
 }

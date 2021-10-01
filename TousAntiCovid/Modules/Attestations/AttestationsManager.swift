@@ -28,7 +28,7 @@ final class AttestationsObserverWrapper: NSObject {
     
 }
 
-final class AttestationsManager: NSObject {
+final class AttestationsManager {
     
     static let shared: AttestationsManager = AttestationsManager()
     
@@ -155,8 +155,7 @@ extension AttestationsManager {
             configuration.timeoutIntervalForRequest = timeout
             configuration.timeoutIntervalForResource = timeout
         }
-        let session: URLSession = URLSession(configuration: configuration, delegate: self, delegateQueue: .main)
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: AttestationsConstant.jsonUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: AttestationsConstant.jsonUrl) { data, response, error in
             guard let data = data else {
                 completion()
                 return
@@ -239,14 +238,4 @@ extension AttestationsManager {
         observers.forEach { $0.observer?.attestationsDidUpdate() }
     }
     
-}
-
-extension AttestationsManager: URLSessionDelegate {
-    
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
-            validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
-        }
-    }
-     
 }

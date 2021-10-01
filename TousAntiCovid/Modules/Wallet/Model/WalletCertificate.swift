@@ -22,21 +22,25 @@ class WalletCertificate {
     
     var authority: String?
     var certificateId: String?
+    var parentId: String?
     var message: Data? { fatalError("Must be overriden") }
     var signature: Data? { fatalError("Must be overriden") }
     var isSignatureAlreadyEncoded: Bool { fatalError("Must be overriden") }
 
-    var pillTitles: [String] { fatalError("Must be overriden") }
+    var pillTitles: [(text: String, backgroundColor: UIColor)] { fatalError("Must be overriden") }
     var shortDescription: String? { fatalError("Must be overriden") }
     var fullDescription: String? { fatalError("Must be overriden") }
+    var fullDescriptionForFullscreen: String? { fatalError("Must be overriden") }
     
     var timestamp: Double { fatalError("Must be overriden") }
+
+    var is2dDoc: Bool { type.format == .wallet2DDoc }
 
     var codeImageTitle: String? {
         switch type.format {
         case .wallet2DDoc:
             return "2D-DOC"
-        case .walletDCC:
+        case .walletDCC, .walletDCCACT:
             return nil
         }
     }
@@ -45,7 +49,7 @@ class WalletCertificate {
         switch type.format {
         case .wallet2DDoc:
             return  value.dataMatrix()
-        case .walletDCC:
+        case .walletDCC, .walletDCCACT:
             return value.qrCode()
         }
     }
@@ -76,6 +80,10 @@ class WalletCertificate {
         self.value = value
         self.type = type
     }
+
+    func toRawCertificate() -> RawWalletCertificate {
+        RawWalletCertificate(id: id, value: value, expiryDate: nil, parentId: parentId, didGenerateAllActivityCertificates: false)
+    }
     
 }
 
@@ -92,10 +100,19 @@ extension WalletCertificate {
                 return nil
             }
         } else if let hCert = HCert(from: rawCertificate.value) {
-            return EuropeanCertificate(id: rawCertificate.id,
-                                       value: rawCertificate.value,
-                                       type: WalletManager.certificateType(hCert: hCert),
-                                       hCert: hCert)
+            if let parentId = rawCertificate.parentId {
+                return ActivityCertificate(id: rawCertificate.id,
+                                           value: rawCertificate.value,
+                                           hCert: hCert,
+                                           parentId: parentId)
+            } else {
+                return EuropeanCertificate(id: rawCertificate.id,
+                                           value: rawCertificate.value,
+                                           type: WalletManager.certificateType(hCert: hCert),
+                                           hCert: hCert,
+                                           didGenerateAllActivityCertificates: rawCertificate.didGenerateAllActivityCertificates,
+                                           didAlreadyGenerateActivityCertificates: rawCertificate.didAlreadyGenerateActivityCertificates)
+            }
         } else {
             return nil
         }
@@ -111,10 +128,6 @@ extension WalletCertificate {
         default:
             return nil
         }
-    }
-
-    func toRawCertificate() -> RawWalletCertificate {
-        RawWalletCertificate(id: id, value: value)
     }
 
 }

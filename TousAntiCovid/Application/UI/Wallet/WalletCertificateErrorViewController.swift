@@ -42,9 +42,8 @@ final class WalletCertificateErrorViewController: CVTableViewController {
     
     private func initUI() {
         title = "walletCertificateErrorController.title".localized
+        tableView.tableHeaderView = UIView(frame: .zero)
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -78,6 +77,12 @@ final class WalletCertificateErrorViewController: CVTableViewController {
             documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
         case .recoveryEurope:
             documentImage = WalletImagesManager.shared.image(named: .recoveryEuropeCertificateFull)!
+        case .activityEurope:
+            documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
+        case .exemptionEurope:
+            documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
+        case .unknown:
+            documentImage = UIImage()
         }
         let checkDocumentRow: CVRow = CVRow(title: "walletCertificateErrorController.checkDocument.\(certificateType.textKey).title".localized,
                                             subtitle: "walletCertificateErrorController.checkDocument.\(certificateType.textKey).subtitle".localized,
@@ -86,7 +91,7 @@ final class WalletCertificateErrorViewController: CVTableViewController {
                                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                                            topInset: 15.0,
                                                            bottomInset: 0.0,
-                                                           textAlignment: .natural,
+                                                           textAlignment: .center,
                                                            titleFont: { Appearance.Cell.Text.headTitleFont }),
                                         selectionAction: { [weak self] in
                                             guard let self = self else { return }

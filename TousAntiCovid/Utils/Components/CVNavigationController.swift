@@ -11,12 +11,17 @@
 import UIKit
 
 final class CVNavigationController: UINavigationController, UINavigationControllerDelegate {
-    
+
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        topViewController?.preferredStatusBarStyle ?? super.preferredStatusBarStyle
+    }
+    override var childForStatusBarHidden: UIViewController? { topViewController }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
     }
-    
+
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         let backBarButton = UIBarButtonItem(title: " ", style: .plain, target: nil, action: nil)
         viewController.navigationItem.backBarButtonItem = backBarButton

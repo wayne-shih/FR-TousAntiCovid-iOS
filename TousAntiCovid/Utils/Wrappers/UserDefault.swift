@@ -101,6 +101,9 @@ extension UserDefault {
         case lastInitialBlacklist2dDocBuildNumber
         case lastInitialDccBlacklistBuildNumber
         case isWatchAppInstalled
+        case activityPassAutoRenewalActivated
+        case activityPassNotificationActivated
+        case hideStatusBar
     }
     
 }

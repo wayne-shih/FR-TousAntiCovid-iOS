@@ -58,6 +58,12 @@ final class DocumentExplanationViewController: CVTableViewController {
             documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
         case .recoveryEurope:
             documentImage = WalletImagesManager.shared.image(named: .recoveryEuropeCertificateFull)!
+        case .activityEurope:
+            documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
+        case .exemptionEurope:
+            documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
+        case .unknown:
+            documentImage = UIImage()
         }
         let ratioHeight: CGFloat = (documentImage.size.height / documentImage.size.width) * UIScreen.main.bounds.width
         let imageRow: CVRow = CVRow(image: documentImage,
@@ -70,10 +76,8 @@ final class DocumentExplanationViewController: CVTableViewController {
     }
     
     private func initUI() {
-        tableView.contentInset.top = 20.0
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
     }

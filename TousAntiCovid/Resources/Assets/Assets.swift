@@ -127,6 +127,7 @@ internal enum Asset {
     internal static let tabBarSupportSelected = ImageAsset(name: "TabBarSupport-Selected")
     internal static let logosPasseport = ImageAsset(name: "LogosPasseport")
     internal static let walletPhone = ImageAsset(name: "WalletPhone")
+    internal static let logoPS = ImageAsset(name: "logoPS")
     internal static let usefulLinks = ImageAsset(name: "UsefulLinks")
     internal static let about = ImageAsset(name: "about")
     internal static let bubble = ImageAsset(name: "bubble")

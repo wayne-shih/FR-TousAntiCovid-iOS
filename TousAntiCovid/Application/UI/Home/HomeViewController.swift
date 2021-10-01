@@ -15,7 +15,7 @@ import StorageSDK
 import ServerSDK
 
 final class HomeViewController: CVTableViewController {
-    
+
     var canActivateProximity: Bool { areNotificationsAuthorized == true && BluetoothStateManager.shared.isAuthorized && BluetoothStateManager.shared.isActivated }
     private let showCaptchaChallenge: (_ captcha: Captcha, _ didEnterCaptcha: @escaping (_ id: String, _ answer: String) -> (), _ didCancelCaptcha: @escaping () -> ()) -> ()
     private let didTouchAppUpdate: () -> ()
@@ -51,6 +51,7 @@ final class HomeViewController: CVTableViewController {
     private var isActivated: Bool { canActivateProximity && RBManager.shared.isProximityActivated }
     private var wasActivated: Bool = false
     private var isChangingState: Bool = false
+    private var didShowRobertErrorAlertOnce: Bool = false
     
     private var areNotificationsAuthorized: Bool?
     private weak var stateCell: StateAnimationCell?
@@ -62,7 +63,7 @@ final class HomeViewController: CVTableViewController {
             return false
         }
     }
-    
+
     @UserDefault(key: .latestAvailableBuild)
     private var latestAvailableBuild: Int?
 
@@ -145,11 +146,8 @@ final class HomeViewController: CVTableViewController {
         if !RBManager.shared.isRegistered {
             areNotificationsAuthorized = true
             isWaitingForNeededInfo = false
-            updateUIForAuthorizationChange()
         }
-        updateNotificationsState {
-            self.updateUIForAuthorizationChange()
-        }
+        updateNotificationsState { self.updateUIForAuthorizationChange() }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -158,6 +156,7 @@ final class HomeViewController: CVTableViewController {
         stateCell?.continuePlayingIfNeeded()
         showUniversalQrCodeExplanationsIfNeeded()
         showUserLanguageIfNeeded()
+        displayRobertUnregisteredAlertIfNecessary()
     }
     
     deinit {
@@ -329,10 +328,8 @@ final class HomeViewController: CVTableViewController {
     }
 
     private func initUI() {
-        tableView.contentInset.top = navigationChildController?.navigationBarHeight ?? 0.0
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: navigationChildController?.navigationBarHeight ?? 0.0))
         updateTableViewBottomInset()
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.canCancelContentTouches = true
@@ -342,7 +339,6 @@ final class HomeViewController: CVTableViewController {
         scanBarButtonItem.accessibilityLabel = "home.qrScan.button.title".localized
         navigationChildController?.updateRightBarButtonItem(scanBarButtonItem)
         navigationChildController?.navigationBar.isAccessibilityElement = false
-
     }
 
     private func updateTableViewBottomInset() {
@@ -375,7 +371,7 @@ final class HomeViewController: CVTableViewController {
         WalletManager.shared.addObserver(self)
         NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(statusDataChanged), name: .statusDataDidChange, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(widgetDidRequestRegister), name: .widgetDidRequestRegister, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(requestRegister), name: .requestRegister, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(didTouchProximityReactivationNotification), name: .didTouchProximityReactivationNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(openFullVenueRecordingFlowFromDeeplink), name: .openFullVenueRecordingFlowFromDeeplink, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(newVenueRecordingFromDeeplink(_:)), name: .newVenueRecordingFromDeeplink, object: nil)
@@ -388,6 +384,7 @@ final class HomeViewController: CVTableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(openWallet), name: .openWallet, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(openCertificateQRCode), name: .openCertificateQRCode, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(voiceOverStatusDidChange), name: UIAccessibility.voiceOverStatusDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(displayRobertUnregisteredAlertIfNecessary), name: .gotRobert430Error, object: nil)
     }
     
     private func removeObservers() {
@@ -601,7 +598,7 @@ final class HomeViewController: CVTableViewController {
         updateUIForAuthorizationChange()
     }
     
-    @objc private func widgetDidRequestRegister() {
+    @objc private func requestRegister() {
         didChangeSwitchValue(isOn: true)
     }
     
@@ -937,6 +934,10 @@ extension HomeViewController {
                                                              titleFont: { Appearance.Cell.Text.headTitleFont }))
         rows.append(infoSectionRow)
 
+        let isHavingFeaturedKeyFigures: Bool = !KeyFiguresManager.shared.featuredKeyFigures.isEmpty
+        if isHavingFeaturedKeyFigures && !KeyFiguresManager.shared.canShowCurrentlyNeededFile {
+            rows.append(contentsOf: keyFiguresWarningRows())
+        }
         let highlightedKeyFigure: KeyFigure? = KeyFiguresManager.shared.highlightedKeyFigure
         if let highlightedKeyFigure = highlightedKeyFigure, highlightedKeyFigure.isLabelReady {
             let highlightedKeyFigureRow: CVRow = CVRow(title: ["home.infoSection.newCases".localized, "(\("common.country.france".localized))"].joined(separator: " "),
@@ -959,7 +960,7 @@ extension HomeViewController {
                                                        })
             rows.append(highlightedKeyFigureRow)
         }
-        if !KeyFiguresManager.shared.featuredKeyFigures.isEmpty {
+        if isHavingFeaturedKeyFigures {
             let keyFiguresRow: CVRow = CVRow(title: highlightedKeyFigure?.isLabelReady == true ? "home.infoSection.otherKeyFigures".localized : "home.infoSection.keyFigures".localized,
                                              accessoryText: highlightedKeyFigure?.isLabelReady == true ? nil :  "keyfigure.dailyUpdates".localized,
                                              buttonTitle: "home.infoSection.seeAll".localized,
@@ -1051,6 +1052,40 @@ extension HomeViewController {
         }
 
         return rows
+    }
+
+    private func keyFiguresWarningRows() -> [CVRow] {
+        let warningRow: CVRow = CVRow(subtitle: "keyFiguresController.fetchError.message".localized,
+                                      xibName: .cardCell,
+                                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                                         topInset: 0.0,
+                                                         bottomInset: 0.0,
+                                                         textAlignment: .center,
+                                                         maskedCorners: .top),
+                                      selectionAction: {
+                                        HUD.show(.progress)
+                                        KeyFiguresManager.shared.fetchKeyFigures {
+                                            HUD.hide()
+                                        }
+                                      })
+        let retryRow: CVRow = CVRow(title: "keyFiguresController.fetchError.button".localized,
+                                    xibName: .standardCardCell,
+                                    theme:  CVRow.Theme(backgroundColor: Appearance.Button.Secondary.backgroundColor,
+                                                        topInset: 0.0,
+                                                        bottomInset: Appearance.Cell.leftMargin,
+                                                        textAlignment: .center,
+                                                        titleFont: { Appearance.Cell.Text.actionTitleFont },
+                                                        titleColor: Appearance.Button.Secondary.titleColor,
+                                                        separatorLeftInset: nil,
+                                                        separatorRightInset: nil,
+                                                        maskedCorners: .bottom),
+                                    selectionAction: {
+                                        HUD.show(.progress)
+                                        KeyFiguresManager.shared.fetchKeyFigures {
+                                            HUD.hide()
+                                        }
+                                    })
+        return [warningRow, retryRow]
     }
 
     private func attestationSectionRows() -> [CVRow] {
@@ -1286,9 +1321,7 @@ extension HomeViewController: KeyFiguresChangesObserver {
         reloadUI(animated: true)
     }
 
-    func postalCodeDidUpdate(_ postalCode: String?) {
-        reloadUI(animated: true)
-    }
+    func postalCodeDidUpdate(_ postalCode: String?) {}
 
 }
 
@@ -1316,11 +1349,28 @@ extension HomeViewController: RisksUIChangesObserver {
 
 
 extension HomeViewController: WalletChangesObserver {
-
     func walletCertificatesDidUpdate() {}
+    func walletActivityCertificateDidUpdate() {}
 
     func walletFavoriteCertificateDidUpdate() {
         reloadUI(animated: true)
     }
 
+}
+
+extension HomeViewController {
+    // In order to help user who has added venues to the app but is not registered to reregister to Robert to add more venues
+    @objc private func displayRobertUnregisteredAlertIfNecessary() {
+        if !RBManager.shared.isRegistered && !VenuesManager.shared.venuesQrCodes.isEmpty && !didShowRobertErrorAlertOnce {
+            didShowRobertErrorAlertOnce = true
+            showAlert(
+                title: "robertStatus.error.alert.title".localized,
+                message: "robertStatus.error.alert.message".localized,
+                okTitle: "robertStatus.error.alert.later".localized,
+                cancelTitle: "robertStatus.error.alert.action".localized,
+                cancelHandler: { [weak self] in
+                    self?.requestRegister()
+                })
+        }
+    }
 }

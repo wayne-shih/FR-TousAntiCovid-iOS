@@ -22,7 +22,16 @@ extension AnalyticsManager {
             realm.add(error)
         }
     }
-    
+
+    func reportError(serviceName: String, code: Int) {
+        guard isOptIn else { return }
+        let error: AnalyticsError = AnalyticsError(name: "ERR-\(serviceName.uppercased())-\(code)", timestamp: Date().roundingToHour()?.universalDateFormatted() ?? "", desc: nil)
+        let realm: Realm = try! Realm.analyticsDb()
+        try! realm.write {
+            realm.add(error)
+        }
+    }
+
     func getCurrentErrors() -> [AnalyticsError] {
         let realm: Realm = try! Realm.analyticsDb()
         return [AnalyticsError](realm.objects(AnalyticsError.self))

@@ -27,7 +27,7 @@ final class DccBlacklistObserverWrapper: NSObject {
 
 }
 
-final class DccBlacklistManager: NSObject {
+final class DccBlacklistManager {
 
     static let shared: DccBlacklistManager = DccBlacklistManager()
 
@@ -62,9 +62,7 @@ final class DccBlacklistManager: NSObject {
 extension DccBlacklistManager {
 
     private func fetchCertList() {
-        let session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        session.configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let dataTask: URLSessionDataTask = session.dataTaskWithETag(with: DccBlacklistConstant.certListUrl) { data, response, error in
+        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: DccBlacklistConstant.certListUrl) { data, response, error in
             guard let data = data else { return }
             do {
                 self.hashes = try JSONDecoder().decode([String].self, from: data)
@@ -135,16 +133,6 @@ extension DccBlacklistManager {
 
     private func notifyObservers() {
         observers.forEach { $0.observer?.dccBlacklistDidUpdate() }
-    }
-
-}
-
-extension DccBlacklistManager: URLSessionDelegate {
-
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CertificatePinning.validateChallenge(challenge, certificateFiles: Constant.Server.resourcesCertificates) { validated, credential in
-            validated ? completionHandler(.useCredential, credential) : completionHandler(.cancelAuthenticationChallenge, nil)
-        }
     }
 
 }

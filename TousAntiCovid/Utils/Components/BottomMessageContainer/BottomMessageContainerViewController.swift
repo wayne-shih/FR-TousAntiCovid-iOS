@@ -12,6 +12,8 @@ import UIKit
 
 final class BottomMessageContainerViewController: UIViewController {
 
+    override var childForStatusBarHidden: UIViewController? { embeddedController }
+
     var messageDidTouch: (() -> ())?
     var messageHeight: CGFloat {
         messageLabel.text?.isEmpty != false ? 0.0 : messageView.frame.height

@@ -11,36 +11,43 @@
 import UIKit
 
 final class ParagraphCell: CardCell {
-    
+
     @IBOutlet private var button: UIButton!
 
     override func setup(with row: CVRow) {
         super.setup(with: row)
-        setupUI()
+        setupUI(with: row)
         setupContent(with: row)
     }
-    
-    private func setupUI() {
+
+    private func setupUI(with row: CVRow) {
         cvSubtitleLabel?.font = Appearance.Cell.Text.subtitleFont
-        button?.contentHorizontalAlignment = .left
+        button?.contentHorizontalAlignment = row.theme.textAlignment == .center ? .center : .left
         button?.tintColor = Appearance.Button.Tertiary.titleColor
         button?.titleLabel?.font = Appearance.Button.linkFont
         button?.titleLabel?.adjustsFontForContentSizeCategory = true
     }
-    
+
     private func setupContent(with row: CVRow) {
         if #available(iOS 13.0, *) {
             let imageAttachment: NSTextAttachment = NSTextAttachment()
             imageAttachment.image = UIImage(systemName: "arrow.up.right.square.fill")?.withRenderingMode(.alwaysTemplate)
             let fullString: NSMutableAttributedString = NSMutableAttributedString(string: "\(row.buttonTitle ?? "") ")
             fullString.append(NSAttributedString(attachment: imageAttachment))
-            button.setAttributedTitle(fullString, for: .normal)
+            UIView.performWithoutAnimation {
+                button.setAttributedTitle(fullString, for: .normal)
+                button.isHidden = row.buttonTitle?.isEmpty != false
+                button.layoutIfNeeded()
+            }
         } else {
-            button.setTitle(row.buttonTitle, for: .normal)
+            UIView.performWithoutAnimation {
+                button.setTitle(row.buttonTitle, for: .normal)
+                button.isHidden = row.buttonTitle?.isEmpty != false
+                button.layoutIfNeeded()
+            }
         }
-        button.isHidden = row.buttonTitle?.isEmpty != false
     }
-    
+
     @IBAction private func buttonPressed(_ sender: Any) {
         currentAssociatedRow?.selectionAction?()
     }

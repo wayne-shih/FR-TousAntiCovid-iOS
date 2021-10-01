@@ -97,5 +97,5 @@ public protocol RBStorage {
     func clearLocalEpochs()
     func clearLocalProximityList()
     func clearAll(includingDBKey: Bool)
-
+    func clearRobertData()
 }

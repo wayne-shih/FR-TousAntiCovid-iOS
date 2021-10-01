@@ -13,7 +13,7 @@ import UIKit
 final class StandardSwitchCell: CVTableViewCell {
     
     @IBOutlet var cvSwitch: UISwitch!
-    
+
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI(with: row)
@@ -31,7 +31,10 @@ final class StandardSwitchCell: CVTableViewCell {
     }
     
     @IBAction private func switchValueChanged() {
-        currentAssociatedRow?.valueChanged?(cvSwitch.isOn)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            guard let self = self else { return }
+            self.currentAssociatedRow?.valueChanged?(self.cvSwitch.isOn)
+        }
     }
     
 }

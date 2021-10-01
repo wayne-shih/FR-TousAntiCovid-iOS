@@ -63,6 +63,11 @@ enum Appearance {
             static var backgroundColor: UIColor { .clear }
             static var titleColor: UIColor { Asset.Colors.error.color }
         }
+
+        enum Disabled {
+            static var backgroundColor: UIColor { .lightGray }
+            static var titleColor: UIColor { Asset.Colors.buttonLabel.color }
+        }
         
     }
     

@@ -12,7 +12,9 @@ import SwiftUI
 import WidgetKit
 
 struct HeaderView: View {
+
     var separatorColor : Color
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {

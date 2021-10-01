@@ -12,20 +12,27 @@ import UIKit
 
 final class BottomButtonContainerController: UIViewController {
 
-    @IBOutlet private var button: CVButton!
+    @IBOutlet private(set) var button: CVButton!
     @IBOutlet private var secondaryButton: UIButton!
     @IBOutlet private var bottomBarView: UIView!
     @IBOutlet private var containerView: UIView!
     @IBOutlet private var separator: UIView!
+    @IBOutlet private var bottomConstraint: NSLayoutConstraint!
+
     private var embeddedController: UIViewController?
     private var buttonAction: (() -> ())?
     private var secondaryButtonAction: (() -> ())?
     private var buttonStyle: CVButton.Style = .primary
     private var accessHint: String?
+    private var isHidden: Bool = false
     
     @IBOutlet private var buttonLeadingConstraint: NSLayoutConstraint?
     @IBOutlet private var buttonTrailingConstraint: NSLayoutConstraint?
-    
+
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        embeddedController?.preferredStatusBarStyle ?? super.preferredStatusBarStyle
+    }
+
     class func controller(_ embeddedController: UIViewController, buttonStyle: CVButton.Style = .primary, accessibilityHint: String? = nil) -> UIViewController {
         let containerController: BottomButtonContainerController = StoryboardScene.BottomButtonContainer.bottomButtonContainerController.instantiate()
         containerController.embeddedController = embeddedController
@@ -57,6 +64,14 @@ final class BottomButtonContainerController: UIViewController {
     public func unlockButtons() {
         button.isUserInteractionEnabled = true
         secondaryButton.isUserInteractionEnabled = true
+    }
+
+    public func setBottomBarHidden(_ isHidden: Bool, animated: Bool) {
+        guard self.isHidden != isHidden else { return }
+        let safeAreaBottomInset: CGFloat = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
+        bottomConstraint.constant = isHidden ? bottomBarView.frame.height + separator.frame.height + safeAreaBottomInset : 0.0
+        self.isHidden = isHidden
+        UIView.animate(withDuration: animated ? 0.3 : 0.0) { self.view.layoutIfNeeded() }
     }
     
     private func initUI() {
