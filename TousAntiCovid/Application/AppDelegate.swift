@@ -13,6 +13,9 @@ import PKHUD
 import RobertSDK
 import StorageSDK
 import ServerSDK
+#if !PROD
+import Firebase
+#endif
 
 @UIApplicationMain
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -58,15 +61,15 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                        configCertificateFiles: Constant.Server.certificates)
         ConversionServer.shared.start(session: UrlSessionManager.shared.session,
                                       convertUrl: { Constant.Server.convertUrl },
-                                      requestLoggingHandler: { request, response, responseData, error in })
+                                      requestLoggingHandler: { _, _, _, _ in })
         ActivityCertificateServer.shared.start(session: URLSession.shared,
                                                serverUrl: { Constant.Server.activityCertificateGenerationUrl },
-                                               requestLoggingHandler: { request, response, responseData, error in })
+                                               requestLoggingHandler: { _, _, _, _ in })
         CleaServer.shared.start(certificateFiles: Constant.Server.certificates,
                                 reportBaseUrl: { Constant.Server.cleaReportBaseUrl },
                                 statusBaseUrl: { Constant.Server.cleaStatusBaseUrl() },
                                 statusBaseFallbackUrl: { Constant.Server.cleaStatusBaseUrl(fallbackUrl: true) },
-                                taskLoggingHandler: { task, responseData, error in })
+                                taskLoggingHandler: { _, _, _ in })
         
         RBManager.shared.start(isFirstInstall: !isAppAlreadyInstalled,
                                server: Server(baseUrl: { Constant.Server.baseUrl },
@@ -76,7 +79,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                                 if UIApplication.shared.applicationState != .active {
                                                     NotificationsManager.shared.triggerDeviceTimeErrorNotification()
                                                 }
-                                              }, taskLoggingHandler: { task, responseData, error in }),
+                                              }, taskLoggingHandler: { _, _, _ in }),
                                storage: storageManager,
                                bluetooth: BluetoothManager(),
                                filter: FilteringManager(),
@@ -85,7 +88,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                     NotificationsManager.shared.triggerRestartNotification()
                                }, didReceiveProximityHandler: {
                                     StatusManager.shared.status()
-                               }, didSaveProximity: { proximity in })
+                               }, didSaveProximity: { _ in })
         RatingsManager.shared.start()
         AnalyticsManager.shared.start()
         if #available(iOS 14.0, *) {

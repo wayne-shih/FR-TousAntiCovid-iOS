@@ -152,7 +152,6 @@ extension String {
             guard let cgImage = ZXImage(matrix: result)?.cgimage else { return nil }
             return UIImage(cgImage: cgImage)
         } catch {
-            print(error)
             return nil
         }
     }

@@ -44,6 +44,7 @@ final class HomeViewController: CVTableViewController {
     private let didEnterCodeFromDeeplink: (_ code: String) -> ()
     private let showUniversalQrScanExplanation: (_ initialButtonFrame: CGRect?, _ animationDidEnd: @escaping (_ animated: Bool) -> ()) -> ()
     private let showUserLanguage: () -> ()
+    private let didTouchUrgentDgs: () -> ()
     private let deinitBlock: () -> ()
     
     private var popRecognizer: InteractivePopGestureRecognizer?
@@ -100,6 +101,7 @@ final class HomeViewController: CVTableViewController {
          showUniversalQrScanExplanation: @escaping (_ initialButtonFrame: CGRect?, _ animationDidEnd: @escaping (_ animated: Bool) -> ()) -> (),
          didEnterCodeFromDeeplink: @escaping (_ code: String) -> (),
          showUserLanguage: @escaping () -> (),
+         didTouchUrgentDgs: @escaping () -> (),
          deinitBlock: @escaping () -> ()) {
         self.didTouchAppUpdate = didTouchAppUpdate
         self.didTouchDocument = didTouchDocument
@@ -128,6 +130,7 @@ final class HomeViewController: CVTableViewController {
         self.didTouchCertificate = didTouchCertificate
         self.didEnterCodeFromDeeplink = didEnterCodeFromDeeplink
         self.showUserLanguage = showUserLanguage
+        self.didTouchUrgentDgs = didTouchUrgentDgs
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
     }
@@ -674,7 +677,8 @@ final class HomeViewController: CVTableViewController {
         ParametersManager.shared.proximityReactivationReminderHours.forEach { hours in
             let hoursString: String = hours == 1 ? "home.deactivate.actionSheet.hours.singular" : "home.deactivate.actionSheet.hours.plural"
             alertController.addAction(UIAlertAction(title: String(format: hoursString.localized, Int(hours)), style: .default) { [weak self] _ in
-                self?.triggerReactivationReminder(hours: Double(hours))
+                var hoursToUse: Double = Double(hours)
+                self?.triggerReactivationReminder(hours: hoursToUse)
             })
         }
         alertController.addAction(UIAlertAction(title: "home.deactivate.actionSheet.noReminder".localized, style: .cancel) { [weak self] _ in
@@ -758,13 +762,30 @@ extension HomeViewController {
                                  bottomInset: 0.0,
                                  textAlignment: .natural),
               selectionAction: { [weak self] in
-                self?.didTouchAppUpdate()
-              })
+            self?.didTouchAppUpdate()
+        })
     }
     
     private func healthSectionRows() -> [CVRow] {
         var rows: [CVRow] = []
         
+        if ParametersManager.shared.shouldDisplayUrgentDgs {
+            let urgentDgsRow: CVRow = CVRow(title: "home.healthSection.dgsUrgent.title".localized,
+                                            subtitle: "home.healthSection.dgsUrgent.subtitle".localized,
+                                            image: nil,
+                                            xibName: .cardCell,
+                                            theme: CVRow.Theme(backgroundColor: Appearance.Cell.redBackgroundColor,
+                                                               topInset: 0.0,
+                                                               bottomInset: Appearance.Cell.leftMargin,
+                                                               textAlignment: .natural,
+                                                               titleColor: UIColor.white,
+                                                               subtitleColor: UIColor.white),
+                                            selectionAction: { [weak self] in
+                self?.didTouchUrgentDgs()
+            })
+            
+            rows.append(urgentDgsRow)
+        }
         if !StatusManager.shared.hideStatus {
             if RBManager.shared.isImmune {
                 let row: CVRow = contactStatusRow(header: nil,
@@ -1229,6 +1250,7 @@ extension HomeViewController {
                                                          actionBlock: { [weak self] in
                                                             self?.didTouchAbout()
                                                          })])
+
         rows.append(contentsOf: menuRowsForEntries(menuEntries))
         return rows
     }

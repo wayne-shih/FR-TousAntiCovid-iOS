@@ -28,7 +28,7 @@ struct HeaderView: View {
             Rectangle()
                 .fill(separatorColor)
                 .frame(height: 0.5)
-        }
+        }.unredacted()
         
     }
 }

@@ -134,7 +134,7 @@ final class StatusManager {
             completion?(error)
         }
     }
-    
+
 }
 
 extension StatusManager {
@@ -419,6 +419,7 @@ extension StatusManager {
                 AnalyticsManager.shared.reportHealthEvent(.eh2, description: "\(newRiskLevelInfo.riskLevel)")
             }
         }
+
         currentStatusRiskLevel = newRiskLevelInfo
 
         if UIApplication.shared.applicationState == .active {

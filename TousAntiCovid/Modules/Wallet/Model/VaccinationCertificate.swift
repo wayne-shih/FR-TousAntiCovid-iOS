@@ -35,7 +35,6 @@ final class VaccinationCertificate: WalletCertificate {
         do {
             return try signatureString.decodeBase32(padded: signatureString.hasSuffix("="))
         } catch {
-            print(error)
             return nil
         }
     }

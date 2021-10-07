@@ -45,6 +45,7 @@ internal enum Asset {
     internal static let success = ColorAsset(name: "success")
     internal static let tacBlue = ColorAsset(name: "tacBlue")
     internal static let tint = ColorAsset(name: "tint")
+    internal static let urgent = ColorAsset(name: "urgent")
   }
   internal enum Images {
     internal static let shops = ImageAsset(name: "Shops")
@@ -113,6 +114,11 @@ internal enum Asset {
     internal static let thumbsup = ImageAsset(name: "Thumbsup")
     internal static let venuesRecording = ImageAsset(name: "VenuesRecording")
     internal static let wallet = ImageAsset(name: "Wallet")
+    internal static let debug4g = ImageAsset(name: "debug-4g")
+    internal static let debugDateToggle = ImageAsset(name: "debug-dateToggle")
+    internal static let debugFilter = ImageAsset(name: "debug-filter")
+    internal static let debugNotconnected = ImageAsset(name: "debug-notconnected")
+    internal static let debugWifi = ImageAsset(name: "debug-wifi")
     internal static let tabBarDeclareNormal = ImageAsset(name: "TabBarDeclare-Normal")
     internal static let tabBarInfoNormal = ImageAsset(name: "TabBarInfo-Normal")
     internal static let tabBarProximityNormal = ImageAsset(name: "TabBarProximity-Normal")

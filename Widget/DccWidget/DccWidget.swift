@@ -27,6 +27,7 @@ struct DccWidget: Widget {
 }
 
 struct DccProvider: TimelineProvider {
+    
     public typealias Entry = DccWidgetContent
     
     func getSnapshot(in context: Context, completion: @escaping (DccWidgetContent) -> ()) { completion(createEntry(Date())) }
@@ -46,8 +47,10 @@ struct DccProvider: TimelineProvider {
         let timeline: Timeline = Timeline(entries: [entry], policy: .after(adjustedEndDate))
         completion(timeline)
     }
-
-    func placeholder(in context: Context) -> DccWidgetContent { createEntry(Date()) }
+    
+    func placeholder(in context: Context) -> DccWidgetContent {
+        createEntry(Date())
+    }
 
     private func createEntry(_ date: Date) -> DccWidgetContent {
         DccWidgetContent(date: date,

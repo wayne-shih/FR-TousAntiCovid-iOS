@@ -69,7 +69,7 @@ enum XibName: String {
     case updateAppCell = "UpdateAppCell"
     case statusVerificationCell = "StatusVerificationCell"
     case walletDocumentsCell = "WalletDocumentsCell"
-    case whenToUseCell = "WhenToUseCell"
+    case cardWithButtonCell = "CardWithButtonCell"
     case phoneCell = "PhoneCell"
     case segmentedCell = "SegmentedCell"
     case walletAddCertificateCell = "WalletAddCertificateCell"
@@ -77,4 +77,5 @@ enum XibName: String {
     case zoomableImageCell = "ZoomableImageCell"
     case favoriteCertificateCell = "FavoriteCertificateCell"
     case activityPassExpirationCell = "ActivityPassExpirationCell"
+
 }

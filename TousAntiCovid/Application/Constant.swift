@@ -52,34 +52,24 @@ enum Constant {
         static let resourcesRootDomain: String = "app.tousanticovid.gouv.fr"
 
         static let staticResourcesRootDomain: String = "app-static.tousanticovid.gouv.fr"
-
+        
         static var baseUrl: URL { URL(string: "https://api.tousanticovid.gouv.fr/api/\(ParametersManager.shared.apiVersion.rawValue)")! }
-
         static var cleaReportBaseUrl: URL { URL(string: "https://signal-api.tousanticovid.gouv.fr/api/clea/\(ParametersManager.shared.cleaReportApiVersion.rawValue)")! }
-
         static var analyticsBaseUrl: URL { URL(string: "https://analytics-api.tousanticovid.gouv.fr/api/\(ParametersManager.shared.analyticsApiVersion.rawValue)")! }
 
         static let publicKey: Data = Data(base64Encoded: "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAc9IDt6qJq453SwyWPB94JaLB2VfTAcL43YVtMr3HhDCd22gKaQXIbX1d+tNhfvaKM51sxeaXziPjntUzbTNiw==")!
-
         static var certificates: [Data] { ["certigna-root", "certigna-services"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
-
         static var dccCertsUrl: URL { URL(string: "https://\(staticResourcesRootDomain)/json/version-\(jsonVersion)/Certs/dcc-certs.json")! }
-
         static var convertCertificates: [Data] { ["ISRG-Root-X1", "R3"].compactMap { Bundle.main.fileDataFor(fileName: $0, ofType: "pem") } }
-
         static var convertUrl: URL {
             ParametersManager.shared.walletConversionApiVersion == 2 ?
                 URL(string: "https://portail.tacv.myservices-ingroupe.com/api/v2/client/convertor/decode/decodeDocument")! :
                 URL(string: "https://portail.tacv.myservices-ingroupe.com/api/client/convertor/decode/decodeDocument")!
         }
-
         static var activityCertificateGenerationUrl: URL? { nil }
-
         static let jsonVersion: Int = 35
-
         static let baseJsonUrl: String = "https://\(resourcesRootDomain)/json/version-\(jsonVersion)/Config"
         static let configUrl: URL = URL(string: "\(baseJsonUrl)/config.json")!
-
         static func cleaStatusBaseUrl(fallbackUrl: Bool = false) -> URL {
             let defaultCleaUrl: URL = URL(string: ParametersManager.shared.defaultCleaUrl)!
             let baseUrl: URL = fallbackUrl ? defaultCleaUrl : URL(string: ParametersManager.shared.cleaUrl) ?? defaultCleaUrl

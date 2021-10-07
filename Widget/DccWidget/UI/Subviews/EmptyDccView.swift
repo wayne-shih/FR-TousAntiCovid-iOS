@@ -13,17 +13,39 @@ import SwiftUI
 struct EmptyDccView: View {
     var content: DccWidgetContent
     
+    @Environment(\.widgetFamily) private var family
+    
     var body: some View {
+        let padding: Double = family == .systemLarge ? 30 : 10
+        let topPadding: Double = family == .systemLarge ? 20 : 0
+        let logoSize: CGSize = family == .systemLarge ? CGSize(width: 140, height: 36) : CGSize(width: 70, height: 18)
         VStack(alignment: .center) {
             HeaderView(separatorColor: Color("separator"))
-            Spacer()
-            Image("logoPS")
-                .frame(width: 140, height: 36, alignment: .center)
-            Text(content.noCertificatText)
-                .multilineTextAlignment(.center)
-                .font(SwiftUI.Font(FontFamily.Marianne.bold.font(size: 15)))
-                .padding(EdgeInsets(top: 20, leading: 30, bottom: 0, trailing: 30))
-            Spacer()
+            Spacer(minLength: 0)
+            containerView {
+                Image("logoPS")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .clipped()
+                    .frame(width: logoSize.width, height: logoSize.height, alignment: .center)
+                    .unredacted()
+                Text(content.noCertificatText)
+                    .multilineTextAlignment(family == .systemLarge ? .center : .leading)
+                    .font(SwiftUI.Font(FontFamily.Marianne.bold.font(size: family == .systemLarge ? 15 : 13)))
+                    .padding(EdgeInsets(top: topPadding, leading: padding, bottom: 0, trailing: padding))
+                    .unredacted()
+            }
+            Spacer(minLength: 0)
+        }
+    }
+    
+    @ViewBuilder
+    func containerView<T: View>(@ViewBuilder content: () -> T) -> some View {
+        if family == .systemLarge {
+            VStack(alignment: .center, content: content)
+        } else {
+            HStack(alignment: .center, content: content)
+                .padding(EdgeInsets(top: 0.0, leading: 10.0, bottom: 0.0, trailing: 10.0))
         }
     }
 }

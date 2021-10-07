@@ -198,6 +198,7 @@ enum Appearance {
         }
         
         static var cardBackgroundColor: UIColor { Asset.Colors.cardTableViewCellBackground.color }
+        static var redBackgroundColor: UIColor { Asset.Colors.urgent.color }
         static let leftMargin: CGFloat = 16.0
         static let rightMargin: CGFloat = 16.0
         

@@ -31,8 +31,16 @@ final class FlashVenueCodeController: FlashCodeController {
         navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont,
                                                                    .foregroundColor: UIColor.white]
         navigationController?.navigationBar.tintColor = .white
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
+        if #available(iOS 15, *) {
+            // navigation bar transparency specified in child controller
+            let appearence = UINavigationBarAppearance()
+            appearence.configureWithTransparentBackground()
+            navigationItem.scrollEdgeAppearance = appearence
+            navigationItem.standardAppearance = appearence
+        } else {
+            navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+            navigationController?.navigationBar.shadowImage = UIImage()
+        }
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
         navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "common.moreInfo".localized, style: .plain, target: self, action: #selector(didTouchMoreInfoButton))

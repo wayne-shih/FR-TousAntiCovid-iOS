@@ -48,7 +48,7 @@ class WalletCertificate {
     var codeImage: UIImage? {
         switch type.format {
         case .wallet2DDoc:
-            return  value.dataMatrix()
+            return value.dataMatrix()
         case .walletDCC, .walletDCCACT:
             return value.qrCode()
         }

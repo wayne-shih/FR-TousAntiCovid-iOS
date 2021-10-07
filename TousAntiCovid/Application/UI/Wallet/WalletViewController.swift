@@ -164,7 +164,7 @@ final class WalletViewController: CVTableViewController {
         let whenToUseRow: CVRow = CVRow(title: "walletController.whenToUse.title".localized,
                                         subtitle: "walletController.whenToUse.subtitle".localized,
                                         buttonTitle: "walletController.whenToUse.button".localized,
-                                        xibName: .whenToUseCell,
+                                        xibName: .cardWithButtonCell,
                                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                                            topInset: 15.0,
                                                            bottomInset: 0.0,
@@ -179,7 +179,7 @@ final class WalletViewController: CVTableViewController {
         let fraudRow: CVRow = CVRow(title: "walletController.info.fraud.title".localized,
                                         subtitle: "walletController.info.fraud.explanation".localized,
                                         buttonTitle: "walletController.info.fraud.button".localized,
-                                        xibName: .whenToUseCell,
+                                        xibName: .cardWithButtonCell,
                                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                                            topInset: 15.0,
                                                            bottomInset: 0.0,
@@ -339,6 +339,7 @@ final class WalletViewController: CVTableViewController {
         if DccBlacklistManager.shared.isBlacklisted(certificate: certificate) || Blacklist2dDocManager.shared.isBlacklisted(certificate: certificate) {
             subtitle += "\n\n\("wallet.blacklist.warning".localized)"
         }
+
         if (certificate as? EuropeanCertificate)?.isAutoTest == true { subtitle += "\n\n\("wallet.autotest.warning".localized)" }
         let certificateRow: CVRow = CVRow(title: certificate.codeImageTitle,
                                           subtitle: subtitle,
@@ -425,6 +426,7 @@ final class WalletViewController: CVTableViewController {
                 }
             }))
         }
+
         alertController.addAction(UIAlertAction(title: "walletController.menu.delete".localized, style: .destructive, handler: { [weak self] _ in
             self?.showCertificateDeletionAlert(certificate: certificate)
         }))

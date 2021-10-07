@@ -67,7 +67,7 @@ public final class ParametersManager: NSObject {
     public var activityPassRenewThreshold: Int { valueFor(name: "app.activityPass.renewThreshold") as? Int ?? 3}
 
     public var displayActivityPass: Bool { valueFor(name: "app.displayActivityPass") as? Bool ?? false }
-    public var activityPassAutoRenewable: Bool { valueFor(name: "app.activtyPass.autoRenewable") as? Bool ?? false }
+    public var activityPassAutoRenewable: Bool { valueFor(name: "app.activityPass.autoRenewable") as? Bool ?? false }
 
     public var displayIsolation: Bool { valueFor(name: "app.displayIsolation") as? Bool ?? false }
     public var isolationMinRiskLevel: Double { valueFor(name: "app.isolationMinRiskLevel") as? Double ?? 4.0 }
@@ -81,6 +81,8 @@ public final class ParametersManager: NSObject {
     public var postIsolationDuration: Double { valueFor(name: "app.postIsolation.duration") as? Double ?? 604800.0 }
 
     public var maxCertBeforeWarning: Int { valueFor(name: "app.wallet.maxCertBeforeWarning") as? Int ?? 15 }
+    
+    public var shouldDisplayUrgentDgs: Bool { valueFor(name: "app.displayUrgentDgs") as? Bool ?? false }
 
     var appAvailability: Bool? { valueFor(name: "app.appAvailability") as? Bool }
     var preSymptomsSpan: Int {

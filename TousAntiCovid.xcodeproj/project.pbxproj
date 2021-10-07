@@ -263,8 +263,11 @@
 		3765B7E125558D0100AA5659 /* CACornerMask+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3765B7E025558D0100AA5659 /* CACornerMask+Extension.swift */; };
 		3765B80125569F5C00AA5659 /* PositiveTestController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3765B80025569F5C00AA5659 /* PositiveTestController.swift */; };
 		3766102324A0F01C00A5F13D /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 3766102124A0F01C00A5F13D /* config.json */; };
+		37689F87246AE4B200D99BC4 /* privacy-es.json in Resources */ = {isa = PBXBuildFile; fileRef = 37689F86246AE4B200D99BC4 /* privacy-es.json */; };
 		37689F94246BCFE900D99BC4 /* NSError+RBExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37689F92246BCFE900D99BC4 /* NSError+RBExtension.swift */; };
 		37689F95246BD01200D99BC4 /* RBReceivedProximity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378A26E02462FCA2000F2FD8 /* RBReceivedProximity.swift */; };
+		3768A09C246D276F00D99BC4 /* privacy-it.json in Resources */ = {isa = PBXBuildFile; fileRef = 3768A09A246D276F00D99BC4 /* privacy-it.json */; };
+		3768A09D246D276F00D99BC4 /* privacy-pt.json in Resources */ = {isa = PBXBuildFile; fileRef = 3768A09B246D276F00D99BC4 /* privacy-pt.json */; };
 		37692805246010A600310876 /* MyHealthStateHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37692804246010A600310876 /* MyHealthStateHeaderCell.swift */; };
 		37692807246010B200310876 /* MyHealthStateHeaderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37692806246010B200310876 /* MyHealthStateHeaderCell.xib */; };
 		376928092460242800310876 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376928082460242800310876 /* Date+Extension.swift */; };
@@ -424,8 +427,8 @@
 		37BBA37C264ACC57002A01AA /* WalletDocumentsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BBA37B264ACC57002A01AA /* WalletDocumentsCell.swift */; };
 		37BBA382264ACCC8002A01AA /* WalletDocumentsCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37BBA381264ACCC8002A01AA /* WalletDocumentsCell.xib */; };
 		37BBA3F2264AD64D002A01AA /* DocumentExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BBA3F1264AD64D002A01AA /* DocumentExplanationViewController.swift */; };
-		37BBA3F9264ADC99002A01AA /* WhenToUseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37BBA3F7264ADC99002A01AA /* WhenToUseCell.xib */; };
-		37BBA3FC264ADC99002A01AA /* WhenToUseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BBA3F8264ADC99002A01AA /* WhenToUseCell.swift */; };
+		37BBA3F9264ADC99002A01AA /* CardWithButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37BBA3F7264ADC99002A01AA /* CardWithButtonCell.xib */; };
+		37BBA3FC264ADC99002A01AA /* CardWithButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BBA3F8264ADC99002A01AA /* CardWithButtonCell.swift */; };
 		37BBA402264ADFEA002A01AA /* PhoneCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37BBA400264ADFEA002A01AA /* PhoneCell.xib */; };
 		37BC85B4256BA37800054931 /* VenueRecordCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37BC85B1256BA37800054931 /* VenueRecordCell.xib */; };
 		37BED07027019ED300FD6ADA /* ExemptionDccSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BED06E27019ED200FD6ADA /* ExemptionDccSchema.swift */; };
@@ -487,6 +490,8 @@
 		37C5D0FE2609EA5D00D6494C /* String+STExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C5D0FD2609EA5D00D6494C /* String+STExtension.swift */; };
 		37C74AD026B15FF800E1C78B /* CGPDFDocument+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C74ACF26B15FF800E1C78B /* CGPDFDocument+Extension.swift */; };
 		37C772CA2481195C00B01BAE /* RBCryptoKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C772C92481195C00B01BAE /* RBCryptoKeys.swift */; };
+		37C772DC24816ED200B01BAE /* privacy-ar.json in Resources */ = {isa = PBXBuildFile; fileRef = 37C772DA24816ED200B01BAE /* privacy-ar.json */; };
+		37C772DD24816ED200B01BAE /* privacy-de.json in Resources */ = {isa = PBXBuildFile; fileRef = 37C772DB24816ED200B01BAE /* privacy-de.json */; };
 		37C7B07B26BC1EF6009974AD /* WatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7B07A26BC1EF6009974AD /* WatchMessage.swift */; };
 		37C7B07C26BC1EF6009974AD /* WatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7B07A26BC1EF6009974AD /* WatchMessage.swift */; };
 		37C8DAE02518AF5C00F59CCB /* DeclareController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C8DADF2518AF5C00F59CCB /* DeclareController.swift */; };
@@ -678,6 +683,8 @@
 		9D1D8FEB8492319A58F00442 /* Pods_StorageSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 687CFE18D0E0E598C5A3BB2A /* Pods_StorageSDK.framework */; };
 		9E0002B12AFA79F699E29914 /* Pods_TousAntiCovid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FA1108BCEE42D622F05968F /* Pods_TousAntiCovid.framework */; };
 		C67476FB3395F72144291F30 /* Pods_RobertSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DA02CBEDACA215063614C6F /* Pods_RobertSDK.framework */; };
+		C817EE6D270B27C6003ABF84 /* UrgentDgsDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C817EE6C270B27C6003ABF84 /* UrgentDgsDetailController.swift */; };
+		C817EE71270B3007003ABF84 /* UrgentDgsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C817EE70270B3007003ABF84 /* UrgentDgsCoordinator.swift */; };
 		C8B166A026F4CD39003B6369 /* UserDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37663CB3243D91B3009F1D98 /* UserDefault.swift */; };
 /* End PBXBuildFile section */
 
@@ -1045,10 +1052,13 @@
 		37663D07243DBBC4009F1D98 /* Fonts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		37663D09243DBFE2009F1D98 /* OnboardingGovernmentCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OnboardingGovernmentCell.xib; sourceTree = "<group>"; };
 		37663D0D243DC35C009F1D98 /* BottomButtonContainer.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BottomButtonContainer.storyboard; sourceTree = "<group>"; };
+		37689F86246AE4B200D99BC4 /* privacy-es.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-es.json"; sourceTree = "<group>"; };
 		37689F92246BCFE900D99BC4 /* NSError+RBExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSError+RBExtension.swift"; sourceTree = "<group>"; };
 		37689FBB246BFBAE00D99BC4 /* swiftgen.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = swiftgen.yml; sourceTree = SOURCE_ROOT; };
 		3768A036246C2C4100D99BC4 /* StandardTextFieldCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StandardTextFieldCell.xib; sourceTree = "<group>"; };
 		3768A03B246C382600D99BC4 /* StandardTextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardTextFieldCell.swift; sourceTree = "<group>"; };
+		3768A09A246D276F00D99BC4 /* privacy-it.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-it.json"; sourceTree = "<group>"; };
+		3768A09B246D276F00D99BC4 /* privacy-pt.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-pt.json"; sourceTree = "<group>"; };
 		37692804246010A600310876 /* MyHealthStateHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyHealthStateHeaderCell.swift; sourceTree = "<group>"; };
 		37692806246010B200310876 /* MyHealthStateHeaderCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MyHealthStateHeaderCell.xib; sourceTree = "<group>"; };
 		376928082460242800310876 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
@@ -1193,8 +1203,8 @@
 		37BBA37B264ACC57002A01AA /* WalletDocumentsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletDocumentsCell.swift; sourceTree = "<group>"; };
 		37BBA381264ACCC8002A01AA /* WalletDocumentsCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WalletDocumentsCell.xib; sourceTree = "<group>"; };
 		37BBA3F1264AD64D002A01AA /* DocumentExplanationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentExplanationViewController.swift; sourceTree = "<group>"; };
-		37BBA3F7264ADC99002A01AA /* WhenToUseCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WhenToUseCell.xib; sourceTree = "<group>"; };
-		37BBA3F8264ADC99002A01AA /* WhenToUseCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WhenToUseCell.swift; sourceTree = "<group>"; };
+		37BBA3F7264ADC99002A01AA /* CardWithButtonCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CardWithButtonCell.xib; sourceTree = "<group>"; };
+		37BBA3F8264ADC99002A01AA /* CardWithButtonCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardWithButtonCell.swift; sourceTree = "<group>"; };
 		37BBA400264ADFEA002A01AA /* PhoneCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PhoneCell.xib; sourceTree = "<group>"; };
 		37BC85B1256BA37800054931 /* VenueRecordCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VenueRecordCell.xib; sourceTree = "<group>"; };
 		37BED06E27019ED200FD6ADA /* ExemptionDccSchema.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExemptionDccSchema.swift; sourceTree = "<group>"; };
@@ -1253,6 +1263,8 @@
 		37C5D0FD2609EA5D00D6494C /* String+STExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+STExtension.swift"; sourceTree = "<group>"; };
 		37C74ACF26B15FF800E1C78B /* CGPDFDocument+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPDFDocument+Extension.swift"; sourceTree = "<group>"; };
 		37C772C92481195C00B01BAE /* RBCryptoKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBCryptoKeys.swift; sourceTree = "<group>"; };
+		37C772DA24816ED200B01BAE /* privacy-ar.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-ar.json"; sourceTree = "<group>"; };
+		37C772DB24816ED200B01BAE /* privacy-de.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-de.json"; sourceTree = "<group>"; };
 		37C7B07A26BC1EF6009974AD /* WatchMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMessage.swift; sourceTree = "<group>"; };
 		37C8DADF2518AF5C00F59CCB /* DeclareController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeclareController.swift; sourceTree = "<group>"; };
 		37C8DAE82518AFB300F59CCB /* DeclareCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeclareCoordinator.swift; sourceTree = "<group>"; };
@@ -1391,7 +1403,6 @@
 		37FA2B942608D036003246A9 /* Collection+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Extension.swift"; sourceTree = "<group>"; };
 		37FBB03B25E7A99F00377A52 /* StatusManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusManager.swift; sourceTree = "<group>"; };
 		37FBB06925E8158200377A52 /* RBStatusRiskLevelInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBStatusRiskLevelInfo.swift; sourceTree = "<group>"; };
-		3A65D27D95992A7AB7C924E2 /* Pods_Proximity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Proximity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		476D9C75250B69FE00B97541 /* MoreInformationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreInformationsView.swift; sourceTree = "<group>"; };
 		476D9C78250B6AAC00B97541 /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		476D9C7B250B6B1500B97541 /* InformationsContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationsContentView.swift; sourceTree = "<group>"; };
@@ -1474,12 +1485,12 @@
 		66F5377D25E7AA40008B1AAD /* StandardCardHorizontalCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardCardHorizontalCell.swift; sourceTree = "<group>"; };
 		66F5379225E7AA7B008B1AAD /* StandardCardHorizontalCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StandardCardHorizontalCell.xib; sourceTree = "<group>"; };
 		687CFE18D0E0E598C5A3BB2A /* Pods_StorageSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StorageSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		6CA585894F2872CCACC96D4C /* Pods_TAC_Prod_Plus_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TAC_Prod_Plus_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D65CB902EE2DF612868AB1F /* Pods-StorageSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StorageSDK.release.xcconfig"; path = "Target Support Files/Pods-StorageSDK/Pods-StorageSDK.release.xcconfig"; sourceTree = "<group>"; };
 		AC7ECFD5F8865A0A83845E4E /* Pods-TousAntiCovid.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TousAntiCovid.release.xcconfig"; path = "Target Support Files/Pods-TousAntiCovid/Pods-TousAntiCovid.release.xcconfig"; sourceTree = "<group>"; };
 		B130EF6D37FCF486F81B6E07 /* Pods-RobertSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RobertSDK.debug.xcconfig"; path = "Target Support Files/Pods-RobertSDK/Pods-RobertSDK.debug.xcconfig"; sourceTree = "<group>"; };
+		C817EE6C270B27C6003ABF84 /* UrgentDgsDetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrgentDgsDetailController.swift; sourceTree = "<group>"; };
+		C817EE70270B3007003ABF84 /* UrgentDgsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrgentDgsCoordinator.swift; sourceTree = "<group>"; };
 		DFDA4D3378410AAC7FAD02F1 /* Pods-RobertSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RobertSDK.release.xcconfig"; path = "Target Support Files/Pods-RobertSDK/Pods-RobertSDK.release.xcconfig"; sourceTree = "<group>"; };
-		F78A3A0FEF5592FAD235AEDF /* Pods_TAC_Prod_Plus.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TAC_Prod_Plus.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA4F6E21CA0C924E56B05780 /* Pods-StorageSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StorageSDK.debug.xcconfig"; path = "Target Support Files/Pods-StorageSDK/Pods-StorageSDK.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1936,7 +1947,12 @@
 		373A344A243E235500148FCF /* Privacy */ = {
 			isa = PBXGroup;
 			children = (
+				37C772DA24816ED200B01BAE /* privacy-ar.json */,
+				37C772DB24816ED200B01BAE /* privacy-de.json */,
+				3768A09A246D276F00D99BC4 /* privacy-it.json */,
+				3768A09B246D276F00D99BC4 /* privacy-pt.json */,
 				373A3456243E252F00148FCF /* privacy-en.json */,
+				37689F86246AE4B200D99BC4 /* privacy-es.json */,
 				373A3457243E252F00148FCF /* privacy-fr.json */,
 			);
 			path = Privacy;
@@ -2486,6 +2502,7 @@
 				378A264324606CE4000F2FD8 /* SendHistory */,
 				378A262F246057EE000F2FD8 /* Symptoms */,
 				37F5D839267241220053AEFA /* UniversalQrScan */,
+				C817EE6A270B279F003ABF84 /* UrgentDgs */,
 				3757800725ADD4B1000ADB0A /* Vaccination */,
 				37CAEFDE256D5DC200AB8540 /* VenuesHistory */,
 				6667AADE256BC0A00082601E /* VenuesRecording */,
@@ -2523,6 +2540,7 @@
 				37663CA0243CCD90009F1D98 /* Root */,
 				378A264024605BF3000F2FD8 /* SymptomsOrigin */,
 				6073AE8826B7FF8E0091284F /* UniversalQrScan */,
+				C817EE6F270B2FEC003ABF84 /* UrgentDgs */,
 				37577FFD25ADD3F3000ADB0A /* Vaccination */,
 				6667AAC4256BBE4E0082601E /* VenuesRecording */,
 				379698D826024E5F008A188E /* Wallet */,
@@ -2802,6 +2820,7 @@
 				6667AB0E256C09840082601E /* Animation */,
 				373A34A1243EFBF700148FCF /* Button */,
 				377EF0EA252F6E25000F6175 /* CardText */,
+				37BBA3F6264ADC3B002A01AA /* CardWithButton */,
 				373A964E25DC144E00ACC737 /* CenteredImageCard */,
 				3769280A24603A4400310876 /* CenteredImageText */,
 				379892E62485065400C68AD9 /* Empty */,
@@ -3381,14 +3400,11 @@
 			isa = PBXGroup;
 			children = (
 				376D4021268DE7270078594C /* CoreHaptics.framework */,
-				3A65D27D95992A7AB7C924E2 /* Pods_Proximity.framework */,
 				2DA02CBEDACA215063614C6F /* Pods_RobertSDK.framework */,
 				687CFE18D0E0E598C5A3BB2A /* Pods_StorageSDK.framework */,
 				47CECA78250A25B900F13739 /* WidgetKit.framework */,
 				47CECA7A250A25B900F13739 /* SwiftUI.framework */,
 				1FA1108BCEE42D622F05968F /* Pods_TousAntiCovid.framework */,
-				F78A3A0FEF5592FAD235AEDF /* Pods_TAC_Prod_Plus.framework */,
-				6CA585894F2872CCACC96D4C /* Pods_TAC_Prod_Plus_Tests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -3493,13 +3509,13 @@
 			path = SanitaryCertificate;
 			sourceTree = "<group>";
 		};
-		37BBA3F6264ADC3B002A01AA /* WhenToUse */ = {
+		37BBA3F6264ADC3B002A01AA /* CardWithButton */ = {
 			isa = PBXGroup;
 			children = (
-				37BBA3F8264ADC99002A01AA /* WhenToUseCell.swift */,
-				37BBA3F7264ADC99002A01AA /* WhenToUseCell.xib */,
+				37BBA3F8264ADC99002A01AA /* CardWithButtonCell.swift */,
+				37BBA3F7264ADC99002A01AA /* CardWithButtonCell.xib */,
 			);
-			path = WhenToUse;
+			path = CardWithButton;
 			sourceTree = "<group>";
 		};
 		37BBA3FF264ADFB7002A01AA /* Phone */ = {
@@ -3899,7 +3915,6 @@
 				37BBA3F5264ADC2B002A01AA /* SanitaryCertificate */,
 				37F1F346264BA90000015DCE /* WalletAddCertificate */,
 				37BBA380264ACC5E002A01AA /* WalletDocuments */,
-				37BBA3F6264ADC3B002A01AA /* WhenToUse */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -4623,6 +4638,22 @@
 			path = StandardCardHorizontal;
 			sourceTree = "<group>";
 		};
+		C817EE6A270B279F003ABF84 /* UrgentDgs */ = {
+			isa = PBXGroup;
+			children = (
+				C817EE6C270B27C6003ABF84 /* UrgentDgsDetailController.swift */,
+			);
+			path = UrgentDgs;
+			sourceTree = "<group>";
+		};
+		C817EE6F270B2FEC003ABF84 /* UrgentDgs */ = {
+			isa = PBXGroup;
+			children = (
+				C817EE70270B3007003ABF84 /* UrgentDgsCoordinator.swift */,
+			);
+			path = UrgentDgs;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -4919,12 +4950,14 @@
 				3769280D24603A6A00310876 /* CenteredImageTextCell.xib in Resources */,
 				375807FB2566CA2700CCB59F /* morekeyfigures-fr.json in Resources */,
 				37A6582026A6D63E00483B68 /* FavoriteCertificateCell.xib in Resources */,
+				3768A09D246D276F00D99BC4 /* privacy-pt.json in Resources */,
 				37BBA402264ADFEA002A01AA /* PhoneCell.xib in Resources */,
 				37C4812B267761C700766A36 /* vaccin-europe-certificate-fr.png in Resources */,
+				37C772DD24816ED200B01BAE /* privacy-de.json in Resources */,
 				37E8D2D8254B0E4600686377 /* QRCodeCell.xib in Resources */,
 				37014CFB24460CD000CE0BF1 /* InfoPlist.strings in Resources */,
 				3761BEB726DFCDEA00A7ACEA /* KeyFigureChart.storyboard in Resources */,
-				37BBA3F9264ADC99002A01AA /* WhenToUseCell.xib in Resources */,
+				37BBA3F9264ADC99002A01AA /* CardWithButtonCell.xib in Resources */,
 				37EAEEF025359A4400DC33EE /* KeyFigureCell.xib in Resources */,
 				37F0BEA6260DDE0E00CBF4B2 /* WalletCertificateVerified.storyboard in Resources */,
 				3716B5432673996B00632FA8 /* dcc-certs.json in Resources */,
@@ -4940,11 +4973,13 @@
 				37E8D2F4254B205C00686377 /* DateCell.xib in Resources */,
 				37F1F3CF264C1DB200015DCE /* test-certificate-fr.png in Resources */,
 				37F1F3C3264C1DB200015DCE /* vaccin-certificate-full-fr.png in Resources */,
+				37C772DC24816ED200B01BAE /* privacy-ar.json in Resources */,
 				37014CFE24460CD000CE0BF1 /* privacy-fr.json in Resources */,
 				37014CFF24460CD000CE0BF1 /* FlashReportCode.storyboard in Resources */,
 				37014D0124460CD000CE0BF1 /* ModalContainer.storyboard in Resources */,
 				377B0B4025E50FF800459BCE /* risks.json in Resources */,
 				37C48127267761C700766A36 /* recovery-europe-certificate-en.png in Resources */,
+				3768A09C246D276F00D99BC4 /* privacy-it.json in Resources */,
 				37B6BFF72515DB3A008E4558 /* InfoCell.xib in Resources */,
 				3765B73B25553F2900AA5659 /* AttestationCell.xib in Resources */,
 				37014D0224460CD000CE0BF1 /* privacy-en.json in Resources */,
@@ -4987,6 +5022,7 @@
 				37045668249356540042B7E6 /* AudioCell.xib in Resources */,
 				37014D0824460CD000CE0BF1 /* AppVersionCell.xib in Resources */,
 				372F446B25B988F600607F0B /* LegendView.xib in Resources */,
+				37689F87246AE4B200D99BC4 /* privacy-es.json in Resources */,
 				37DAA3C825487B3B00ADE007 /* Marianne-Medium.otf in Resources */,
 				3714EDDC25813D1000D6736F /* IsolationInitialCaseSafeCell.xib in Resources */,
 				37F1F3D2264C1DB200015DCE /* test-certificate-full-fr.png in Resources */,
@@ -5341,7 +5377,7 @@
 				379891472484E98900C68AD9 /* Storyboarded.swift in Sources */,
 				37812E1125B9DCCF00FDACA1 /* ChartsValueFormatter.swift in Sources */,
 				379583012448A47100E8467B /* OnboardingImageCell.swift in Sources */,
-				37BBA3FC264ADC99002A01AA /* WhenToUseCell.swift in Sources */,
+				37BBA3FC264ADC99002A01AA /* CardWithButtonCell.swift in Sources */,
 				37014CC524460CD000CE0BF1 /* WindowedCoordinator.swift in Sources */,
 				37E582F926020351007106F8 /* SanitaryCertificateCell.swift in Sources */,
 				37DEA691254C055300D0877B /* Attestation+Extension.swift in Sources */,
@@ -5367,6 +5403,7 @@
 				37C4181526CA96B5001BA1F8 /* ActivityCertificate.swift in Sources */,
 				37014CC824460CD000CE0BF1 /* UIApplication+Extension.swift in Sources */,
 				375807D42566C31000CCB59F /* KeyFiguresExplanationsManager.swift in Sources */,
+				C817EE71270B3007003ABF84 /* UrgentDgsCoordinator.swift in Sources */,
 				37014CC924460CD000CE0BF1 /* CVTableViewCell.swift in Sources */,
 				379698DA26024E8D008A188E /* WalletCoordinator.swift in Sources */,
 				37BF68A9252DB3DC006D00AD /* ActivationButtonCell.swift in Sources */,
@@ -5424,6 +5461,7 @@
 				37014CDB24460CD000CE0BF1 /* Locale+Extension.swift in Sources */,
 				373DD728251501690062CB4D /* InfoCenterManager.swift in Sources */,
 				37014CDC24460CD000CE0BF1 /* OnboardingController.swift in Sources */,
+				C817EE6D270B27C6003ABF84 /* UrgentDgsDetailController.swift in Sources */,
 				373DD742251503B10062CB4D /* Info.swift in Sources */,
 				37C10C9C265BE093008BDAA8 /* JSON.swift in Sources */,
 				377EF16C25306406000F6175 /* ParagraphCell.swift in Sources */,
@@ -5845,7 +5883,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.8.2;
+				MARKETING_VERSION = 3.8.4;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios;
 				PRODUCT_NAME = TousAntiCovid;
@@ -5872,7 +5910,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.8.2;
+				MARKETING_VERSION = 3.8.4;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios;
 				PRODUCT_NAME = TousAntiCovid;
@@ -6016,7 +6054,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.8.2;
+				MARKETING_VERSION = 3.8.4;
 				OTHER_SWIFT_FLAGS = "-DDEBUG -DWIDGET -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6043,7 +6081,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.8.2;
+				MARKETING_VERSION = 3.8.4;
 				OTHER_SWIFT_FLAGS = "-DWIDGET -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6067,7 +6105,7 @@
 				DEVELOPMENT_TEAM = PR958DC548;
 				IBSC_MODULE = Watch_Extension;
 				INFOPLIST_FILE = Watch/Resources/Info.plist;
-				MARKETING_VERSION = 3.8.2;
+				MARKETING_VERSION = 3.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -6091,7 +6129,7 @@
 				DEVELOPMENT_TEAM = PR958DC548;
 				IBSC_MODULE = Watch_Extension;
 				INFOPLIST_FILE = Watch/Resources/Info.plist;
-				MARKETING_VERSION = 3.8.2;
+				MARKETING_VERSION = 3.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -6117,7 +6155,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.8.2;
+				MARKETING_VERSION = 3.8.4;
 				OTHER_SWIFT_FLAGS = "-DDEBUG -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
@@ -6144,7 +6182,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.8.2;
+				MARKETING_VERSION = 3.8.4;
 				OTHER_SWIFT_FLAGS = "-DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";

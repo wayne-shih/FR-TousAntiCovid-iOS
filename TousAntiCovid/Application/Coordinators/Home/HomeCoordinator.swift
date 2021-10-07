@@ -91,6 +91,8 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
             self?.didEnterCodeFromDeeplink(code)
         }, showUserLanguage: { [weak self] in
             self?.showUserLanguage()
+        }, didTouchUrgentDgs: { [weak self] in
+            self?.showUrgentDgs()
         },
         deinitBlock: { [weak self] in
             self?.didDeinit()
@@ -345,6 +347,11 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
                                                                                                  certificate: certificate)
             addChild(coordinator: coordinator)
         }
+    }
+    
+    private func showUrgentDgs() {
+        let urgentDgsCoordinator: UrgentDgsCoordinator = UrgentDgsCoordinator(presentingController: navigationController?.topViewController, parent: self)
+        addChild(coordinator: urgentDgsCoordinator)
     }
     
     private func loadLaunchScreen() {

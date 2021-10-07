@@ -180,14 +180,12 @@ extension WidgetDCCManager: WalletChangesObserver {
 extension WidgetDCCManager {
 
     private func startTimer() {
-        print("⏰ Start Widget Timer")
         timer?.invalidate()
         timer = Timer(timeInterval: 1.0, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
         RunLoop.main.add(timer!, forMode: .common)
     }
 
     @objc private func timerFired() {
-        print("⏰ Timer Widget fired")
         if WalletManager.shared.activityCertificateIdFor(certificate: currentCertificate) != currentActivityCertificate?.id {
             updateCertificate()
             wasCertificateValid = currentActivityCertificate?.isValid == true
@@ -200,7 +198,6 @@ extension WidgetDCCManager {
     }
 
     private func stopTimer() {
-        print("⏰ Stop Widget Timer")
         timer?.invalidate()
         timer = nil
     }

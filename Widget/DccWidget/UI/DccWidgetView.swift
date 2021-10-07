@@ -14,14 +14,29 @@ import WidgetKit
 struct DccWidgetView: View {
     var entry: DccWidgetContent
     
+    @Environment(\.redactionReasons) private var redactionReasons
+    
     var body: some View {
-        let isActivityPassStillValid: Bool = Date().timeIntervalSince1970 < entry.certificateActivityExpiryTimestamp ?? 0.0
-        if let data = entry.certificateActivityQrCodeData, let image = UIImage(data: data), isActivityPassStillValid {
-            QRCodeView(image: image, bottomText: entry.bottomTextActivityPass)
-        } else if let data = entry.certificateQRCodeData, let image = UIImage(data: data) {
-            QRCodeView(image: image, bottomText: entry.bottomText)
-        } else {
-            EmptyDccView(content: entry)
+        ZStack {
+            Color(UIColor.systemBackground).edgesIgnoringSafeArea(.all)
+            let isActivityPassStillValid: Bool = Date().timeIntervalSince1970 < entry.certificateActivityExpiryTimestamp ?? 0.0
+            if let data = entry.certificateActivityQrCodeData, let image = UIImage(data: data), isActivityPassStillValid {
+                switch redactionReasons {
+                case .placeholder:
+                    EmptyDccView(content: entry)
+                default:
+                    QRCodeView(image: image, bottomText: entry.bottomTextActivityPass)
+                }
+            } else if let data = entry.certificateQRCodeData, let image = UIImage(data: data) {
+                switch redactionReasons {
+                case .placeholder:
+                    EmptyDccView(content: entry)
+                default:
+                    QRCodeView(image: image, bottomText: entry.bottomText)
+                }
+            } else {
+                EmptyDccView(content: entry)
+            }
         }
     }
 }
@@ -34,6 +49,7 @@ struct DccWidgetView_Previews: PreviewProvider {
                                               certificateQRCodeData: UIImage(named: "qrCodeVaccin")?.jpegData(compressionQuality: 1.0),
                                               noCertificatText: textContent,
                                               bottomText: textBottom,
-                                              bottomTextActivityPass: ""))
+                                              bottomTextActivityPass: "")
+        )
     }
 }

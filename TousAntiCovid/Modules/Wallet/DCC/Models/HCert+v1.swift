@@ -49,9 +49,6 @@ extension HCert {
     }
     #if DEBUG
     if Self.debugPrintJsonErrors {
-      validation.errors?.forEach {
-        print($0.description)
-      }
       if !validation.valid {
         return false
       }
