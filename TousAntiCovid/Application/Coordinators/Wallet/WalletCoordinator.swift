@@ -60,15 +60,12 @@ final class WalletCoordinator: Coordinator {
 
     private func start() {
         DeepLinkingManager.shared.walletCoordinator = self
-        let areThereCertificatesToLoad: Bool = WalletManager.shared.areThereCertificatesToLoad
-        if areThereCertificatesToLoad { HUD.show(.progress) }
         let walletController: WalletViewController = createWalletController()
         walletViewController = walletController
         let innerController: UIViewController = UIAccessibility.isVoiceOverRunning ? walletController : BottomButtonContainerController.controller(walletController)
         let navigationController: CVNavigationController = CVNavigationController(rootViewController: innerController)
         self.navigationController = navigationController
         presentingController?.present(navigationController, animated: true) { [weak self] in
-            if areThereCertificatesToLoad { HUD.hide() }
             self?.processUrl(url: self?.initialUrlToProcess)
             self?.initialUrlToProcess = nil
         }

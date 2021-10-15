@@ -194,6 +194,18 @@ public final class ParametersManager: NSObject {
     public var analyticsApiVersion: AnalyticsApiVersion { AnalyticsApiVersion(rawValue: valueFor(name: "app.analyticsApiVersion") as? String ?? "") ?? .v1 }
 
     public var certificateConversionSidepOnlyCode: [String] { valueFor(name: "app.wallet.certificateConversionSidepOnlyCode") as? [String] ?? [] }
+    
+    public var homeNotification: HomeNotification? {
+        guard let value = valueFor(name: "app.notif") as? [String: Any] else {
+            return nil
+        }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode(HomeNotification.self, from: jsonData)
+        } catch {
+            return nil
+        }
+    }
 
     public var inGroupApiVersion: InGroupApiVersion = .v0
 

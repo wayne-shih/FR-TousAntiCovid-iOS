@@ -11,6 +11,7 @@
 import Foundation
 
 enum DccBlacklistConstant {
+
     static let directoryName: String = "CertList"
     static let baseUrl: String = "https://\(Constant.Server.staticResourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/\(directoryName)"
     static let filename: String = "certlist.json"

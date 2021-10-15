@@ -69,6 +69,7 @@ struct JWK {
     guard
       let key = keyReference
     else {
+      print(errorString)
       return nil
     }
 

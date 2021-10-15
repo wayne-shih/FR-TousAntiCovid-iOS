@@ -13,9 +13,7 @@ import PKHUD
 import RobertSDK
 import StorageSDK
 import ServerSDK
-#if !PROD
-import Firebase
-#endif
+import AVFoundation
 
 @UIApplicationMain
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,6 +30,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         initExceptionsCatching()
+        initAudioSession()
         initAppearance()
         initUrlCache()
         NotificationsManager.shared.start()
@@ -40,7 +39,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         KeyFiguresManager.shared.start()
         VaccinationCenterManager.shared.start()
         RisksUIManager.shared.start()
-        let storageManager: StorageManager = StorageManager()
+        let storageManager: StorageManager = StorageManager { message in
+            StackLogger.log(symbols: Thread.callStackSymbolsString, message: message)
+        }
         AttestationsManager.shared.start(storageManager: storageManager)
         WalletManager.shared.start(storageManager: storageManager)
         WalletManager.shared.addObserver(self)
@@ -61,15 +62,15 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                        configCertificateFiles: Constant.Server.certificates)
         ConversionServer.shared.start(session: UrlSessionManager.shared.session,
                                       convertUrl: { Constant.Server.convertUrl },
-                                      requestLoggingHandler: { _, _, _, _ in })
+                                      requestLoggingHandler: { request, response, responseData, error in })
         ActivityCertificateServer.shared.start(session: URLSession.shared,
                                                serverUrl: { Constant.Server.activityCertificateGenerationUrl },
-                                               requestLoggingHandler: { _, _, _, _ in })
+                                               requestLoggingHandler: { request, response, responseData, error in })
         CleaServer.shared.start(certificateFiles: Constant.Server.certificates,
                                 reportBaseUrl: { Constant.Server.cleaReportBaseUrl },
                                 statusBaseUrl: { Constant.Server.cleaStatusBaseUrl() },
                                 statusBaseFallbackUrl: { Constant.Server.cleaStatusBaseUrl(fallbackUrl: true) },
-                                taskLoggingHandler: { _, _, _ in })
+                                taskLoggingHandler: { task, responseData, error in })
         
         RBManager.shared.start(isFirstInstall: !isAppAlreadyInstalled,
                                server: Server(baseUrl: { Constant.Server.baseUrl },
@@ -79,7 +80,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                                 if UIApplication.shared.applicationState != .active {
                                                     NotificationsManager.shared.triggerDeviceTimeErrorNotification()
                                                 }
-                                              }, taskLoggingHandler: { _, _, _ in }),
+                                              }, taskLoggingHandler: { task, responseData, error in }),
                                storage: storageManager,
                                bluetooth: BluetoothManager(),
                                filter: FilteringManager(),
@@ -88,7 +89,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                     NotificationsManager.shared.triggerRestartNotification()
                                }, didReceiveProximityHandler: {
                                     StatusManager.shared.status()
-                               }, didSaveProximity: { _ in })
+                               }, didSaveProximity: { proximity in })
         RatingsManager.shared.start()
         AnalyticsManager.shared.start()
         if #available(iOS 14.0, *) {
@@ -209,6 +210,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     
     private func initAppMaintenance() {
         MaintenanceManager.shared.start(coordinator: rootCoordinator)
+    }
+
+    private func initAudioSession() {
+        let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setCategory(.playback, mode: .moviePlayback, options: [.mixWithOthers])
+        } catch {}
     }
     
     private func updateAppShortcut() {

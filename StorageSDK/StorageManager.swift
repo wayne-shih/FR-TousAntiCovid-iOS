@@ -57,8 +57,11 @@ public final class StorageManager: RBStorage {
     
     let keychain: KeychainSwift = KeychainSwift(keyPrefix: "SC")
     private var realm: Realm?
+    private var loggingHandler: (_ message: String) -> ()
     
-    public init() {}
+    public init(loggingHandler: @escaping (_ message: String) -> ()) {
+        self.loggingHandler = loggingHandler
+    }
     
     public func start() {
         loadDb()
@@ -562,6 +565,7 @@ public final class StorageManager: RBStorage {
         if let key = getDbKey() {
             realm = try! Realm.db(key: key)
         } else if let newKey = Realm.generateEncryptionKey(), !keychain.allKeys.contains("SC\(KeychainKey.dbKey.rawValue)") {
+            loggingHandler("Deleting Realm Db")
             deleteDb(includingFile: true)
             realm = try! Realm.db(key: newKey)
             save(dbKey: newKey)

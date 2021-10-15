@@ -263,11 +263,8 @@
 		3765B7E125558D0100AA5659 /* CACornerMask+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3765B7E025558D0100AA5659 /* CACornerMask+Extension.swift */; };
 		3765B80125569F5C00AA5659 /* PositiveTestController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3765B80025569F5C00AA5659 /* PositiveTestController.swift */; };
 		3766102324A0F01C00A5F13D /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = 3766102124A0F01C00A5F13D /* config.json */; };
-		37689F87246AE4B200D99BC4 /* privacy-es.json in Resources */ = {isa = PBXBuildFile; fileRef = 37689F86246AE4B200D99BC4 /* privacy-es.json */; };
 		37689F94246BCFE900D99BC4 /* NSError+RBExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37689F92246BCFE900D99BC4 /* NSError+RBExtension.swift */; };
 		37689F95246BD01200D99BC4 /* RBReceivedProximity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378A26E02462FCA2000F2FD8 /* RBReceivedProximity.swift */; };
-		3768A09C246D276F00D99BC4 /* privacy-it.json in Resources */ = {isa = PBXBuildFile; fileRef = 3768A09A246D276F00D99BC4 /* privacy-it.json */; };
-		3768A09D246D276F00D99BC4 /* privacy-pt.json in Resources */ = {isa = PBXBuildFile; fileRef = 3768A09B246D276F00D99BC4 /* privacy-pt.json */; };
 		37692805246010A600310876 /* MyHealthStateHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37692804246010A600310876 /* MyHealthStateHeaderCell.swift */; };
 		37692807246010B200310876 /* MyHealthStateHeaderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37692806246010B200310876 /* MyHealthStateHeaderCell.xib */; };
 		376928092460242800310876 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376928082460242800310876 /* Date+Extension.swift */; };
@@ -490,8 +487,6 @@
 		37C5D0FE2609EA5D00D6494C /* String+STExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C5D0FD2609EA5D00D6494C /* String+STExtension.swift */; };
 		37C74AD026B15FF800E1C78B /* CGPDFDocument+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C74ACF26B15FF800E1C78B /* CGPDFDocument+Extension.swift */; };
 		37C772CA2481195C00B01BAE /* RBCryptoKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C772C92481195C00B01BAE /* RBCryptoKeys.swift */; };
-		37C772DC24816ED200B01BAE /* privacy-ar.json in Resources */ = {isa = PBXBuildFile; fileRef = 37C772DA24816ED200B01BAE /* privacy-ar.json */; };
-		37C772DD24816ED200B01BAE /* privacy-de.json in Resources */ = {isa = PBXBuildFile; fileRef = 37C772DB24816ED200B01BAE /* privacy-de.json */; };
 		37C7B07B26BC1EF6009974AD /* WatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7B07A26BC1EF6009974AD /* WatchMessage.swift */; };
 		37C7B07C26BC1EF6009974AD /* WatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7B07A26BC1EF6009974AD /* WatchMessage.swift */; };
 		37C8DAE02518AF5C00F59CCB /* DeclareController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C8DADF2518AF5C00F59CCB /* DeclareController.swift */; };
@@ -686,6 +681,14 @@
 		C817EE6D270B27C6003ABF84 /* UrgentDgsDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C817EE6C270B27C6003ABF84 /* UrgentDgsDetailController.swift */; };
 		C817EE71270B3007003ABF84 /* UrgentDgsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C817EE70270B3007003ABF84 /* UrgentDgsCoordinator.swift */; };
 		C8B166A026F4CD39003B6369 /* UserDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37663CB3243D91B3009F1D98 /* UserDefault.swift */; };
+		C8F8676F27106AD10061E600 /* HomeNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F8676E27106AD10061E600 /* HomeNotificationManager.swift */; };
+		C8F8677327106FE10061E600 /* HomeNotificationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8F8677227106FE10061E600 /* HomeNotificationCell.xib */; };
+		C8F86776271073440061E600 /* HomeNotificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F86775271073440061E600 /* HomeNotificationCell.swift */; };
+		C8F8677C271469280061E600 /* HomeNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F867692710412E0061E600 /* HomeNotification.swift */; };
+		C8F8677E271469BF0061E600 /* HomeNotification+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F8677D271469BF0061E600 /* HomeNotification+Extension.swift */; };
+		C8F8678E2715DAF10061E600 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F8678C2715DAF10061E600 /* PlayerView.swift */; };
+		C8F867922715DB1C0061E600 /* VideoPlayerCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8F867902715DB1C0061E600 /* VideoPlayerCell.xib */; };
+		C8F867932715DB1C0061E600 /* VideoPlayerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F867912715DB1C0061E600 /* VideoPlayerCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1052,13 +1055,10 @@
 		37663D07243DBBC4009F1D98 /* Fonts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		37663D09243DBFE2009F1D98 /* OnboardingGovernmentCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OnboardingGovernmentCell.xib; sourceTree = "<group>"; };
 		37663D0D243DC35C009F1D98 /* BottomButtonContainer.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BottomButtonContainer.storyboard; sourceTree = "<group>"; };
-		37689F86246AE4B200D99BC4 /* privacy-es.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-es.json"; sourceTree = "<group>"; };
 		37689F92246BCFE900D99BC4 /* NSError+RBExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSError+RBExtension.swift"; sourceTree = "<group>"; };
 		37689FBB246BFBAE00D99BC4 /* swiftgen.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = swiftgen.yml; sourceTree = SOURCE_ROOT; };
 		3768A036246C2C4100D99BC4 /* StandardTextFieldCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StandardTextFieldCell.xib; sourceTree = "<group>"; };
 		3768A03B246C382600D99BC4 /* StandardTextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardTextFieldCell.swift; sourceTree = "<group>"; };
-		3768A09A246D276F00D99BC4 /* privacy-it.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-it.json"; sourceTree = "<group>"; };
-		3768A09B246D276F00D99BC4 /* privacy-pt.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-pt.json"; sourceTree = "<group>"; };
 		37692804246010A600310876 /* MyHealthStateHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyHealthStateHeaderCell.swift; sourceTree = "<group>"; };
 		37692806246010B200310876 /* MyHealthStateHeaderCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MyHealthStateHeaderCell.xib; sourceTree = "<group>"; };
 		376928082460242800310876 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
@@ -1263,8 +1263,6 @@
 		37C5D0FD2609EA5D00D6494C /* String+STExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+STExtension.swift"; sourceTree = "<group>"; };
 		37C74ACF26B15FF800E1C78B /* CGPDFDocument+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPDFDocument+Extension.swift"; sourceTree = "<group>"; };
 		37C772C92481195C00B01BAE /* RBCryptoKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBCryptoKeys.swift; sourceTree = "<group>"; };
-		37C772DA24816ED200B01BAE /* privacy-ar.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-ar.json"; sourceTree = "<group>"; };
-		37C772DB24816ED200B01BAE /* privacy-de.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "privacy-de.json"; sourceTree = "<group>"; };
 		37C7B07A26BC1EF6009974AD /* WatchMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMessage.swift; sourceTree = "<group>"; };
 		37C8DADF2518AF5C00F59CCB /* DeclareController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeclareController.swift; sourceTree = "<group>"; };
 		37C8DAE82518AFB300F59CCB /* DeclareCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeclareCoordinator.swift; sourceTree = "<group>"; };
@@ -1403,6 +1401,7 @@
 		37FA2B942608D036003246A9 /* Collection+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Extension.swift"; sourceTree = "<group>"; };
 		37FBB03B25E7A99F00377A52 /* StatusManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusManager.swift; sourceTree = "<group>"; };
 		37FBB06925E8158200377A52 /* RBStatusRiskLevelInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBStatusRiskLevelInfo.swift; sourceTree = "<group>"; };
+		3A65D27D95992A7AB7C924E2 /* Pods_Proximity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Proximity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		476D9C75250B69FE00B97541 /* MoreInformationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreInformationsView.swift; sourceTree = "<group>"; };
 		476D9C78250B6AAC00B97541 /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		476D9C7B250B6B1500B97541 /* InformationsContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationsContentView.swift; sourceTree = "<group>"; };
@@ -1485,12 +1484,22 @@
 		66F5377D25E7AA40008B1AAD /* StandardCardHorizontalCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardCardHorizontalCell.swift; sourceTree = "<group>"; };
 		66F5379225E7AA7B008B1AAD /* StandardCardHorizontalCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StandardCardHorizontalCell.xib; sourceTree = "<group>"; };
 		687CFE18D0E0E598C5A3BB2A /* Pods_StorageSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StorageSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6CA585894F2872CCACC96D4C /* Pods_TAC_Prod_Plus_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TAC_Prod_Plus_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D65CB902EE2DF612868AB1F /* Pods-StorageSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StorageSDK.release.xcconfig"; path = "Target Support Files/Pods-StorageSDK/Pods-StorageSDK.release.xcconfig"; sourceTree = "<group>"; };
 		AC7ECFD5F8865A0A83845E4E /* Pods-TousAntiCovid.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TousAntiCovid.release.xcconfig"; path = "Target Support Files/Pods-TousAntiCovid/Pods-TousAntiCovid.release.xcconfig"; sourceTree = "<group>"; };
 		B130EF6D37FCF486F81B6E07 /* Pods-RobertSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RobertSDK.debug.xcconfig"; path = "Target Support Files/Pods-RobertSDK/Pods-RobertSDK.debug.xcconfig"; sourceTree = "<group>"; };
 		C817EE6C270B27C6003ABF84 /* UrgentDgsDetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrgentDgsDetailController.swift; sourceTree = "<group>"; };
 		C817EE70270B3007003ABF84 /* UrgentDgsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrgentDgsCoordinator.swift; sourceTree = "<group>"; };
+		C8F867692710412E0061E600 /* HomeNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeNotification.swift; sourceTree = "<group>"; };
+		C8F8676E27106AD10061E600 /* HomeNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeNotificationManager.swift; sourceTree = "<group>"; };
+		C8F8677227106FE10061E600 /* HomeNotificationCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HomeNotificationCell.xib; sourceTree = "<group>"; };
+		C8F86775271073440061E600 /* HomeNotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeNotificationCell.swift; sourceTree = "<group>"; };
+		C8F8677D271469BF0061E600 /* HomeNotification+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeNotification+Extension.swift"; sourceTree = "<group>"; };
+		C8F8678C2715DAF10061E600 /* PlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		C8F867902715DB1C0061E600 /* VideoPlayerCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VideoPlayerCell.xib; sourceTree = "<group>"; };
+		C8F867912715DB1C0061E600 /* VideoPlayerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoPlayerCell.swift; sourceTree = "<group>"; };
 		DFDA4D3378410AAC7FAD02F1 /* Pods-RobertSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RobertSDK.release.xcconfig"; path = "Target Support Files/Pods-RobertSDK/Pods-RobertSDK.release.xcconfig"; sourceTree = "<group>"; };
+		F78A3A0FEF5592FAD235AEDF /* Pods_TAC_Prod_Plus.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TAC_Prod_Plus.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA4F6E21CA0C924E56B05780 /* Pods-StorageSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StorageSDK.debug.xcconfig"; path = "Target Support Files/Pods-StorageSDK/Pods-StorageSDK.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1947,12 +1956,7 @@
 		373A344A243E235500148FCF /* Privacy */ = {
 			isa = PBXGroup;
 			children = (
-				37C772DA24816ED200B01BAE /* privacy-ar.json */,
-				37C772DB24816ED200B01BAE /* privacy-de.json */,
-				3768A09A246D276F00D99BC4 /* privacy-it.json */,
-				3768A09B246D276F00D99BC4 /* privacy-pt.json */,
 				373A3456243E252F00148FCF /* privacy-en.json */,
-				37689F86246AE4B200D99BC4 /* privacy-es.json */,
 				373A3457243E252F00148FCF /* privacy-fr.json */,
 			);
 			path = Privacy;
@@ -1974,6 +1978,7 @@
 				378A26A82461BD8D000F2FD8 /* CallCenter.swift */,
 				378A26A62461BD6D000F2FD8 /* CallCenterRegion.swift */,
 				37A4999026CC008D00998A7C /* CodeDetail.swift */,
+				C8F8677D271469BF0061E600 /* HomeNotification+Extension.swift */,
 				37812DF925B997AB00FDACA1 /* KeyFigureChartData.swift */,
 				372F447325B989B800607F0B /* KeyFigureChartLegend.swift */,
 				375807DC2566C41500CCB59F /* KeyFiguresExplanationsSection.swift */,
@@ -2451,6 +2456,7 @@
 				3725DED5250BC70700531570 /* DeepLinking */,
 				0F2ABF66262864EA0021AB39 /* ETag */,
 				09D83223249CC0C300064733 /* Filtering */,
+				C8F8676D27106AB30061E600 /* HomeNotification */,
 				373DD7262515014F0062CB4D /* InfoCenter */,
 				3714ECBB257FDFFF00D6736F /* Isolation */,
 				37EAEECB25357C1500DC33EE /* KeyFigures */,
@@ -3400,11 +3406,14 @@
 			isa = PBXGroup;
 			children = (
 				376D4021268DE7270078594C /* CoreHaptics.framework */,
+				3A65D27D95992A7AB7C924E2 /* Pods_Proximity.framework */,
 				2DA02CBEDACA215063614C6F /* Pods_RobertSDK.framework */,
 				687CFE18D0E0E598C5A3BB2A /* Pods_StorageSDK.framework */,
 				47CECA78250A25B900F13739 /* WidgetKit.framework */,
 				47CECA7A250A25B900F13739 /* SwiftUI.framework */,
 				1FA1108BCEE42D622F05968F /* Pods_TousAntiCovid.framework */,
+				F78A3A0FEF5592FAD235AEDF /* Pods_TAC_Prod_Plus.framework */,
+				6CA585894F2872CCACC96D4C /* Pods_TAC_Prod_Plus_Tests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -3593,6 +3602,7 @@
 				37BF68DF252DF426006D00AD /* Declare */,
 				37A6581D26A6D63E00483B68 /* FavoriteCertificate */,
 				37EF413A257A30E80024AE65 /* HighlightedKeyFigure */,
+				C8F8677127106F8B0061E600 /* HomeNotification */,
 				3714EDCF258122FF00D6736F /* Isolation */,
 				37BF68D1252DEF4A006D00AD /* KeyFigures */,
 				37BF68B5252DBA5E006D00AD /* LastInfo */,
@@ -3851,6 +3861,7 @@
 				66F34FCB262F15FC0002A2B9 /* CleaServerStatusClusterExposure.swift */,
 				37E06D8F256EB3EB003DAA68 /* CleaServerVisit.swift */,
 				66D18198268B6A4800F708D4 /* DaysAfterCompletionEntry.swift */,
+				C8F867692710412E0061E600 /* HomeNotification.swift */,
 				37EDBE4026E75C4E009063C3 /* NoWaitDosesEntry.swift */,
 				37B724A926ED204900415B9F /* ActivityCertificate */,
 			);
@@ -4641,7 +4652,9 @@
 		C817EE6A270B279F003ABF84 /* UrgentDgs */ = {
 			isa = PBXGroup;
 			children = (
+				C8F8678C2715DAF10061E600 /* PlayerView.swift */,
 				C817EE6C270B27C6003ABF84 /* UrgentDgsDetailController.swift */,
+				C8F867942715DB230061E600 /* Cell */,
 			);
 			path = UrgentDgs;
 			sourceTree = "<group>";
@@ -4652,6 +4665,32 @@
 				C817EE70270B3007003ABF84 /* UrgentDgsCoordinator.swift */,
 			);
 			path = UrgentDgs;
+			sourceTree = "<group>";
+		};
+		C8F8676D27106AB30061E600 /* HomeNotification */ = {
+			isa = PBXGroup;
+			children = (
+				C8F8676E27106AD10061E600 /* HomeNotificationManager.swift */,
+			);
+			path = HomeNotification;
+			sourceTree = "<group>";
+		};
+		C8F8677127106F8B0061E600 /* HomeNotification */ = {
+			isa = PBXGroup;
+			children = (
+				C8F86775271073440061E600 /* HomeNotificationCell.swift */,
+				C8F8677227106FE10061E600 /* HomeNotificationCell.xib */,
+			);
+			path = HomeNotification;
+			sourceTree = "<group>";
+		};
+		C8F867942715DB230061E600 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				C8F867912715DB1C0061E600 /* VideoPlayerCell.swift */,
+				C8F867902715DB1C0061E600 /* VideoPlayerCell.xib */,
+			);
+			path = Cell;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -4936,6 +4975,7 @@
 				37B475A326414FFE00B303D0 /* UpdateAppCell.xib in Resources */,
 				37BF68F3252DF78A006D00AD /* ContactStatusCell.xib in Resources */,
 				37F1F3C0264C1DB200015DCE /* vaccin-certificate-full-en.png in Resources */,
+				C8F8677327106FE10061E600 /* HomeNotificationCell.xib in Resources */,
 				3793916126CE3A1000A774D5 /* ActivityPassExpirationCell.xib in Resources */,
 				3710A6A325C1C62B001CB839 /* zip-geoloc.json in Resources */,
 				370CF0AF255AD20F0019B735 /* links-en.json in Resources */,
@@ -4950,10 +4990,8 @@
 				3769280D24603A6A00310876 /* CenteredImageTextCell.xib in Resources */,
 				375807FB2566CA2700CCB59F /* morekeyfigures-fr.json in Resources */,
 				37A6582026A6D63E00483B68 /* FavoriteCertificateCell.xib in Resources */,
-				3768A09D246D276F00D99BC4 /* privacy-pt.json in Resources */,
 				37BBA402264ADFEA002A01AA /* PhoneCell.xib in Resources */,
 				37C4812B267761C700766A36 /* vaccin-europe-certificate-fr.png in Resources */,
-				37C772DD24816ED200B01BAE /* privacy-de.json in Resources */,
 				37E8D2D8254B0E4600686377 /* QRCodeCell.xib in Resources */,
 				37014CFB24460CD000CE0BF1 /* InfoPlist.strings in Resources */,
 				3761BEB726DFCDEA00A7ACEA /* KeyFigureChart.storyboard in Resources */,
@@ -4973,13 +5011,11 @@
 				37E8D2F4254B205C00686377 /* DateCell.xib in Resources */,
 				37F1F3CF264C1DB200015DCE /* test-certificate-fr.png in Resources */,
 				37F1F3C3264C1DB200015DCE /* vaccin-certificate-full-fr.png in Resources */,
-				37C772DC24816ED200B01BAE /* privacy-ar.json in Resources */,
 				37014CFE24460CD000CE0BF1 /* privacy-fr.json in Resources */,
 				37014CFF24460CD000CE0BF1 /* FlashReportCode.storyboard in Resources */,
 				37014D0124460CD000CE0BF1 /* ModalContainer.storyboard in Resources */,
 				377B0B4025E50FF800459BCE /* risks.json in Resources */,
 				37C48127267761C700766A36 /* recovery-europe-certificate-en.png in Resources */,
-				3768A09C246D276F00D99BC4 /* privacy-it.json in Resources */,
 				37B6BFF72515DB3A008E4558 /* InfoCell.xib in Resources */,
 				3765B73B25553F2900AA5659 /* AttestationCell.xib in Resources */,
 				37014D0224460CD000CE0BF1 /* privacy-en.json in Resources */,
@@ -5003,6 +5039,7 @@
 				37BF68BB252DBAA3006D00AD /* LastInfoCell.xib in Resources */,
 				3700111D268B7144008C547E /* certigna-root.pem in Resources */,
 				370AA9BC244763D9009CEB0D /* SF-Pro-Text-Semibold.otf in Resources */,
+				C8F867922715DB1C0061E600 /* VideoPlayerCell.xib in Resources */,
 				37B4A2BD24D00EF300018320 /* OffToOn-Dark.json in Resources */,
 				37577FE625ADD13D000ADB0A /* VaccinationCell.xib in Resources */,
 				3714EDD12581231700D6736F /* IsolationTopCell.xib in Resources */,
@@ -5022,7 +5059,6 @@
 				37045668249356540042B7E6 /* AudioCell.xib in Resources */,
 				37014D0824460CD000CE0BF1 /* AppVersionCell.xib in Resources */,
 				372F446B25B988F600607F0B /* LegendView.xib in Resources */,
-				37689F87246AE4B200D99BC4 /* privacy-es.json in Resources */,
 				37DAA3C825487B3B00ADE007 /* Marianne-Medium.otf in Resources */,
 				3714EDDC25813D1000D6736F /* IsolationInitialCaseSafeCell.xib in Resources */,
 				37F1F3D2264C1DB200015DCE /* test-certificate-full-fr.png in Resources */,
@@ -5256,6 +5292,7 @@
 				3757809225AED1B2000ADB0A /* VenuesScanAuthorizationController.swift in Sources */,
 				371C43B824BC61AE007B5A73 /* NSRegularExpression+Extension.swift in Sources */,
 				37014CA324460CD000CE0BF1 /* UIViewController+Extension.swift in Sources */,
+				C8F8678E2715DAF10061E600 /* PlayerView.swift in Sources */,
 				37F1F34C264BA93900015DCE /* WalletAddCertificateCell.swift in Sources */,
 				6667AAE0256BC0C00082601E /* VenuesRecordingOnboardingController.swift in Sources */,
 				37F1F3EF264CF03400015DCE /* PanZoomImageView.swift in Sources */,
@@ -5487,6 +5524,7 @@
 				3716B5372673506600632FA8 /* UniversalQrCodeExplanationsController.swift in Sources */,
 				37CAF00F256E3A1D00AB8540 /* OnboardingVenuesController.swift in Sources */,
 				374ED21426848443005E01FB /* UniversalScannerView.swift in Sources */,
+				C8F867932715DB1C0061E600 /* VideoPlayerCell.swift in Sources */,
 				377B0B2F25E50F8F00459BCE /* RisksUIConstant.swift in Sources */,
 				37B0234C245AAD67002281E9 /* BluetoothStateManager.swift in Sources */,
 				37FBB03C25E7A99F00377A52 /* StatusManager.swift in Sources */,
@@ -5501,6 +5539,7 @@
 				37014CE224460CD000CE0BF1 /* CVNavigationController.swift in Sources */,
 				37014CE324460CD000CE0BF1 /* UIFont+Appearance.swift in Sources */,
 				37014CE424460CD000CE0BF1 /* OnboardingWelcomeController.swift in Sources */,
+				C8F8676F27106AD10061E600 /* HomeNotificationManager.swift in Sources */,
 				375318B1254A96C9006DD736 /* AttestationFormField.swift in Sources */,
 				3742121A26B290F600AA058A /* DccBlacklistManager.swift in Sources */,
 				373AED7D260CC71300F5BCBD /* WalletCertificateVerificationCoordinator.swift in Sources */,
@@ -5549,6 +5588,7 @@
 				3718A0F124894A09007EAC4F /* Bundle+Extension.swift in Sources */,
 				37AD4072246437ED005FD22B /* UIPopoverPresentationController+Extension.swift in Sources */,
 				3742121726B290AF00AA058A /* DccBlacklistConstant.swift in Sources */,
+				C8F86776271073440061E600 /* HomeNotificationCell.swift in Sources */,
 				373DD79C251535130062CB4D /* InfoCenterCoordinator.swift in Sources */,
 				37BBA37C264ACC57002A01AA /* WalletDocumentsCell.swift in Sources */,
 				3758A9C6256CF6AB0072433B /* FlashVenueCodeController.swift in Sources */,
@@ -5566,6 +5606,7 @@
 				09D83225249CC0D800064733 /* FilteringManager.swift in Sources */,
 				37BED07027019ED300FD6ADA /* ExemptionDccSchema.swift in Sources */,
 				378A26A92461BD8D000F2FD8 /* CallCenter.swift in Sources */,
+				C8F8677E271469BF0061E600 /* HomeNotification+Extension.swift in Sources */,
 				3725DED8250BC79E00531570 /* DeepLinkingManager.swift in Sources */,
 				66E311A226BD26EE001D3BE1 /* TextCell.swift in Sources */,
 				6667AAD1256BBED60082601E /* VenuesRecordingCoordinator.swift in Sources */,
@@ -5735,6 +5776,7 @@
 				37B724A826ED1E8400415B9F /* GenerateLightDccBody.swift in Sources */,
 				6622CBDC2684B3350096C606 /* InGroupServerError.swift in Sources */,
 				37B7249F26ED1C0200415B9F /* GenerateLightDccResponse.swift in Sources */,
+				C8F8677C271469280061E600 /* HomeNotification.swift in Sources */,
 				37EB2EA32486480D003D999A /* ServerConstant.swift in Sources */,
 				3704067C24E15006000C7C1B /* RBServerPushInfo.swift in Sources */,
 				66F34FB9262F15CC0002A2B9 /* CleaServerStatusCluster.swift in Sources */,
@@ -5883,7 +5925,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.8.4;
+				MARKETING_VERSION = 3.8.5;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios;
 				PRODUCT_NAME = TousAntiCovid;
@@ -5910,7 +5952,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.8.4;
+				MARKETING_VERSION = 3.8.5;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios;
 				PRODUCT_NAME = TousAntiCovid;
@@ -6054,7 +6096,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.8.4;
+				MARKETING_VERSION = 3.8.5;
 				OTHER_SWIFT_FLAGS = "-DDEBUG -DWIDGET -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6081,7 +6123,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.8.4;
+				MARKETING_VERSION = 3.8.5;
 				OTHER_SWIFT_FLAGS = "-DWIDGET -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6105,7 +6147,7 @@
 				DEVELOPMENT_TEAM = PR958DC548;
 				IBSC_MODULE = Watch_Extension;
 				INFOPLIST_FILE = Watch/Resources/Info.plist;
-				MARKETING_VERSION = 3.8.4;
+				MARKETING_VERSION = 3.8.5;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -6129,7 +6171,7 @@
 				DEVELOPMENT_TEAM = PR958DC548;
 				IBSC_MODULE = Watch_Extension;
 				INFOPLIST_FILE = Watch/Resources/Info.plist;
-				MARKETING_VERSION = 3.8.4;
+				MARKETING_VERSION = 3.8.5;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -6155,7 +6197,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.8.4;
+				MARKETING_VERSION = 3.8.5;
 				OTHER_SWIFT_FLAGS = "-DDEBUG -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
@@ -6182,7 +6224,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.8.4;
+				MARKETING_VERSION = 3.8.5;
 				OTHER_SWIFT_FLAGS = "-DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";

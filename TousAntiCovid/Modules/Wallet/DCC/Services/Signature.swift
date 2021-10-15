@@ -50,6 +50,9 @@ struct Signature {
       signature as NSData,
       &error
     )
+    if let err = error?.takeUnretainedValue().localizedDescription {
+      print(err)
+    }
     error?.release()
 
     return result

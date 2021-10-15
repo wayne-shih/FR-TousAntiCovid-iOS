@@ -291,6 +291,9 @@ final class HomeViewController: CVTableViewController {
             cell.accessibilityElementsHidden = true
         }
         rows.append(titleRow)
+        if let notifRow = homeNotificationRow() {
+            rows.append(notifRow)
+        }
         let stateRow: CVRow = CVRow(xibName: .stateAnimationCell,
                                     theme: CVRow.Theme(topInset: 30.0, separatorLeftInset: nil),
                                     willDisplay: { [weak self] cell in
@@ -677,8 +680,7 @@ final class HomeViewController: CVTableViewController {
         ParametersManager.shared.proximityReactivationReminderHours.forEach { hours in
             let hoursString: String = hours == 1 ? "home.deactivate.actionSheet.hours.singular" : "home.deactivate.actionSheet.hours.plural"
             alertController.addAction(UIAlertAction(title: String(format: hoursString.localized, Int(hours)), style: .default) { [weak self] _ in
-                var hoursToUse: Double = Double(hours)
-                self?.triggerReactivationReminder(hours: hoursToUse)
+                self?.triggerReactivationReminder(hours: Double(hours))
             })
         }
         alertController.addAction(UIAlertAction(title: "home.deactivate.actionSheet.noReminder".localized, style: .cancel) { [weak self] _ in
@@ -698,6 +700,31 @@ final class HomeViewController: CVTableViewController {
 }
 
 extension HomeViewController {
+    
+    private func homeNotificationRow() -> CVRow? {
+        guard let notif = ParametersManager.shared.homeNotification else {
+            return nil
+        }
+        guard notif.hasContent && !HomeNotificationManager.shared.wasAlreadyClosed(notification: notif) else {
+            return nil
+        }
+        return CVRow(
+            title: notif.title,
+            subtitle: notif.subtitle,
+            image: Asset.Images.homeNotifCard.image,
+            xibName: .homeNotificationCell,
+            theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                               topInset: Appearance.Cell.leftMargin / 2,
+                               bottomInset: Appearance.Cell.leftMargin / 2,
+                               textAlignment: .natural),
+            selectionAction: {
+                notif.url?.openInSafari()
+            }, secondarySelectionAction: { [weak self] in
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                HomeNotificationManager.shared.close(notification: notif)
+                self?.reloadUI(animated: true)
+            })
+    }
     
     private func activationButtonRow(isRegistered: Bool) -> CVRow {
         let buttonAccessibilityLabel: String = isActivated ? "accessibility.home.mainButton.deactivate".localized : "accessibility.home.mainButton.activate".localized
@@ -1250,7 +1277,6 @@ extension HomeViewController {
                                                          actionBlock: { [weak self] in
                                                             self?.didTouchAbout()
                                                          })])
-
         rows.append(contentsOf: menuRowsForEntries(menuEntries))
         return rows
     }

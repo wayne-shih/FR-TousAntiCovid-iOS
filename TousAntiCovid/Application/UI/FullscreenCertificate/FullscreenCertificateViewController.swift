@@ -311,9 +311,20 @@ extension FullscreenCertificateViewController {
         let borderModeSelectionAction: () -> () = { [weak self] in
             self?.selectBorderMode()
         }
-        let activitySegmentTitle: String = WalletManager.shared.isActivityPassActivated ? "europeanCertificate.fullscreen.type.activityPass".localized : "europeanCertificate.fullscreen.type.minimum".localized
-        let modeSelectionRow: CVRow = CVRow(segmentsTitles: [activitySegmentTitle,
-                                                             "europeanCertificate.fullscreen.type.border".localized],
+        let activitySegmentTitle: String
+        let borderSegmentTitle: String
+        let minimumSegmentTitle: String
+        if #available(iOS 13.0, *) {
+            minimumSegmentTitle = "europeanCertificate.fullscreen.type13.minimum".localized
+            borderSegmentTitle = "europeanCertificate.fullscreen.type13.border".localized
+            activitySegmentTitle = "europeanCertificate.fullscreen.type13.activityPass".localized
+        } else {
+            minimumSegmentTitle = "europeanCertificate.fullscreen.type.minimum".localized
+            borderSegmentTitle = "europeanCertificate.fullscreen.type.border".localized
+            activitySegmentTitle = "europeanCertificate.fullscreen.type.activityPass".localized
+        }
+        let modeSelectionRow: CVRow = CVRow(segmentsTitles: [ WalletManager.shared.isActivityPassActivated ? activitySegmentTitle : minimumSegmentTitle,
+                                                              borderSegmentTitle],
                                             selectedSegmentIndex: mode == .border ? 1 : 0,
                                             xibName: .segmentedCell,
                                             theme:  CVRow.Theme(backgroundColor: .clear,

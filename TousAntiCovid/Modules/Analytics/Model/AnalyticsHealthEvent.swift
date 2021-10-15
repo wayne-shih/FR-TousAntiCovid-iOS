@@ -26,6 +26,7 @@ final class AnalyticsHealthEvent: Object, Encodable {
     enum EventName: String {
         case eh1
         case eh2
+        case eh3
     }
     
     init(name: String, timestamp: String, desc: String?) {

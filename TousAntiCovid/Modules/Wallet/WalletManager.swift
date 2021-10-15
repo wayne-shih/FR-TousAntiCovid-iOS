@@ -62,13 +62,9 @@ final class WalletManager {
         }.isNil
     }
 
-    var isWalletActivated: Bool {
-        ParametersManager.shared.displaySanitaryCertificatesWallet
-    }
+    var isWalletActivated: Bool { ParametersManager.shared.displaySanitaryCertificatesWallet }
     
-    var isActivityPassActivated: Bool {
-        ParametersManager.shared.displayActivityPass
-    }
+    var isActivityPassActivated: Bool { ParametersManager.shared.displayActivityPass }
     
     @UserDefault(key: .activityPassAutoRenewalActivated)
     var activityPassAutoRenewalActivated: Bool = false
@@ -91,7 +87,6 @@ final class WalletManager {
         addObservers()
         HCert.publicKeyStorageDelegate = self
         reloadCertificates()
-
     }
     
     func setFavorite(certificate: WalletCertificate) {
@@ -519,6 +514,7 @@ extension WalletManager {
         }
         dispatchGroup.notify(queue: .main) { completion?() }
     }
+
 }
 
 extension WalletManager {

@@ -77,5 +77,6 @@ enum XibName: String {
     case zoomableImageCell = "ZoomableImageCell"
     case favoriteCertificateCell = "FavoriteCertificateCell"
     case activityPassExpirationCell = "ActivityPassExpirationCell"
-
+    case videoPlayerCell = "VideoPlayerCell"
+    case homeNotificationCell = "HomeNotificationCell"
 }

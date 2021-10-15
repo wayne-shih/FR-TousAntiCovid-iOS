@@ -15,6 +15,7 @@ final class UrgentDgsDetailController: CVTableViewController {
     private let didTouchMoreInfo: () -> ()
     private let didTouchCloseButton: () -> ()
     private let deinitBlock: () -> ()
+    private var isFirstLoad: Bool = true
     
     init(
         didTouchMoreInfo: @escaping () -> (),
@@ -37,6 +38,14 @@ final class UrgentDgsDetailController: CVTableViewController {
         reloadUI()
         LocalizationsManager.shared.addObserver(self)
     }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if isFirstLoad {
+            isFirstLoad = false
+            updateTableViewLayout()
+        }
+    }
     
     deinit {
         LocalizationsManager.shared.removeObserver(self)
@@ -45,6 +54,22 @@ final class UrgentDgsDetailController: CVTableViewController {
     
     override func createRows() -> [CVRow] {
         var rows: [CVRow] = []
+        // Video row if there is an url defined in strings
+        let videoPath: String = "dgsUrgentController.videoUrl".localized
+        if !videoPath.isEmpty {
+            let videoRow: CVRow = CVRow(xibName: .videoPlayerCell,
+                                        theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                                           topInset: 0.0,
+                                                           bottomInset: 0.0,
+                                                           leftInset: 0.0,
+                                                           rightInset: 0.0),
+                                        associatedValue: URL(string: videoPath),
+                                        valueChanged: { [weak self] _ in
+                guard self?.isFirstLoad == false else { return }
+                self?.updateTableViewLayout()
+            })
+            rows.append(videoRow)
+        }
         // Information row with details on the reminders
         let infosRow: CVRow = CVRow(title: "dgsUrgentController.section.title".localized,
                                     subtitle: "dgsUrgentController.section.desc".localized,
@@ -60,7 +85,7 @@ final class UrgentDgsDetailController: CVTableViewController {
         })
         rows.append(infosRow)
         // Need help row with possibility to call the help center
-        let phoneNumber = "dgsUrgentController.phone.number".localized
+        let phoneNumber: String = "dgsUrgentController.phone.number".localized
         if !phoneNumber.isEmpty {
             let phoneRow: CVRow = CVRow(title: "dgsUrgentController.phone.title".localized,
                                         subtitle: "dgsUrgentController.phone.subtitle".localized,
@@ -81,6 +106,11 @@ final class UrgentDgsDetailController: CVTableViewController {
         
         return rows
     }
+
+    private func updateTableViewLayout() {
+        tableView.beginUpdates()
+        tableView.endUpdates()
+    }
 }
 
 // MARK: - Privates functions -
@@ -90,7 +120,7 @@ private extension UrgentDgsDetailController {
     }
     
     func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchClose))

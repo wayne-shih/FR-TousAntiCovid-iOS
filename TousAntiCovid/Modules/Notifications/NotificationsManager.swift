@@ -13,23 +13,23 @@ import UserNotifications
 import RobertSDK
 
 final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
-    
+
     static let shared: NotificationsManager = NotificationsManager()
-    
+
     @UserDefault(key: .showNewInfoNotification)
     var showNewInfoNotification: Bool = true
     
     @UserDefault(key: .lastNotificationTimestamp)
     private var lastNotificationTimeStamp: Double = 0.0
-    
+
     private var waitingToReactivateProximity: Bool = false
     private var waitingToShowCompletedVaccination: Bool = false
-    
+
     func start() {
         UNUserNotificationCenter.current().delegate = self
         addObservers()
     }
-    
+
     func areNotificationsAuthorized(completion: ((_ authorized: Bool) -> ())? = nil) {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {
@@ -37,7 +37,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
             }
         }
     }
-    
+
     func requestAuthorization(completion: ((_ granted: Bool) -> ())? = nil) {
         DispatchQueue.main.async {
             UIApplication.shared.registerForRemoteNotifications()
@@ -85,9 +85,9 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
             waitingToShowCompletedVaccination = false
             NotificationCenter.default.post(name: .didCompletedVaccinationNotification, object: nil)
         }
-        
+
     }
-    
+
     func scheduleNotification(minHour: Int?, maxHour: Int?, triggerDate: Date = Date(), title: String, body: String, identifier: String, badge: Int? = nil) {
         let content = UNMutableNotificationContent()
         content.title = title
@@ -121,7 +121,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         let request: UNNotificationRequest = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         requestAuthorization { _ in
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
-            UNUserNotificationCenter.current().add(request) { _ in }
+            UNUserNotificationCenter.current().add(request)
         }
     }
     
@@ -149,7 +149,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
             UNUserNotificationCenter.current().add(request) { _ in }
         }
     }
-    
+
     
     func triggerDeviceTimeErrorNotification() {
         checkIfNotificationIsAlreadySentOrStillVisible(for: NotificationsContant.Identifier.deviceTimeError) { alreadySentOrStillVisible in
@@ -164,7 +164,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
             }
         }
     }
-    
+
     func triggerProximityServiceRunningNotification(minHoursBetweenNotif: Int) {
         guard shouldShowNotification(minHoursBetweenNotif) else { return }
         let content = UNMutableNotificationContent()
@@ -176,7 +176,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
             UNUserNotificationCenter.current().add(request) { _ in }
         }
     }
-    
+
     func triggerProximityServiceNotRunningNotification(minHoursBetweenNotif: Int) {
         guard shouldShowNotification(minHoursBetweenNotif) else { return }
         let content = UNMutableNotificationContent()
@@ -205,11 +205,11 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
     func scheduleStillHavingFeverNotification(minHour: Int?, maxHour: Int?, triggerDate: Date) {
         scheduleNotification(minHour: minHour, maxHour: maxHour, triggerDate: triggerDate, title: "notification.stillHavingFever.title".localized, body: "notification.stillHavingFever.message".localized, identifier: NotificationsContant.Identifier.stillHavingFever)
     }
-    
+
     func scheduleCompletedVaccination(triggerDate: Date) {
         scheduleNotification(minHour: nil, maxHour: nil, triggerDate: triggerDate, title: "vaccineCompletionNotification.title".localized, body: "vaccineCompletionNotification.message".localized, identifier: NotificationsContant.Identifier.completedVaccination)
     }
-    
+
     func scheduleActivityPassAvailable(triggerDate: Date) {
         scheduleNotification(minHour: nil, maxHour: nil, triggerDate: triggerDate, title: "activityPass.notification.title".localized, body: "activityPass.notification.message".localized, identifier: NotificationsContant.Identifier.activityPassAvailable)
     }
@@ -248,7 +248,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         requestAuthorization { _ in
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [NotificationsContant.Identifier.ultimate])
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NotificationsContant.Identifier.ultimate])
-            UNUserNotificationCenter.current().add(request) { _ in }
+            UNUserNotificationCenter.current().add(request)
         }
     }
     
@@ -263,7 +263,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         requestAuthorization { _ in
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [NotificationsContant.Identifier.proximityReactivation])
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NotificationsContant.Identifier.proximityReactivation])
-            UNUserNotificationCenter.current().add(request) { _ in }
+            UNUserNotificationCenter.current().add(request)
         }
     }
     
@@ -286,7 +286,7 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
     }
-    
+
     private func shouldShowNotification(_ minHoursBetweenNotif: Int) -> Bool {
         let timestamp: Double = Date().timeIntervalSince1970
         guard timestamp - lastNotificationTimeStamp > Double(minHoursBetweenNotif * 3600) else { return false }
@@ -303,5 +303,5 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
             }
         }
     }
-    
+
 }

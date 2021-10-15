@@ -104,7 +104,7 @@ extension UserDefault {
         case activityPassAutoRenewalActivated
         case activityPassNotificationActivated
         case hideStatusBar
-        
+        case notifClosedVersion
     }
     
 }

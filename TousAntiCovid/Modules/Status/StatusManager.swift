@@ -134,7 +134,7 @@ final class StatusManager {
             completion?(error)
         }
     }
-
+    
 }
 
 extension StatusManager {
@@ -415,11 +415,13 @@ extension StatusManager {
         if !RBManager.shared.isImmune {
             mustNotifyLastRiskLevelChange = (newRiskLevelInfo.riskLevel > currentStatusRiskLevel?.riskLevel ?? 0.0) || (newRiskLevelInfo.riskLevel != 0.0 && newRiskLevelInfo.riskLevel == currentStatusRiskLevel?.riskLevel && newRiskLevelInfo.lastRiskScoringDate ?? .distantPast > currentStatusRiskLevel?.lastRiskScoringDate ?? .distantPast)
             mustShowAlertAboutLastRiskLevelChange = newRiskLevelInfo.lastRiskScoringDate != currentStatusRiskLevel?.lastRiskScoringDate
-            if mustNotifyLastRiskLevelChange || mustShowAlertAboutLastRiskLevelChange {
-                AnalyticsManager.shared.reportHealthEvent(.eh2, description: "\(newRiskLevelInfo.riskLevel)")
+            let description: String = "\(currentStatusRiskLevel?.riskLevel ?? 0.0)|\(newRiskLevelInfo.riskLevel)"
+            if mustNotifyLastRiskLevelChange {
+                AnalyticsManager.shared.reportHealthEvent(.eh2, description: description)
+            } else if mustShowAlertAboutLastRiskLevelChange {
+                AnalyticsManager.shared.reportHealthEvent(.eh3, description: description)
             }
         }
-
         currentStatusRiskLevel = newRiskLevelInfo
 
         if UIApplication.shared.applicationState == .active {

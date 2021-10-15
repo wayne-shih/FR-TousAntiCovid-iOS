@@ -212,6 +212,22 @@ enum Appearance {
         static var legendFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .bold(size: 15.0)) }
     }
     
+    static var defaultShadowColor: UIColor {
+        if #available(iOS 13.0, *) {
+            return UIColor.init(dynamicProvider: {
+                switch $0.userInterfaceStyle {
+                case .dark:
+                    return .white
+                case .light, .unspecified:
+                    return .black
+                @unknown default:
+                    return .black
+                }
+            })
+        } else {
+            return .black
+        }
+    }
 }
 
 extension CVRow.Theme {

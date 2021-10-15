@@ -339,7 +339,6 @@ final class WalletViewController: CVTableViewController {
         if DccBlacklistManager.shared.isBlacklisted(certificate: certificate) || Blacklist2dDocManager.shared.isBlacklisted(certificate: certificate) {
             subtitle += "\n\n\("wallet.blacklist.warning".localized)"
         }
-
         if (certificate as? EuropeanCertificate)?.isAutoTest == true { subtitle += "\n\n\("wallet.autotest.warning".localized)" }
         let certificateRow: CVRow = CVRow(title: certificate.codeImageTitle,
                                           subtitle: subtitle,
@@ -426,7 +425,6 @@ final class WalletViewController: CVTableViewController {
                 }
             }))
         }
-
         alertController.addAction(UIAlertAction(title: "walletController.menu.delete".localized, style: .destructive, handler: { [weak self] _ in
             self?.showCertificateDeletionAlert(certificate: certificate)
         }))

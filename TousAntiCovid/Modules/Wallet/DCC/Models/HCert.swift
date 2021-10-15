@@ -173,6 +173,7 @@ public struct HCert {
         return nil
       }
     } else {
+      print("Wrong EU_DGC Version!")
       errors?.errors.append(.version)
       return nil
     }
