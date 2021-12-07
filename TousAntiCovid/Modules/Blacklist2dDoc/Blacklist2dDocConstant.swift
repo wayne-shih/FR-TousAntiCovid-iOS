@@ -8,13 +8,9 @@
 //  Created by Lunabee Studio / Date - 29/07/2021 - for the TousAntiCovid project.
 //
 
-import Foundation
-
 enum Blacklist2dDocConstant {
-
-    static let directoryName: String = "CertList"
-    static let baseUrl: String = "https://\(Constant.Server.staticResourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/\(directoryName)"
-    static let filename: String = "2ddoc_list.json"
-    static let certListUrl: URL = URL(string: "\(baseUrl)/\(filename)")!
-
+    private static let directoryName: String = "CertList"
+    
+    static let baseUrl: String = "https://\(Constant.Server.staticResourcesRootDomain)/json/blacklist/v2/\(directoryName)/2ddoc"
+    static let filename: String = "2ddoc_list.pb.gz"
 }

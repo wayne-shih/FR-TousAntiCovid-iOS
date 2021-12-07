@@ -12,16 +12,13 @@ import UIKit
 import Lottie
 
 final class AnimationCell: CVTableViewCell {
-
     @IBOutlet var animationView: AnimationView?
-
-    private let defaultAnimationSpeed: CGFloat = 1.0
-    private let waveAnimationSpeed: CGFloat = 1.0
+    private let animationSpeed: CGFloat = 1.0
 
     override func setup(with row: CVRow) {
         super.setup(with: row)
         animationView?.backgroundColor = .clear
-        setOnWaving(animation: row.animation)
+        startAnimation(animation: row.animation)
     }
 
     override func setupAccessibility() {
@@ -31,12 +28,11 @@ final class AnimationCell: CVTableViewCell {
         accessibilityElementsHidden = true
     }
 
-    private func setOnWaving(animation: Animation?) {
+    private func startAnimation(animation: Animation?) {
         guard animationView?.animation == nil else { return }
         animationView?.animation = animation
-        animationView?.animationSpeed = waveAnimationSpeed
+        animationView?.animationSpeed = animationSpeed
         animationView?.loopMode = .loop
         animationView?.play()
     }
-
 }

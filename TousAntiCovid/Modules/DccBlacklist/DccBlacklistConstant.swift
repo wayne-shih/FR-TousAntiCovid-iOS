@@ -8,13 +8,10 @@
 //  Created by Lunabee Studio / Date - 29/07/2021 - for the TousAntiCovid project.
 //
 
-import Foundation
-
 enum DccBlacklistConstant {
-
-    static let directoryName: String = "CertList"
-    static let baseUrl: String = "https://\(Constant.Server.staticResourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/\(directoryName)"
-    static let filename: String = "certlist.json"
-    static let certListUrl: URL = URL(string: "\(baseUrl)/\(filename)")!
+    private static let directoryName: String = "CertList"
+    
+    static let baseUrl: String = "https://\(Constant.Server.staticResourcesRootDomain)/json/blacklist/v2/\(directoryName)/dcc"
+    static let filename: String = "certlist.pb.gz"
 
 }

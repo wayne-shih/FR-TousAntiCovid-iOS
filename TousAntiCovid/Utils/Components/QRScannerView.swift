@@ -27,7 +27,7 @@ class QRScannerView: UIView {
         doInitialSetup()
     }
     
-    //MARK: overriding the layerClass to return `AVCaptureVideoPreviewLayer`.
+    // MARK: overriding the layerClass to return `AVCaptureVideoPreviewLayer`.
     override class var layerClass: AnyClass  {
         return AVCaptureVideoPreviewLayer.self
     }

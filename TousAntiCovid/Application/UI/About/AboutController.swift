@@ -36,94 +36,74 @@ final class AboutController: CVTableViewController {
         LocalizationsManager.shared.removeObserver(self)
         deinitBlock?()
     }
-
+    
     private func updateTitle() {
         title = "aboutController.title".localized
     }
-
+    
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
+        tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
         navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        let appLogoRow: CVRow = CVRow(image: Asset.Images.logo.image,
-                                      xibName: .onboardingImageCell,
-                                      theme: CVRow.Theme(topInset: 20.0, imageRatio: Appearance.Cell.Image.defaultRatio))
-        rows.append(appLogoRow)
-        let appVersionRow: CVRow = CVRow(title: "app.name".localized,
-                                         subtitle: String(format: "aboutController.appVersion".localized, UIApplication.shared.marketingVersion, UIApplication.shared.buildNumber),
-                                         xibName: .textCell,
-                                         theme: CVRow.Theme(topInset: 16.0, separatorLeftInset: nil))
-        rows.append(appVersionRow)
-        let textRow: CVRow = CVRow(title: "aboutController.mainMessage.title".localized,
-                                   subtitle: "aboutController.mainMessage.subtitle".localized,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 40.0, bottomInset: 20.0, textAlignment: .natural, separatorLeftInset: nil))
-        rows.append(textRow)
-        let contactRow: CVRow = CVRow(title: "aboutController.contactUsByEmail".localized,
-                                      xibName: .standardCell,
-                                      theme: CVRow.Theme(topInset: 15.0,
-                                                         bottomInset: 15.0,
-                                                         textAlignment: .natural,
-                                                         titleFont: { Appearance.Cell.Text.standardFont },
-                                                         titleColor: Asset.Colors.tint.color,
-                                                         separatorLeftInset: Appearance.Cell.leftMargin),
-                                      selectionAction: {
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow(image: Asset.Images.logo.image,
+                      xibName: .onboardingImageCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                         imageRatio: Appearance.Cell.Image.defaultRatio))
+                CVRow(title: "app.name".localized,
+                      subtitle: String(format: "aboutController.appVersion".localized, UIApplication.shared.marketingVersion, UIApplication.shared.buildNumber),
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
+                                         separatorLeftInset: nil)
+                )
+                CVRow(title: "aboutController.mainMessage.title".localized,
+                      subtitle: "aboutController.mainMessage.subtitle".localized,
+                      xibName: .standardCardCell,
+                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                         topInset: Appearance.Cell.Inset.extraLarge,
+                                         bottomInset: Appearance.Cell.Inset.medium,
+                                         textAlignment: .natural,
+                                         titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
+                                         separatorLeftInset: nil)
+                )
+            }
+            actionsSection()
+        }
+    }
+    
+    private func actionsSection() -> CVSection {
+        let menuEntries: [GroupedMenuEntry] = [GroupedMenuEntry(image: Asset.Images.contact.image,
+                                                                title: "aboutController.contactUsByEmail".localized,
+                                                                actionBlock: {
             URL(string: "contactUs.url".localized)?.openInSafari()
-        })
-        rows.append(contactRow)
-        let faqRow: CVRow = CVRow(title: "aboutController.faq".localized,
-                                  xibName: .standardCell,
-                                  theme: CVRow.Theme(topInset: 15.0,
-                                                     bottomInset: 15.0,
-                                                     textAlignment: .natural,
-                                                     titleFont: { Appearance.Cell.Text.standardFont },
-                                                     titleColor: Asset.Colors.tint.color,
-                                                     separatorLeftInset: Appearance.Cell.leftMargin),
-                                  selectionAction: {
+        }),
+                                               GroupedMenuEntry(image: Asset.Images.faq.image,
+                                                                title: "aboutController.faq".localized,
+                                                                actionBlock: {
             URL(string: "aboutController.faqUrl".localized)?.openInSafari()
-        })
-        rows.append(faqRow)
-        let opinionRow: CVRow = CVRow(title: "aboutController.opinion".localized,
-                                      xibName: .standardCell,
-                                      theme: CVRow.Theme(topInset: 15.0,
-                                                         bottomInset: 15.0,
-                                                         textAlignment: .natural,
-                                                         titleFont: { Appearance.Cell.Text.standardFont },
-                                                         titleColor: Asset.Colors.tint.color,
-                                                         separatorLeftInset: Appearance.Cell.leftMargin),
-                                      selectionAction: {
+        }),
+                                               GroupedMenuEntry(image: Asset.Images.opinion.image,
+                                                                title: "aboutController.opinion".localized,
+                                                                actionBlock: {
             URL(string: "aboutController.opinionUrl".localized)?.openInSafari()
-        })
-        rows.append(opinionRow)
-        let internetRow: CVRow = CVRow(title: "aboutController.webpage".localized,
-                                       xibName: .standardCell,
-                                       theme: CVRow.Theme(topInset: 15.0,
-                                                          bottomInset: 15.0,
-                                                          textAlignment: .natural,
-                                                          titleFont: { Appearance.Cell.Text.standardFont },
-                                                          titleColor: Asset.Colors.tint.color,
-                                                          separatorLeftInset: 0.0),
-                                       selectionAction: {
+        }),
+                                               GroupedMenuEntry(image: Asset.Images.moreInfo.image,
+                                                                title: "aboutController.webpage".localized,
+                                                                actionBlock: {
             URL(string: "aboutController.webpageUrl".localized)?.openInSafari()
-        })
-        rows.append(internetRow)
-        rows.append(.empty)
-        return rows
+        })]
+        return CVSection(rows: menuEntries.toMenuRows())
     }
     
     @objc private func didTouchCloseButton() {
         dismiss(animated: true, completion: nil)
     }
-
 }
 
 extension AboutController: LocalizationsChangesObserver {

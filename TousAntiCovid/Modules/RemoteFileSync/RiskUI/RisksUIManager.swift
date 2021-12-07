@@ -114,6 +114,10 @@ final class RisksUIManager: RemoteFileSyncManager {
         observers.forEach { $0.observer?.risksUIChanged() }
     }
 
+    override func resetLastUpdateDate() {
+        lastUpdateDate = .distantPast
+    }
+
 }
 
 extension RisksUIManager {

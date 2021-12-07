@@ -61,7 +61,7 @@ class OnboardingController: CVTableViewController, LocalizationsChangesObserver 
         navigationChildController?.updateTitle(title)
     }
     
-    override func createRows() -> [CVRow] { [] }
+    override func createSections() -> [CVSection] { [] }
     
     func bottomContainerButtonTouched() {
         didContinue?()
@@ -86,8 +86,7 @@ class OnboardingController: CVTableViewController, LocalizationsChangesObserver 
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: navigationChildController?.navigationBarHeight ?? 0.0))
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
+        addHeaderView(height: navigationChildController?.navigationBarHeight ?? 0.0)
         tableView.separatorStyle = .none
         tableView.showsVerticalScrollIndicator = false
         if !isOpenedFromOnboarding {

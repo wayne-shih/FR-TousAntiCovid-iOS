@@ -11,8 +11,8 @@
 import Foundation
 
 enum InfoCenterConstant {
-
     static let directoryName: String = "InfoCenter"
+    
     static let baseUrl: String = "https://\(Constant.Server.staticResourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/\(directoryName)"
     static let tagsUrl: URL = URL(string: "\(baseUrl)/info-tags.json")!
     static let infoCenterUrl: URL = URL(string: "\(baseUrl)/info-center.json")!

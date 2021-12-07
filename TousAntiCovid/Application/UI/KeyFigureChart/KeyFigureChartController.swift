@@ -12,6 +12,11 @@ import UIKit
 import Charts
 
 final class KeyFigureChartController: UIViewController {
+    
+    enum Mode {
+        case normal
+        case comparison
+    }
 
     override var prefersStatusBarHidden: Bool { true }
     override var prefersHomeIndicatorAutoHidden: Bool { true }
@@ -30,14 +35,16 @@ final class KeyFigureChartController: UIViewController {
     @IBOutlet private var widthConstraint: NSLayoutConstraint!
     @IBOutlet private var heightConstraint: NSLayoutConstraint!
 
-    private var chartDatas: [KeyFigureChartData] = []
+    var chartDatas: [KeyFigureChartData] = []
     private var dismissBlock: (() -> ())?
+    private var mode: Mode = .normal
     private weak var chartView: ChartViewBase?
 
-    static func controller(chartDatas: [KeyFigureChartData], dismissBlock: @escaping () -> ()) -> KeyFigureChartController {
+    static func controller(chartDatas: [KeyFigureChartData], mode: Mode = .normal, dismissBlock: @escaping () -> ()) -> KeyFigureChartController {
         let chartController: KeyFigureChartController = UIStoryboard(name: "KeyFigureChart", bundle: nil).instantiateViewController(withIdentifier: "KeyFigureChartController") as! KeyFigureChartController
         chartController.chartDatas = chartDatas
         chartController.dismissBlock = dismissBlock
+        chartController.mode = mode
         return chartController
     }
 
@@ -46,6 +53,17 @@ final class KeyFigureChartController: UIViewController {
         setupUI()
         setupContent()
         setupChart()
+    }
+    
+    private func createChartView() -> ChartViewBase? {
+        switch mode {
+        case .normal:
+            return ChartViewBase.create(chartDatas: chartDatas, allowInteractions: true)
+        case .comparison:
+            guard chartDatas.count == 2 else { return nil }
+            let sameOrdinate: Bool = chartDatas.haveSameMagnitude
+            return ChartViewBase.create(chartData1: chartDatas[0], chartData2: chartDatas[1], sameOrdinate: sameOrdinate, allowInteractions: true)
+        }
     }
 
     private func setupUI() {
@@ -77,7 +95,7 @@ final class KeyFigureChartController: UIViewController {
     }
 
     private func setupChart() {
-        guard let chartView = ChartViewBase.create(chartDatas: chartDatas, allowInteractions: true) else { return }
+        guard let chartView = createChartView() else { return }
         chartView.delegate = self
         self.chartView = chartView
         chartContainerView.subviews.forEach { $0.removeFromSuperview() }

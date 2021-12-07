@@ -61,8 +61,6 @@ final class NewAttestationViewController: CVTableViewController {
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -191,40 +189,52 @@ final class NewAttestationViewController: CVTableViewController {
         }
     }
     
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        
+    override func createSections() -> [CVSection] {
         let headerText: String = "newAttestationController.header".localizedOrEmpty
         if headerText.isEmpty {
-            rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: true))
-        } else {
-            let headerRow: CVRow = CVRow(title: headerText,
-                                         xibName: .textCell,
-                                         theme:  CVRow.Theme(topInset: 20.0,
-                                                             bottomInset: 20.0,
-                                                             textAlignment: .natural,
-                                                             titleFont: { Appearance.Cell.Text.footerFont },
-                                                             titleColor: Appearance.Cell.Text.captionTitleColor,
-                                                             separatorLeftInset: 0.0,
-                                                             separatorRightInset: 0.0),
-                                         willDisplay: { cell in
-                                            cell.accessibilityElements = []
-                                            cell.accessibilityElementsHidden = true
-                                            cell.isAccessibilityElement = false
-                                         })
-            rows.append(headerRow)
+            addHeaderView(height: Appearance.TableView.Header.largeHeight)
         }
-        
+        return makeSections {
+            CVSection {
+                if !headerText.isEmpty {
+                    titleRow(title: headerText)
+                }
+                fieldsRows()
+                switchRow()
+                footerRow()
+            }
+        }
+    }
+
+    // MARK: - Rows -
+    private func titleRow(title: String) -> CVRow {
+        CVRow(title: title,
+              xibName: .textCell,
+              theme:  CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                  bottomInset: Appearance.Cell.Inset.medium,
+                                  textAlignment: .natural,
+                                  titleFont: { Appearance.Cell.Text.footerFont },
+                                  titleColor: Appearance.Cell.Text.captionTitleColor,
+                                  separatorLeftInset: .zero,
+                                  separatorRightInset: .zero),
+              willDisplay: { cell in
+            cell.accessibilityElements = []
+            cell.accessibilityElementsHidden = true
+            cell.isAccessibilityElement = false
+        })
+    }
+
+    private func fieldsRows() -> [CVRow] {
         let theme: CVRow.Theme = CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                             topInset: 10.0,
-                                             bottomInset: 10.0,
+                                             topInset: Appearance.Cell.Inset.small,
+                                             bottomInset: Appearance.Cell.Inset.small,
                                              textAlignment: .natural,
                                              titleFont: { .regular(size: 12.0) },
                                              titleColor: Appearance.Cell.Text.subtitleColor,
                                              subtitleFont: { .regular(size: 17.0) },
                                              subtitleColor: Appearance.Cell.Text.titleColor,
                                              separatorLeftInset: Appearance.Cell.leftMargin)
-        
+
         var fieldTag: Int = 1000
         let fieldsRows: [[CVRow]] = groupedFields.map { fields in
             var rows: [CVRow] = fields.map { field in
@@ -241,18 +251,18 @@ final class NewAttestationViewController: CVTableViewController {
                                 initialDate: field.key == "dob" ? dobDate : nil,
                                 datePickerMode: .date,
                                 willDisplay: { [weak self] cell in
-                                    guard let self = self else { return }
-                                    (cell as? DateCell)?.datePicker.date = self.dobDate
-                                    (cell as? DateCell)?.cvSubtitleLabel?.text = self.fieldValues[field.dataKeyValue]?[field.key]
-                                },
+                        guard let self = self else { return }
+                        (cell as? DateCell)?.datePicker.date = self.dobDate
+                        (cell as? DateCell)?.cvSubtitleLabel?.text = self.fieldValues[field.dataKeyValue]?[field.key]
+                    },
                                 valueChanged: { [weak self] value in
-                                    guard let value = value as? Date else { return }
-                                    self?.fieldValues[field.key] = [field.key: value.dayMonthYearFormatted()]
-                                    self?.fieldValues["\(field.key)-timestamp"] = ["\(field.key)-timestamp": "\(value.timeIntervalSince1970)"]
-                                }, displayValueForValue: { value -> String? in
-                                    guard let value = value as? Date else { return nil }
-                                    return value.dayMonthYearFormatted()
-                                })
+                        guard let value = value as? Date else { return }
+                        self?.fieldValues[field.key] = [field.key: value.dayMonthYearFormatted()]
+                        self?.fieldValues["\(field.key)-timestamp"] = ["\(field.key)-timestamp": "\(value.timeIntervalSince1970)"]
+                    }, displayValueForValue: { value -> String? in
+                        guard let value = value as? Date else { return nil }
+                        return value.dayMonthYearFormatted()
+                    })
                 case .dateTime:
                     row = CVRow(title: field.name,
                                 subtitle: fieldValues[field.dataKeyValue]?[field.key],
@@ -264,25 +274,25 @@ final class NewAttestationViewController: CVTableViewController {
                                 initialDate: field.key == "datetime" ? Date() : nil,
                                 datePickerMode: .dateAndTime,
                                 willDisplay: { [weak self] cell in
-                                    guard let self = self else { return }
-                                    (cell as? DateCell)?.datePicker.date = self.outingDate
-                                    (cell as? DateCell)?.cvSubtitleLabel?.text = self.fieldValues[field.dataKeyValue]?[field.key]
-                                },
+                        guard let self = self else { return }
+                        (cell as? DateCell)?.datePicker.date = self.outingDate
+                        (cell as? DateCell)?.cvSubtitleLabel?.text = self.fieldValues[field.dataKeyValue]?[field.key]
+                    },
                                 valueChanged: { [weak self] value in
-                                    guard let value = value as? Date else { return }
-                                    if field.key == "datetime" {
-                                        self?.outingDate = value
-                                    }
-                                    let day: String = value.dayMonthYearFormatted()
-                                    let hour: String = value.shortTimeFormatted()
-                                    self?.fieldValues[field.key] = [field.key: "\(day), \(hour)"]
-                                    self?.fieldValues["\(field.key)-timestamp"] = ["\(field.key)-timestamp": "\(value.timeIntervalSince1970)"]
-                                    self?.fieldValues["\(field.key)-day"] = ["\(field.key)-day": day]
-                                    self?.fieldValues["\(field.key)-hour"] = ["\(field.key)-hour": hour]
-                                }, displayValueForValue: { value -> String? in
-                                    guard let value = value as? Date else { return nil }
-                                    return "\(value.dayMonthYearFormatted()), \(value.shortTimeFormatted())"
-                                })
+                        guard let value = value as? Date else { return }
+                        if field.key == "datetime" {
+                            self?.outingDate = value
+                        }
+                        let day: String = value.dayMonthYearFormatted()
+                        let hour: String = value.shortTimeFormatted()
+                        self?.fieldValues[field.key] = [field.key: "\(day), \(hour)"]
+                        self?.fieldValues["\(field.key)-timestamp"] = ["\(field.key)-timestamp": "\(value.timeIntervalSince1970)"]
+                        self?.fieldValues["\(field.key)-day"] = ["\(field.key)-day": day]
+                        self?.fieldValues["\(field.key)-hour"] = ["\(field.key)-hour": hour]
+                    }, displayValueForValue: { value -> String? in
+                        guard let value = value as? Date else { return nil }
+                        return "\(value.dayMonthYearFormatted()), \(value.shortTimeFormatted())"
+                    })
                 case .list:
                     let selectedListItem: AttestationFormFieldItem? = fieldSelectedItems[field.dataKeyValue]?[field.key]
                     row = CVRow(title: field.name,
@@ -290,19 +300,19 @@ final class NewAttestationViewController: CVTableViewController {
                                 xibName: .textCell,
                                 theme: self.listRowTheme(fieldDataKey: field.dataKeyValue),
                                 selectionAction: { [weak self] in
-                                    self?.didTouchSelectFieldItem(field.items ?? [], self?.fieldSelectedItems[field.dataKeyValue]?[field.key], field.key) { selectedItem in
-                                        self?.fieldSelectedItems[field.dataKeyValue] = [field.key: selectedItem]
-                                        self?.fieldValues[field.dataKeyValue] = ["\(field.key)": selectedItem.code,
-                                                                                 "\(field.key)-code": selectedItem.code,
-                                                                                 "\(field.key)-shortlabel": selectedItem.shortLabel]
-                                        self?.reloadUI()
-                                    }
-                                }, willDisplay: { [weak self] cell in
-                                    cell.cvSubtitleLabel?.textColor = self?.fieldSelectedItems[field.dataKeyValue]?[field.key] == nil ? Appearance.Cell.Text.placeholderColor : Appearance.Cell.Text.subtitleColor
-                                    cell.cvSubtitleLabel?.accessibilityHint = cell.cvTitleLabel?.text?.removingEmojis()
-                                    cell.cvSubtitleLabel?.accessibilityTraits = .button
-                                    cell.accessibilityElements = [cell.cvSubtitleLabel].compactMap { $0 }
-                                })
+                        self?.didTouchSelectFieldItem(field.items ?? [], self?.fieldSelectedItems[field.dataKeyValue]?[field.key], field.key) { selectedItem in
+                            self?.fieldSelectedItems[field.dataKeyValue] = [field.key: selectedItem]
+                            self?.fieldValues[field.dataKeyValue] = ["\(field.key)": selectedItem.code,
+                                                                     "\(field.key)-code": selectedItem.code,
+                                                                     "\(field.key)-shortlabel": selectedItem.shortLabel]
+                            self?.reloadUI()
+                        }
+                    }, willDisplay: { [weak self] cell in
+                        cell.cvSubtitleLabel?.textColor = self?.fieldSelectedItems[field.dataKeyValue]?[field.key] == nil ? Appearance.Cell.Text.placeholderColor : Appearance.Cell.Text.subtitleColor
+                        cell.cvSubtitleLabel?.accessibilityHint = cell.cvTitleLabel?.text?.removingEmojis()
+                        cell.cvSubtitleLabel?.accessibilityTraits = .button
+                        cell.accessibilityElements = [cell.cvSubtitleLabel].compactMap { $0 }
+                    })
                 default:
                     row = CVRow(title: field.name,
                                 subtitle: fieldValues[field.dataKeyValue]?[field.key],
@@ -314,79 +324,85 @@ final class NewAttestationViewController: CVTableViewController {
                                 textFieldContentType: field.contentType?.textContentType,
                                 textFieldCapitalizationType: field.type.capitalizationType,
                                 willDisplay: { [weak self] cell in
-                                    guard let self = self else { return }
-                                    if self.firstTextField == nil {
-                                        self.firstTextField = (cell as? StandardTextFieldCell)?.cvTextField
-                                    }
-                                    if let defaultValue = field.defaultValue, self.fieldValues[field.dataKeyValue]?[field.key] == nil {
-                                        self.fieldValues[field.dataKeyValue] = [field.key: defaultValue]
-                                    }
-                                    (cell as? StandardTextFieldCell)?.cvTextField.text = self.fieldValues[field.dataKeyValue]?[field.key]
-                                }, valueChanged: { [weak self] value in
-                                    if let value = value as? String, !value.isEmpty {
-                                        self?.fieldValues[field.dataKeyValue] = [field.key: value]
-                                    } else {
-                                        self?.fieldValues[field.dataKeyValue] = nil
-                                    }
-                                }, didValidateValue: { [weak self] _, cell in
-                                    guard let fieldTag = (cell as? StandardTextFieldCell)?.cvTextField.tag else { return }
-                                    self?.tableView.viewWithTag(fieldTag + 1)?.becomeFirstResponder()
-                                })
+                        guard let self = self else { return }
+                        if self.firstTextField == nil {
+                            self.firstTextField = (cell as? StandardTextFieldCell)?.cvTextField
+                        }
+                        if let defaultValue = field.defaultValue, self.fieldValues[field.dataKeyValue]?[field.key] == nil {
+                            self.fieldValues[field.dataKeyValue] = [field.key: defaultValue]
+                        }
+                        (cell as? StandardTextFieldCell)?.cvTextField.text = self.fieldValues[field.dataKeyValue]?[field.key]
+                    }, valueChanged: { [weak self] value in
+                        if let value = value as? String, !value.isEmpty {
+                            self?.fieldValues[field.dataKeyValue] = [field.key: value]
+                        } else {
+                            self?.fieldValues[field.dataKeyValue] = nil
+                        }
+                    }, didValidateValue: { [weak self] _, cell in
+                        guard let fieldTag = (cell as? StandardTextFieldCell)?.cvTextField.tag else { return }
+                        self?.tableView.viewWithTag(fieldTag + 1)?.becomeFirstResponder()
+                    })
                 }
                 fieldTag += 1
                 return row
             }
             if let lastRow = rows.last {
                 var theme: CVRow.Theme = theme
-                theme.separatorLeftInset = 0.0
+                theme.separatorLeftInset = .zero
                 var row: CVRow = lastRow
                 row.theme = theme
                 rows.removeLast()
                 rows.append(row)
             }
-            rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: true))
+            rows.append(.emptyFor(topInset: Appearance.Cell.Inset.small,
+                                  bottomInset: Appearance.Cell.Inset.small,
+                                  showSeparator: true)
+            )
             return rows
         }
-        rows.append(contentsOf: fieldsRows.joined())
-        let switchRow: CVRow = CVRow(title: "newAttestationController.saveMyData".localized,
-                                     isOn: currentSaveMyData,
-                                     xibName: .standardSwitchCell,
-                                     theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                        topInset: 10.0,
-                                                        bottomInset: 10.0,
-                                                        textAlignment: .left,
-                                                        titleFont: { Appearance.Cell.Text.standardFont },
-                                                        separatorLeftInset: 0.0,
-                                                        separatorRightInset: 0.0),
-                                     willDisplay: { [weak self] cell in
-                                        guard let self = self else { return }
-                                        (cell as? StandardSwitchCell)?.cvSwitch.isOn = self.currentSaveMyData
-                                        let generateAction: UIAccessibilityCustomAction = UIAccessibilityCustomAction(
-                                            name: "accessibility.attestation.generate".localized,
-                                            target: self,
-                                            selector: #selector(self.didTouchGenerateButton)
-                                        )
-                                        cell.accessibilityCustomActions = [generateAction]
-                                     }, valueChanged: { [weak self] value in
-                                        guard let isOn = value as? Bool else { return }
-                                        self?.currentSaveMyData = isOn
-                                     })
-        rows.append(switchRow)
-        let footerRow: CVRow = CVRow(title: "newAttestationController.footer".localized,
-                                     xibName: .textCell,
-                                     theme:  CVRow.Theme(topInset: 20.0,
-                                                         bottomInset: 0.0,
-                                                         textAlignment: .natural,
-                                                         titleFont: { Appearance.Cell.Text.footerFont },
-                                                         titleColor: Appearance.Cell.Text.captionTitleColor))
-        rows.append(footerRow)
-        return rows
+        return fieldsRows.flatMap { $0 }
+    }
+
+    private func switchRow() -> CVRow {
+        CVRow(title: "newAttestationController.saveMyData".localized,
+              isOn: currentSaveMyData,
+              xibName: .standardSwitchCell,
+              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                 topInset: Appearance.Cell.Inset.small,
+                                 bottomInset: Appearance.Cell.Inset.small,
+                                 textAlignment: .left,
+                                 titleFont: { Appearance.Cell.Text.standardFont },
+                                 separatorLeftInset: .zero,
+                                 separatorRightInset: .zero),
+              willDisplay: { [weak self] cell in
+            guard let self = self else { return }
+            (cell as? StandardSwitchCell)?.cvSwitch.isOn = self.currentSaveMyData
+            let generateAction: UIAccessibilityCustomAction = UIAccessibilityCustomAction(
+                name: "accessibility.attestation.generate".localized,
+                target: self,
+                selector: #selector(self.didTouchGenerateButton)
+            )
+            cell.accessibilityCustomActions = [generateAction]
+        }, valueChanged: { [weak self] value in
+            guard let isOn = value as? Bool else { return }
+            self?.currentSaveMyData = isOn
+        })
+    }
+
+    private func footerRow() -> CVRow {
+        CVRow(title: "newAttestationController.footer".localized,
+              xibName: .textCell,
+              theme:  CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                  bottomInset: .zero,
+                                  textAlignment: .natural,
+                                  titleFont: { Appearance.Cell.Text.footerFont },
+                                  titleColor: Appearance.Cell.Text.captionTitleColor))
     }
     
     private func defaultRowTheme() -> CVRow.Theme {
         return CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                           topInset: 10.0,
-                           bottomInset: 10.0,
+                           topInset: Appearance.Cell.Inset.small,
+                           bottomInset: Appearance.Cell.Inset.small,
                            textAlignment: .natural,
                            titleFont: { .regular(size: 12.0) },
                            titleColor: Appearance.Cell.Text.subtitleColor,
@@ -397,8 +413,8 @@ final class NewAttestationViewController: CVTableViewController {
     
     private func listRowTheme(fieldDataKey: String) -> CVRow.Theme {
         return CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                           topInset: 10.0,
-                           bottomInset: 10.0,
+                           topInset: Appearance.Cell.Inset.small,
+                           bottomInset: Appearance.Cell.Inset.small,
                            textAlignment: .natural,
                            titleFont: { .regular(size: 12.0) },
                            titleColor: Appearance.Cell.Text.subtitleColor,

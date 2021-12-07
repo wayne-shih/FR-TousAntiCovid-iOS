@@ -34,8 +34,6 @@ final class UniversalQrCodeExplanationsController: CVTableViewController {
 
     private func initUI() {
         title = "universalQrScanExplanationsController.title".localized
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -49,30 +47,35 @@ final class UniversalQrCodeExplanationsController: CVTableViewController {
         didTouchClose(imageView)
     }
 
-    override func createRows() -> [CVRow] {
-        let headerImageRow: CVRow = CVRow(image: Asset.Images.qrScan.image,
-                                          xibName: .imageCell,
-                                          theme: CVRow.Theme(topInset: 20.0,
-                                                             imageTintColor: Appearance.tintColor,
-                                                             imageSize: CGSize(width: 90.0, height: 90.0)),
-                                          willDisplay: { [weak self] cell in
-                                            self?.imageView = cell.cvImageView
-                                          })
-        let explanationsRow: CVRow = CVRow(title: "universalQrScanExplanationsController.explanation.title".localized,
-                                           subtitle: "universalQrScanExplanationsController.explanation.subtitle".localized,
-                                           xibName: .standardCardCell,
-                                           theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                              topInset: 10.0,
-                                                              bottomInset: 0.0,
-                                                              textAlignment: .center,
-                                                              titleFont: { Appearance.Cell.Text.headTitleFont }))
-        let buttonRow: CVRow = CVRow(title: "universalQrScanExplanationsController.button.title".localized,
-                                     xibName: .buttonCell,
-                                     theme: CVRow.Theme(topInset: 20.0, bottomInset: 0.0, buttonStyle: .primary),
-                                     selectionAction: { [weak self] in
-                                        self?.didTouchCloseButton()
-                                     })
-        return [headerImageRow, explanationsRow, buttonRow]
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow(image: Asset.Images.qrScan.image,
+                      xibName: .imageCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                         imageTintColor: Appearance.tintColor,
+                                         imageSize: CGSize(width: 90.0, height: 90.0)),
+                      willDisplay: { [weak self] cell in
+                    self?.imageView = cell.cvImageView
+                })
+                CVRow(title: "universalQrScanExplanationsController.explanation.title".localized,
+                      subtitle: "universalQrScanExplanationsController.explanation.subtitle".localized,
+                      xibName: .standardCardCell,
+                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                         topInset: Appearance.Cell.Inset.small,
+                                         bottomInset: .zero,
+                                         textAlignment: .center,
+                                         titleFont: { Appearance.Cell.Text.headTitleFont }))
+                CVRow(title: "universalQrScanExplanationsController.button.title".localized,
+                      xibName: .buttonCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                         bottomInset: .zero,
+                                         buttonStyle: .primary),
+                      selectionAction: { [weak self] in
+                    self?.didTouchCloseButton()
+                })
+            }
+        }
     }
 
 }

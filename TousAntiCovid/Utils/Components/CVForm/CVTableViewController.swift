@@ -12,19 +12,30 @@ import UIKit
 
 class CVTableViewController: UITableViewController {
 
-    var rows: [CVRow] = []
+    var sections: [CVSection] = []
     private var cellHeights: [IndexPath: CGFloat] = [:]
+    private var sectionsHeights: [Int: CGFloat] = [:]
+
+    override func loadView() {
+        super.loadView()
+        tableView = CVTableView(frame: .zero, style: .plain)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        addHeaderView()
+        addFooterView()
         tableView.backgroundColor = Appearance.Controller.backgroundColor
+        if #available(iOS 15.0, *) {
+            UITableView.appearance().sectionHeaderTopPadding = 0
+        }
     }
     
-    func createRows() -> [CVRow] { [] }
-    func makeRows(@CVRowsBuilder _ content: () -> [CVRow]) -> [CVRow] { content() }
+    func createSections() -> [CVSection] { [] }
+    func makeSections(@CVSectionsBuilder _ content: () -> [CVSection]) -> [CVSection] { content() }
 
     func reloadUI(animated: Bool = false, animatedView: UIView? = nil, completion: (() -> ())? = nil) {
-        rows = createRows()
+        sections = createSections()
         registerXibs()
         if #available(iOS 13.0, *) {
             if animated {
@@ -43,20 +54,33 @@ class CVTableViewController: UITableViewController {
         }
     }
     
-    func rowObject(at indexPath: IndexPath) -> CVRow {
-        rows[indexPath.row]
+    private func rowObject(at indexPath: IndexPath) -> CVRow {
+        sections[indexPath.section].rows[indexPath.row]
     }
     
     private func registerXibs() {
-        var xibNames: Set<String> = Set<String>()
-        rows.forEach { xibNames.insert($0.xibName.rawValue) }
-        xibNames.forEach{ tableView.register(UINib(nibName: $0, bundle: nil), forCellReuseIdentifier: $0) }
+        var cellXibNames: Set<String> = Set<String>()
+        var sectionXibNames: Set<String> = Set<String>()
+        sections.forEach { section in
+            if let header = section.header {
+                sectionXibNames.insert(header.xibName.rawValue)
+            }
+            if let footer = section.footer {
+                sectionXibNames.insert(footer.xibName.rawValue)
+            }
+            section.rows.forEach { cellXibNames.insert($0.xibName.rawValue) }
+            cellXibNames.forEach{ tableView.register(UINib(nibName: $0, bundle: nil), forCellReuseIdentifier: $0) }
+            sectionXibNames.forEach { tableView.register(UINib(nibName: $0, bundle: nil), forHeaderFooterViewReuseIdentifier: $0) }
+        }
+
     }
     
-    override func numberOfSections(in tableView: UITableView) -> Int { 1 }
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        sections.count
+    }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        rows.count
+        sections[section].rows.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -80,11 +104,46 @@ class CVTableViewController: UITableViewController {
         let row: CVRow = rowObject(at: indexPath)
         row.selectionAction?()
     }
-    
+
     override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         cellHeights[indexPath] ?? UITableView.automaticDimension
     }
 
+    override open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let headerSection = sections[section].header else { return nil }
+        guard let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: headerSection.xibName.rawValue) as? CVHeaderFooterSectionView else { return nil }
+        view.setup(with: headerSection)
+        return view
+    }
+
+    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        sectionsHeights[section] = view.frame.size.height
+        guard let headerSection = sections[section].header else { return }
+        guard let view = view as? CVHeaderFooterSectionView else { return }
+        headerSection.willDisplay?(view)
+    }
+
+    override open func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
+        sections[section].header == nil ? 0.0 : sectionsHeights[section] ?? 1
+    }
+    
+    override open func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        guard let footerSection = sections[section].footer else { return nil }
+        guard let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: footerSection.xibName.rawValue) as? CVHeaderFooterSectionView else { return nil }
+        view.setup(with: footerSection)
+        return view
+    }
+
+    override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
+        sectionsHeights[section] = view.frame.size.height
+        guard let footerSection = sections[section].footer else { return }
+        guard let view = view as? CVHeaderFooterSectionView else { return }
+        footerSection.willDisplay?(view)
+    }
+
+    override open func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
+        sections[section].footer == nil ? 0.0 : sectionsHeights[section] ?? 1
+    }
 
     override func accessibilityPerformEscape() -> Bool {
         if let navigationController = navigationController, navigationController.viewControllers.first !== self {
@@ -95,4 +154,15 @@ class CVTableViewController: UITableViewController {
         return true
     }
     
+}
+
+// MARK: - Header/Bottom View Management-
+extension CVTableViewController {
+    func addHeaderView(height: CGFloat = Appearance.TableView.Header.standardHeight) {
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: height))
+    }
+
+    func addFooterView(height: CGFloat = Appearance.TableView.Footer.standardHeight) {
+        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: height))
+    }
 }

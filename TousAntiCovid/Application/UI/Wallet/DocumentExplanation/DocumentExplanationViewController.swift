@@ -39,13 +39,35 @@ final class DocumentExplanationViewController: CVTableViewController {
         title = "documentExplanationController.\(certificateType.textKey).title".localized
     }
     
-    override func createRows() -> [CVRow] {
-        let textRow: CVRow = CVRow(subtitle: "documentExplanationController.\(certificateType.textKey).explanation".localized,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(backgroundColor: .clear,
-                                                      topInset: 0.0,
-                                                      bottomInset: 0.0,
-                                                      textAlignment: .natural))
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow(subtitle: "documentExplanationController.\(certificateType.textKey).explanation".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(backgroundColor: .clear,
+                                         topInset: .zero,
+                                         bottomInset: .zero,
+                                         textAlignment: .natural))
+             documentImageRow()
+            }
+        }
+    }
+    
+    private func initUI() {
+        addHeaderView(height: Appearance.TableView.Header.largeHeight)
+        tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
+        tableView.showsVerticalScrollIndicator = false
+    }
+    
+    private func addObservers() {
+        LocalizationsManager.shared.addObserver(self)
+    }
+    
+    private func removeObservers() {
+        LocalizationsManager.shared.removeObserver(self)
+    }
+
+    private func documentImageRow() -> CVRow {
         let documentImage: UIImage
         switch certificateType {
         case .vaccination:
@@ -66,28 +88,12 @@ final class DocumentExplanationViewController: CVTableViewController {
             documentImage = UIImage()
         }
         let ratioHeight: CGFloat = (documentImage.size.height / documentImage.size.width) * UIScreen.main.bounds.width
-        let imageRow: CVRow = CVRow(image: documentImage,
-                                    xibName: .zoomableImageCell,
-                                    theme: CVRow.Theme(topInset: 16.0,
-                                                       leftInset: 0.0,
-                                                       rightInset: 0.0,
-                                                       imageSize: CGSize(width: UIScreen.main.bounds.width, height: ratioHeight)))
-        return [textRow, imageRow]
-    }
-    
-    private func initUI() {
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
-        tableView.showsVerticalScrollIndicator = false
-    }
-    
-    private func addObservers() {
-        LocalizationsManager.shared.addObserver(self)
-    }
-    
-    private func removeObservers() {
-        LocalizationsManager.shared.removeObserver(self)
+        return CVRow(image: documentImage,
+              xibName: .zoomableImageCell,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
+                                 leftInset: .zero,
+                                 rightInset: .zero,
+                                 imageSize: CGSize(width: UIScreen.main.bounds.width, height: ratioHeight)))
     }
 
 }

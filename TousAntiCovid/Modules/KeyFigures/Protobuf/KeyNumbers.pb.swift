@@ -20,12 +20,14 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-struct KeyNumbers {
+struct Keynumbers_KeyNumbersMessage {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var keyfigureList: [KeyNumbers.KeyfigureMessage] = []
+  var keyfigureList: [Keynumbers_KeyNumbersMessage.KeyfigureMessage] = []
+
+  var keyfigureMapList: [Keynumbers_KeyNumbersMessage.KeyfigureMapMessage] = []
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -73,7 +75,7 @@ struct KeyNumbers {
 
     var value: Double = 0
 
-    var series: [KeyNumbers.ElementSerieMessage] = []
+    var series: [Keynumbers_KeyNumbersMessage.ElementSerieMessage] = []
 
     var valueToDisplay: String = String()
 
@@ -107,6 +109,8 @@ struct KeyNumbers {
     /// Clears the value of `displayOnSameChart`. Subsequent reads from it will return its default value.
     mutating func clearDisplayOnSameChart() {self._displayOnSameChart = nil}
 
+    var magnitude: UInt32 = 0
+
     var isHighlighted: Bool = false
 
     var chartType: String {
@@ -137,13 +141,13 @@ struct KeyNumbers {
 
     var extractDate: UInt32 = 0
 
-    var series: [KeyNumbers.ElementSerieMessage] = []
+    var series: [Keynumbers_KeyNumbersMessage.ElementSerieMessage] = []
 
-    var avgSeries: [KeyNumbers.ElementSerieMessage] = []
+    var avgSeries: [Keynumbers_KeyNumbersMessage.ElementSerieMessage] = []
 
     var version: String = String()
 
-    var valuesDepartments: [KeyNumbers.DepartmentValuesMessage] = []
+    var valuesDepartments: [Keynumbers_KeyNumbersMessage.DepartmentValuesMessage] = []
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -155,6 +159,36 @@ struct KeyNumbers {
     fileprivate var _limitLine: Double? = nil
   }
 
+  struct DepartmentValuesMapMessage {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    var dptNb: String = String()
+
+    var series: [Keynumbers_KeyNumbersMessage.ElementSerieMessage] = []
+
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    init() {}
+  }
+
+  struct KeyfigureMapMessage {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    var labelKey: String = String()
+
+    var version: String = String()
+
+    var valuesDepartments: [Keynumbers_KeyNumbersMessage.DepartmentValuesMapMessage] = []
+
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    init() {}
+  }
+
   init() {}
 }
 
@@ -162,16 +196,21 @@ struct KeyNumbers {
 
 fileprivate let _protobuf_package = "keynumbers"
 
-extension KeyNumbers: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Keynumbers_KeyNumbersMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".KeyNumbersMessage"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "keyfigureList"),
+    2: .same(proto: "KeyfigureMapList"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try decoder.decodeRepeatedMessageField(value: &self.keyfigureList)
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.keyfigureList) }()
+      case 2: try { try decoder.decodeRepeatedMessageField(value: &self.keyfigureMapList) }()
       default: break
       }
     }
@@ -181,18 +220,22 @@ extension KeyNumbers: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
     if !self.keyfigureList.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.keyfigureList, fieldNumber: 1)
     }
+    if !self.keyfigureMapList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.keyfigureMapList, fieldNumber: 2)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: KeyNumbers, rhs: KeyNumbers) -> Bool {
+  static func ==(lhs: Keynumbers_KeyNumbersMessage, rhs: Keynumbers_KeyNumbersMessage) -> Bool {
     if lhs.keyfigureList != rhs.keyfigureList {return false}
+    if lhs.keyfigureMapList != rhs.keyfigureMapList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension KeyNumbers.ElementSerieMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = KeyNumbers.protoMessageName + ".ElementSerieMessage"
+extension Keynumbers_KeyNumbersMessage.ElementSerieMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Keynumbers_KeyNumbersMessage.protoMessageName + ".ElementSerieMessage"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "date"),
     2: .same(proto: "value"),
@@ -200,25 +243,32 @@ extension KeyNumbers.ElementSerieMessage: SwiftProtobuf.Message, SwiftProtobuf._
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try decoder.decodeSingularUInt32Field(value: &self._date)
-      case 2: try decoder.decodeSingularDoubleField(value: &self._value)
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self._date) }()
+      case 2: try { try decoder.decodeSingularDoubleField(value: &self._value) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._date {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._date {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._value {
+    } }()
+    try { if let v = self._value {
       try visitor.visitSingularDoubleField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: KeyNumbers.ElementSerieMessage, rhs: KeyNumbers.ElementSerieMessage) -> Bool {
+  static func ==(lhs: Keynumbers_KeyNumbersMessage.ElementSerieMessage, rhs: Keynumbers_KeyNumbersMessage.ElementSerieMessage) -> Bool {
     if lhs._date != rhs._date {return false}
     if lhs._value != rhs._value {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -226,8 +276,8 @@ extension KeyNumbers.ElementSerieMessage: SwiftProtobuf.Message, SwiftProtobuf._
   }
 }
 
-extension KeyNumbers.DepartmentValuesMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = KeyNumbers.protoMessageName + ".DepartmentValuesMessage"
+extension Keynumbers_KeyNumbersMessage.DepartmentValuesMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Keynumbers_KeyNumbersMessage.protoMessageName + ".DepartmentValuesMessage"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "dptNb"),
     2: .same(proto: "dptLabel"),
@@ -239,13 +289,16 @@ extension KeyNumbers.DepartmentValuesMessage: SwiftProtobuf.Message, SwiftProtob
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try decoder.decodeSingularStringField(value: &self.dptNb)
-      case 2: try decoder.decodeSingularStringField(value: &self.dptLabel)
-      case 3: try decoder.decodeSingularUInt32Field(value: &self.extractDate)
-      case 4: try decoder.decodeSingularDoubleField(value: &self.value)
-      case 5: try decoder.decodeRepeatedMessageField(value: &self.series)
-      case 6: try decoder.decodeSingularStringField(value: &self.valueToDisplay)
+      case 1: try { try decoder.decodeSingularStringField(value: &self.dptNb) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.dptLabel) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.extractDate) }()
+      case 4: try { try decoder.decodeSingularDoubleField(value: &self.value) }()
+      case 5: try { try decoder.decodeRepeatedMessageField(value: &self.series) }()
+      case 6: try { try decoder.decodeSingularStringField(value: &self.valueToDisplay) }()
       default: break
       }
     }
@@ -273,7 +326,7 @@ extension KeyNumbers.DepartmentValuesMessage: SwiftProtobuf.Message, SwiftProtob
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: KeyNumbers.DepartmentValuesMessage, rhs: KeyNumbers.DepartmentValuesMessage) -> Bool {
+  static func ==(lhs: Keynumbers_KeyNumbersMessage.DepartmentValuesMessage, rhs: Keynumbers_KeyNumbersMessage.DepartmentValuesMessage) -> Bool {
     if lhs.dptNb != rhs.dptNb {return false}
     if lhs.dptLabel != rhs.dptLabel {return false}
     if lhs.extractDate != rhs.extractDate {return false}
@@ -285,12 +338,13 @@ extension KeyNumbers.DepartmentValuesMessage: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension KeyNumbers.KeyfigureMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = KeyNumbers.protoMessageName + ".KeyfigureMessage"
+extension Keynumbers_KeyNumbersMessage.KeyfigureMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Keynumbers_KeyNumbersMessage.protoMessageName + ".KeyfigureMessage"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "category"),
     2: .same(proto: "isFeatured"),
     3: .same(proto: "displayOnSameChart"),
+    16: .same(proto: "magnitude"),
     4: .same(proto: "isHighlighted"),
     5: .same(proto: "chartType"),
     6: .same(proto: "limitLine"),
@@ -307,46 +361,54 @@ extension KeyNumbers.KeyfigureMessage: SwiftProtobuf.Message, SwiftProtobuf._Mes
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try decoder.decodeSingularStringField(value: &self.category)
-      case 2: try decoder.decodeSingularBoolField(value: &self._isFeatured)
-      case 3: try decoder.decodeSingularBoolField(value: &self._displayOnSameChart)
-      case 4: try decoder.decodeSingularBoolField(value: &self.isHighlighted)
-      case 5: try decoder.decodeSingularStringField(value: &self._chartType)
-      case 6: try decoder.decodeSingularDoubleField(value: &self._limitLine)
-      case 7: try decoder.decodeSingularStringField(value: &self.labelKey)
-      case 8: try decoder.decodeSingularStringField(value: &self.valueGlobalToDisplay)
-      case 9: try decoder.decodeSingularDoubleField(value: &self.valueGlobal)
-      case 10: try decoder.decodeSingularUInt32Field(value: &self.lastUpdate)
-      case 11: try decoder.decodeSingularUInt32Field(value: &self.extractDate)
-      case 12: try decoder.decodeRepeatedMessageField(value: &self.series)
-      case 13: try decoder.decodeRepeatedMessageField(value: &self.avgSeries)
-      case 14: try decoder.decodeSingularStringField(value: &self.version)
-      case 15: try decoder.decodeRepeatedMessageField(value: &self.valuesDepartments)
+      case 1: try { try decoder.decodeSingularStringField(value: &self.category) }()
+      case 2: try { try decoder.decodeSingularBoolField(value: &self._isFeatured) }()
+      case 3: try { try decoder.decodeSingularBoolField(value: &self._displayOnSameChart) }()
+      case 4: try { try decoder.decodeSingularBoolField(value: &self.isHighlighted) }()
+      case 5: try { try decoder.decodeSingularStringField(value: &self._chartType) }()
+      case 6: try { try decoder.decodeSingularDoubleField(value: &self._limitLine) }()
+      case 7: try { try decoder.decodeSingularStringField(value: &self.labelKey) }()
+      case 8: try { try decoder.decodeSingularStringField(value: &self.valueGlobalToDisplay) }()
+      case 9: try { try decoder.decodeSingularDoubleField(value: &self.valueGlobal) }()
+      case 10: try { try decoder.decodeSingularUInt32Field(value: &self.lastUpdate) }()
+      case 11: try { try decoder.decodeSingularUInt32Field(value: &self.extractDate) }()
+      case 12: try { try decoder.decodeRepeatedMessageField(value: &self.series) }()
+      case 13: try { try decoder.decodeRepeatedMessageField(value: &self.avgSeries) }()
+      case 14: try { try decoder.decodeSingularStringField(value: &self.version) }()
+      case 15: try { try decoder.decodeRepeatedMessageField(value: &self.valuesDepartments) }()
+      case 16: try { try decoder.decodeSingularUInt32Field(value: &self.magnitude) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.category.isEmpty {
       try visitor.visitSingularStringField(value: self.category, fieldNumber: 1)
     }
-    if let v = self._isFeatured {
+    try { if let v = self._isFeatured {
       try visitor.visitSingularBoolField(value: v, fieldNumber: 2)
-    }
-    if let v = self._displayOnSameChart {
+    } }()
+    try { if let v = self._displayOnSameChart {
       try visitor.visitSingularBoolField(value: v, fieldNumber: 3)
-    }
+    } }()
     if self.isHighlighted != false {
       try visitor.visitSingularBoolField(value: self.isHighlighted, fieldNumber: 4)
     }
-    if let v = self._chartType {
+    try { if let v = self._chartType {
       try visitor.visitSingularStringField(value: v, fieldNumber: 5)
-    }
-    if let v = self._limitLine {
+    } }()
+    try { if let v = self._limitLine {
       try visitor.visitSingularDoubleField(value: v, fieldNumber: 6)
-    }
+    } }()
     if !self.labelKey.isEmpty {
       try visitor.visitSingularStringField(value: self.labelKey, fieldNumber: 7)
     }
@@ -374,13 +436,17 @@ extension KeyNumbers.KeyfigureMessage: SwiftProtobuf.Message, SwiftProtobuf._Mes
     if !self.valuesDepartments.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.valuesDepartments, fieldNumber: 15)
     }
+    if self.magnitude != 0 {
+      try visitor.visitSingularUInt32Field(value: self.magnitude, fieldNumber: 16)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: KeyNumbers.KeyfigureMessage, rhs: KeyNumbers.KeyfigureMessage) -> Bool {
+  static func ==(lhs: Keynumbers_KeyNumbersMessage.KeyfigureMessage, rhs: Keynumbers_KeyNumbersMessage.KeyfigureMessage) -> Bool {
     if lhs.category != rhs.category {return false}
     if lhs._isFeatured != rhs._isFeatured {return false}
     if lhs._displayOnSameChart != rhs._displayOnSameChart {return false}
+    if lhs.magnitude != rhs.magnitude {return false}
     if lhs.isHighlighted != rhs.isHighlighted {return false}
     if lhs._chartType != rhs._chartType {return false}
     if lhs._limitLine != rhs._limitLine {return false}
@@ -391,6 +457,88 @@ extension KeyNumbers.KeyfigureMessage: SwiftProtobuf.Message, SwiftProtobuf._Mes
     if lhs.extractDate != rhs.extractDate {return false}
     if lhs.series != rhs.series {return false}
     if lhs.avgSeries != rhs.avgSeries {return false}
+    if lhs.version != rhs.version {return false}
+    if lhs.valuesDepartments != rhs.valuesDepartments {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Keynumbers_KeyNumbersMessage.DepartmentValuesMapMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Keynumbers_KeyNumbersMessage.protoMessageName + ".DepartmentValuesMapMessage"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "dptNb"),
+    2: .same(proto: "series"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.dptNb) }()
+      case 2: try { try decoder.decodeRepeatedMessageField(value: &self.series) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.dptNb.isEmpty {
+      try visitor.visitSingularStringField(value: self.dptNb, fieldNumber: 1)
+    }
+    if !self.series.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.series, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Keynumbers_KeyNumbersMessage.DepartmentValuesMapMessage, rhs: Keynumbers_KeyNumbersMessage.DepartmentValuesMapMessage) -> Bool {
+    if lhs.dptNb != rhs.dptNb {return false}
+    if lhs.series != rhs.series {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Keynumbers_KeyNumbersMessage.KeyfigureMapMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Keynumbers_KeyNumbersMessage.protoMessageName + ".KeyfigureMapMessage"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "labelKey"),
+    2: .same(proto: "version"),
+    3: .same(proto: "valuesDepartments"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.labelKey) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.version) }()
+      case 3: try { try decoder.decodeRepeatedMessageField(value: &self.valuesDepartments) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.labelKey.isEmpty {
+      try visitor.visitSingularStringField(value: self.labelKey, fieldNumber: 1)
+    }
+    if !self.version.isEmpty {
+      try visitor.visitSingularStringField(value: self.version, fieldNumber: 2)
+    }
+    if !self.valuesDepartments.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.valuesDepartments, fieldNumber: 3)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Keynumbers_KeyNumbersMessage.KeyfigureMapMessage, rhs: Keynumbers_KeyNumbersMessage.KeyfigureMapMessage) -> Bool {
+    if lhs.labelKey != rhs.labelKey {return false}
     if lhs.version != rhs.version {return false}
     if lhs.valuesDepartments != rhs.valuesDepartments {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}

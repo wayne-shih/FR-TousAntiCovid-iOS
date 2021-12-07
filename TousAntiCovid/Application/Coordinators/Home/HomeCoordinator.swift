@@ -12,6 +12,7 @@ import UIKit
 import PKHUD
 import RobertSDK
 import StoreKit
+import LBBottomSheet
 
 final class HomeCoordinator: NSObject, WindowedCoordinator {
 
@@ -97,6 +98,7 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
         deinitBlock: { [weak self] in
             self?.didDeinit()
         }))
+        
         let controller: UIViewController = BottomMessageContainerViewController.controller(navigationChildController)
         let navigationController: UINavigationController = CVNavigationController(rootViewController: controller)
         self.navigationController = navigationController
@@ -342,9 +344,7 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
                   let coordinator = walletCoordinator.childCoordinators.first(where: { $0 is FullscreenCertificateCoordinator }) as? FullscreenCertificateCoordinator {
             coordinator.updateCertificate(certificate)
         } else  {
-            let coordinator: FullscreenCertificateCoordinator = FullscreenCertificateCoordinator(presentingController: navigationController?.topPresentedController,
-                                                                                                 parent: self,
-                                                                                                 certificate: certificate)
+            let coordinator: FullscreenCertificateCoordinator = FullscreenCertificateCoordinator(presentingController: navigationController?.topPresentedController, parent: self, certificate: certificate)
             addChild(coordinator: coordinator)
         }
     }
@@ -360,7 +360,7 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
         launchScreenWindow = window
         window.windowLevel = .statusBar
         window.rootViewController = launchScreen
-        window.makeKeyAndVisible()
+        window.isHidden = false
     }
     
     private func hideLaunchScreen() {
@@ -378,6 +378,7 @@ extension HomeCoordinator {
     
     private func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(dismissAllAndShowRecommandations), name: .dismissAllAndShowRecommandations, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(shouldShowStorageAlert(_:)), name: .shouldShowStorageAlert, object: nil)
     }
 
     private func removeObservers() {
@@ -400,6 +401,16 @@ extension HomeCoordinator {
         }
     }
     
+    @objc private func shouldShowStorageAlert(_ notification: Notification) {
+        guard let alertType = notification.object as? StorageAlertManager.StorageAlertType else { return }
+        let bottomSheetAlert: BottomSheetAlertController = .init(
+            title: nil,
+            message: alertType.localizedDescription,
+            image: Asset.Images.tacHorizontalAlert.image,
+            imageTintColor: Appearance.tintColor,
+            okTitle: alertType.localizedConfirmationButtonTitle)
+        bottomSheetAlert.show()
+    }
 }
 
 extension HomeCoordinator: SKStoreProductViewControllerDelegate {

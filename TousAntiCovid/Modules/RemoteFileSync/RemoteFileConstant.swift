@@ -13,9 +13,9 @@ import Foundation
 import ServerSDK
 
 enum RemoteFileConstant {
-
     static let baseUrl: String = "https://\(Constant.Server.staticResourcesRootDomain)/json/version-\(Constant.Server.jsonVersion)/Strings"
     static let stringsFilePrefix: String = "strings"
+    
     
     static let useOnlyLocalStrings: Bool = ProcessInfo.processInfo.environment["LOCAL_STRINGS"] == "YES"
     static let minDurationBetweenUpdatesInSeconds: Double = ParametersManager.shared.minFilesRefreshInterval ?? 60.0

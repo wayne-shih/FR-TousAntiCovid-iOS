@@ -8,3 +8,4 @@
 
 "widget.status.description" = "Receive alerts and alert others about exposures to COVID-19";
 "widget.favoriteCertificate.description" = "Your favorite certificate";
+"widget.favoriteCertificate.alwaysOn.description" = "Your favorite certificate, BE CAREFUL always visible even when your iPhone is locked";

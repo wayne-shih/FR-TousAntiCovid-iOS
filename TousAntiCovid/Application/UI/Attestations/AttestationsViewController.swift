@@ -17,7 +17,11 @@ final class AttestationsViewController: CVTableViewController {
     private let didTouchTermsOfUse: () -> ()
     private let didTouchWebAttestation: () -> ()
     private let didTouchAttestationQrCode: (_ qrCode: UIImage, _ text: String) -> ()
-    private let deinitBlock: () -> ()
+    var deinitBlock: (() -> ())?
+    
+    private var controller: UIViewController {
+        bottomButtonContainerController ?? self
+    }
     
     init(didTouchNewAttestation: @escaping () -> (),
          didTouchTermsOfUse: @escaping () -> (),
@@ -39,10 +43,10 @@ final class AttestationsViewController: CVTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         DeepLinkingManager.shared.attestationController = self
-        title = "attestationsController.title".localized
         initUI()
         reloadUI()
         addObservers()
+        updateBottomBarButton()
     }
     
     deinit {
@@ -50,14 +54,20 @@ final class AttestationsViewController: CVTableViewController {
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
+        controller.title = "attestationsController.title".localized
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
         tableView.delaysContentTouches = false
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
-        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
+        controller.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        controller.navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
+    }
+    
+    private func updateBottomBarButton() {
+        bottomButtonContainerController?.updateButton(title: "attestationsController.newAttestation".localized) { [weak self] in
+            self?.didTouchNewAttestation()
+            self?.bottomButtonContainerController?.unlockButtons()
+        }
     }
     
     @objc private func didTouchCloseButton() {
@@ -72,103 +82,133 @@ final class AttestationsViewController: CVTableViewController {
         AttestationsManager.shared.removeObserver(self)
     }
     
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        let newAttestationRow: CVRow = CVRow(title: "attestationsController.newAttestation".localized,
-                                             xibName: .buttonCell,
-                                             theme: CVRow.Theme(topInset: 0.0, bottomInset: 0.0, buttonStyle: .primary),
-                                             selectionAction: { [weak self] in
-                                                self?.didTouchNewAttestation()
-                                             })
-        rows.append(newAttestationRow)
-        let attestations: [Attestation] = AttestationsManager.shared.attestations.filter { !$0.isExpired }
-        if !attestations.isEmpty {
-            let attestationsSectionRow: CVRow = CVRow(title: "attestationsController.validAttestationsSection.title".localized,
-                                                      xibName: .textCell,
-                                                      theme: CVRow.Theme(topInset: 20.0,
-                                                                         bottomInset: 0.0,
-                                                                         textAlignment: .natural,
-                                                                         titleFont: { Appearance.Cell.Text.headTitleFont }))
-            rows.append(attestationsSectionRow)
-            let attestationsExplanationRow: CVRow = CVRow(subtitle: "attestationsController.validAttestationsSection.subtitle".localized,
-                                                          xibName: .textCell,
-                                                          theme: CVRow.Theme(topInset: 20.0,
-                                                                             bottomInset: 0.0,
-                                                                             textAlignment: .natural))
-            rows.append(attestationsExplanationRow)
-            let attestationsRows: [CVRow] = attestations.map { attestation in
+    override func createSections() -> [CVSection] {
+        makeSections {
+            if AttestationsManager.shared.attestations.isEmpty {
+               headerSection()
+            }
+            let attestations: [Attestation] = AttestationsManager.shared.attestations.filter { !$0.isExpired }
+            if !attestations.isEmpty {
+                availableAttestations(attestations: attestations)
+            }
+            let expiredAttestations: [Attestation] = AttestationsManager.shared.attestations.filter { $0.isExpired }
+            if !expiredAttestations.isEmpty {
+                expiredSection(attestations: expiredAttestations)
+            }
+            linksSection()
+        }
+    }
+    
+    private func headerSection() -> CVSection {
+        CVSection {
+            if UIAccessibility.isVoiceOverRunning {
+                CVRow(title: "attestationsController.newAttestation".localized,
+                                                     xibName: .buttonCell,
+                                                     theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
+                                                                        bottomInset: .zero,
+                                                                        buttonStyle: .primary),
+                                                     selectionAction: { [weak self] in
+                    self?.didTouchNewAttestation()
+                })
+            }
+            CVRow(image: Asset.Images.attestation.image,
+                  xibName: .imageCell,
+                  theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                     imageRatio: 375.0 / 116.0))
+            CVRow(title: "attestationController.header.title".localized,
+                  subtitle: "attestationController.header.subtitle".localized,
+                  xibName: .paragraphCell,
+                  theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                     topInset: .zero,
+                                     bottomInset: .zero,
+                                     textAlignment: .natural,
+                                     titleFont: { Appearance.Cell.Text.headTitleFont })
+            )
+        }
+    }
+    
+    private func availableAttestations(attestations: [Attestation]) -> CVSection {
+        CVSection(title: "attestationsController.validAttestationsSection.title".localized) {
+            CVRow(subtitle: "attestationsController.validAttestationsSection.subtitle".localized,
+                  xibName: .textCell,
+                  theme: CVRow.Theme(topInset: .zero,
+                                     bottomInset: .zero,
+                                     textAlignment: .natural))
+            attestations.map { attestation in
                 CVRow(title: attestation.footer,
                       image: UIImage(data: attestation.qrCode),
                       xibName: .qrCodeCell,
                       theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                         topInset: 20.0,
-                                         bottomInset: 0.0,
+                                         topInset: Appearance.Cell.Inset.medium,
+                                         bottomInset: .zero,
                                          titleFont: { Appearance.Cell.Text.subtitleFont }),
                       selectionActionWithCell: { [weak self] cell in
-                        self?.didTouchAttestionMenuButton(attestation: attestation, cell: cell)
-                      },
+                    self?.didTouchAttestionMenuButton(attestation: attestation, cell: cell)
+                },
                       selectionAction: { [weak self] in
-                        guard let qrCode = UIImage(data: attestation.qrCode) else { return }
-                        self?.didTouchAttestationQrCode(qrCode, attestation.qrCodeString.isEmpty ? attestation.footer : attestation.qrCodeString)
-                      })
+                    guard let qrCode = UIImage(data: attestation.qrCode) else { return }
+                    self?.didTouchAttestationQrCode(qrCode, attestation.qrCodeString.isEmpty ? attestation.footer : attestation.qrCodeString)
+                })
             }
-            rows.append(contentsOf: attestationsRows)
         }
-        
-        let expiredAttestations: [Attestation] = AttestationsManager.shared.attestations.filter { $0.isExpired }
-        if !expiredAttestations.isEmpty {
-            let attestationsSectionRow: CVRow = CVRow(title: "attestationsController.expiredSection.title".localized,
-                                                      xibName: .textCell,
-                                                      theme: CVRow.Theme(topInset: 20.0,
-                                                                         bottomInset: 0.0,
-                                                                         textAlignment: .natural,
-                                                                         titleFont: { Appearance.Cell.Text.headTitleFont }))
-            rows.append(attestationsSectionRow)
-            let attestationsExplanationRow: CVRow = CVRow(subtitle: "attestationsController.expiredSection.subtitle".localized,
-                                                          xibName: .textCell,
-                                                          theme: CVRow.Theme(topInset: 20.0,
-                                                                             bottomInset: 0.0,
-                                                                             textAlignment: .natural))
-            rows.append(attestationsExplanationRow)
-            let attestationsRows: [CVRow] = expiredAttestations.map { attestation in
+    }
+    
+    private func expiredSection(attestations: [Attestation]) -> CVSection {
+        CVSection(title: "attestationsController.expiredSection.title".localized) {
+            CVRow(subtitle: "attestationsController.expiredSection.subtitle".localized,
+                  xibName: .textCell,
+                  theme: CVRow.Theme(topInset: .zero,
+                                     bottomInset: .zero,
+                                     textAlignment: .natural))
+            attestations.map { attestation in
                 CVRow(title: attestation.footer,
                       image: UIImage(data: attestation.qrCode),
                       xibName: .qrCodeCell,
                       theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                         topInset: 20.0,
-                                         bottomInset: 0.0,
+                                         topInset: Appearance.Cell.Inset.medium,
+                                         bottomInset: .zero,
                                          titleFont: { Appearance.Cell.Text.subtitleFont }),
                       selectionActionWithCell: { [weak self] cell in
-                        self?.didTouchAttestionMenuButton(attestation: attestation, cell: cell)
-                      })
+                    self?.didTouchAttestionMenuButton(attestation: attestation, cell: cell)
+                })
             }
-            rows.append(contentsOf: attestationsRows)
         }
-        let termsOfuseRow: CVRow = CVRow(buttonTitle: "attestationsController.termsOfUse".localized,
-                                         xibName: .linkButtonCell,
-                                         theme:  CVRow.Theme(topInset: 20.0,
-                                                             bottomInset: 0.0),
-                                         secondarySelectionAction: { [weak self] in
-                                            self?.showTermsOfUseAlert()
-                                         })
-        rows.append(termsOfuseRow)
-        let footerRow: CVRow = CVRow(title: "attestationController.footer".localized,
-                                     xibName: .textCell,
-                                     theme:  CVRow.Theme(topInset: 20.0,
-                                                         bottomInset: 8.0,
-                                                         textAlignment: .natural,
-                                                         titleFont: { Appearance.Cell.Text.footerFont },
-                                                         titleColor: Appearance.Cell.Text.captionTitleColor))
-        rows.append(footerRow)
-        let webAttestationRow: CVRow = CVRow(buttonTitle: "attestationsController.attestationWebSite".localized,
-                                             xibName: .linkButtonCell,
-                                             theme:  CVRow.Theme(topInset: 0.0,
-                                                                 bottomInset: 20.0),
-                                             secondarySelectionAction: { [weak self] in
-                                                self?.didTouchWebAttestation()
-                                             })
-        rows.append(webAttestationRow)
-        return rows
+    }
+    
+    private func linksSection() -> CVSection {
+        CVSection(title: "attestationController.plusSection.title".localized,
+                  footerTitle: "attestationController.footer".localized,
+                  rows: [
+                    standardCardRow(title: "attestationsController.termsOfUse".localized,
+                                    image: Asset.Images.conditions.image,
+                                    actionBlock: { [weak self] in
+                                        self?.showTermsOfUseAlert()
+                                    }),
+                    standardCardRow(title: "attestationsController.attestationWebSite".localized,
+                                    image: Asset.Images.compassToured.image,
+                                    bottomInset: .zero,
+                                    actionBlock: { [weak self] in
+                                        self?.didTouchWebAttestation()
+                                    })
+                  ])
+    }
+    
+    private func standardCardRow(title: String, subtitle: String? = nil, image: UIImage, bottomInset: CGFloat = Appearance.Cell.Inset.normal, actionBlock: @escaping () -> ()) -> CVRow {
+        let row: CVRow = CVRow(title: title,
+                               subtitle: subtitle,
+                               image: image,
+                               xibName: .standardCardCell,
+                               theme:  CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                                   topInset: .zero,
+                                                   bottomInset: bottomInset,
+                                                   textAlignment: .natural,
+                                                   titleFont: { Appearance.Cell.Text.standardFont },
+                                                   titleColor: Appearance.Cell.Text.headerTitleColor,
+                                                   imageTintColor: Appearance.Cell.Text.headerTitleColor),
+                               selectionAction: {
+            actionBlock()
+        })
+        return row
     }
     
     private func showTermsOfUseAlert() {
@@ -176,8 +216,8 @@ final class AttestationsViewController: CVTableViewController {
                   message: "attestationsController.termsOfUse.alert.message".localized,
                   okTitle: "common.readMore".localized,
                   cancelTitle: "common.ok".localized, handler:  { [weak self] in
-                    self?.didTouchTermsOfUse()
-                  })
+            self?.didTouchTermsOfUse()
+        })
     }
     
     private func didTouchAttestionMenuButton(attestation: Attestation, cell: CVTableViewCell) {

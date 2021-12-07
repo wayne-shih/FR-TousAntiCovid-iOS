@@ -10,7 +10,9 @@
 
 import UIKit
 import CommonCrypto
+#if !PROXIMITY
 import ZXingObjC
+#endif
 
 extension String {
     
@@ -40,6 +42,13 @@ extension String {
         guard let regex = try? NSRegularExpression(pattern: rhs) else { return false }
         let range: NSRange = NSRange(location: 0, length: lhs.utf16.count)
         return regex.firstMatch(in: lhs, options: [], range: range) != nil
+    }
+    
+    static func ~> (lhs: [String], rhs: String) -> [String] {
+        guard let regex = try? NSRegularExpression(pattern: rhs) else { return lhs }
+        return lhs.filter {
+            regex.firstMatch(in: $0, range: NSRange(0..<$0.utf16.count)) != nil
+        }
     }
 
     subscript(_ range: ClosedRange<Int>) -> String {
@@ -142,7 +151,7 @@ extension String {
         }
         return nil
     }
-
+    #if !PROXIMITY
     func dataMatrix() -> UIImage? {
         let writer: ZXMultiFormatWriter = ZXMultiFormatWriter()
         do {
@@ -150,9 +159,11 @@ extension String {
             guard let cgImage = ZXImage(matrix: result)?.cgimage else { return nil }
             return UIImage(cgImage: cgImage)
         } catch {
+            print(error)
             return nil
         }
     }
+    #endif
     
     func sha256() -> String {
         if let stringData = self.data(using: String.Encoding.utf8) {

@@ -9,8 +9,10 @@
 //
 
 import Foundation
+import ServerSDK
 
 enum WalletConstant {
+    static let vaccinBoosterDoseNumber: Int = 3
     
     enum Separator: String {
         case group = "<GS>"
@@ -73,7 +75,7 @@ enum WalletConstant {
             case .exemptionEurope:
                 return "exemptionEurope"
             case .unknown:
-                return ""
+                return "vaccinCertificate"
             }
         }
         
@@ -151,6 +153,21 @@ enum WalletConstant {
                 return .walletDCC
             case .activityEurope:
                 return .walletDCCACT
+            }
+        }
+    }
+    
+    enum VaccineType: CaseIterable {
+        case arnm
+        case janssen
+        case astraZeneca
+        
+        var stringValues: [String] {
+            let vaccineTypes: Vaccins? = ParametersManager.shared.vaccinTypes
+            switch self {
+            case .arnm: return vaccineTypes?.arnm ?? ["EU/1/20/1528", "EU/1/20/1507", "Covidshield", "Covid-19-recombinant", "R-COVI"]
+            case .janssen: return vaccineTypes?.janssen ?? ["EU/1/20/1525"]
+            case .astraZeneca: return vaccineTypes?.astraZeneca ?? ["EU/1/21/1529"]
             }
         }
     }

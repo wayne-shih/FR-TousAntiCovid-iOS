@@ -43,8 +43,7 @@ final class WalletCertificateVerifiedController: UIViewController {
         restartButton.setTitle("walletCertificateVerifiedController.validateAnotherProof".localized, for: .normal)
         restartButton.backgroundColor = UIColor.black.withAlphaComponent(0.3)
         restartButton.setTitleColor(.white, for: .normal)
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont,
-                                                                   .foregroundColor: UIColor.white]
+        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont, .foregroundColor: UIColor.white]
     }
 
     private func setupContent() {

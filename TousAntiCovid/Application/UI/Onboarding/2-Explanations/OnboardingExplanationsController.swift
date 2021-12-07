@@ -19,20 +19,24 @@ final class OnboardingExplanationsController: OnboardingController {
         super.updateTitle()
     }
     
-    override func createRows() -> [CVRow] {
-        let titleRow: CVRow = CVRow.titleRow(title: title) { [weak self] cell in
-            self?.navigationChildController?.updateLabel(titleLabel: cell.cvTitleLabel, containerView: cell)
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow.titleRow(title: title) { [weak self] cell in
+                    self?.navigationChildController?.updateLabel(titleLabel: cell.cvTitleLabel, containerView: cell)
+                }
+                steps().enumerated().map { index, step in
+                    CVRow(title: step.title,
+                          subtitle: step.subtitle,
+                          accessoryText: "\(index + 1)",
+                          xibName: .onboardingWorkingStepCell,
+                          theme: CVRow.Theme(topInset: index == 0 ? Appearance.Cell.Inset.small / 2 : Appearance.Cell.Inset.medium,
+                                             titleFont: { Appearance.Cell.Text.smallHeadTitleFont })
+                    )
+                }
+
+            }
         }
-        let stepsRows: [CVRow] = steps().enumerated().map { index, step in
-            CVRow(title: step.title,
-                  subtitle: step.subtitle,
-                  accessoryText: "\(index + 1)",
-                  xibName: .onboardingWorkingStepCell,
-                  theme: CVRow.Theme(topInset: index == 0 ? 4.0 : 20.0,
-                                     titleFont: { Appearance.Cell.Text.smallHeadTitleFont })
-            )
-        }
-        return [titleRow] + stepsRows
     }
     
     private func steps() -> [Step] {

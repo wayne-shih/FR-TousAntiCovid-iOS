@@ -23,8 +23,10 @@ final class BottomButtonContainerController: UIViewController {
     private var buttonAction: (() -> ())?
     private var secondaryButtonAction: (() -> ())?
     private var buttonStyle: CVButton.Style = .primary
+    private var embeddedControllerBackgroundColor: UIColor = Appearance.Controller.backgroundColor
     private var accessHint: String?
     private var isHidden: Bool = false
+    private var isClear: Bool = false
     
     @IBOutlet private var buttonLeadingConstraint: NSLayoutConstraint?
     @IBOutlet private var buttonTrailingConstraint: NSLayoutConstraint?
@@ -33,9 +35,10 @@ final class BottomButtonContainerController: UIViewController {
         embeddedController?.preferredStatusBarStyle ?? super.preferredStatusBarStyle
     }
 
-    class func controller(_ embeddedController: UIViewController, buttonStyle: CVButton.Style = .primary, accessibilityHint: String? = nil) -> UIViewController {
+    class func controller(_ embeddedController: UIViewController, embeddedControllerBackgroundColor: UIColor = Appearance.Controller.backgroundColor, buttonStyle: CVButton.Style = .primary, accessibilityHint: String? = nil) -> UIViewController {
         let containerController: BottomButtonContainerController = StoryboardScene.BottomButtonContainer.bottomButtonContainerController.instantiate()
         containerController.embeddedController = embeddedController
+    containerController.embeddedControllerBackgroundColor = embeddedControllerBackgroundColor
         containerController.buttonStyle = buttonStyle
         containerController.accessHint = accessibilityHint
         return containerController
@@ -45,6 +48,16 @@ final class BottomButtonContainerController: UIViewController {
         super.viewDidLoad()
         initUI()
         setupEmbeddedController()
+    }
+    
+    public func makeClear(_ clear: Bool, animated: Bool) {
+        guard isClear != clear else { return }
+        UIView.animate(withDuration: animated ? 0.2 : 0.0) { [weak self] in
+            guard let self = self else { return }
+            self.separator.backgroundColor = clear ? .clear : Appearance.BottomBar.separatorColor
+            self.bottomBarView.backgroundColor = clear ? ((self.embeddedController as? CVTableViewController)?.tableView.backgroundColor ?? self.embeddedControllerBackgroundColor) : Appearance.BottomBar.backgroundColor
+        }
+        isClear = clear
     }
     
     public func updateButton(title: String, action: @escaping () -> ()) {
@@ -126,4 +139,23 @@ extension UIViewController {
         return parentController as? BottomButtonContainerController
     }
     
+}
+
+extension CVTableViewController {
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateBottomBar(with: tableView, animated: false)
+    }
+    
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updateBottomBar(with: scrollView)
+    }
+    
+    private func updateBottomBar(with scrollView: UIScrollView, animated: Bool = true) {
+        let height: Int = Int(scrollView.frame.size.height)
+        let contentHeight: Int = Int(scrollView.contentSize.height)
+        let bottomOfContent: Int = contentHeight - Int(scrollView.contentOffset.y)
+        let offset: Int = height + 2
+        bottomButtonContainerController?.makeClear(bottomOfContent < offset || (bottomOfContent < offset && contentHeight < offset), animated: animated)
+    }
 }

@@ -42,7 +42,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         let storageManager: StorageManager = StorageManager { message in
             StackLogger.log(symbols: Thread.callStackSymbolsString, message: message)
         }
+        StorageAlertManager.shared.start(with: storageManager)
         AttestationsManager.shared.start(storageManager: storageManager)
+        DccBlacklistManager.shared.start(storageManager: storageManager)
+        Blacklist2dDocManager.shared.start(storageManager: storageManager)
         WalletManager.shared.start(storageManager: storageManager)
         WalletManager.shared.addObserver(self)
         VenuesManager.shared.start(storageManager: storageManager)
@@ -52,8 +55,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         KeyFiguresExplanationsManager.shared.start()
         WalletImagesManager.shared.start()
         DccCertificatesManager.shared.start()
-        DccBlacklistManager.shared.start()
-        Blacklist2dDocManager.shared.start()
         OrientationManager.shared.start()
         if isOnboardingDone {
             BluetoothStateManager.shared.start()
@@ -62,15 +63,18 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                        configCertificateFiles: Constant.Server.certificates)
         ConversionServer.shared.start(session: UrlSessionManager.shared.session,
                                       convertUrl: { Constant.Server.convertUrl },
-                                      requestLoggingHandler: { request, response, responseData, error in })
+                                      requestLoggingHandler: { request, response, responseData, error in
+                                      })
         ActivityCertificateServer.shared.start(session: URLSession.shared,
                                                serverUrl: { Constant.Server.activityCertificateGenerationUrl },
-                                               requestLoggingHandler: { request, response, responseData, error in })
+                                               requestLoggingHandler: { request, response, responseData, error in
+                                               })
         CleaServer.shared.start(certificateFiles: Constant.Server.certificates,
                                 reportBaseUrl: { Constant.Server.cleaReportBaseUrl },
                                 statusBaseUrl: { Constant.Server.cleaStatusBaseUrl() },
                                 statusBaseFallbackUrl: { Constant.Server.cleaStatusBaseUrl(fallbackUrl: true) },
-                                taskLoggingHandler: { task, responseData, error in })
+                                taskLoggingHandler: { task, responseData, error in
+                                   })
         
         RBManager.shared.start(isFirstInstall: !isAppAlreadyInstalled,
                                server: Server(baseUrl: { Constant.Server.baseUrl },
@@ -80,7 +84,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                                 if UIApplication.shared.applicationState != .active {
                                                     NotificationsManager.shared.triggerDeviceTimeErrorNotification()
                                                 }
-                                              }, taskLoggingHandler: { task, responseData, error in }),
+                                              }, taskLoggingHandler: { task, responseData, error in
+                                              }),
                                storage: storageManager,
                                bluetooth: BluetoothManager(),
                                filter: FilteringManager(),
@@ -89,7 +94,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                     NotificationsManager.shared.triggerRestartNotification()
                                }, didReceiveProximityHandler: {
                                     StatusManager.shared.status()
-                               }, didSaveProximity: { proximity in })
+                               }, didSaveProximity: { proximity in
+                               })
         RatingsManager.shared.start()
         AnalyticsManager.shared.start()
         if #available(iOS 14.0, *) {
@@ -100,6 +106,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         isAppAlreadyInstalled = true
         rootCoordinator.start()
         initAppMaintenance()
+        if #available(iOS 12, *) {
+            NetworkMonitor.shared.start()
+            NetworkAlertManager.shared.start()
+        }
         DeepLinkingManager.shared.start()
         HUD.leadingMargin = 8.0
         HUD.trailingMargin = 8.0
@@ -145,6 +155,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         InfoCenterManager.shared.fetchInfo()
         KeyFiguresManager.shared.fetchKeyFigures()
+        WalletManager.shared.showSmartNotificationIfNeeded()
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -163,6 +174,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         InfoCenterManager.shared.fetchInfo()
         KeyFiguresManager.shared.fetchKeyFigures()
+        WalletManager.shared.showSmartNotificationIfNeeded()
         AnalyticsManager.shared.reportAppEvent(.e1)
     }
     
@@ -194,11 +206,14 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     
     private func initAppearance() {
         UINavigationBar.appearance().tintColor = Asset.Colors.tint.color
+        UINavigationBar.appearance().titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
         //Fix Nav Bar tint issue in iOS 15.0 or later - is transparent w/o code below
-        if #available(iOS 15, *) {
-            let appearance: UINavigationBarAppearance = UINavigationBarAppearance()
+        if #available(iOS 13, *) {
+            let appearance: UINavigationBarAppearance = .init()
+            appearance.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
             appearance.configureWithDefaultBackground()
             UINavigationBar.appearance().scrollEdgeAppearance = appearance
+            UINavigationBar.appearance().standardAppearance = appearance
         }
     }
     
@@ -276,5 +291,6 @@ extension AppDelegate: WalletChangesObserver {
     func walletFavoriteCertificateDidUpdate() {
         updateAppShortcut()
     }
+    func walletSmartStateDidUpdate() {}
 
 }

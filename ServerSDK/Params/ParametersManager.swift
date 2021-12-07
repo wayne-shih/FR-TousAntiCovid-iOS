@@ -206,13 +206,90 @@ public final class ParametersManager: NSObject {
             return nil
         }
     }
+    
+    public var defaultInitialKeyFiguresSelectionKeys: [String]? {
+        guard let value = valueFor(name: "app.keyfigures.compare") as? [[String: String]] else {
+            return nil
+        }
+        guard let keys = value.first, let key1 = keys["k1"], let key2 = keys["k2"] else { return nil }
+        return ["keyfigure." + key1, "keyfigure." + key2]
+    }
+    
+    public var keyFiguresComparisonColors: [UIColor]? {
+        guard let value = valueFor(name: "app.keyfigures.compareColors") as? [[String: String]] else {
+            return nil
+        }
+        return value.compactMap { color in
+            guard let lightColorCode: String = color["l"], let darkColorCode: String = color["d"] else { return nil }
+            let lightColor: UIColor = UIColor(hexString: lightColorCode)
+            let darkColor: UIColor = UIColor(hexString: darkColorCode)
+            if #available(iOS 13.0, *) {
+                return UIColor { trait in
+                    trait.userInterfaceStyle == .dark ? darkColor : lightColor
+                }
+            } else {
+                return lightColor
+            }
+        }
+    }
 
     public var inGroupApiVersion: InGroupApiVersion = .v0
 
     public var cleaUrl: String { cleaUrls.randomElement() ?? defaultCleaUrl }
     public let defaultCleaUrl: String = "https://s3.fr-par.scw.cloud/clea-batch/"
-
+    
+    // SmartWallet
+    var smartWalletAges: Ages? {
+        guard let value = valueFor(name: "app.smartwallet.ages") as? [String: Any] else {
+            return nil
+        }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode(Ages.self, from: jsonData)
+        } catch {
+            return nil
+        }
+    }
+    var smartWalletExp: Expiration? {
+        guard let value = valueFor(name: "app.smartwallet.exp") as? [String: Any] else {
+            return nil
+        }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode(Expiration.self, from: jsonData)
+        } catch {
+            return nil
+        }
+    }
+    var smartWalletElg: Eligibility? {
+        guard let value = valueFor(name: "app.smartwallet.elg") as? [String: Any] else {
+            return nil
+        }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode(Eligibility.self, from: jsonData)
+        } catch {
+            return nil
+        }
+    }
+    public var vaccinTypes: Vaccins? {
+        guard let value = valueFor(name: "app.smartwallet.vacc") as? [String: Any] else {
+            return nil
+        }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode(Vaccins.self, from: jsonData)
+        } catch {
+            return nil
+        }
+    }
+    public var smartWalletConfiguration: SmartWalletConfig {
+        SmartWalletConfig(ages: smartWalletAges ?? Ages(), exp: smartWalletExp ?? Expiration(), elg: smartWalletElg ?? Eligibility())
+    }
+    public var smartWalletFeatureActivated: Bool { valueFor(name: "app.isSmartwalletOn") as? Bool ?? false }
+    public var smartWalletNotificationsActivated: Bool { valueFor(name: "app.smartwallet.notif") as? Bool ?? false }
     private var cleaUrls: [String] { valueFor(name: "app.cleaUrls") as? [String] ?? [] }
+    
     private var config: [[String: Any]] = [] {
         didSet { distributeUpdatedConfig() }
     }

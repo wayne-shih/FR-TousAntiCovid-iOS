@@ -37,20 +37,8 @@ final class VenuesRecordingCoordinator: Coordinator {
         } else if didAlreadySeeOnboarding {
             startFlashCode()
         } else {
-            startOnboarding()
+            startMoreInformation()
         }
-    }
-
-    private func startOnboarding() {
-        let navigationController: CVNavigationController
-        let controller: VenuesRecordingOnboardingController = VenuesRecordingOnboardingController(didContinue: { [weak self] in
-            self?.didTouchContinue()
-        }, deinitBlock: { [weak self] in
-            self?.didDeinit()
-        })
-        navigationController = CVNavigationController(rootViewController: BottomButtonContainerController.controller(controller))
-        self.navigationController = navigationController
-        presentingController?.topPresentedController.present(navigationController, animated: true)
     }
 
     private func startFlashCode() {
@@ -99,11 +87,17 @@ final class VenuesRecordingCoordinator: Coordinator {
     private func showConfirmation() {
         navigationController?.pushViewController(confirmationController(), animated: true)
     }
+    
+    private func startMoreInformation() {
+        let venuesInformationCoordinator: VenuesInformationCoordinator = VenuesInformationCoordinator(presentingController: presentingController, parent: self) { [weak self] in
+            self?.didTouchContinue()
+        }
+        self.addChild(coordinator: venuesInformationCoordinator)
+    }
 
     private func showMoreInformation() {
-        let venuesInformationCoordinator: VenuesInformationCoordinator = VenuesInformationCoordinator(presentingController: navigationController, parent: self)
+        let venuesInformationCoordinator: VenuesInformationCoordinator = VenuesInformationCoordinator(presentingController: navigationController, parent: self, didTouchContinue: nil)
         self.addChild(coordinator: venuesInformationCoordinator)
-
     }
 
 }
@@ -113,7 +107,7 @@ extension VenuesRecordingCoordinator {
 
     private func didTouchContinue() {
         didAlreadySeeOnboarding = true
-        showFlashCode()
+        startFlashCode()
     }
 
     private func didTouchFinish() {

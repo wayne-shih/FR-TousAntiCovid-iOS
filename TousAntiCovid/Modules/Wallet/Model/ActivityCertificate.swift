@@ -23,7 +23,7 @@ final class ActivityCertificate: WalletCertificate {
         return startDate <= now && endDate > now
     }
     var kid: String { hCert.kidStr }
-
+    
     private var fullName: String {
         let first: String? = hCert.get(.firstName).string
         let last: String? = hCert.get(.lastName).string

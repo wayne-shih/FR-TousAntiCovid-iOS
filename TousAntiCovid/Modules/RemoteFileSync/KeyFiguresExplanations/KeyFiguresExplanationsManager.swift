@@ -82,6 +82,10 @@ final class KeyFiguresExplanationsManager: RemoteFileSyncManager {
         observers.forEach { $0.observer?.keyFiguresExplanationsChanged() }
     }
 
+    override func resetLastUpdateDate() {
+        lastUpdateDate = .distantPast
+    }
+
 }
 
 extension KeyFiguresExplanationsManager {

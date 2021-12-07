@@ -31,6 +31,7 @@ final class SanitaryCertificate: WalletCertificate {
         do {
             return try signatureString.decodeBase32(padded: signatureString.hasSuffix("="))
         } catch {
+            print(error)
             return nil
         }
     }
@@ -58,12 +59,11 @@ final class SanitaryCertificate: WalletCertificate {
 
     override var timestamp: Double { analysisDate?.timeIntervalSince1970 ?? 0.0 }
 
+    override var title: String? { "wallet.proof.sanitaryCertificate.title".localized }    
     override var pillTitles: [(text: String, backgroundColor: UIColor)] { [("wallet.proof.sanitaryCertificate.pillTitle".localized, Appearance.tintColor)] }
     override var shortDescription: String? { [firstName, name].compactMap { $0 }.joined(separator: " ") }
     override var fullDescription: String? {
-        var text: String = "wallet.proof.sanitaryCertificate.description".localized
-        text = text.replacingOccurrences(of: "<\(FieldName.firstName.rawValue)>", with: firstName ?? "N/A")
-        text = text.replacingOccurrences(of: "<\(FieldName.name.rawValue)>", with: name ?? "N/A")
+        var text: String = "wallet.proof.sanitaryCertificate.infos".localized
         text = text.replacingOccurrences(of: "<\(FieldName.birthDate.rawValue)>", with: birthDateString ?? "N/A")
         text = text.replacingOccurrences(of: "<\(FieldName.gender.rawValue)>", with: gender ?? "N/A")
         text = text.replacingOccurrences(of: "<\(FieldName.analysisCode.rawValue)>", with: analysisCode ?? "N/A")
@@ -71,7 +71,7 @@ final class SanitaryCertificate: WalletCertificate {
         text = text.replacingOccurrences(of: "<\(FieldName.analysisResult.rawValue)>", with: analysisResult ?? "N/A")
         
         text += "\n"
-        text += validityString
+        text += validityString(forceEnglish: false)
         
         return text
     }

@@ -20,10 +20,14 @@ class RemoteFileSyncManager {
             ETagManager.shared.clearAllData()
         }
     }
+
+    @UserDefault(key: .lastRemoteFileBuildNumber)
+    var lastRemoteFileBuildNumber: Int?
     
     func start() {
         writeInitialFileIfNeeded()
         loadLocalFile()
+        resetLastUpdateDateIfNeeded()
         addObserver()
     }
     
@@ -40,6 +44,7 @@ class RemoteFileSyncManager {
     func remoteFileUrl(for languageCode: String) -> URL { fatalError("Must be overriden") }
     
     func notifyObservers() {}
+    func resetLastUpdateDate() {}
     
     @discardableResult func processReceivedData(_ data: Data) -> Bool { fatalError("Must be overriden") }
     
@@ -63,6 +68,14 @@ class RemoteFileSyncManager {
     @objc private func appDidBecomeActive() {
         guard !RemoteFileConstant.useOnlyLocalStrings && canUpdateData() else { return }
         fetchLastFile(languageCode: Locale.currentAppLanguageCode)
+    }
+
+    private func resetLastUpdateDateIfNeeded() {
+        guard let buildNumber = Int(UIApplication.shared.buildNumber) else { return }
+        if lastRemoteFileBuildNumber != buildNumber {
+            lastRemoteFileBuildNumber = buildNumber
+            resetLastUpdateDate()
+        }
     }
     
     private func fetchLastFile(languageCode: String) {

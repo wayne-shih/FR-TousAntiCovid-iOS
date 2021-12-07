@@ -34,16 +34,13 @@ struct CVRow {
         var imageTintColor: UIColor?
         var imageSize: CGSize?
         var imageRatio: CGFloat?
+        var interLabelSpacing: CGFloat?
         var separatorLeftInset: CGFloat?
         var separatorRightInset: CGFloat?
         var buttonStyle: CVButton.Style = .primary
         var maskedCorners: CACornerMask = .all
         var showImageBottomEdging: Bool = false
-    }
-    
-    static var empty: CVRow {
-        CVRow(xibName: .emptyCell,
-              theme: CVRow.Theme(topInset: 0.0, bottomInset: 0.0))
+        var accessoryType: UITableViewCell.AccessoryType? = nil
     }
     
     var title: String?
@@ -59,7 +56,7 @@ struct CVRow {
     var isOn: Bool?
     var segmentsTitles: [String]?
     var selectedSegmentIndex: Int?
-    var xibName: XibName
+    var xibName: XibName.Row
     var theme: Theme = Theme()
     var enabled: Bool = true
     var associatedValue: Any? = nil
@@ -89,8 +86,8 @@ struct CVRow {
         CVRow(xibName: .emptyCell,
               theme: CVRow.Theme(topInset: topInset,
                                  bottomInset: bottomInset,
-                                 separatorLeftInset: showSeparator ? 0.0 : nil,
-                                 separatorRightInset: showSeparator ? 0.0 : nil))
+                                 separatorLeftInset: showSeparator ? .zero : nil,
+                                 separatorRightInset: showSeparator ? .zero : nil))
     }
     
 }

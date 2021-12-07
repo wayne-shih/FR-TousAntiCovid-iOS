@@ -13,9 +13,9 @@ import UIKit
 final class HomeNotificationCell: CardCell {
     @IBOutlet private weak var closeButton: UIButton!
     @IBOutlet private weak var closeImageView: UIImageView!
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
+
+    override func setup(with row: CVRow) {
+        super.setup(with: row)
         setupButton()
         setupShadow()
     }

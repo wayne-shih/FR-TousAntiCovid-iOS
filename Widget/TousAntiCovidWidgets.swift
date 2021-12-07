@@ -18,6 +18,7 @@ struct TousAntiCovidWidgets: WidgetBundle {
     var body: some Widget {
         StatusWidget()
         DccWidget()
+        AlwaysOnDccWidget()
     }
 
 }

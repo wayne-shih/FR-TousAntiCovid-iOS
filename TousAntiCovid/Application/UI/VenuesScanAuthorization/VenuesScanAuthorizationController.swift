@@ -36,10 +36,7 @@ final class VenuesScanAuthorizationController: CVTableViewController {
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.separatorStyle = .none
-        tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
     }
     
@@ -47,43 +44,41 @@ final class VenuesScanAuthorizationController: CVTableViewController {
         title = "confirmVenueQrCodeController.title".localized
     }
 
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        let imageRow: CVRow = CVRow(image: Asset.Images.venuesRecording.image,
-                                      xibName: .onboardingImageCell,
-                                      theme: CVRow.Theme(topInset: 40.0,
-                                                         imageRatio: Appearance.Cell.Image.defaultRatio))
-        rows.append(imageRow)
-        let explanationRow: CVRow = CVRow(title: "confirmVenueQrCodeController.explanation.title".localized,
-                                          xibName: .textCell,
-                                          theme: CVRow.Theme(topInset: 40.0,
-                                                             bottomInset: 10.0,
-                                                             textAlignment: .center,
-                                                             titleFont: { Appearance.Cell.Text.standardFont }))
-        rows.append(explanationRow)
-        let questionRow: CVRow = CVRow(title: "confirmVenueQrCodeController.explanation.subtitle".localized,
-                                       xibName: .textCell,
-                                       theme: CVRow.Theme(topInset: 10.0,
-                                                          bottomInset: 20.0,
-                                                          textAlignment: .center))
-        rows.append(questionRow)
-        let acceptRow: CVRow = CVRow(title: "confirmVenueQrCodeController.confirm".localized,
-                                        xibName: .buttonCell,
-                                        theme: CVRow.Theme(topInset: 20.0, bottomInset: 10.0),
-                                        selectionAction: { [weak self] in
-                                            self?.didAnswer(true)
-        })
-        rows.append(acceptRow)
-        let refuseRow: CVRow = CVRow(title: "common.cancel".localized,
-                                        xibName: .buttonCell,
-                                        theme: CVRow.Theme(topInset: 10.0,
-                                                           bottomInset: 0.0,
-                                                           buttonStyle: .destructive),
-                                        selectionAction: { [weak self] in
-                                            self?.didAnswer(false)
-                                        })
-        rows.append(refuseRow)
-        return rows
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow(image: Asset.Images.venuesRecording.image,
+                      xibName: .onboardingImageCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                         imageRatio: Appearance.Cell.Image.defaultRatio))
+                CVRow(title: "confirmVenueQrCodeController.explanation.title".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                         bottomInset: Appearance.Cell.Inset.small,
+                                         textAlignment: .center,
+                                         titleFont: { Appearance.Cell.Text.standardFont }))
+                CVRow(title: "confirmVenueQrCodeController.explanation.subtitle".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                         bottomInset: Appearance.Cell.Inset.medium,
+                                         textAlignment: .center))
+                CVRow(title: "confirmVenueQrCodeController.confirm".localized,
+                      xibName: .buttonCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                         bottomInset: Appearance.Cell.Inset.small),
+                      selectionAction: { [weak self] in
+                    self?.didAnswer(true)
+                })
+                CVRow(title: "common.cancel".localized,
+                      xibName: .buttonCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                         bottomInset: .zero,
+                                         buttonStyle: .destructive),
+                      selectionAction: { [weak self] in
+                    self?.didAnswer(false)
+                })
+            }
+        }
     }
 
 }

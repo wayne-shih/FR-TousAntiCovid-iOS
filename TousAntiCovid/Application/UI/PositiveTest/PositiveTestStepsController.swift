@@ -49,27 +49,27 @@ final class PositiveTestStepsController: CVTableViewController {
         LocalizationsManager.shared.removeObserver(self)
     }
 
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = [sectionRow(title: "positiveTestStepsController.sectionTitle".localized)]
-        rows.append(selectableRow(title: "positiveTestStepsController.step.addCertificate.label".localized,
-                                  isDone: didSaveCertificate == true,
-                                  isCurrentStep: currentState == .addCertificate,
-                                  isLastRowInGroup: false))
-        rows.append(selectableRow(title: "positiveTestStepsController.step.declare.label".localized,
-                                  isDone: false,
-                                  isCurrentStep: currentState == .declare,
-                                  isLastRowInGroup: true))
-        rows.append(footerRow(title: "positiveTestStepsController.sectionFooter".localized))
-        return rows
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                sectionRow(title: "positiveTestStepsController.sectionTitle".localized)
+                selectableRow(title: "positiveTestStepsController.step.addCertificate.label".localized,
+                              isDone: didSaveCertificate == true,
+                              isCurrentStep: currentState == .addCertificate,
+                              isLastRowInGroup: false)
+                selectableRow(title: "positiveTestStepsController.step.declare.label".localized,
+                              isDone: false,
+                              isCurrentStep: currentState == .declare,
+                              isLastRowInGroup: true)
+                footerRow(title: "positiveTestStepsController.sectionFooter".localized)
+            }
+        }
     }
 
     private func initUI() {
         tableView.tintColor = Appearance.tintColor
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
         let barButtonItem: UIBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
         barButtonItem.accessibilityHint = "accessibility.closeModal.zGesture".localized
         (bottomButtonContainerController ?? self).navigationItem.leftBarButtonItem = barButtonItem
@@ -125,33 +125,33 @@ extension PositiveTestStepsController {
               isOn: isDone,
               xibName: .selectableCell,
               theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                 topInset: Appearance.Cell.leftMargin,
-                                 bottomInset: Appearance.Cell.leftMargin,
+                                 topInset: Appearance.Cell.Inset.normal,
+                                 bottomInset: Appearance.Cell.Inset.normal,
                                  textAlignment: .natural,
                                  titleFont: { Appearance.Cell.Text.standardFont },
                                  titleColor: isCurrentStep ? Appearance.Cell.Text.titleColor : Appearance.Cell.Text.disabledColor,
-                                 separatorLeftInset: isLastRowInGroup ? 0.0 : Appearance.Cell.leftMargin,
-                                 separatorRightInset: 0.0))
+                                 separatorLeftInset: isLastRowInGroup ? .zero : Appearance.Cell.leftMargin,
+                                 separatorRightInset: .zero))
     }
 
 
     private func sectionRow(title: String) -> CVRow {
         let row: CVRow = CVRow(title: title,
                                xibName: .textCell,
-                               theme: CVRow.Theme(topInset: 40.0,
-                                                  bottomInset: Appearance.Cell.leftMargin,
+                               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                                  bottomInset: Appearance.Cell.Inset.normal,
                                                   textAlignment: .natural,
                                                   titleColor: Appearance.tintColor,
-                                                  separatorLeftInset: 0.0,
-                                                  separatorRightInset: 0.0))
+                                                  separatorLeftInset: .zero,
+                                                  separatorRightInset: .zero))
         return row
     }
 
     private func footerRow(title: String) -> CVRow {
         CVRow(title: title,
               xibName: .textCell,
-              theme:  CVRow.Theme(topInset: 10.0,
-                                  bottomInset: 8.0,
+              theme:  CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                  bottomInset: Appearance.Cell.Inset.small,
                                   textAlignment: .natural,
                                   titleFont: { Appearance.Cell.Text.footerFont },
                                   titleColor: Appearance.Cell.Text.captionTitleColor))

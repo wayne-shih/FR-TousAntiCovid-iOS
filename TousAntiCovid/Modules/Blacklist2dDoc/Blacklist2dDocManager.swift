@@ -9,130 +9,41 @@
 //
 
 import UIKit
-import ServerSDK
+import StorageSDK
 
-protocol Blacklist2dDocChangesObserver: AnyObject {
-
-    func blacklist2dDocDidUpdate()
-
-}
-
-final class Blacklist2dDocObserverWrapper: NSObject {
-
-    weak var observer: Blacklist2dDocChangesObserver?
-
-    init(observer: Blacklist2dDocChangesObserver) {
-        self.observer = observer
-    }
-
-}
-
-final class Blacklist2dDocManager: NSObject {
-
+final class Blacklist2dDocManager: BlacklistManager {
     static let shared: Blacklist2dDocManager = Blacklist2dDocManager()
 
-    private var hashes: [String] = []
-    private var observers: [Blacklist2dDocObserverWrapper] = []
-
-    @UserDefault(key: .lastInitialBlacklist2dDocBuildNumber)
-    private var lastInitialBlacklist2dDocBuildNumber: String? = nil
-
-    func start() {
-        writeInitialFileIfNeeded()
-        loadLocalCertList()
-        addObserver()
+    weak var storageManager: StorageManager?
+    var baseUrl: String { Blacklist2dDocConstant.baseUrl }
+    var filename: String { Blacklist2dDocConstant.filename }
+    
+    @UserDefault(key: .last2dDocBlacklistVersionNumber)
+    var lastBlacklistVersionNumber: Int = 0
+    
+    deinit {
+        removeNotifications()
+    }
+    
+    func start(storageManager: StorageManager) {
+        self.storageManager = storageManager
+        addNotifications()
     }
 
     func isBlacklisted(certificate: WalletCertificate) -> Bool {
         guard let uniqueHash = certificate.uniqueHash else { return false }
-        return hashes.contains(uniqueHash)
+        return storageManager?.isBlacklisted2dDoc(uniqueHash) ?? false
     }
-
-    private func addObserver() {
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
-    }
-
-    @objc private func appDidBecomeActive() {
-        fetchCertList()
-    }
-
 }
 
-// MARK: - All fetching methods -
+// MARK: - Realm Persistence -
 extension Blacklist2dDocManager {
-
-    private func fetchCertList() {
-        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: Blacklist2dDocConstant.certListUrl) { data, response, error in
-            guard let data = data else { return }
-            do {
-                self.hashes = try JSONDecoder().decode([String].self, from: data)
-                try data.write(to: self.localCertListUrl())
-            } catch {}
+    func updateBlacklist(addedOrUpdated: [String], removed: [String]) {
+        if !removed.isEmpty {
+            storageManager?.delete2dDocsFromBlacklist(removed)
         }
-        dataTask.resume()
-    }
-
-}
-
-// MARK: - Local files management -
-extension Blacklist2dDocManager {
-
-    private func initialFileUrl() -> URL {
-        Bundle.main.url(forResource: Blacklist2dDocConstant.filename, withExtension: nil)!
-    }
-
-    private func localCertListUrl() -> URL {
-        let directoryUrl: URL = self.createWorkingDirectoryIfNeeded()
-        return directoryUrl.appendingPathComponent(Blacklist2dDocConstant.filename)
-    }
-
-    private func loadLocalCertList() {
-        let localUrl: URL = localCertListUrl()
-        guard FileManager.default.fileExists(atPath: localUrl.path) else { return }
-        guard let data = try? Data(contentsOf: localUrl) else { return }
-        hashes = (try? JSONDecoder().decode([String].self, from: data)) ?? []
-    }
-
-    private func createWorkingDirectoryIfNeeded() -> URL {
-        let directoryUrl: URL = FileManager.libraryDirectory().appendingPathComponent("CertList")
-        if !FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: nil) {
-            try? FileManager.default.createDirectory(at: directoryUrl, withIntermediateDirectories: false, attributes: nil)
-        }
-        return directoryUrl
-    }
-
-    private func writeInitialFileIfNeeded() {
-        let fileUrl: URL = initialFileUrl()
-        let destinationFileUrl: URL = createWorkingDirectoryIfNeeded().appendingPathComponent(fileUrl.lastPathComponent)
-        let currentBuildNumber: String = UIApplication.shared.buildNumber
-        let isNewAppVersion: Bool = lastInitialBlacklist2dDocBuildNumber != currentBuildNumber
-        if !FileManager.default.fileExists(atPath: destinationFileUrl.path) || isNewAppVersion {
-            try? FileManager.default.removeItem(at: destinationFileUrl)
-            try? FileManager.default.copyItem(at: fileUrl, to: destinationFileUrl)
-            lastInitialBlacklist2dDocBuildNumber = currentBuildNumber
+        if !addedOrUpdated.isEmpty {
+            storageManager?.update2dDocBlacklist(addedOrUpdated)
         }
     }
-
-}
-
-extension Blacklist2dDocManager {
-
-    func addObserver(_ observer: Blacklist2dDocChangesObserver) {
-        guard observerWrapper(for: observer) == nil else { return }
-        observers.append(Blacklist2dDocObserverWrapper(observer: observer))
-    }
-
-    func removeObserver(_ observer: Blacklist2dDocChangesObserver) {
-        guard let wrapper = observerWrapper(for: observer), let index = observers.firstIndex(of: wrapper) else { return }
-        observers.remove(at: index)
-    }
-
-    private func observerWrapper(for observer: Blacklist2dDocChangesObserver) -> Blacklist2dDocObserverWrapper? {
-        observers.first { $0.observer === observer }
-    }
-
-    private func notifyObservers() {
-        observers.forEach { $0.observer?.blacklist2dDocDidUpdate() }
-    }
-
 }

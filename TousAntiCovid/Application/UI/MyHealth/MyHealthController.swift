@@ -13,12 +13,14 @@ import PKHUD
 import RobertSDK
 import StorageSDK
 import ServerSDK
+import Lottie
 
 final class MyHealthController: CVTableViewController {
     
     private let didTouchAbout: () -> ()
     private let didTouchCautionMeasures: () -> ()
     private let didTouchRisksUILevelSectionLink: (RisksUILevelSectionLink?) -> ()
+    private weak var animationView: AnimationView?
     
     init(didTouchAbout: @escaping () -> (), didTouchCautionMeasures: @escaping () -> (), didTouchRisksUILevelSectionLink: @escaping (RisksUILevelSectionLink?) -> ()) {
         self.didTouchAbout = didTouchAbout
@@ -36,9 +38,7 @@ final class MyHealthController: CVTableViewController {
         updateTitle()
         initUI()
         reloadUI()
-        if !RBManager.shared.isImmune {
-            addObservers()
-        }
+        addObservers()
     }
     
     deinit {
@@ -49,7 +49,7 @@ final class MyHealthController: CVTableViewController {
         title = RBManager.shared.isImmune ? "myHealthController.sick.title".localized : "myHealthController.title".localized
     }
     
-    override func createRows() -> [CVRow] {
+    override func createSections() -> [CVSection] {
         var rows: [CVRow] = []
         let ameliUrl: String = ParametersManager.shared.ameliUrl
         if RBManager.shared.isImmune {
@@ -76,7 +76,7 @@ final class MyHealthController: CVTableViewController {
             }
             rows.append(contentsOf: sectionRows(for: currentRiskLevel))
         }
-        return rows
+        return [CVSection(rows: rows)]
     }
 
     private func riskRow(for currentRiskLevel: RisksUILevel, isStatusOnGoing: Bool) -> CVRow {
@@ -94,8 +94,8 @@ final class MyHealthController: CVTableViewController {
                      accessoryText: notificationDateString,
                      footerText: lastContactDateString,
                      xibName: .myHealthStateHeaderCell,
-                     theme: CVRow.Theme(topInset: 0.0,
-                                        bottomInset: isStatusOnGoing ? 0.0 : 20.0,
+                     theme: CVRow.Theme(topInset: .zero,
+                                        bottomInset: isStatusOnGoing ? .zero : Appearance.Cell.Inset.medium,
                                         textAlignment: .natural,
                                         accessoryTextFont: { Appearance.Cell.Text.accessoryFont },
                                         maskedCorners: isStatusOnGoing ? .top : .all),
@@ -106,7 +106,7 @@ final class MyHealthController: CVTableViewController {
         CVRow(title: "home.healthSection.statusState".localized,
               xibName: .statusVerificationCell,
               theme: CVRow.Theme(topInset: -2.0,
-                                 bottomInset: 20.0,
+                                 bottomInset: Appearance.Cell.Inset.medium,
                                  textAlignment: .natural,
                                  maskedCorners: .bottom),
               associatedValue: currentRiskLevel)
@@ -117,12 +117,12 @@ final class MyHealthController: CVTableViewController {
         var rows: [CVRow] = []
         let imageRow: CVRow = CVRow(image: Asset.Images.sick.image,
                                     xibName: .onboardingImageCell,
-                                    theme: CVRow.Theme(topInset: 20.0))
+                                    theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium))
         rows.append(imageRow)
         let declarationTextRow: CVRow = CVRow(title: "myHealthController.sick.mainMessage.title".localized,
                                               subtitle: "myHealthController.sick.mainMessage.subtitle".localized,
                                               xibName: .textCell,
-                                              theme: CVRow.Theme(topInset: 40.0, bottomInset: 40.0))
+                                              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large, bottomInset: Appearance.Cell.Inset.large))
         rows.append(declarationTextRow)
         return rows
     }
@@ -132,14 +132,14 @@ final class MyHealthController: CVTableViewController {
 
         let recommendationsButton: CVRow = CVRow(title: "myHealthController.button.recommendations".localized,
                                         xibName: .buttonCell,
-                                        theme: CVRow.Theme(topInset: 10.0, bottomInset: 10.0),
+                                        theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small),
                                         selectionAction: {
             URL(string: "myHealthController.button.recommendations.url".localized)?.openInSafari()
         })
         rows.append(recommendationsButton)
         let phoneButton: CVRow = CVRow(title: "myHealthController.step.appointment.buttonTitle".localized,
                                             xibName: .buttonCell,
-                                            theme: CVRow.Theme(topInset: 10.0, bottomInset: 10.0),
+                                            theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small),
                                             selectionAction: { [weak self] in
             guard let self = self else { return }
             "callCenter.phoneNumber".localized.callPhoneNumber(from: self)
@@ -147,26 +147,41 @@ final class MyHealthController: CVTableViewController {
         rows.append(phoneButton)
         let measuresButton: CVRow = CVRow(title: "myHealthController.button.cautionMeasures".localized,
                                             xibName: .buttonCell,
-                                            theme: CVRow.Theme(topInset: 10.0, bottomInset: 10.0),
+                                            theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small),
                                             selectionAction: { [weak self] in
                                                 self?.didTouchCautionMeasures()
         })
         rows.append(measuresButton)
         return rows
     }
-    
+
     private func headerRow() -> CVRow {
-        CVRow(image: Asset.Images.diagnosis.image,
-              xibName: .imageCell,
-              theme: CVRow.Theme(topInset: 20.0,
-                                 imageRatio: 375.0 / 233.0))
+        if StatusManager.shared.currentStatusRiskLevel?.riskLevel ?? 0.0 > 0.0 {
+            let animation: Animation = Animation.named("DoctorAlert")!
+            return CVRow(accessoryText: Date().shortDateTimeFormatted(),
+                         animation: animation,
+                         xibName: .animatedHeaderCell,
+                         theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                            accessoryTextFont: { .marianneBold(size: 14.0) },
+                                            accessoryTextColor: .white),
+                         secondarySelectionAction: { [weak self] in
+                self?.showRiskMoreInfoAlert()
+            }, willDisplay: { [weak self] cell in
+                self?.animationView = (cell as? AnimatedHeaderCell)?.animationView
+            })
+        } else {
+            return CVRow(image: Asset.Images.health.image,
+                         xibName: .imageCell,
+                         theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                            imageRatio: 375.0 / 116.0))
+        }
     }
 
     private func notRegisteredRows() -> [CVRow] {
         let textRow: CVRow = CVRow(title: "myHealthController.notRegistered.mainMessage.title".localized,
                                    subtitle: "myHealthController.notRegistered.mainMessage.subtitle".localized,
                                    xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 20.0))
+                                   theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium))
         return [textRow]
     }
 
@@ -177,8 +192,8 @@ final class MyHealthController: CVTableViewController {
                   buttonTitle: section.link?.label.localized,
                   xibName: .paragraphCell,
                   theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                     topInset: 0.0,
-                                     bottomInset: 20.0,
+                                     topInset: .zero,
+                                     bottomInset: Appearance.Cell.Inset.medium,
                                      textAlignment: .left,
                                      titleFont: { Appearance.Cell.Text.headTitleFont }),
                   selectionAction: section.link == nil ? nil : { [weak self] in
@@ -208,8 +223,8 @@ final class MyHealthController: CVTableViewController {
                                image: Asset.Images.hand.image,
                                xibName: .isolationTopCell,
                                theme:  CVRow.Theme(backgroundColor: backgroundColor,
-                                                   topInset: 0.0,
-                                                   bottomInset: 0.0,
+                                                   topInset: .zero,
+                                                   bottomInset: .zero,
                                                    textAlignment: .natural,
                                                    titleColor: Appearance.Button.Primary.titleColor,
                                                    subtitleColor: Appearance.Button.Primary.titleColor,
@@ -224,8 +239,8 @@ final class MyHealthController: CVTableViewController {
         let row: CVRow = CVRow(title: title,
                                xibName: .standardCardCell,
                                theme:  CVRow.Theme(backgroundColor: Appearance.Cell.Isolation.actionBackgroundColor,
-                                                   topInset: 0.0,
-                                                   bottomInset: isLastAction ? Appearance.Cell.leftMargin : 0.0,
+                                                   topInset: .zero,
+                                                   bottomInset: isLastAction ? Appearance.Cell.Inset.normal : .zero,
                                                    textAlignment: .natural,
                                                    titleFont: { Appearance.Cell.Text.actionTitleFont },
                                                    titleColor: Appearance.Button.Primary.titleColor,
@@ -245,9 +260,14 @@ final class MyHealthController: CVTableViewController {
         present(controller, animated: true, completion: nil)
     }
 
+    private func showRiskMoreInfoAlert() {
+        let alertController: BottomSheetAlertController = .init(title: "myHealthController.riskMoreInfoAlert.title".localized,
+                                                                message: "myHealthController.riskMoreInfoAlert.message".localized,
+                                                                okTitle: "common.ok".localized)
+        alertController.show()
+    }
+
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: navigationChildController?.navigationBarHeight ?? 0.0))
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
@@ -259,6 +279,9 @@ final class MyHealthController: CVTableViewController {
     }
 
     private func addObservers() {
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.animationView?.play()
+        }
         LocalizationsManager.shared.addObserver(self)
         NotificationCenter.default.addObserver(self, selector: #selector(statusDataChanged), name: .statusDataDidChange, object: nil)
     }

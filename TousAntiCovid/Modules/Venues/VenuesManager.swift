@@ -33,7 +33,10 @@ final class VenuesManager: NSObject {
     
     static let shared: VenuesManager = VenuesManager()
     
-    var isVenuesRecordingActivated: Bool { ParametersManager.shared.displayRecordVenues }
+    var isVenuesRecordingActivated: Bool {
+        return ParametersManager.shared.displayRecordVenues
+        
+    }
     
     var venuesQrCodes: [VenueQrCodeInfo] { storageManager?.venuesQrCodes() ?? [] }
 

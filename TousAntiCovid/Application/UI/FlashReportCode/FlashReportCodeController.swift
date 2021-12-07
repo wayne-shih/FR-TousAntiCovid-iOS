@@ -27,7 +27,19 @@ final class FlashReportCodeController: FlashCodeController {
         explanationLabel.text = "scanCodeController.explanation".localized
         explanationLabel.font = Appearance.Cell.Text.standardFont
         explanationLabel.adjustsFontForContentSizeCategory = true
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
+        if #available(iOS 13, *) {
+            // navigation bar transparency specified in child controller
+            let appearence = UINavigationBarAppearance()
+            appearence.configureWithTransparentBackground()
+            appearence.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont, .foregroundColor: UIColor.white]
+            navigationItem.scrollEdgeAppearance = appearence
+            navigationItem.standardAppearance = appearence
+        } else {
+            navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont, .foregroundColor: UIColor.white]
+            navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+            navigationController?.navigationBar.shadowImage = UIImage()
+        }
+        navigationController?.navigationBar.tintColor = .white
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
         navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }

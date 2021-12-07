@@ -13,6 +13,8 @@ import TagListView
 
 final class SanitaryCertificateCell: CardCell {
 
+    @IBOutlet private weak var separator: UIView!
+    @IBOutlet private weak var headerLabel: UILabel!
     @IBOutlet private var favoriteButton: UIButton!
     @IBOutlet private var topRightButton: UIButton!
     @IBOutlet private var tagListView: TagListView!
@@ -37,6 +39,9 @@ final class SanitaryCertificateCell: CardCell {
     }
     
     private func setupUI(with row: CVRow) {
+        separator.backgroundColor = Appearance.Cell.Wallet.separatorColor
+        headerLabel.font = Appearance.Cell.Text.subtitleFont
+        headerLabel.textColor = Appearance.Cell.Wallet.headerTextColor
         topRightButton.tintColor = Appearance.tintColor
         favoriteButton.tintColor = Appearance.tintColor
         favoriteButton.isHidden = row.secondarySelectionAction == nil
@@ -51,21 +56,23 @@ final class SanitaryCertificateCell: CardCell {
     
     private func setupContent(with row: CVRow) {
         tagListView.removeAllTags()
-        guard let certificate = row.associatedValue as? WalletCertificate, !certificate.pillTitles.isEmpty else {
+        guard let certificate = row.associatedValue as? WalletCertificate else { return }
+        headerLabel.text = certificate.title
+        if certificate.pillTitles.isEmpty {
             tagListView.isHidden = true
-            return
+        } else {
+            tagListView.isHidden = false
+            certificate.pillTitles.forEach {
+                let tag: TagView = tagListView.addTag($0.text)
+                tag.tagBackgroundColor = $0.backgroundColor
+                tag.textColor = Appearance.Button.Primary.titleColor
+            }
+            tagListView.isAccessibilityElement = !(tagListView?.isHidden ?? true)
+            tagListView.accessibilityTraits = .staticText
+            tagListView.accessibilityLabel = row.accessoryText
+            tagListView.tagViews.forEach { $0.isAccessibilityElement = false }
+            favoriteButton.setImage(row.isOn == true ? Asset.Images.filledHeart.image : Asset.Images.emptyHeart.image, for: .normal)
         }
-        tagListView.isHidden = false
-        certificate.pillTitles.forEach {
-            let tag: TagView = tagListView.addTag($0.text)
-            tag.tagBackgroundColor = $0.backgroundColor
-            tag.textColor = Appearance.Button.Primary.titleColor
-        }
-        tagListView.isAccessibilityElement = !(tagListView?.isHidden ?? true)
-        tagListView.accessibilityTraits = .staticText
-        tagListView.accessibilityLabel = row.accessoryText
-        tagListView.tagViews.forEach { $0.isAccessibilityElement = false }
-        favoriteButton.setImage(row.isOn == true ? Asset.Images.filledHeart.image : Asset.Images.emptyHeart.image, for: .normal)
         layoutSubviews()
     }
 

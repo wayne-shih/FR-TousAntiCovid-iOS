@@ -60,6 +60,7 @@ final class BluetoothManager: RBBluetooth {
                                                    identifierFromProximityPayload: identifierFromProximityPayload,
                                                    stateChangedHandler: stateChangedHandler,
                                                    logger: BLELogger())
+            
         }
         
         service?.start()

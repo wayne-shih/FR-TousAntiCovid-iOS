@@ -35,33 +35,27 @@ final class VenuesRecordingConfirmationController: CVTableViewController {
         LocalizationsManager.shared.removeObserver(self)
     }
 
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        let animation: Animation = Animation.named(UIColor.isDarkMode ? "ERP-Waving" : "ERP-Waving-Dark")!
-        let stateRow: CVRow = CVRow(animation: animation,
-                                    xibName: .animationCell,
-                                    theme: CVRow.Theme(topInset: 40.0))
-        rows.append(stateRow)
-
-        let confirmationTitle: String = "erp.confirmationMessage.default.title".localized
-        let confirmationMessage: String = "erp.confirmationMessage.default.message".localized
-        let textRow: CVRow = CVRow(title: confirmationTitle,
-                                   subtitle: confirmationMessage,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 40.0,
-                                                      bottomInset: 20.0,
-                                                      textAlignment: .center,
-                                                      titleFont: { Appearance.Controller.titleFont }))
-        rows.append(textRow)
-        return rows
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                let animation: Animation = Animation.named(UIColor.isDarkMode ? "ERP-Waving" : "ERP-Waving-Dark")!
+                CVRow(animation: animation,
+                      xibName: .animationCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge))
+                CVRow(title: "erp.confirmationMessage.default.title".localized,
+                      subtitle: "erp.confirmationMessage.default.message".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                         bottomInset: Appearance.Cell.Inset.medium,
+                                         textAlignment: .center,
+                                         titleFont: { Appearance.Controller.titleFont }))
+            }
+        }
     }
 
     private func initUI() {
         bottomButtonContainerController?.title = "venuesRecording.confirmationController.title".localized
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.separatorStyle = .none
-        tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
         bottomButtonContainerController?.navigationItem.setHidesBackButton(true, animated: false)
         bottomButtonContainerController?.updateButton(title: "common.ok".localized) { [weak self] in

@@ -28,8 +28,8 @@ final class UrgentDgsCoordinator: Coordinator {
 // MARK: - Private functions -
 private extension UrgentDgsCoordinator {
     func start() {
-        let navigationController: CVNavigationController = CVNavigationController(rootViewController: UrgentDgsDetailController(didTouchMoreInfo: { [weak self] in
-            self?.openWebRemindersInfo()
+        let navigationController: CVNavigationController = CVNavigationController(rootViewController: UrgentDgsDetailController(didTouchMoreInfo: { url in
+            url.openInSafari()
         }, didTouchCloseButton: { [weak self] in
             self?.navigationController?.dismiss(animated: true)
         }, deinitBlock: { [weak self] in
@@ -37,9 +37,5 @@ private extension UrgentDgsCoordinator {
         }))
         self.navigationController = navigationController
         presentingController?.present(navigationController, animated: true)
-    }
-
-    func openWebRemindersInfo() {
-        URL(string: "dgsUrgentController.section.url".localized)?.openInSafari()
     }
 }

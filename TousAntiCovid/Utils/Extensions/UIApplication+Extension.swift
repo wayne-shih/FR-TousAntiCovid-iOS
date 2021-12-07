@@ -12,19 +12,12 @@ import UIKit
 
 extension UIApplication {
     
-    var marketingVersion: String {
-        Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
-    }
-    var buildNumber: String {
-        Bundle.main.infoDictionary!["CFBundleVersion"] as! String
-    }
-    var bundleIdentifier: String {
-        Bundle.main.bundleIdentifier!
-    }
-    
-    var displayName: String {
-        Bundle.main.infoDictionary!["CFBundleDisplayName"] as! String
-    }
+    var marketingVersion: String { Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String }
+    var buildNumber: String { Bundle.main.infoDictionary!["CFBundleVersion"] as! String }
+    var bundleIdentifier: String { Bundle.main.bundleIdentifier! }
+    var displayName: String { Bundle.main.infoDictionary!["CFBundleDisplayName"] as! String }
+
+    var topPresentedController: UIViewController? { keyWindow?.rootViewController?.topPresentedController }
     
     func openSettings() {
         if let url = URL(string: UIApplication.openSettingsURLString), canOpenURL(url) {

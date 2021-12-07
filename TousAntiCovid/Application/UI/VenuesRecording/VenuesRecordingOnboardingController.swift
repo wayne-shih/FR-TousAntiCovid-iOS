@@ -42,30 +42,27 @@ final class VenuesRecordingOnboardingController: CVTableViewController {
         deinitBlock()
     }
 
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        let imageRow: CVRow = CVRow(image: Asset.Images.venuesRecording.image,
-                                      xibName: .onboardingImageCell,
-                                      theme: CVRow.Theme(topInset: 40.0,
-                                                         imageRatio: Appearance.Cell.Image.defaultRatio))
-        rows.append(imageRow)
-        let textRow: CVRow = CVRow(title: "venuesRecording.onboardingController.mainMessage.title".localized,
-                                   subtitle: "venuesRecording.onboardingController.mainMessage.message".localized,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 40.0,
-                                                      bottomInset: 20.0,
-                                                      textAlignment: .center,
-                                                      titleFont: { Appearance.Cell.Text.smallHeadTitleFont }))
-        rows.append(textRow)
-        return rows
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow(image: Asset.Images.venuesRecording.image,
+                      xibName: .onboardingImageCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                         imageRatio: Appearance.Cell.Image.defaultRatio))
+                CVRow(title: "venuesRecording.onboardingController.mainMessage.title".localized,
+                      subtitle: "venuesRecording.onboardingController.mainMessage.message".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                         bottomInset: Appearance.Cell.Inset.medium,
+                                         textAlignment: .center,
+                                         titleFont: { Appearance.Cell.Text.smallHeadTitleFont }))
+            }
+        }
     }
 
     private func initUI() {
         bottomButtonContainerController?.title = "venuesRecording.onboardingController.title".localized
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.separatorStyle = .none
-        tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
         bottomButtonContainerController?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
         bottomButtonContainerController?.navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized

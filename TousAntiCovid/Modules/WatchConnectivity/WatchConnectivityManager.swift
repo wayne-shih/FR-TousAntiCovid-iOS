@@ -111,5 +111,6 @@ extension WatchConnectivityManager: WalletChangesObserver {
     func walletFavoriteCertificateDidUpdate() {
         updateApplicationContext()
     }
-
+    
+    func walletSmartStateDidUpdate() {}
 }

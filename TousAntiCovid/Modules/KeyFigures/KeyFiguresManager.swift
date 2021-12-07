@@ -31,6 +31,12 @@ final class KeyFiguresObserverWrapper: NSObject {
     
 }
 
+enum ChartRange: Int, CaseIterable {
+    case year = 1000
+    case threeMonth = 90
+    case month = 30
+}
+
 final class KeyFiguresManager {
     
     static let shared: KeyFiguresManager = KeyFiguresManager()
@@ -41,6 +47,10 @@ final class KeyFiguresManager {
     
     var displayDepartmentLevel: Bool { ParametersManager.shared.displayDepartmentLevel }
     var canShowCurrentlyNeededFile: Bool { localFileExists() }
+    
+    var initialSelectionForComparison: [String] {
+        ParametersManager.shared.defaultInitialKeyFiguresSelectionKeys ?? []
+    }
 
     @UserDefault(key: .currentPostalCode)
     var currentPostalCode: String? {
@@ -70,6 +80,14 @@ final class KeyFiguresManager {
         addObserver()
     }
     
+    func index(for keyFigureLabel: String) -> Int? {
+        keyFigures.compactMap { $0.labelKey }.firstIndex(of: keyFigureLabel)
+    }
+    
+    func label(for keyFigureIndex: Int) -> String? {
+        keyFigures[keyFigureIndex].labelKey
+    }
+    
     func fetchKeyFigures(_ completion: (() -> ())? = nil) {
         fetchAllFiles(completion)
     }
@@ -93,6 +111,43 @@ final class KeyFiguresManager {
         }
     }
     
+    func generateComparisonChartData(between keyfigure1: KeyFigure, and keyfigure2: KeyFigure, daysCount: Int, withFooter: Bool) -> [KeyFigureChartData] {
+        let dateMin: Double = max(keyfigure1.ascendingSeries?.first?.date ?? 0.0, keyfigure2.ascendingSeries?.first?.date ?? 0.0)
+        let dateMax: Double = min(keyfigure1.ascendingSeries?.last?.date ?? 0.0, keyfigure2.ascendingSeries?.last?.date ?? 0.0)
+        return [generateDefaultChartData(from: keyfigure1,
+                                         color: ParametersManager.shared.keyFiguresComparisonColors?.first ?? keyfigure1.color,
+                                         daysCount: daysCount,
+                                         dateMin: dateMin,
+                                         dateMax: dateMax,
+                                         withFooter: withFooter),
+                generateDefaultChartData(from: keyfigure2,
+                                         color: ParametersManager.shared.keyFiguresComparisonColors?.last ?? keyfigure2.color,
+                                         daysCount: daysCount,
+                                         dateMin: dateMin,
+                                         dateMax: dateMax,
+                                         withFooter: withFooter)].compactMap { $0 }
+    }
+    
+    func generateDefaultChartData(from keyFigure: KeyFigure, color: UIColor, daysCount: Int, dateMin: Double, dateMax: Double, withFooter: Bool) -> KeyFigureChartData? {
+        if let series = keyFigure.ascendingSeries, !series.isEmpty {
+            // reduce series between dateMin and dateMax
+            let reducedSeries: [KeyFigureSeriesItem] = series.filter { $0.date >= dateMin && $0.date <= dateMax }
+            let legend: KeyFigureChartLegend = KeyFigureChartLegend(title: keyFigure.labelWithUnit,
+                                                                    image: Asset.Images.chartLegend.image,
+                                                                    color: color)
+            return KeyFigureChartData(legend: legend,
+                                      series: reducedSeries.suffix(daysCount),
+                                      currentValueToDisplay: keyFigure.valueGlobalToDisplay,
+                                      footer: withFooter ? "keyfigures.comparison.chart.footer".localized : nil,
+                                      limitLineValue: keyFigure.limitLine,
+                                      limitLineLabel: keyFigure.limitLineLabel,
+                                      chartKind: keyFigure.chartKind,
+                                      magnitude: keyFigure.magnitude)
+        } else {
+            return nil
+        }
+    }
+    
     func generateChartData(from keyFigure: KeyFigure, daysCount: Int) -> [KeyFigureChartData] {
         var chartDatas: [KeyFigureChartData] = []
         if let series = keyFigure.ascendingSeries, !series.isEmpty {
@@ -111,7 +166,8 @@ final class KeyFiguresManager {
                                                  footer: String(format: "keyFigureDetailController.section.evolution.subtitle".localized, keyFigure.label, lastDate.dayMonthFormatted(), globalFigureToDisplay),
                                                  limitLineValue: keyFigure.limitLine,
                                                  limitLineLabel: keyFigure.limitLineLabel,
-                                                 chartKind: keyFigure.displayOnSameChart ? .line : keyFigure.chartKind))
+                                                 chartKind: keyFigure.displayOnSameChart ? .line : keyFigure.chartKind,
+                                                 magnitude: keyFigure.magnitude))
         }
         if let departmentKeyFigure = keyFigure.currentDepartmentSpecificKeyFigure, let departmentSeries = departmentKeyFigure.ascendingSeries, !departmentSeries.isEmpty, canShowCurrentlyNeededFile {
             let departmentLegend: KeyFigureChartLegend = KeyFigureChartLegend(title: departmentKeyFigure.label,
@@ -132,7 +188,8 @@ final class KeyFiguresManager {
                                                  footer: footer,
                                                  limitLineValue: keyFigure.displayOnSameChart ? nil : keyFigure.limitLine,
                                                  limitLineLabel: keyFigure.displayOnSameChart ? nil : keyFigure.limitLineLabel,
-                                                 chartKind: keyFigure.displayOnSameChart ? .line : keyFigure.chartKind),
+                                                 chartKind: keyFigure.displayOnSameChart ? .line : keyFigure.chartKind,
+                                                 magnitude: keyFigure.magnitude),
                               at: 0)
         }
         if let averageSeries = keyFigure.avgSeries, !averageSeries.isEmpty {
@@ -147,7 +204,8 @@ final class KeyFiguresManager {
                                                  isAverage: true,
                                                  limitLineValue: keyFigure.limitLine,
                                                  limitLineLabel: keyFigure.limitLineLabel,
-                                                 chartKind: .line))
+                                                 chartKind: .line,
+                                                 magnitude: keyFigure.magnitude))
         }
         return chartDatas
     }
@@ -230,7 +288,7 @@ extension KeyFiguresManager {
             }
             do {
                 let uncompressedData: Data = try data.gunzipped()
-                let keyNumbers: KeyNumbers = try KeyNumbers(serializedData: uncompressedData)
+                let keyNumbers: Keynumbers_KeyNumbersMessage = try Keynumbers_KeyNumbersMessage(serializedData: uncompressedData)
                 self.keyFigures = keyNumbers.toAppModel()
                 try uncompressedData.write(to: self.localKeyFiguresUrl())
                 DispatchQueue.main.async { completion() }
@@ -271,7 +329,7 @@ extension KeyFiguresManager {
         }
         guard let url = localUrl else { return }
         guard let data = try? Data(contentsOf: url) else { return }
-        guard let keyNumbers = try? KeyNumbers(serializedData: data) else { return }
+        guard let keyNumbers = try? Keynumbers_KeyNumbersMessage(serializedData: data) else { return }
         self.keyFigures = keyNumbers.toAppModel()
     }
     

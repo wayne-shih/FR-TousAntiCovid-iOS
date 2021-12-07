@@ -9,6 +9,7 @@
 //
 
 import UIKit
+import PKHUD
 
 extension UIImage {
 
@@ -32,6 +33,15 @@ extension UIImage {
     func cropImage(rect: CGRect) -> UIImage? {
         guard let croppedCGImage = cgImage?.cropping(to: rect) else { return nil }
         return UIImage(cgImage: croppedCGImage)
+    }
+
+    func share(from controller: UIViewController, fromButton: UIButton? = nil) {
+        HUD.show(.progress)
+        let activityController: UIActivityViewController = UIActivityViewController(activityItems: [self], applicationActivities: nil)
+        if let button = fromButton {
+            activityController.popoverPresentationController?.setSourceButton(button)
+        }
+        controller.present(activityController, animated: true) { HUD.hide() }
     }
 
 }

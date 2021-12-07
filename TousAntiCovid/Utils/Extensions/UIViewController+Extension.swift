@@ -37,6 +37,18 @@ extension UIViewController {
         topPresentedController.present(alertController, animated: true, completion: nil)
     }
     
+    func showActionSheet(title: String? = nil, message: String? = nil, firstActionTitle: String, secondActionTitle: String? = nil, showCancel: Bool = false, firstActionHandler: (() -> ())? = nil, secondActionHandler: (() -> ())? = nil) {
+        let alertController: UIAlertController = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+        alertController.addAction(UIAlertAction(title: firstActionTitle, style: .default, handler: { _ in firstActionHandler?() }))
+        if let secondActionTitle = secondActionTitle {
+            alertController.addAction(UIAlertAction(title: secondActionTitle, style: .default, handler: { _ in secondActionHandler?() }))
+        }
+        if showCancel {
+            alertController.addAction(UIAlertAction(title: "common.cancel".localized, style: .cancel, handler: { _ in alertController.dismiss(animated: true) }))
+        }
+        topPresentedController.present(alertController, animated: true, completion: nil)
+    }
+    
     func showLeftAlignedAlert(title: String? = nil, message: String? = nil, okTitle: String, isOkDestructive: Bool = false, cancelTitle: String? = nil, handler: (() -> ())? = nil) {
         let paragraphStyle: NSMutableParagraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .left

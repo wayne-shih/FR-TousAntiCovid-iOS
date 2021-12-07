@@ -34,11 +34,19 @@ struct KeyFigure: Codable {
     let displayOnSameChart: Bool
     let avgSeries: [KeyFigureSeriesItem]?
     let limitLine: Double?
+    let magnitude: UInt32
     
     let series: [KeyFigureSeriesItem]?
     let chartType: ChartKind?
     var isLabelReady: Bool { "\(labelKey).label".localizedOrNil != nil }
     var label: String { "\(labelKey).label".localized.trimmingCharacters(in: .whitespaces) }
+    var labelWithUnit: String {
+        if let unit = "\(labelKey).unit".localizedOrNil?.trimmingCharacters(in: .whitespaces) {
+            return "\(labelKey).label".localized.trimmingCharacters(in: .whitespaces) + " (\(unit))"
+        } else {
+            return label
+        }
+    }
     var shortLabel: String { "\(labelKey).shortLabel".localized.trimmingCharacters(in: .whitespaces) }
     var description: String { "\(labelKey).description".localized.trimmingCharacters(in: .whitespaces) }
     var learnMore: String { "\(labelKey).learnMore".localizedOrEmpty.trimmingCharacters(in: .whitespaces) }
@@ -53,9 +61,9 @@ struct KeyFigure: Codable {
     var formattedDate: String {
         switch category {
         case .vaccine, .health:
-            return Date(timeIntervalSince1970: Double(extractDate)).relativelyFormattedDay(prefixStringKey: "keyFigures.update")
+            return Date(timeIntervalSince1970: Double(extractDate)).relativelyFormattedDay(prefixStringKey: "keyFigures.update", todayPrefixStringKey: "keyFigures.update.today", yesterdayPrefixStringKey: "keyFigures.update.today")
         case .app:
-            return Date(timeIntervalSince1970: Double(extractDate)).relativelyFormatted(prefixStringKey: "keyFigures.update")
+            return Date(timeIntervalSince1970: Double(extractDate)).relativelyFormatted(prefixStringKey: "keyFigures.update", todayPrefixStringKey: "keyFigures.update.today", yesterdayPrefixStringKey: "keyFigures.update.today")
         default:
             return ""
         }
@@ -65,5 +73,18 @@ struct KeyFigure: Codable {
         guard KeyFiguresManager.shared.displayDepartmentLevel else { return nil }
         return valuesDepartments?.first
     }
-    
+}
+
+extension KeyFigure: Equatable {
+    static func == (lhs: KeyFigure, rhs: KeyFigure) -> Bool {
+        lhs.labelKey == rhs.labelKey
+    }
+}
+
+extension Array where Element == KeyFigure {
+    var haveSameMagnitude: Bool {
+        Dictionary(grouping: self) { keyFigure in
+            keyFigure.magnitude
+        }.keys.count == 1
+    }
 }

@@ -4,7 +4,6 @@ inhibit_all_warnings!
 
 def projectPods
   use_frameworks!
-  pod 'PKHUD'
   pod 'SwiftGen'
   pod 'lottie-ios'
   pod 'TagListView'
@@ -17,6 +16,10 @@ target 'TousAntiCovid' do
   projectPods
 end
 
+
+
+
+
 target 'StorageSDK' do
   use_frameworks!
   pod 'KeychainSwift'
@@ -27,6 +30,8 @@ target 'RobertSDK' do
   use_frameworks!
   pod 'SwCrypt'
 end
+
+
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|

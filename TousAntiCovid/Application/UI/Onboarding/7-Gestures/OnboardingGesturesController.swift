@@ -19,29 +19,28 @@ final class OnboardingGesturesController: OnboardingController {
         super.updateTitle()
     }
     
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        let titleRow: CVRow = CVRow.titleRow(title: "onboarding.gesturesController.title".localized) { [weak self] cell in
-            self?.navigationChildController?.updateLabel(titleLabel: cell.cvTitleLabel, containerView: cell)
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow.titleRow(title: "onboarding.gesturesController.title".localized) { [weak self] cell in
+                    self?.navigationChildController?.updateLabel(titleLabel: cell.cvTitleLabel, containerView: cell)
+                }
+                CVRow(title: "onboarding.gesturesController.mainMessage.title".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                         bottomInset: Appearance.Cell.Inset.medium,
+                                         textAlignment: .natural,
+                                         titleFont: { Appearance.Cell.Text.smallHeadTitleFont }))
+                gestures().map { gesture in
+                    CVRow(title: gesture.title,
+                          image: gesture.image,
+                          xibName: .onboardingGestureCell,
+                          theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
+                                             bottomInset: Appearance.Cell.Inset.normal,
+                                             textAlignment: .natural))
+                }
+            }
         }
-        rows.append(titleRow)
-        let textRow: CVRow = CVRow(title: "onboarding.gesturesController.mainMessage.title".localized,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 20.0,
-                                                      bottomInset: 20.0,
-                                                      textAlignment: .natural,
-                                                      titleFont: { Appearance.Cell.Text.smallHeadTitleFont }))
-        rows.append(textRow)
-        let gesturesRows: [CVRow] = gestures().map { gesture in
-            CVRow(title: gesture.title,
-                  image: gesture.image,
-                  xibName: .onboardingGestureCell,
-                  theme: CVRow.Theme(topInset: 15.0,
-                                     bottomInset: 15.0,
-                                     textAlignment: .natural))
-        }
-        rows.append(contentsOf: gesturesRows)
-        return rows
     }
     
     private func gestures() -> [Gesture] {

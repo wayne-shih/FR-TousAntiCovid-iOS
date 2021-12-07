@@ -43,12 +43,14 @@ final class PositiveTestController: CVTableViewController {
         LocalizationsManager.shared.removeObserver(self)
     }
     
-    override func createRows() -> [CVRow] {
+    override func createSections() -> [CVSection] {
         var rows: [CVRow] = []
         let textRow: CVRow = CVRow(title: "positiveTestController.explanation.title".localized,
                                    subtitle: "positiveTestController.explanation.subtitle".localized,
                                    xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 40.0, bottomInset: 30.0, separatorLeftInset: nil),
+                                   theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                                      bottomInset: Appearance.Cell.Inset.large,
+                                                      separatorLeftInset: nil),
                                    willDisplay: { cell in
                                     cell.accessibilityHint = (cell.accessibilityHint ?? "") + ".\n" + "accessibility.back.zGesture".localized
                                    })
@@ -57,8 +59,8 @@ final class PositiveTestController: CVTableViewController {
         
         let noDateRow: CVRow = CVRow(title: "positiveTestController.noDate".localized,
                                        xibName: .standardCell,
-                                       theme: CVRow.Theme(topInset: 15.0,
-                                                          bottomInset: 15.0,
+                                       theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
+                                                          bottomInset: Appearance.Cell.Inset.normal,
                                                           textAlignment: .natural,
                                                           titleFont: { Appearance.Cell.Text.standardFont },
                                                           separatorLeftInset: Appearance.Cell.leftMargin),
@@ -82,8 +84,8 @@ final class PositiveTestController: CVTableViewController {
             return CVRow(title: title,
                          subtitle: date.fullDayMonthFormatted().capitalized,
                          xibName: .standardCell,
-                         theme: CVRow.Theme(topInset: 15.0,
-                                            bottomInset: 15.0,
+                         theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
+                                            bottomInset: Appearance.Cell.Inset.normal,
                                             textAlignment: .natural,
                                             titleFont: { Appearance.Cell.Text.standardFont },
                                             separatorLeftInset: Appearance.Cell.leftMargin),
@@ -92,15 +94,11 @@ final class PositiveTestController: CVTableViewController {
             })
         }
         rows.append(contentsOf: originRows)
-        return rows
+        return [CVSection(rows: rows)]
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
     }
     
     private func didSelectPositiveTestDate(date: Date?) {

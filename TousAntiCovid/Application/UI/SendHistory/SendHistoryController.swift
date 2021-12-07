@@ -41,28 +41,18 @@ final class SendHistoryController: CVTableViewController {
         LocalizationsManager.shared.removeObserver(self)
     }
     
-    override func createRows() -> [CVRow] {
-        let imageRow: CVRow = CVRow(image: Asset.Images.envoiData.image,
-                                    xibName: .onboardingImageCell,
-                                    theme: CVRow.Theme(topInset: 40.0,
-                                                       imageRatio: Appearance.Cell.Image.defaultRatio))
-        let textRow: CVRow = CVRow(title: "sendHistoryController.mainMessage.title".localized,
-                                   subtitle: "sendHistoryController.mainMessage.subtitle".localized,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 20.0),
-                                   willDisplay: { cell in
-                                    cell.accessibilityHint = (cell.accessibilityHint ?? "") + ".\n" + "accessibility.back.zGesture".localized
-                                   })
-        return [imageRow, textRow]
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                imageRow()
+                textRow()
+            }
+        }
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.separatorStyle = .none
-        tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
         bottomButtonContainerController?.updateButton(title: "common.send".localized) { [weak self] in
             self?.sendButtonPressed()
         }
@@ -123,6 +113,24 @@ final class SendHistoryController: CVTableViewController {
         }
     }
     
+}
+
+// MARK: - Rows -
+private extension SendHistoryController {
+    func imageRow() -> CVRow { CVRow(image: Asset.Images.envoiData.image,
+                                     xibName: .onboardingImageCell,
+                                     theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                                        imageRatio: Appearance.Cell.Image.defaultRatio))
+    }
+    func textRow() -> CVRow {
+        CVRow(title: "sendHistoryController.mainMessage.title".localized,
+              subtitle: "sendHistoryController.mainMessage.subtitle".localized,
+              xibName: .textCell,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium),
+              willDisplay: { cell in
+            cell.accessibilityHint = (cell.accessibilityHint ?? "") + ".\n" + "accessibility.back.zGesture".localized
+        })
+    }
 }
 
 extension SendHistoryController: LocalizationsChangesObserver {

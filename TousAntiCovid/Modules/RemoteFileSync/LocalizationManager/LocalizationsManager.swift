@@ -83,6 +83,10 @@ final class LocalizationsManager: RemoteFileSyncManager {
     override func notifyObservers() {
         observers.forEach { $0.observer?.localizationsChanged() }
     }
+
+    override func resetLastUpdateDate() {
+        lastUpdateDate = .distantPast
+    }
     
 }
 

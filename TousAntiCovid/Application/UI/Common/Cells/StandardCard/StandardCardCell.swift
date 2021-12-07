@@ -12,7 +12,7 @@ import UIKit
 
 final class StandardCardCell: CardCell {
 
-    @IBOutlet private var titleStackView: UIStackView?
+    @IBOutlet var titleStackView: UIStackView?
 
     override func setup(with row: CVRow) {
         super.setup(with: row)
@@ -21,6 +21,9 @@ final class StandardCardCell: CardCell {
 
     private func setupUI(with row: CVRow) {
         titleStackView?.isHidden = row.title == nil && row.image == nil
+        if let spacing = row.theme.interLabelSpacing {
+            titleStackView?.spacing = spacing
+        }
     }
 
     override func setupAccessibility() {

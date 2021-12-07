@@ -67,50 +67,53 @@ final class EnterCodeController: CVTableViewController {
         deinitBlock()
     }
     
-    override func createRows() -> [CVRow] {
-        let titleRow: CVRow = CVRow(title: "enterCodeController.title".localized,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 40.0, bottomInset: 30.0, textAlignment: .center, titleFont: { Appearance.Controller.titleFont }))
-        let textRow: CVRow = CVRow(title: "enterCodeController.mainMessage.title".localized,
-                                   subtitle: "enterCodeController.mainMessage.subtitle".localized,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 0.0))
-        let textFieldRow: CVRow = CVRow(placeholder: "enterCodeController.textField.placeholder".localized,
-                                        xibName: .textFieldCell,
-                                        theme: CVRow.Theme(topInset: 30.0,
-                                                           placeholderColor: .lightGray,
-                                                           separatorLeftInset: Appearance.Cell.leftMargin,
-                                                           separatorRightInset: Appearance.Cell.leftMargin),
-                                        textFieldKeyboardType: .default,
-                                        textFieldReturnKeyType: .done,
-                                        willDisplay: { [weak self] cell in
-                                            self?.textField = (cell as? TextFieldCell)?.cvTextField
-        }, valueChanged: { [weak self] value in
-            guard let code = value as? String else { return }
-            self?.code = code
-        }, didValidateValue: { [weak self] value, _ in
-            guard let code = value as? String else { return }
-            self?.code = code
-            self?.didTouchValidate()
-        })
-        let buttonRow: CVRow = CVRow(title: "enterCodeController.button.validate".localized,
-                                     xibName: .buttonCell,
-                                     theme: CVRow.Theme(topInset: 40.0),
-                                     selectionAction: { [weak self] in
-                                        self?.didTouchValidate()
-        })
-        return [titleRow, textRow, textFieldRow, buttonRow]
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow(title: "enterCodeController.title".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                         bottomInset: Appearance.Cell.Inset.large,
+                                         textAlignment: .center,
+                                         titleFont: { Appearance.Controller.titleFont }))
+                CVRow(title: "enterCodeController.mainMessage.title".localized,
+                      subtitle: "enterCodeController.mainMessage.subtitle".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: .zero))
+                CVRow(placeholder: "enterCodeController.textField.placeholder".localized,
+                      xibName: .textFieldCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
+                                         placeholderColor: .lightGray,
+                                         separatorLeftInset: Appearance.Cell.leftMargin,
+                                         separatorRightInset: Appearance.Cell.leftMargin),
+                      textFieldKeyboardType: .default,
+                      textFieldReturnKeyType: .done,
+                      willDisplay: { [weak self] cell in
+                    self?.textField = (cell as? TextFieldCell)?.cvTextField
+                }, valueChanged: { [weak self] value in
+                    guard let code = value as? String else { return }
+                    self?.code = code
+                }, didValidateValue: { [weak self] value, _ in
+                    guard let code = value as? String else { return }
+                    self?.code = code
+                    self?.didTouchValidate()
+                })
+                CVRow(title: "enterCodeController.button.validate".localized,
+                      xibName: .buttonCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge),
+                      selectionAction: { [weak self] in
+                    self?.didTouchValidate()
+                })
+            }
+        }
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.keyboardDismissMode = .onDrag
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
         navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "enterCodeController.button.validate".localized, style: .plain, target: self, action: #selector(didTouchValidate))
     }
     
     func enterCode(_ code: String) {
@@ -122,7 +125,7 @@ final class EnterCodeController: CVTableViewController {
         }
     }
     
-    private func didTouchValidate() {
+    @objc private func didTouchValidate() {
         if let code = code?.trimmingCharacters(in: .whitespaces), code.isShortCode || code.isUuidCode {
             tableView.endEditing(true)
             didEnterCode(code)

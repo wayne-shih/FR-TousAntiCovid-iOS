@@ -134,9 +134,9 @@ final class KeyFigureCell: CardCell, Xibbed {
         sharingButton?.isAccessibilityElement = true
         let value: String = valueLabel.text?.replacingOccurrences(of: " ", with: "").accessibilityNumberFormattedString() ?? ""
         cvTitleLabel?.accessibilityLabel = "\(cvTitleLabel?.text ?? ""), \(value)"
-        sharingButton.accessibilityLabel = "accessibility.hint.keyFigure.share".localized
+        sharingButton.accessibilityLabel = String(format: "accessibility.hint.keyFigure.share.withLabel".localized, keyFigure.labelKey)
         let date: Date = Date(timeIntervalSince1970: Double(keyFigure.extractDate))
-        dateLabel.accessibilityLabel = date.accessibilityRelativelyFormattedDate(prefixStringKey: "keyFigures.update")
+        dateLabel.accessibilityLabel = date.accessibilityRelativelyFormattedDate(prefixStringKey: "keyFigures.update", todayPrefixStringKey: "keyFigures.update.today", yesterdayPrefixStringKey: "keyFigures.update.today")
     }
     
     @IBAction private func didTouchSharingButton(_ sender: Any) {

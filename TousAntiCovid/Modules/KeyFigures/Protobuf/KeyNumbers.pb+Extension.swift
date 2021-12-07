@@ -10,7 +10,7 @@
 
 import Foundation
 
-extension KeyNumbers {
+extension Keynumbers_KeyNumbersMessage {
 
     func toAppModel() -> [KeyFigure] {
         keyfigureList.map {
@@ -25,6 +25,7 @@ extension KeyNumbers {
                       displayOnSameChart: $0.displayOnSameChart,
                       avgSeries: $0.avgSeries.map { $0.toAppModel() },
                       limitLine: $0.limitLine,
+                      magnitude: $0.magnitude,
                       series: $0.series.map { $0.toAppModel() },
                       chartType: KeyFigure.ChartKind(rawValue: $0.chartType))
         }
@@ -32,7 +33,7 @@ extension KeyNumbers {
 
 }
 
-extension KeyNumbers.DepartmentValuesMessage {
+extension Keynumbers_KeyNumbersMessage.DepartmentValuesMessage {
 
     func toAppModel() -> KeyFigureDepartment {
         KeyFigureDepartment(number: dptNb,
@@ -45,7 +46,7 @@ extension KeyNumbers.DepartmentValuesMessage {
 
 }
 
-extension KeyNumbers.ElementSerieMessage {
+extension Keynumbers_KeyNumbersMessage.ElementSerieMessage {
 
     func toAppModel() -> KeyFigureSeriesItem {
         KeyFigureSeriesItem(date: Double(date), value: value)

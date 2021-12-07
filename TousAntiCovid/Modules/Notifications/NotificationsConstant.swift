@@ -11,7 +11,7 @@
 
 import UIKit
 
-enum NotificationsContant {
+enum NotificationsConstant {
  
     enum Identifier {
         static let atRisk: String = "atRiskNotification"

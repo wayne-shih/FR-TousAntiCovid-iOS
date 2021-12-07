@@ -29,6 +29,8 @@ final class KeyFiguresCoordinator: Coordinator {
             self?.showKeyFiguresExplanations()
         }, didTouchKeyFigure: { [weak self] keyFigure in
             self?.showKeyFigureDetailFor(keyFigure: keyFigure)
+        }, didTouchCompare: { [weak self] in
+            self?.showKeyFigureComparison()
         }, deinitBlock: { [weak self] in
             self?.didDeinit()
         }))
@@ -46,6 +48,11 @@ final class KeyFiguresCoordinator: Coordinator {
         let detailCoordinator: KeyFigureDetailCoordinator = KeyFigureDetailCoordinator(presentingController: navigationController, parent: self, keyFigure: keyFigure)
         addChild(coordinator: detailCoordinator)
         AnalyticsManager.shared.reportAppEvent(.e9)
+    }
+    
+    private func showKeyFigureComparison() {
+        let comparisonCoordinator: KeyFiguresComparisonCoordinator = .init(presentingController: navigationController, parent: self)
+        addChild(coordinator: comparisonCoordinator)
     }
 
 }

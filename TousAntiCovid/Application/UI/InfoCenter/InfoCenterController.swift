@@ -43,8 +43,7 @@ final class InfoCenterController: CVTableViewController {
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 10.0))
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
+        addHeaderView(height: 10.0)
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -73,37 +72,41 @@ final class InfoCenterController: CVTableViewController {
         super.reloadUI(animated: animated, completion: completion)
     }
     
-    override func createRows() -> [CVRow] {
+    override func createSections() -> [CVSection] {
         updateEmptyView()
-        guard !InfoCenterManager.shared.info.isEmpty else { return [] }
-        var rows: [CVRow] = []
-        let infoRows: [CVRow] = InfoCenterManager.shared.info.sorted { $0.timestamp > $1.timestamp }.map { info in
-            CVRow(title: info.title,
-                  subtitle: info.description,
-                  accessoryText: info.formattedDate,
-                  buttonTitle: info.buttonLabel,
-                  xibName: .infoCell,
-                  theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                     topInset: 10.0,
-                                     bottomInset: 10.0,
-                                     textAlignment: .natural,
-                                     titleFont: { Appearance.Cell.Text.headTitleFont },
-                                     titleHighlightFont: { Appearance.Cell.Text.subtitleBoldFont },
-                                     titleHighlightColor: Appearance.Cell.Text.subtitleColor,
-                                     subtitleFont: { Appearance.Cell.Text.subtitleFont },
-                                     subtitleColor: Appearance.Cell.Text.subtitleColor),
-                  associatedValue: info,
-                  selectionActionWithCell: { [weak self] cell in
-                    self?.didTouchSharingFor(cell: cell, info: info)
-                  },
-                  secondarySelectionAction: {
-                    info.url?.openInSafari()
-            })
+        return makeSections {
+            if InfoCenterManager.shared.info.isEmpty {
+                CVSection.Empty()
+            } else {
+                CVSection {
+                    InfoCenterManager.shared.info.sorted { $0.timestamp > $1.timestamp }.map { info in
+                        CVRow(title: info.title,
+                              subtitle: info.description,
+                              accessoryText: info.formattedDate,
+                              buttonTitle: info.buttonLabel,
+                              xibName: .infoCell,
+                              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                                 topInset: Appearance.Cell.Inset.small,
+                                                 bottomInset: Appearance.Cell.Inset.small,
+                                                 textAlignment: .natural,
+                                                 titleFont: { Appearance.Cell.Text.headTitleFont },
+                                                 titleHighlightFont: { Appearance.Cell.Text.subtitleBoldFont },
+                                                 titleHighlightColor: Appearance.Cell.Text.subtitleColor,
+                                                 subtitleFont: { Appearance.Cell.Text.subtitleFont },
+                                                 subtitleColor: Appearance.Cell.Text.subtitleColor),
+                              associatedValue: info,
+                              selectionActionWithCell: { [weak self] cell in
+                            self?.didTouchSharingFor(cell: cell, info: info)
+                        },
+                              secondarySelectionAction: {
+                            info.url?.openInSafari()
+                        })
+                    }
+                }
+            }
         }
-        rows.append(contentsOf: infoRows)
-        return rows
     }
-    
+
     private func updateEmptyView() {
         tableView.backgroundView = InfoCenterManager.shared.info.isEmpty ? InfoCenterEmptyView.view() : nil
     }

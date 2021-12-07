@@ -43,10 +43,16 @@ class CVTableViewCell: UITableViewCell {
     override func accessibilityElementDidBecomeFocused() {
         currentAssociatedRow?.accessibilityDidFocusCell?(self)
     }
-    
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // Used to remove header section separators
+        subviews.filter { type(of: $0).description() == "_UITableViewCellSeparatorView" && $0.frame.minY == 0.0 } .forEach { $0.isHidden = true }
+    }
+
     private func setupTheme(with row: CVRow) {
         selectionStyle = row.selectionAction == nil ? .none : .default
-        accessoryType = row.selectionAction == nil ? .none : .disclosureIndicator
+        accessoryType = row.theme.accessoryType ?? (row.selectionAction == nil ? .none : .disclosureIndicator)
         backgroundColor = row.theme.backgroundColor ?? .clear
         
         cvTitleLabel?.isHidden = row.title == nil
@@ -139,5 +145,5 @@ class CVTableViewCell: UITableViewCell {
         cvAccessoryLabel?.accessibilityLabel = cvAccessoryLabel?.text?.removingEmojis()
         cvAccessoryLabel?.accessibilityTraits = .staticText
     }
-    
+
 }

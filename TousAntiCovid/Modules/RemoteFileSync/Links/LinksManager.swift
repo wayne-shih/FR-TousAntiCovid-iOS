@@ -82,6 +82,10 @@ final class LinksManager: RemoteFileSyncManager {
         observers.forEach { $0.observer?.linksChanged() }
     }
 
+    override func resetLastUpdateDate() {
+        lastUpdateDate = .distantPast
+    }
+
 }
 
 extension LinksManager {

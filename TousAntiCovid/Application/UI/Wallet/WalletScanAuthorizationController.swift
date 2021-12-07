@@ -43,10 +43,7 @@ final class WalletScanAuthorizationController: CVTableViewController {
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.separatorStyle = .none
-        tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
     }
 
@@ -54,45 +51,44 @@ final class WalletScanAuthorizationController: CVTableViewController {
         title = "confirmWalletQrCodeController.title".localized
     }
 
-    override func createRows() -> [CVRow] {
-        let imageRow: CVRow = CVRow(image: Asset.Images.wallet.image,
-                                    xibName: .imageCell,
-                                    theme: CVRow.Theme(topInset: 30.0,
-                                                       bottomInset: 0.0,
-                                                       imageRatio: 375.0 / 116.0,
-                                                       showImageBottomEdging: true))
-        let explanationRow: CVRow = CVRow(title: comingFromTheApp ? "confirmWalletQrCodeController.explanation.title.fromUniversalQrScan".localized : "confirmWalletQrCodeController.explanation.title".localized,
-                                          xibName: .textCell,
-                                          theme: CVRow.Theme(topInset: 20.0,
-                                                             bottomInset: 0.0,
-                                                             textAlignment: .center,
-                                                             titleFont: { Appearance.Cell.Text.standardFont }))
-        let questionRow: CVRow = CVRow(title: "confirmWalletQrCodeController.explanation.subtitle".localized,
-                                       xibName: .textCell,
-                                       theme: CVRow.Theme(topInset: 20.0,
-                                                          bottomInset: 20.0,
-                                                          textAlignment: .center))
-        let acceptRow: CVRow = CVRow(title: "confirmWalletQrCodeController.confirm".localized,
-                                     xibName: .buttonCell,
-                                     theme: CVRow.Theme(topInset: 20.0, bottomInset: 10.0),
-                                     selectionAction: { [weak self] in
-                                        self?.didAnswer(true)
-                                     })
-        let refuseRow: CVRow = CVRow(title: "common.cancel".localized,
-                                     xibName: .buttonCell,
-                                     theme: CVRow.Theme(topInset: 10.0,
-                                                        bottomInset: 0.0,
-                                                        buttonStyle: .destructive),
-                                     selectionAction: { [weak self] in
-                                        self?.didAnswer(false)
-                                     })
-        return [imageRow,
-                explanationRow,
-                questionRow,
-                acceptRow,
-                refuseRow]
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow(image: Asset.Images.wallet.image,
+                      xibName: .imageCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
+                                         bottomInset: .zero,
+                                         imageRatio: 375.0 / 116.0,
+                                         showImageBottomEdging: true))
+                CVRow(title: comingFromTheApp ? "confirmWalletQrCodeController.explanation.title.fromUniversalQrScan".localized : "confirmWalletQrCodeController.explanation.title".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                         bottomInset: .zero,
+                                         textAlignment: .center,
+                                         titleFont: { Appearance.Cell.Text.standardFont }))
+                CVRow(title: "confirmWalletQrCodeController.explanation.subtitle".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                         bottomInset: Appearance.Cell.Inset.medium,
+                                         textAlignment: .center))
+                CVRow(title: "confirmWalletQrCodeController.confirm".localized,
+                      xibName: .buttonCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium, bottomInset: Appearance.Cell.Inset.small),
+                      selectionAction: { [weak self] in
+                    self?.didAnswer(true)
+                })
+                CVRow(title: "common.cancel".localized,
+                      xibName: .buttonCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                         bottomInset: .zero,
+                                         buttonStyle: .destructive),
+                      selectionAction: { [weak self] in
+                    self?.didAnswer(false)
+                })
+            }
+        }
     }
-
+    
 }
 
 extension WalletScanAuthorizationController: LocalizationsChangesObserver {

@@ -19,23 +19,23 @@ final class OnboardingProximityController: OnboardingController {
         super.updateTitle()
     }
     
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        let titleRow: CVRow = CVRow.titleRow(title: title) { [weak self] cell in
-            self?.navigationChildController?.updateLabel(titleLabel: cell.cvTitleLabel, containerView: cell)
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow.titleRow(title: title) { [weak self] cell in
+                    self?.navigationChildController?.updateLabel(titleLabel: cell.cvTitleLabel, containerView: cell)
+                }
+                CVRow(image: Asset.Images.bluetooth.image,
+                      xibName: .onboardingImageCell,
+                      theme: CVRow.Theme(imageRatio: Appearance.Cell.Image.onboardingControllerRatio))
+                CVRow(title: "onboarding.proximityController.mainMessage.title".localized,
+                      subtitle: "onboarding.proximityController.mainMessage.subtitle".localized,
+                      xibName: .textCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                         titleFont: { Appearance.Cell.Text.smallHeadTitleFont }))
+
+            }
         }
-        rows.append(titleRow)
-        let imageRow: CVRow = CVRow(image: Asset.Images.bluetooth.image,
-                                    xibName: .onboardingImageCell,
-                                    theme: CVRow.Theme(imageRatio: Appearance.Cell.Image.onboardingControllerRatio))
-        rows.append(imageRow)
-        let textRow: CVRow = CVRow(title: "onboarding.proximityController.mainMessage.title".localized,
-                                   subtitle: "onboarding.proximityController.mainMessage.subtitle".localized,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 20.0,
-                                                      titleFont: { Appearance.Cell.Text.smallHeadTitleFont }))
-        rows.append(textRow)
-        return rows
     }
 
     override func bottomContainerButtonTouched() {

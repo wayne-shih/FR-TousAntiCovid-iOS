@@ -40,7 +40,7 @@ extension UIView {
         guard let pngData = image?.pngData() else { return nil }
         return UIImage(data: pngData)
     }
-    
+
 }
 
 extension UIView {

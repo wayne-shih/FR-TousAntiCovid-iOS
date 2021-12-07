@@ -23,7 +23,6 @@ final class VaccinationController: CVTableViewController {
     init(didTouchWebVaccination: @escaping () -> (), deinitBlock: @escaping () -> ()) {
         self.didTouchWebVaccination = didTouchWebVaccination
         self.deinitBlock = deinitBlock
-
         super.init(style: .plain)
     }
     
@@ -48,16 +47,17 @@ final class VaccinationController: CVTableViewController {
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: navigationChildController?.navigationBarHeight ?? 0.0))
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
         navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
     
-    override func createRows() -> [CVRow] {
-        eligibilitySectionRows() + locationSectionRows()
+    override func createSections() -> [CVSection] {
+        makeSections {
+            eligibilitySection()
+            locationSection()
+        }
     }
 
     @objc private func didTouchCloseButton() {
@@ -75,17 +75,20 @@ final class VaccinationController: CVTableViewController {
     }
 
     // MARK: - Section -
-    private func eligibilitySectionRows() -> [CVRow] {
-        [elibilitySectionRow(), eligibilityRow()]
+    private func eligibilitySection() -> CVSection {
+        CVSection(title: "vaccinationController.eligibility.title".localized, rows: [eligibilityRow()])
     }
 
-    private func locationSectionRows() -> [CVRow] {
-        var rows: [CVRow] = [locationSectionRow()]
+    private func locationSection() -> CVSection {
+        let sectionTitle: String = "vaccinationController.vaccinationLocation.section.title".localized
+        var rows: [CVRow] = []
         if KeyFiguresManager.shared.currentPostalCode == nil {
             rows.append(explanationRow())
         }
         rows.append(postalCodeRow(postalCode: KeyFiguresManager.shared.currentPostalCode))
-        guard KeyFiguresManager.shared.currentPostalCode != nil else { return rows }
+        guard KeyFiguresManager.shared.currentPostalCode != nil else {
+            return CVSection(title: sectionTitle.localized, rows: rows)
+        }
         if let vaccinationCenters = VaccinationCenterManager.shared.vaccinationCentersToDisplay {
             let vaccinationCenterRows: [CVRow] = vaccinationCenters.map { vaccinationCenter in
                 vaccinationCenterRow(vaccinationCenter: vaccinationCenter)
@@ -101,46 +104,28 @@ final class VaccinationController: CVTableViewController {
         }
         rows.append(footerWithPostalCodeRow())
         rows.append(webVaccinationRow())
-        return rows
+        return CVSection(title: sectionTitle, rows: rows)
     }
 
-    //MARK: - Row -
-    private func elibilitySectionRow() -> CVRow {
-        CVRow(title: "vaccinationController.eligibility.title".localized,
-              xibName: .textCell,
-              theme: CVRow.Theme(topInset: 30.0,
-                                 bottomInset: 10.0,
-                                 textAlignment: .natural,
-                                 titleFont: { Appearance.Cell.Text.headTitleFont }))
-    }
-
+    // MARK: - Row -
     private func eligibilityRow() -> CVRow {
         CVRow(subtitle: "vaccinationController.eligibility.subtitle".localized,
               buttonTitle: "vaccinationController.eligibility.buttonTitle".localized,
               xibName: .paragraphCell,
               theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                 topInset: 10.0,
-                                 bottomInset: 10.0,
+                                 topInset: Appearance.Cell.Inset.small,
+                                 bottomInset: Appearance.Cell.Inset.small,
                                  textAlignment: .left),
               selectionAction: {
                 URL(string: "vaccinationController.eligibility.url".localized)?.openInSafari()
               })
     }
-
-    private func locationSectionRow() -> CVRow {
-        CVRow(title: "vaccinationController.vaccinationLocation.section.title".localized,
-              xibName: .textCell,
-              theme: CVRow.Theme(topInset: 30.0,
-                                 bottomInset: 10.0,
-                                 textAlignment: .natural,
-                                 titleFont: { Appearance.Cell.Text.headTitleFont }))
-    }
     
     private func explanationRow() -> CVRow {
         CVRow(subtitle: String(format: "vaccinationController.vaccinationLocation.explanation".localized, ParametersManager.shared.vaccinationCentersCount),
               xibName: .textCell,
-              theme: CVRow.Theme(topInset: 10.0,
-                                 bottomInset: 10.0,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                 bottomInset: Appearance.Cell.Inset.small,
                                  textAlignment: .natural))
     }
 
@@ -160,8 +145,8 @@ final class VaccinationController: CVTableViewController {
                      image: Asset.Images.location.image,
                      xibName: postalCode == nil ? .standardCardCell : .standardCardHorizontalCell,
                      theme:  CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                         topInset: 10.0,
-                                         bottomInset: Appearance.Cell.leftMargin,
+                                         topInset: Appearance.Cell.Inset.small,
+                                         bottomInset: Appearance.Cell.Inset.normal,
                                          textAlignment: .natural,
                                          subtitleFont: { Appearance.Cell.Text.standardFont },
                                          subtitleColor: Appearance.Cell.Text.headerTitleColor,
@@ -176,8 +161,8 @@ final class VaccinationController: CVTableViewController {
                                          image: Asset.Images.refresh.image,
                                          xibName: .standardCardCell,
                                          theme:  CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                             topInset: 10.0,
-                                                             bottomInset: Appearance.Cell.leftMargin,
+                                                             topInset: Appearance.Cell.Inset.small,
+                                                             bottomInset: Appearance.Cell.Inset.normal,
                                                              textAlignment: .natural,
                                                              titleFont: { Appearance.Cell.Text.standardFont },
                                                              titleColor: Appearance.Cell.Text.headerTitleColor,
@@ -193,8 +178,8 @@ final class VaccinationController: CVTableViewController {
               subtitle: vaccinationCenter.modalities,
               xibName: .vaccinationCenterCell,
               theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                 topInset: 0.0,
-                                 bottomInset: Appearance.Cell.leftMargin,
+                                 topInset: .zero,
+                                 bottomInset: Appearance.Cell.Inset.normal,
                                  textAlignment: .natural,
                                  subtitleColor: Appearance.Cell.Text.headerTitleColor),
               associatedValue: vaccinationCenter,
@@ -206,16 +191,16 @@ final class VaccinationController: CVTableViewController {
     private func noVaccinationCenterFoundRow() -> CVRow {
         CVRow(subtitle: "vaccinationController.vaccinationLocation.vaccinationCenterNotFound".localized,
               xibName: .textCell,
-              theme:  CVRow.Theme(topInset: 10.0,
-                                  bottomInset: 10.0,
+              theme:  CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                  bottomInset: Appearance.Cell.Inset.small,
                                   textAlignment: .natural))
     }
 
     private func webVaccinationRow() -> CVRow {
         CVRow(buttonTitle: "vaccinationController.vaccinationLocation.buttonTitle".localized,
               xibName: .linkButtonCell,
-              theme:  CVRow.Theme(topInset: 0.0,
-                                  bottomInset: 20.0),
+              theme:  CVRow.Theme(topInset: .zero,
+                                  bottomInset: Appearance.Cell.Inset.medium),
               secondarySelectionAction: { [weak self] in
                 self?.didTouchWebVaccination()
               })
@@ -224,8 +209,8 @@ final class VaccinationController: CVTableViewController {
     private func footerWithPostalCodeRow() -> CVRow {
         CVRow(title: "vaccinationController.vaccinationLocation.footer".localized,
               xibName: .textCell,
-              theme:  CVRow.Theme(topInset: 10.0,
-                                  bottomInset: 8.0,
+              theme:  CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                  bottomInset: Appearance.Cell.Inset.small,
                                   textAlignment: .natural,
                                   titleFont: { Appearance.Cell.Text.footerFont },
                                   titleColor: Appearance.Cell.Text.captionTitleColor))

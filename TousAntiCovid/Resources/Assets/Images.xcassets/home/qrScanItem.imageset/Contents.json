@@ -1,19 +1,8 @@
 {
   "images" : [
     {
-      "filename" : "qrScanItem.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "qrScanItem@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "qrScanItem@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "filename" : "QRScan.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

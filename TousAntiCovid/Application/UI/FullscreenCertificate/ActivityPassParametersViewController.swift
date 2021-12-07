@@ -15,6 +15,8 @@ final class ActivityPassParametersViewController: CVTableViewController {
     let didTouchConfirm: () -> ()
     let didTouchReadCGU: () -> ()
     let dismissBlock: () -> ()
+    
+    @objc var preferredHeightInBottomSheet: CGFloat { tableView.contentSize.height + (UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0) }
 
     @UserDefault(key: .activityPassNotificationActivated)
     private var activityPassNotificationActivated: Bool = false
@@ -33,15 +35,22 @@ final class ActivityPassParametersViewController: CVTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         initUI()
-        reloadUI()
-        if #available(iOS 13.0, *) { navigationController?.overrideUserInterfaceStyle = .light }
+        if #available(iOS 13.0, *) { overrideUserInterfaceStyle = .light }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reloadUI { [weak self] in
+            self?.bottomSheetController?.preferredHeightInBottomSheetDidUpdate()
+        }
     }
 
     private func initUI() {
         title = "activityPassParametersController.title".localized
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
+        if #available(iOS 13.0, *) {
+            addHeaderView(height: bottomSheetController?.topInset ?? 0.0)
+        }
+        addFooterView(height: 8.0)
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
         let barButtonItem: UIBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
@@ -53,13 +62,15 @@ final class ActivityPassParametersViewController: CVTableViewController {
         dismissBlock()
     }
 
-    override func createRows() -> [CVRow] {
-        makeRows {
-            headerImageRow()
-            explanationsRow()
-            confirmationQuestionRow()
-            confirmRow()
-            cguRow()
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                headerImageRow()
+                explanationsRow()
+                confirmationQuestionRow()
+                confirmRow()
+                cguRow()
+            }
         }
     }
 
@@ -78,32 +89,32 @@ extension ActivityPassParametersViewController {
         let imageHeight: CGFloat = 36.0
         return CVRow(image: Asset.Images.logoPS.image,
                      xibName: .imageCell,
-                     theme: CVRow.Theme(topInset: 30.0,
-                                        bottomInset: 0.0,
+                     theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                        bottomInset: .zero,
                                         imageSize: CGSize(width: imageHeight * ratio, height: imageHeight)))
     }
 
     private func explanationsRow() -> CVRow {
         CVRow(title: "activityPassParametersController.explanations".localized,
               xibName: .textCell,
-              theme: CVRow.Theme(topInset: 30.0,
-                                 bottomInset: 0.0,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
+                                 bottomInset: .zero,
                                  titleFont: { Appearance.Cell.Text.footerFont }))
     }
 
     private func confirmationQuestionRow() -> CVRow {
         CVRow(title: "activityPassParametersController.doYouConfirm".localized,
               xibName: .textCell,
-              theme: CVRow.Theme(topInset: 60.0,
-                                 bottomInset: 0.0,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large * 2,
+                                 bottomInset: .zero,
                                  titleFont: { Appearance.Cell.Text.titleFont }))
     }
 
     private func confirmRow() -> CVRow {
         CVRow(title: "common.confirm".localized,
               xibName: .buttonCell,
-              theme: CVRow.Theme(topInset: 30.0,
-                                 bottomInset: 0.0,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
+                                 bottomInset: .zero,
                                  buttonStyle: .primary),
               selectionAction: { [weak self] in
                 self?.didTouchConfirm()
@@ -113,8 +124,8 @@ extension ActivityPassParametersViewController {
     private func cguRow() -> CVRow {
         CVRow(title: "activityPassParametersController.button.readCGU".localized,
               xibName: .buttonCell,
-              theme: CVRow.Theme(topInset: 10.0,
-                                 bottomInset: 0.0,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                 bottomInset: .zero,
                                  buttonStyle: .tertiary),
               selectionAction: { [weak self] in
                 self?.didTouchReadCGU()
@@ -126,12 +137,12 @@ extension ActivityPassParametersViewController {
               isOn: isOn,
               xibName: .standardSwitchCell,
               theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                 topInset: 10.0,
-                                 bottomInset: 10.0,
+                                 topInset: Appearance.Cell.Inset.small,
+                                 bottomInset: Appearance.Cell.Inset.small,
                                  textAlignment: .left,
                                  titleFont: { Appearance.Cell.Text.standardFont },
-                                 separatorLeftInset: 0.0,
-                                 separatorRightInset: 0.0),
+                                 separatorLeftInset: .zero,
+                                 separatorRightInset: .zero),
               valueChanged: { value in
                 guard let isOn = value as? Bool else { return }
                 handler(isOn)

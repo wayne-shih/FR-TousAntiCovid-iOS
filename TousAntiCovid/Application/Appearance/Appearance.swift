@@ -115,6 +115,28 @@ enum Appearance {
         static var selectedFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .semibold(size: 14.0)) }
         static var normalFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .medium(size: 13.0)) }
     }
+
+    enum Header {
+        static let leftMargin: CGFloat = 16.0
+        static let rightMargin: CGFloat = 16.0
+        static let topMargin: CGFloat = 30.0
+        static let bottomMargin: CGFloat = 10.0
+    }
+    
+    enum Footer {
+        static let topMargin: CGFloat = 4.0
+    }
+
+    enum TableView {
+        enum Header {
+            static let standardHeight: CGFloat = 0.0
+            static let mediumHeight: CGFloat = 16.0
+            static let largeHeight: CGFloat = 20.0
+        }
+        enum Footer {
+            static let standardHeight: CGFloat = 20.0
+        }
+    }
     
     enum Cell {
         
@@ -122,6 +144,11 @@ enum Appearance {
             static let stepBackgroundColor: UIColor = Asset.Colors.tint.color
             static var stepFont: UIFont { .medium(size: 28.0) }
             static let stepColor: UIColor = Asset.Colors.buttonLabel.color
+        }
+        
+        enum Wallet {
+            static let separatorColor: UIColor = Asset.Colors.lightSeparator.color
+            static let headerTextColor: UIColor = Asset.Colors.walletCellHeader.color
         }
         
         enum Isolation {
@@ -187,6 +214,8 @@ enum Appearance {
         enum Image {
             static let tintColor: UIColor = Asset.Colors.tint.color
             static let size: CGSize = CGSize(width: 24.0, height: 24.0)
+            static let mediumSize: CGSize = CGSize(width: 36.0, height: 36.0)
+            static let largeSize: CGSize = CGSize(width: 64.0, height: 64.0)
             
             static let defaultRatio: CGFloat = 375.0 / 210.0
             static let onboardingControllerRatio: CGFloat = 375.0 / 288.0
@@ -202,6 +231,13 @@ enum Appearance {
         static let leftMargin: CGFloat = 16.0
         static let rightMargin: CGFloat = 16.0
         
+        enum Inset {
+            static let small: CGFloat = 10.0
+            static let normal: CGFloat = 16.0
+            static let medium: CGFloat = 20.0
+            static let large: CGFloat = 32.0
+            static let extraLarge: CGFloat = 40.0
+        }
     }
     
     enum BottomMessage {

@@ -20,6 +20,8 @@ final class StackLogger {
         ------------------------------
         📦 APP VERSION: \(UIApplication.shared.marketingVersion) (\(UIApplication.shared.buildNumber))
         📱 iOS VERSION: \(UIDevice.current.systemName) \(UIDevice.current.systemVersion)
+        💾 STORAGE Important available: \(FileManager.default.importantAvailableSpaceFormatted)/\(FileManager.default.totalSpaceFormatted)
+        💾 STORAGE Opportunistic available: \(FileManager.default.opportunisticAvailableSpaceFormatted)/\(FileManager.default.totalSpaceFormatted)
         💬 MESSAGE: \(message)
         ⚙️ SYMBOLS:
         \(symbols)
@@ -40,12 +42,14 @@ final class StackLogger {
         ------------------------------
         📦 APP VERSION: \(UIApplication.shared.marketingVersion) (\(UIApplication.shared.buildNumber))
         📱 iOS VERSION: \(UIDevice.current.systemName) \(UIDevice.current.systemVersion)
+        💾 STORAGE Important available: \(FileManager.default.importantAvailableSpaceFormatted)/\(FileManager.default.totalSpaceFormatted)
+        💾 STORAGE Opportunistic available: \(FileManager.default.opportunisticAvailableSpaceFormatted)/\(FileManager.default.totalSpaceFormatted)
         👤 NAME: \(name)
         💬 REASON: \(reason)
         ⚙️ SYMBOLS:
         \(symbols)
         ------------------------------
-
+        
         """
         writeLogToFile(log)
     }

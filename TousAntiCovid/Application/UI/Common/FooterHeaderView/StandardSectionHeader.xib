@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina3_5" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" userLabel="StandardSectionHeader" customClass="CVHeaderFooterSectionView" customModule="TAC_Prod_Plus" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="eLy-1a-9y1">
+                    <rect key="frame" x="20" y="0.0" width="280" height="480"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oRi-AG-Aqf">
+                            <rect key="frame" x="0.0" y="0.0" width="280" height="17"/>
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="999" verticalCompressionResistancePriority="1000" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Rtq-Sr-fhg">
+                            <rect key="frame" x="0.0" y="25" width="280" height="455"/>
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="eLy-1a-9y1" secondAttribute="bottom" id="JBq-io-tGA"/>
+                <constraint firstItem="eLy-1a-9y1" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="S5S-I5-Qe2"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="eLy-1a-9y1" secondAttribute="trailing" constant="20" id="hlm-8q-b1d"/>
+                <constraint firstItem="eLy-1a-9y1" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="yBM-yp-W2o"/>
+            </constraints>
+            <connections>
+                <outlet property="bottomConstraint" destination="JBq-io-tGA" id="il5-p5-ymh"/>
+                <outlet property="cvSubtitleLabel" destination="Rtq-Sr-fhg" id="AWR-VZ-cEe"/>
+                <outlet property="cvTitleLabel" destination="oRi-AG-Aqf" id="2lE-Fs-euh"/>
+                <outlet property="leadingConstraint" destination="yBM-yp-W2o" id="1Bj-SH-4I0"/>
+                <outlet property="topConstraint" destination="S5S-I5-Qe2" id="JnC-l6-wAc"/>
+                <outlet property="trailingConstraint" destination="hlm-8q-b1d" id="OW8-ii-IES"/>
+            </connections>
+            <point key="canvasLocation" x="-707" y="180"/>
+        </view>
+    </objects>
+</document>

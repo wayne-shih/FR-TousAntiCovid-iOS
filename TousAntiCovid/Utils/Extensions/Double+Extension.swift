@@ -26,4 +26,5 @@ extension Double {
         return newValue
     }
     
+    func secondsToDays() -> Int { Int(self/24/3600) }
 }

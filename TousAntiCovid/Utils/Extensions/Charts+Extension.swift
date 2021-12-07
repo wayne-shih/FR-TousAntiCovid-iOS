@@ -23,6 +23,143 @@ extension ChartViewBase {
             return BarChartView.createBarChart(chartDatas: chartDatas, allowInteractions: allowInteractions)
         }
     }
+    
+    static func create(chartData1: KeyFigureChartData, chartData2: KeyFigureChartData, sameOrdinate: Bool,  allowInteractions: Bool) -> ChartViewBase {
+        if chartData1.chartKind == .bars && chartData2.chartKind == .bars {
+            return BarLineChartViewBase.createBarsChart(chartData1: chartData1, chartData2: chartData2, sameOrdinate: sameOrdinate, allowInteractions: allowInteractions)
+        } else {
+            return BarLineChartViewBase.createCombinedChart(chartData1: chartData1, chartData2: chartData2, sameOrdinate: sameOrdinate, allowInteractions: allowInteractions)
+        }
+    }
+
+}
+
+// MARK: - Combined chart -
+private extension BarLineChartViewBase {
+    
+    static func createBarsChart(chartData1: KeyFigureChartData, chartData2: KeyFigureChartData, sameOrdinate: Bool, allowInteractions: Bool) -> BarChartView {
+        let entries1: [ChartDataEntry] = chartData1.series.map { BarChartDataEntry(x: $0.date, y: $0.value, data: $0.date) }
+        let dataSet1: BarChartDataSet = BarChartDataSet(entries: entries1)
+        dataSet1.setupStyle(color: chartData1.legend.color, entriesCount: entries1.count)
+        
+        let entries2: [ChartDataEntry] = chartData2.series.map { BarChartDataEntry(x: $0.date, y: $0.value, data: $0.date) }
+        let dataSet2: BarChartDataSet = BarChartDataSet(entries: entries2)
+        dataSet2.setupStyle(color: chartData2.legend.color, entriesCount: entries2.count)
+        if !sameOrdinate {
+            dataSet2.axisDependency = .right
+        }
+        
+        let groupSpace = 0.08
+        let barSpace = 0.03
+        let barWidth = 0.2
+        let groupsCount: Int = min(entries1.count, entries2.count)
+        let xStart: Double = max(entries1.first?.x ?? 0.0, entries2.first?.x ?? 0.0)
+        
+        let barChartView: BarChartView = BarChartView()
+        let data: BarChartData = BarChartData(dataSets: [dataSet1, dataSet2])
+        data.barWidth = barWidth
+        data.groupBars(fromX: xStart, groupSpace: groupSpace, barSpace: barSpace)
+        barChartView.data = data
+        
+        barChartView.xAxis.axisMinimum = xStart
+        barChartView.xAxis.axisMaximum = xStart + data.groupWidth(groupSpace: groupSpace, barSpace: barSpace) * Double(groupsCount)
+        
+        barChartView.setupFor(chartData1: chartData1, chartData2: chartData2, sameOrdinate: sameOrdinate, allowInteractions: allowInteractions)
+        barChartView.fitBars = true
+        
+        return barChartView
+    }
+    
+    static func createCombinedChart(chartData1: KeyFigureChartData, chartData2: KeyFigureChartData, sameOrdinate: Bool, allowInteractions: Bool) -> CombinedChartView {
+        let entries1: [ChartDataEntry] = chartData1.chartKind == .line ? chartData1.series.map { ChartDataEntry(x: $0.date, y: $0.value, data: $0.date) } : chartData1.series.map { BarChartDataEntry(x: $0.date, y: $0.value, data: $0.date) }
+        let dataSet1: ChartDataSet = chartData1.chartKind == .line ? LineChartDataSet(entries: entries1) : BarChartDataSet(entries: entries1)
+        dataSet1.setupStyle(color: chartData1.legend.color, entriesCount: entries1.count)
+        
+        let entries2: [ChartDataEntry] = chartData2.chartKind == .line ? chartData2.series.map { ChartDataEntry(x: $0.date, y: $0.value, data: $0.date) } : chartData2.series.map { BarChartDataEntry(x: $0.date, y: $0.value, data: $0.date) }
+        let dataSet2: ChartDataSet = chartData2.chartKind == .line ? LineChartDataSet(entries: entries2) : BarChartDataSet(entries: entries2)
+        dataSet2.setupStyle(color: chartData2.legend.color, entriesCount: entries2.count)
+        if !sameOrdinate {
+            dataSet2.axisDependency = .right
+        }
+        
+        let chartView: CombinedChartView = CombinedChartView()
+        let data: CombinedChartData = CombinedChartData()
+        
+        let lineDataSets: [LineChartDataSet] = [dataSet1, dataSet2].compactMap { $0 as? LineChartDataSet }
+        if !lineDataSets.isEmpty {
+            data.lineData = LineChartData(dataSets: lineDataSets)
+        }
+        
+        let barDataSets: [BarChartDataSet] = [dataSet1, dataSet2].compactMap { $0 as? BarChartDataSet }
+        if !barDataSets.isEmpty {
+            let barData: BarChartData = BarChartData(dataSets: barDataSets)
+            barData.setupStyle(entriesCount: barDataSets.first?.entries.count ?? 0)
+            data.barData = barData
+            chartView.xAxis.spaceMin = 12*3600
+            chartView.xAxis.spaceMax = 12*3600
+        }
+        
+        chartView.setupFor(chartData1: chartData1, chartData2: chartData2, sameOrdinate: sameOrdinate, allowInteractions: allowInteractions)
+        chartView.data = data
+        
+        return chartView
+    }
+    
+    func setupFor(chartData1: KeyFigureChartData, chartData2: KeyFigureChartData, sameOrdinate: Bool, allowInteractions: Bool) {
+        setupStyle(allowInteractions: allowInteractions, withRightAxis: !sameOrdinate)
+        xAxis.setupStyle()
+        xAxis.valueFormatter = ChartsDateFormatter()
+        
+        let minValue1: Double = chartData1.minValue
+        let maxValue1: Double = chartData1.maxValue
+        let minValue2: Double = chartData2.minValue
+        let maxValue2: Double = chartData2.maxValue
+        
+        leftAxis.setupStyle(color: chartData1.legend.color)
+        leftAxis.valueFormatter = ChartsValueFormatter()
+        rightAxis.setupStyle(color: chartData2.legend.color)
+        rightAxis.valueFormatter = ChartsValueFormatter()
+        
+        if sameOrdinate {
+            leftAxis.setupStyle(color: .gray)
+            leftAxis.axisMinimum = min(minValue1, minValue2)
+            leftAxis.axisMaximum = max(0.0, max(maxValue1 + (maxValue1 - minValue1) * 0.1, maxValue2 + (maxValue2 - minValue2) * 0.1))
+        } else {
+            leftAxis.axisMinimum = 0.0
+            rightAxis.axisMinimum = 0.0
+            leftAxis.axisMaximum = max(0.0, maxValue1 + (maxValue1 - minValue1) * 0.1)
+            rightAxis.axisMaximum = max(0.0, maxValue2 + (maxValue2 - minValue2) * 0.1)
+        }
+        
+        let yLeftAxisRenderer: YAxisCustomRenderer = YAxisCustomRenderer(
+            viewPortHandler: viewPortHandler,
+            yAxis: leftAxis,
+            transformer: getTransformer(forAxis: .left)
+        )
+        leftYAxisRenderer = yLeftAxisRenderer
+        
+        let yRightAxisRenderer: YAxisCustomRenderer = YAxisCustomRenderer(
+            viewPortHandler: viewPortHandler,
+            yAxis: rightAxis,
+            transformer: getTransformer(forAxis: .right)
+        )
+        rightYAxisRenderer = yRightAxisRenderer
+        
+        if allowInteractions { marker = MarkerView(chartView: self) }
+    }
+
+    func setupStyle(allowInteractions: Bool = false, withRightAxis: Bool = false) {
+        legend.enabled = false
+        chartDescription?.enabled = false
+        isUserInteractionEnabled = allowInteractions
+        extraBottomOffset = 16.0
+        rightAxis.enabled = withRightAxis
+        pinchZoomEnabled = false
+        dragEnabled = allowInteractions
+        doubleTapToZoomEnabled = false
+        highlightPerTapEnabled = allowInteractions
+        scaleYEnabled = false
+    }
 
 }
 
@@ -46,7 +183,7 @@ private extension LineChartView {
         let maxTodayValue: Double = chartDatas.max { $0.maxValue < $1.maxValue }?.maxValue ?? 0.0
 
         lineChartView.leftAxis.axisMinimum = max(0.0, minTodayValue - (maxTodayValue - minTodayValue) * 0.1)
-
+        
         lineChartView.xAxis.setupStyle()
         lineChartView.xAxis.valueFormatter = ChartsDateFormatter()
 
@@ -81,6 +218,10 @@ private extension LineChartView {
 
 }
 
+private extension ChartDataSet {
+    @objc func setupStyle(color: UIColor, entriesCount: Int) { }
+}
+
 private extension LineChartDataSet {
 
     var defaultCircleWidth: CGFloat { 4.0 }
@@ -88,7 +229,7 @@ private extension LineChartDataSet {
     var circleResizingThreshold: Int { 25 }
     var circleWidthFactorFromLineWidth: CGFloat { 2.0 }
 
-    func setupStyle(color: UIColor, entriesCount: Int) {
+    @objc override func setupStyle(color: UIColor, entriesCount: Int) {
         drawValuesEnabled = false
         circleRadius = ((defaultCircleWidth * CGFloat(circleResizingThreshold)) / CGFloat(entriesCount)).clamped(to: minCircleWidth...defaultCircleWidth)
         lineWidth = circleRadius / circleWidthFactorFromLineWidth
@@ -159,7 +300,7 @@ private extension BarChartView {
 
 private extension BarChartDataSet {
 
-    func setupStyle(color: UIColor, entriesCount: Int) {
+    @objc override func setupStyle(color: UIColor, entriesCount: Int) {
         drawValuesEnabled = false
         colors = [color]
     }
@@ -180,14 +321,14 @@ private extension BarChartData {
 // MARK: - Axis -
 private extension YAxis {
 
-    func setupStyle() {
+    func setupStyle(color: UIColor? = nil) {
         drawAxisLineEnabled = false
         drawLabelsEnabled = true
         drawGridLinesEnabled = true
         gridColor = .lightGray
         setLabelCount(3, force: true)
         labelFont = Appearance.Cell.Text.subtitleFont
-        labelTextColor = .gray
+        labelTextColor = color ?? .gray
         drawTopYLabelEntryEnabled = true
         drawZeroLineEnabled = true
     }

@@ -9,130 +9,42 @@
 //
 
 import UIKit
-import ServerSDK
+import StorageSDK
 
-protocol DccBlacklistChangesObserver: AnyObject {
-
-    func dccBlacklistDidUpdate()
-
-}
-
-final class DccBlacklistObserverWrapper: NSObject {
-
-    weak var observer: DccBlacklistChangesObserver?
-
-    init(observer: DccBlacklistChangesObserver) {
-        self.observer = observer
-    }
-
-}
-
-final class DccBlacklistManager {
-
+final class DccBlacklistManager: BlacklistManager {
+    
     static let shared: DccBlacklistManager = DccBlacklistManager()
 
-    private var hashes: [String] = []
-    private var observers: [DccBlacklistObserverWrapper] = []
-
-    @UserDefault(key: .lastInitialDccBlacklistBuildNumber)
-    private var lastInitialDccBlacklistBuildNumber: String? = nil
-
-    func start() {
-        writeInitialFileIfNeeded()
-        loadLocalCertList()
-        addObserver()
+    weak var storageManager: StorageManager?
+    var baseUrl: String { DccBlacklistConstant.baseUrl }
+    var filename: String { DccBlacklistConstant.filename }
+    
+    @UserDefault(key: .lastDccBlacklistVersionNumber)
+    var lastBlacklistVersionNumber: Int = 0
+    
+    deinit {
+        removeNotifications()
+    }
+    
+    func start(storageManager: StorageManager) {
+        self.storageManager = storageManager
+        addNotifications()
     }
 
     func isBlacklisted(certificate: WalletCertificate) -> Bool {
         guard let cert = certificate as? EuropeanCertificate else { return false }
-        return hashes.contains(cert.uniqueHash)
+        return storageManager?.isBlacklistedDcc(cert.uniqueHash) ?? false
     }
-
-    private func addObserver() {
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
-    }
-
-    @objc private func appDidBecomeActive() {
-        fetchCertList()
-    }
-
 }
 
-// MARK: - All fetching methods -
+// MARK: - Realm Persistence -
 extension DccBlacklistManager {
-
-    private func fetchCertList() {
-        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTaskWithETag(with: DccBlacklistConstant.certListUrl) { data, response, error in
-            guard let data = data else { return }
-            do {
-                self.hashes = try JSONDecoder().decode([String].self, from: data)
-                try data.write(to: self.localCertListUrl())
-            } catch {}
+    func updateBlacklist(addedOrUpdated: [String], removed: [String]) {
+        if !removed.isEmpty {
+            storageManager?.deleteDccsFromBlacklist(removed)
         }
-        dataTask.resume()
-    }
-
-}
-
-// MARK: - Local files management -
-extension DccBlacklistManager {
-
-    private func initialFileUrl() -> URL {
-        Bundle.main.url(forResource: DccBlacklistConstant.filename, withExtension: nil)!
-    }
-
-    private func localCertListUrl() -> URL {
-        let directoryUrl: URL = self.createWorkingDirectoryIfNeeded()
-        return directoryUrl.appendingPathComponent(DccBlacklistConstant.filename)
-    }
-
-    private func loadLocalCertList() {
-        let localUrl: URL = localCertListUrl()
-        guard FileManager.default.fileExists(atPath: localUrl.path) else { return }
-        guard let data = try? Data(contentsOf: localUrl) else { return }
-        hashes = (try? JSONDecoder().decode([String].self, from: data)) ?? []
-    }
-
-    private func createWorkingDirectoryIfNeeded() -> URL {
-        let directoryUrl: URL = FileManager.libraryDirectory().appendingPathComponent("CertList")
-        if !FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: nil) {
-            try? FileManager.default.createDirectory(at: directoryUrl, withIntermediateDirectories: false, attributes: nil)
-        }
-        return directoryUrl
-    }
-
-    private func writeInitialFileIfNeeded() {
-        let fileUrl: URL = initialFileUrl()
-        let destinationFileUrl: URL = createWorkingDirectoryIfNeeded().appendingPathComponent(fileUrl.lastPathComponent)
-        let currentBuildNumber: String = UIApplication.shared.buildNumber
-        let isNewAppVersion: Bool = lastInitialDccBlacklistBuildNumber != currentBuildNumber
-        if !FileManager.default.fileExists(atPath: destinationFileUrl.path) || isNewAppVersion {
-            try? FileManager.default.removeItem(at: destinationFileUrl)
-            try? FileManager.default.copyItem(at: fileUrl, to: destinationFileUrl)
-            lastInitialDccBlacklistBuildNumber = currentBuildNumber
+        if !addedOrUpdated.isEmpty {
+            storageManager?.updateDccBlacklist(addedOrUpdated)
         }
     }
-
-}
-
-extension DccBlacklistManager {
-
-    func addObserver(_ observer: DccBlacklistChangesObserver) {
-        guard observerWrapper(for: observer) == nil else { return }
-        observers.append(DccBlacklistObserverWrapper(observer: observer))
-    }
-
-    func removeObserver(_ observer: DccBlacklistChangesObserver) {
-        guard let wrapper = observerWrapper(for: observer), let index = observers.firstIndex(of: wrapper) else { return }
-        observers.remove(at: index)
-    }
-
-    private func observerWrapper(for observer: DccBlacklistChangesObserver) -> DccBlacklistObserverWrapper? {
-        observers.first { $0.observer === observer }
-    }
-
-    private func notifyObservers() {
-        observers.forEach { $0.observer?.dccBlacklistDidUpdate() }
-    }
-
 }

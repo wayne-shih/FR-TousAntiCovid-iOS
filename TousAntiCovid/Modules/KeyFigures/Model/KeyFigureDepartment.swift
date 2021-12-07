@@ -22,7 +22,7 @@ struct KeyFigureDepartment: Codable {
     var ascendingSeries: [KeyFigureSeriesItem]? { series?.sorted { $0.date < $1.date } }
     
     var formattedDate: String {
-        Date(timeIntervalSince1970: Double(extractDate)).relativelyFormattedDay(prefixStringKey: "keyFigures.update")
+        Date(timeIntervalSince1970: Double(extractDate)).relativelyFormattedDay(prefixStringKey: "keyFigures.update", todayPrefixStringKey: "keyFigures.update.today", yesterdayPrefixStringKey: "keyFigures.update.today")
     }
     
     enum CodingKeys: String, CodingKey {

@@ -11,7 +11,7 @@
 import Foundation
 
 enum KeyFiguresConstant {
-
     static let baseUrl: URL = URL(string: "https://\(Constant.Server.staticResourcesRootDomain)/infos/v2")!
+    
     
 }

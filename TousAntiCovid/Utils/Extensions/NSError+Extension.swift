@@ -11,9 +11,16 @@
 import UIKit
 
 extension NSError {
-    
     static func localizedError(message: String, code: Int) -> Error {
         return NSError(domain: UIApplication.shared.bundleIdentifier, code: code, userInfo: [NSLocalizedDescriptionKey: message])
     }
     
+    var isNetworkConnectionError: Bool {
+        [URLError.notConnectedToInternet.rawValue,
+         URLError.dataNotAllowed.rawValue].contains(code)
+    }
+}
+
+extension Error {
+    var isNetworkConnectionError: Bool { (self as NSError).isNetworkConnectionError }
 }

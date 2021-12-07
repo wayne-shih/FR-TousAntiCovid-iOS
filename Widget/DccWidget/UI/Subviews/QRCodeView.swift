@@ -34,6 +34,7 @@ struct QRCodeView: View {
         }
         .background(Color.white)
         .foregroundColor(.black)
+        .unredacted()
     }
 
     @ViewBuilder

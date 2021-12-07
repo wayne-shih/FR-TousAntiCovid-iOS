@@ -23,6 +23,7 @@ struct KeyFigureChartData {
     let limitLineValue: Double?
     let limitLineLabel: String?
     let chartKind: KeyFigure.ChartKind
+    let magnitude: UInt32
 
     var initialValue: Double { series.first?.value ?? 0.0 }
     var lastValue: Double { series.last?.value ?? 0.0 }
@@ -34,7 +35,8 @@ struct KeyFigureChartData {
          isAverage: Bool = false,
          limitLineValue: Double?,
          limitLineLabel: String?,
-         chartKind: KeyFigure.ChartKind) {
+         chartKind: KeyFigure.ChartKind,
+         magnitude: UInt32) {
         self.legend = legend
         self.series = series
         self.currentValueToDisplay = currentValueToDisplay
@@ -45,6 +47,15 @@ struct KeyFigureChartData {
         self.limitLineValue = limitLineValue
         self.limitLineLabel = limitLineLabel
         self.chartKind = chartKind
+        self.magnitude = magnitude
     }
 
+}
+
+extension Array where Element == KeyFigureChartData {
+    var haveSameMagnitude: Bool {
+        Dictionary(grouping: self) { keyFigure in
+            keyFigure.magnitude
+        }.keys.count == 1
+    }
 }

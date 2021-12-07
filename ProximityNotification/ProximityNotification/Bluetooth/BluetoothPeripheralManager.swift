@@ -62,9 +62,7 @@ class BluetoothPeripheralManager: NSObject, BluetoothPeripheralManagerProtocol {
         logger.info(message: "stop peripheral manager",
                     source: ProximityNotificationEvent.bluetoothPeripheralManagerStop.rawValue)
 
-        dispatchQueue.sync {
-            stopPeripheralManager()
-        }
+        stopPeripheralManager()
     }
     
     private func stopPeripheralManager() {

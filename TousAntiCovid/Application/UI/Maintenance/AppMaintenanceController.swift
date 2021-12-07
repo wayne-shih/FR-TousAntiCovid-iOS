@@ -42,64 +42,29 @@ final class AppMaintenanceController: CVTableViewController, MaintenanceControll
         reloadUI()
     }
 
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        let imageRow: CVRow = CVRow(image: Asset.Images.maintenance.image,
-                                    xibName: .onboardingImageCell,
-                                    theme: CVRow.Theme(topInset: 40.0,
-                                                       imageRatio: Appearance.Cell.Image.defaultRatio))
-        rows.append(imageRow)
-        let message: String = maintenanceInfo.localizedMessage ?? ""
-        let messageComponents: [String] = message.components(separatedBy: "\n")
-        let title: String = messageComponents[0]
-        let subtitle: String = message.replacingOccurrences(of: "\(title)\n", with: "")
-        let textRow: CVRow = CVRow(title: title,
-                                   subtitle: subtitle,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: 40.0))
-        rows.append(textRow)
-        
-        if let buttonTitle = maintenanceInfo.localizedButtonTitle, let buttonUrl = maintenanceInfo.localizedButtonUrl, maintenanceInfo.mode == .upgrade {
-            let buttonRow: CVRow = CVRow(title: buttonTitle,
-                                         xibName: .buttonCell,
-                                         theme: CVRow.Theme(topInset: 40.0,
-                                                            bottomInset: 0.0),
-                                         selectionAction: {
-                                            URL(string: buttonUrl)?.openInSafari()
-                                         })
-            rows.append(buttonRow)
-        } else {
-            let retryRow: CVRow = CVRow(title: "common.tryAgain".localized,
-                                        xibName: .buttonCell,
-                                        theme: CVRow.Theme(topInset: 40.0,
-                                                           bottomInset: 0.0),
-                                        selectionAction: { [weak self] in
-                                            self?.didTouchButton()
-                                        })
-            rows.append(retryRow)
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                imageRow()
+                textRow()
+                if let buttonTitle = maintenanceInfo.localizedButtonTitle, let buttonUrl = maintenanceInfo.localizedButtonUrl, maintenanceInfo.mode == .upgrade {
+                    buttonRow(title: buttonTitle, url: buttonUrl)
+                } else {
+                    retryRow()
+                }
+                laterRow()
+            }
         }
-        let laterRow: CVRow = CVRow(title: "appMaintenanceController.later.button.title".localized,
-                                    xibName: .buttonCell,
-                                    theme: CVRow.Theme(topInset: 0.0, buttonStyle: .quaternary),
-                                    selectionAction: { [weak self] in
-                                        self?.didTouchLater()
-                                    })
-        rows.append(laterRow)
-        return rows
     }
-    
+
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         navigationChildController?.scrollViewDidScroll(scrollView)
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: navigationChildController?.navigationBarHeight ?? 0.0))
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.separatorStyle = .none
-        tableView.backgroundColor = Appearance.Controller.backgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "common.about".localized, style: .plain, target: self, action: #selector(didTouchAboutButton))
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
     }
     
     @objc private func didTouchAboutButton() {
@@ -113,4 +78,54 @@ final class AppMaintenanceController: CVTableViewController, MaintenanceControll
         }
     }
 
+}
+
+// MARK: - Rows -
+private extension AppMaintenanceController {
+    func imageRow() -> CVRow { CVRow(image: Asset.Images.maintenance.image,
+                                     xibName: .onboardingImageCell,
+                                     theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                                        imageRatio: Appearance.Cell.Image.defaultRatio))
+    }
+
+    func textRow() -> CVRow {
+        let message: String = maintenanceInfo.localizedMessage ?? ""
+        let messageComponents: [String] = message.components(separatedBy: "\n")
+        let title: String = messageComponents[0]
+        let subtitle: String = message.replacingOccurrences(of: "\(title)\n", with: "")
+        return CVRow(title: title,
+                             subtitle: subtitle,
+                             xibName: .textCell,
+                             theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge))
+    }
+
+    func buttonRow(title: String, url: String) -> CVRow {
+        CVRow(title: title,
+              xibName: .buttonCell,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                 bottomInset: .zero),
+              selectionAction: {
+            URL(string: url)?.openInSafari()
+        })
+    }
+
+    func retryRow() -> CVRow {
+        CVRow(title: "common.tryAgain".localized,
+              xibName: .buttonCell,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                 bottomInset: .zero),
+              selectionAction: { [weak self] in
+            self?.didTouchButton()
+        })
+    }
+
+    func laterRow() -> CVRow {
+        CVRow(title: "appMaintenanceController.later.button.title".localized,
+              xibName: .buttonCell,
+              theme: CVRow.Theme(topInset: .zero,
+                                 buttonStyle: .quaternary),
+              selectionAction: { [weak self] in
+            self?.didTouchLater()
+        })
+    }
 }

@@ -99,12 +99,23 @@ extension UserDefault {
         case lastBuildNumberForRatingsAlert
         case didShowRatingsAlert
         case lastInitialBlacklist2dDocBuildNumber
+        case last2dDocBlacklistVersionNumber
         case lastInitialDccBlacklistBuildNumber
+        case lastDccBlacklistVersionNumber
         case isWatchAppInstalled
         case activityPassAutoRenewalActivated
         case activityPassNotificationActivated
         case hideStatusBar
         case notifClosedVersion
+        case lastStorageAlertDisplayBuildNumber
+        case wipedDatabaseAlertDisplayed
+        case autoBrightnessActivated
+        case smartWalletActivated
+        case smartWalletLastNotificationTimestamp
+        case smartWalletSentNotificationsIds
+        case comparedKeyFigures
+        case lastRemoteFileBuildNumber
+        
     }
     
 }

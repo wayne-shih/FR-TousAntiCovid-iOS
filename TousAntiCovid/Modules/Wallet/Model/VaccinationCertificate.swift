@@ -35,6 +35,7 @@ final class VaccinationCertificate: WalletCertificate {
         do {
             return try signatureString.decodeBase32(padded: signatureString.hasSuffix("="))
         } catch {
+            print(error)
             return nil
         }
     }
@@ -61,18 +62,17 @@ final class VaccinationCertificate: WalletCertificate {
     
     override var timestamp: Double { lastVaccinationDate?.timeIntervalSince1970 ?? 0.0 }
 
-
     override var pillTitles: [(text: String, backgroundColor: UIColor)] {
         ["wallet.proof.vaccinationCertificate.pillTitle".localized, vaccinationCycleState].compactMap {
             guard let string = $0 else { return nil }
             return (string, Appearance.tintColor)
         }
     }
+    override var title: String? { "wallet.proof.vaccinationCertificate.title".localized }
+    
     override var shortDescription: String? { [firstName, name].compactMap { $0 }.joined(separator: " ") }
     override var fullDescription: String? {
-        var text: String = "wallet.proof.vaccinationCertificate.description".localized
-        text = text.replacingOccurrences(of: "<\(FieldName.name.rawValue)>", with: firstName ?? "N/A")
-        text = text.replacingOccurrences(of: "<\(FieldName.firstName.rawValue)>", with: name ?? "N/A")
+        var text: String = "wallet.proof.vaccinationCertificate.infos".localized
         text = text.replacingOccurrences(of: "<\(FieldName.birthDate.rawValue)>", with: birthDateString ?? "N/A")
         text = text.replacingOccurrences(of: "<\(FieldName.diseaseName.rawValue)>", with: diseaseName ?? "N/A")
         text = text.replacingOccurrences(of: "<\(FieldName.prophylacticAgent.rawValue)>", with: prophylacticAgent ?? "N/A")

@@ -14,7 +14,7 @@ final class OnboardingPrivacyController: OnboardingController {
 
     override var bottomButtonTitle: String { "onboarding.privacyController.accept".localized }
     private var isFirstLoad: Bool = true
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.separatorStyle = .singleLine
@@ -51,55 +51,47 @@ final class OnboardingPrivacyController: OnboardingController {
         }
     }
     
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = isOpenedFromOnboarding ? [] : [blockSeparatorRow()]
+    override func createSections() -> [CVSection] {
+        var sections: [CVSection] = []
         if isOpenedFromOnboarding {
             let titleRow: CVRow = CVRow.titleRow(title: title) { [weak self] cell in
                 self?.navigationChildController?.updateLabel(titleLabel: cell.cvTitleLabel, containerView: cell)
             }
-            rows.append(titleRow)
+            sections.append(CVSection(rows: [titleRow]))
         }
-        let sections: [PrivacySection] = PrivacyManager.shared.privacySections
-        let sectionsRows: [CVRow] = sections.map { section in
+        let privacySections: [CVSection] = PrivacyManager.shared.privacySections.enumerated().map { index, section in
+            let links: [Link] = section.links ?? []
+            let linkRows: [CVRow] = links.enumerated().map { index, link in
+                CVRow(title: link.label,
+                      xibName: .standardCell,
+                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                         topInset: Appearance.Cell.Inset.normal,
+                                         bottomInset: Appearance.Cell.Inset.normal,
+                                         textAlignment: .natural,
+                                         titleFont: { Appearance.Cell.Text.standardFont },
+                                         titleColor: Appearance.tintColor,
+                                         separatorLeftInset: index + 1 == links.count ? nil : Appearance.Cell.leftMargin,
+                                         accessoryType: UITableViewCell.AccessoryType.none),
+                      selectionAction: {
+                    URL(string: link.url)?.openInSafari()
+                }, willDisplay: { cell in
+                    cell.cvTitleLabel?.accessibilityTraits = .button
+                })
+            }
             let sectionRow: CVRow = CVRow(title: section.section,
                                           subtitle: section.description,
                                           xibName: .textCell,
                                           theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                             topInset: Appearance.Cell.leftMargin,
-                                                             bottomInset: Appearance.Cell.leftMargin,
+                                                             topInset: Appearance.Cell.Inset.normal,
+                                                             bottomInset: Appearance.Cell.Inset.normal,
                                                              textAlignment: .natural,
                                                              titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
-                                                             separatorLeftInset: Appearance.Cell.leftMargin))
-            let linkRows: [CVRow] = section.links?.map { link in
-                CVRow(title: link.label,
-                      xibName: .standardCell,
-                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                         topInset: Appearance.Cell.leftMargin,
-                                         bottomInset: Appearance.Cell.leftMargin,
-                                         textAlignment: .natural,
-                                         titleFont: { Appearance.Cell.Text.standardFont },
-                                         titleColor: Appearance.tintColor,
-                                         separatorLeftInset: Appearance.Cell.leftMargin),
-                      selectionAction: {
-                        URL(string: link.url)?.openInSafari()
-                      }, willDisplay: { cell in
-                        cell.cvTitleLabel?.accessibilityTraits = .button
-                        cell.accessoryType = .none
-                })
-            } ?? []
-            return [sectionRow] + linkRows + [blockSeparatorRow()]
-        }.reduce([], +)
-        rows.append(contentsOf: sectionsRows)
-        rows.removeLast()
-        rows.append(.empty)
-        return rows
-    }
-    
-    private func blockSeparatorRow() -> CVRow {
-        var row: CVRow = .emptyFor(topInset: 15.0, bottomInset: 15.0)
-        row.theme.separatorLeftInset = 0.0
-        row.theme.separatorRightInset = 0.0
-        return row
+                                                             separatorLeftInset: links.isEmpty ? nil : Appearance.Cell.leftMargin))
+
+            return CVSection(header: index == 0 && isOpenedFromOnboarding ? nil : .groupedHeader, rows: [sectionRow] + linkRows)
+        }
+        sections.append(contentsOf: privacySections)
+        return sections
     }
 
 }

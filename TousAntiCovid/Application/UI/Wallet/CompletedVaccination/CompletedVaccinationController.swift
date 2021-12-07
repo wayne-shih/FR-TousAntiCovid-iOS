@@ -22,7 +22,13 @@ final class CompletedVaccinationController: CVTableViewController {
     private lazy var noWaitDoses: Int = { ParametersManager.shared.noWaitDoses.first(where: { $0.code.trimLowercased() == certificate.medicalProductCode?.trimLowercased() ?? "" })?.value ?? ParametersManager.shared.noWaitDoses.first(where: { $0.code.trimLowercased() == "default" })?.value ?? 0 }()
     private lazy var shouldShowNoWaitWarning: Bool = { noWaitDoses > 0 && certificate.dosesNumber ?? 0 >= noWaitDoses }()
     
-    private lazy var completedDate: Date = { Date(timeIntervalSince1970: certificate.timestamp + Double((daysAfterCompletion * 24 * 3600))) }()
+    private lazy var completedDate: Date = {
+        if (certificate.dosesTotal ?? 0) > 2 {
+            return Date(timeIntervalSince1970: certificate.timestamp)
+        } else {
+            return Date(timeIntervalSince1970: certificate.timestamp + Double((daysAfterCompletion * 24 * 3600)))
+        }
+    }()
     private lazy var isVaccineCompleted = { completedDate <= Date() || shouldShowNoWaitWarning }()
 
     init(certificate: EuropeanCertificate) {
@@ -46,8 +52,6 @@ final class CompletedVaccinationController: CVTableViewController {
     }
 
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -59,21 +63,27 @@ final class CompletedVaccinationController: CVTableViewController {
         dismiss(animated: true, completion: nil)
     }
 
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = infoRows()
-        if isVaccineCompleted {
-            rows.append(contentsOf: addToFavoriteRows())
-        } else {
-            rows.append(contentsOf: notifyMeRows())
-            rows.append(contentsOf: notifyMeAndFavoriteRows())
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                infoRows()
+                if isVaccineCompleted {
+                    addToFavoriteRows()
+                } else {
+                    notifyMeRows()
+                    notifyMeAndFavoriteRows()
+                }
+            }
         }
-        return rows
     }
+}
 
-    private func infoRows() -> [CVRow] {
+// MARK: - Rows -
+private extension CompletedVaccinationController {
+    func infoRows() -> [CVRow] {
         let headerImageRow: CVRow = CVRow(image: Asset.Images.thumbsup.image,
                                           xibName: .imageCell,
-                                          theme: CVRow.Theme(topInset: 20.0,
+                                          theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
                                                              imageTintColor: Appearance.tintColor,
                                                              imageSize: CGSize(width: 90, height: 90)))
         let title: String
@@ -91,89 +101,88 @@ final class CompletedVaccinationController: CVTableViewController {
                                            subtitle: message,
                                            xibName: .standardCardCell,
                                            theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                              topInset: 10.0,
-                                                              bottomInset: 0.0,
+                                                              topInset: Appearance.Cell.Inset.small,
+                                                              bottomInset: .zero,
                                                               textAlignment: .center,
                                                               titleFont: { Appearance.Cell.Text.headTitleFont }))
         return [headerImageRow, explanationsRow]
     }
 
-    private func notifyMeRows() -> [CVRow] {
+    func notifyMeRows() -> [CVRow] {
         let footer: String = String(format: "vaccineCompletionController.footer.notify".localized, completedDate.dayMonthFormatted())
         let notifyMeRow: CVRow = CVRow(title: String(format: "vaccineCompletionController.pending.button.notifyMe.title".localized, completedDate.dayMonthFormatted()),
                                        xibName: .buttonCell,
-                                       theme: CVRow.Theme(topInset: 40.0,
-                                                          bottomInset: 0.0),
+                                       theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                                          bottomInset: .zero),
                                        selectionAction: { [weak self] in
-                                        self?.notifyMe()
-                                        self?.dismiss(animated: true, completion: nil)
-                                       },
+            self?.notifyMe()
+            self?.dismiss(animated: true, completion: nil)
+        },
                                        willDisplay: { cell in
-                                        (cell as? ButtonCell)?.button.accessibilityHint = footer
-                                       })
+            (cell as? ButtonCell)?.button.accessibilityHint = footer
+        })
         let footerRow: CVRow = footerRow(title: footer)
         return [notifyMeRow, footerRow]
     }
 
-    private func addToFavoriteRows() -> [CVRow] {
+    func addToFavoriteRows() -> [CVRow] {
         let footer: String = "vaccineCompletionController.footer.favorite".localized
         let addToFavorieRow: CVRow = CVRow(title: "vaccineCompletionController.button.favorite.title".localized,
                                            xibName: .buttonCell,
-                                           theme: CVRow.Theme(topInset: 40.0,
-                                                              bottomInset: 0.0),
+                                           theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                                              bottomInset: .zero),
                                            selectionAction: { [weak self] in
-                                            self?.addToFavorite()
-                                            self?.dismiss(animated: true, completion: nil)
-                                           },
+            self?.addToFavorite()
+            self?.dismiss(animated: true, completion: nil)
+        },
                                            willDisplay: { cell in
-                                            (cell as? ButtonCell)?.button.accessibilityHint = footer
-                                           })
+            (cell as? ButtonCell)?.button.accessibilityHint = footer
+        })
         let footerRow: CVRow = footerRow(title: footer)
         return [addToFavorieRow, footerRow]
     }
 
-    private func notifyMeAndFavoriteRows() -> [CVRow] {
+    func notifyMeAndFavoriteRows() -> [CVRow] {
         let footer: String = String(format: "vaccineCompletionController.footer.notifyAndFavorite".localized, completedDate.dayMonthFormatted())
         let notifyMeAndFavoriteRow: CVRow = CVRow(title: String(format: "vaccineCompletionController.button.notifyAndFavorite.title".localized, completedDate.dayMonthFormatted()),
                                                   xibName: .buttonCell,
-                                                  theme: CVRow.Theme(topInset: 40.0,
-                                                                     bottomInset: 0.0),
+                                                  theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                                                     bottomInset: .zero),
                                                   selectionAction: { [weak self] in
-                                                    self?.notifyMe()
-                                                    self?.addToFavorite()
-                                                    self?.dismiss(animated: true, completion: nil)
-                                                  },
+            self?.notifyMe()
+            self?.addToFavorite()
+            self?.dismiss(animated: true, completion: nil)
+        },
                                                   willDisplay: { cell in
-                                                    (cell as? ButtonCell)?.button.accessibilityHint = footer
-                                                  })
+            (cell as? ButtonCell)?.button.accessibilityHint = footer
+        })
         let footerRow: CVRow = footerRow(title: footer)
         return [notifyMeAndFavoriteRow, footerRow]
     }
 
-    private func footerRow(title: String) -> CVRow {
+    func footerRow(title: String) -> CVRow {
         CVRow(title: title,
               xibName: .textCell,
-              theme: CVRow.Theme(topInset: 10.0,
-                                 bottomInset: 0.0,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                 bottomInset: .zero,
                                  textAlignment: .natural,
                                  titleFont: { Appearance.Cell.Text.accessoryFont },
                                  titleColor: Appearance.Cell.Text.captionTitleColor),
               willDisplay: { cell in
-                cell.isAccessibilityElement = false
-                cell.accessibilityElements = []
-                cell.accessibilityElementsHidden = true
-              })
+            cell.isAccessibilityElement = false
+            cell.accessibilityElements = []
+            cell.accessibilityElementsHidden = true
+        })
     }
 
-    private func notifyMe() {
+    func notifyMe() {
         NotificationsManager.shared.scheduleCompletedVaccination(triggerDate: completedDate)
         HUD.flash(.success)
     }
 
-    private func addToFavorite() {
+    func addToFavorite() {
         WalletManager.shared.setFavorite(certificate: certificate)
     }
-
 }
 
 extension CompletedVaccinationController {

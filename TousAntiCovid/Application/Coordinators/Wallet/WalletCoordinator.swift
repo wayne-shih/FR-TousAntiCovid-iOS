@@ -74,8 +74,6 @@ final class WalletCoordinator: Coordinator {
     private func createWalletController() -> WalletViewController {
         WalletViewController { [weak self] in
             self?.startFlashCode()
-        } didTouchTermsOfUse: { [weak self] in
-            self?.openTermsOfUse()
         } didTouchCertificate: { [weak self] certificate in
             self?.showCodeFullscreen(certificate)
         } didConvertToEuropeanCertifcate: { [weak self] certificate in
@@ -105,10 +103,6 @@ final class WalletCoordinator: Coordinator {
         guard wasVoiceOverActivated != UIAccessibility.isVoiceOverRunning else { return }
         wasVoiceOverActivated = UIAccessibility.isVoiceOverRunning
         updateCurrentController()
-    }
-    
-    private func openTermsOfUse() {
-        URL(string: "walletController.termsOfUse.url".localized)?.openInSafari()
     }
     
     private func openConvertToEuropeTermsOfUse() {
@@ -324,6 +318,8 @@ final class WalletCoordinator: Coordinator {
         guard certificate.type == .vaccinationEurope else { return }
         guard certificate.isLastDose == true else { return }
         guard !DccBlacklistManager.shared.isBlacklisted(certificate: certificate) else { return }
+        guard !certificate.isExpired else { return }
+        guard !WalletManager.shared.isPassExpired(for: certificate) else { return }
         let completedVaccinationController: CompletedVaccinationController = CompletedVaccinationController(certificate: certificate)
         let navigationController: UIViewController = CVNavigationController(rootViewController: completedVaccinationController)
         self.navigationController?.topPresentedController.present(navigationController, animated: true)

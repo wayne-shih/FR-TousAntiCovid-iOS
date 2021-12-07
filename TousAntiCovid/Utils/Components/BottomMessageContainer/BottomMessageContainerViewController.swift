@@ -19,6 +19,7 @@ final class BottomMessageContainerViewController: UIViewController {
         messageLabel.text?.isEmpty != false ? 0.0 : messageView.frame.height
     }
     
+    @IBOutlet private weak var separatorView: UIView!
     @IBOutlet private var containerView: UIView!
     @IBOutlet private var messageView: UIView!
     @IBOutlet private var messageLabel: UILabel!
@@ -38,9 +39,10 @@ final class BottomMessageContainerViewController: UIViewController {
         messageLabel.isAccessibilityElement = true
     }
     
-    func updateMessage(text: String? = nil, font: UIFont? = nil, textColor: UIColor? = nil, backgroundColor: UIColor? = nil, actionHint: String? = nil, completion: (() -> ())? = nil) {
+    func updateMessage(text: String? = nil, font: UIFont? = nil, textColor: UIColor? = nil, backgroundColor: UIColor? = nil, actionHint: String? = nil, separatorColor: UIColor = Asset.Colors.bottomWarningSeparator.color, completion: (() -> ())? = nil) {
         UIView.transition(with: messageView, duration: 0.2, options: [.transitionCrossDissolve], animations: {
             self.messageView.backgroundColor = backgroundColor
+            self.separatorView.backgroundColor = separatorColor
             self.messageLabel.text = text
             self.messageLabel.font = font
             self.messageLabel.textColor = textColor

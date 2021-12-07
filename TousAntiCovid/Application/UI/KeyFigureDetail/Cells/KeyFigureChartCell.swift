@@ -51,6 +51,13 @@ final class KeyFigureChartCell: CardCell {
         legendViews.forEach { legendStackView.addArrangedSubview($0) }
         footerLabel.text = chartDatas.first?.footer
     }
+        
+    func captureWithoutFooter() -> UIImage? {
+        footerLabel.isHidden = true
+        let capture: UIImage? = capture()
+        footerLabel.isHidden = false
+        return capture
+    }
     
     override func capture() -> UIImage? {
         sharingImageView.isHidden = true

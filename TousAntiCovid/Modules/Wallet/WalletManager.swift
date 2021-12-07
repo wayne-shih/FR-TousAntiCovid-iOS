@@ -17,6 +17,7 @@ protocol WalletChangesObserver: AnyObject {
     func walletCertificatesDidUpdate()
     func walletFavoriteCertificateDidUpdate()
     func walletActivityCertificateDidUpdate()
+    func walletSmartStateDidUpdate()
 
 }
 
@@ -46,10 +47,16 @@ final class WalletManager {
         }
         set { _walletCertificates = newValue }
     }
-
+    
+    var lastRelevantCertificates: [EuropeanCertificate]? {
+        didSet {
+            // WalletState could have changed
+            notifyWalletSmartState()
+        }
+    }
     var areThereCertificatesToLoad: Bool { _walletCertificates.count != storageManager.walletCertificates().count }
     var recentWalletCertificates: [WalletCertificate] { walletCertificates.filter { !$0.isOld } }
-    var oldWalletCertificates: [WalletCertificate] { walletCertificates.filter { $0.isOld } }
+    var oldWalletCertificates: [WalletCertificate] { walletCertificates.filter { $0.isOld || isPassExpired(for: $0 as? EuropeanCertificate) } }
     var areThereCertificatesNeedingAttention: Bool {
         !walletCertificates.first {
             if let europeCertificate = $0 as? EuropeanCertificate {
@@ -62,12 +69,35 @@ final class WalletManager {
         }.isNil
     }
 
-    var isWalletActivated: Bool { ParametersManager.shared.displaySanitaryCertificatesWallet }
+    var isWalletActivated: Bool {
+        return ParametersManager.shared.displaySanitaryCertificatesWallet
+        
+    }
     
-    var isActivityPassActivated: Bool { ParametersManager.shared.displayActivityPass }
+    var isActivityPassActivated: Bool {
+        return ParametersManager.shared.displayActivityPass
+        
+    }
     
     @UserDefault(key: .activityPassAutoRenewalActivated)
     var activityPassAutoRenewalActivated: Bool = false
+    
+    @UserDefault(key: .smartWalletActivated)
+    var smartWalletActivated: Bool = true {
+        didSet {
+            if smartWalletActivated {
+                updateLastRelevantCertificates()
+            } else {
+                lastRelevantCertificates = nil
+            }
+        }
+    }
+    
+    // Notifications
+    @UserDefault(key: .smartWalletSentNotificationsIds)
+    var smartWalletSentNotificationsIds: [String] = []
+    @UserDefault(key: .smartWalletLastNotificationTimestamp)
+    var smartWalletLastNotificationTimestamp: Double = Date.distantPast.timeIntervalSince1970
 
     var favoriteCertificate: WalletCertificate? { _walletCertificates.filter { $0.id == favoriteDccId }.first ?? loadCertificate(for: favoriteDccId) }
     
@@ -116,7 +146,7 @@ final class WalletManager {
     }
 
     func isDuplicatedCertificate(_ certificate: WalletCertificate)  -> Bool {
-        walletCertificates.first { $0.value == certificate.value } != nil
+        walletCertificates.first { $0.uniqueHash == certificate.uniqueHash } != nil
     }
 
     func activityCertificateFor(certificate: EuropeanCertificate?) -> ActivityCertificate? {
@@ -136,11 +166,15 @@ final class WalletManager {
         if notify { notifyActivityCertificate() }
     }
 
+    func updateLastRelevantCertificates() {
+        lastRelevantCertificates = getLastRelevantCertificates()
+    }
+
     private func getSortedRawActivityCertificatesFor(certificate: EuropeanCertificate) -> [RawWalletCertificate] {
         let now: Date = Date()
         return storageManager.walletCertificates().filter({ $0.parentId == certificate.id && $0.expiryDate ?? .distantPast > now }).sorted { $0.expiryDate ?? .distantPast < $1.expiryDate ?? .distantPast }
     }
-    
+
     private func loadCertificate(for id: String?) -> WalletCertificate? {
         guard let certificate = storageManager.walletCertificates().filter({ $0.id == id }).first.flatMap({ WalletCertificate.from(rawCertificate: $0) }) else { return nil }
         _walletCertificates.append(certificate)
@@ -158,6 +192,7 @@ final class WalletManager {
                 return loadedCertificatesDict[$0.id]?.first ?? WalletCertificate.from(rawCertificate: $0)
             }
         }
+        updateLastRelevantCertificates()
     }
 
     private func addObservers() {
@@ -195,6 +230,7 @@ final class WalletManager {
                                                                &error)
             return isSignatureValid
         } catch {
+            print(error)
             return false
         }
     }
@@ -287,6 +323,7 @@ extension WalletManager {
         let errors: HCert.ParseErrors = HCert.ParseErrors()
         guard let hCert = HCert(from: doc, errors: errors) else { throw WalletError.parsing.error }
         let certificateType: WalletConstant.CertificateType = WalletManager.certificateType(hCert: hCert)
+        guard certificateType != .unknown else { throw WalletError.parsing.error }
         let certificate: EuropeanCertificate = EuropeanCertificate(id: id, value: doc, type: certificateType, hCert: hCert, didGenerateAllActivityCertificates: false, didAlreadyGenerateActivityCertificates: false)
         guard certificate.isForeignCertificate || hCert.cryptographicallyValid else { throw WalletError.signature.error }
         return certificate
@@ -517,6 +554,27 @@ extension WalletManager {
 
 }
 
+// MARK: - -
+extension WalletManager {
+    func getLastRelevantCertificates() -> [EuropeanCertificate]? {
+            // If feature activated
+        guard ParametersManager.shared.smartWalletFeatureActivated else { return nil }
+            // If user wants to use the feature
+        guard smartWalletActivated else { return nil }
+            // user only for EuropeanCertificates
+        let europeanCertificates: [EuropeanCertificate] = _walletCertificates.filter { ($0 as? EuropeanCertificate)?.hasLunarBirthdate == false } as? [EuropeanCertificate] ?? []
+            // group certificates by user (on firstname and birthdate only)
+        let groupedCerts: [String: [EuropeanCertificate]] = Dictionary(grouping: europeanCertificates) { "\($0.firstname.uppercased())\($0.birthdate)" }
+            // keep only the last relevant certificate: completed vaccine or recovery.
+        return groupedCerts.compactMap {
+            $0.value
+                .filter { ($0.isLastDose == true || $0.type == .recoveryEurope || $0.isTestNegative == false) && !$0.isExpired }
+                .sorted(by: { $0.alignedTimestamp > $1.alignedTimestamp })
+                .first
+        }
+    }
+}
+
 extension WalletManager {
 
     func addObserver(_ observer: WalletChangesObserver) {
@@ -545,4 +603,7 @@ extension WalletManager {
         observers.forEach { $0.observer?.walletActivityCertificateDidUpdate() }
     }
     
+    private func notifyWalletSmartState() {
+        observers.forEach { $0.observer?.walletSmartStateDidUpdate() }
+    }
 }

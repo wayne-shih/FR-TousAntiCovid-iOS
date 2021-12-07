@@ -81,6 +81,10 @@ final class PrivacyManager: RemoteFileSyncManager {
     override func notifyObservers() {
         observers.forEach { $0.observer?.privacyChanged() }
     }
+
+    override func resetLastUpdateDate() {
+        lastUpdateDate = .distantPast
+    }
     
 }
 

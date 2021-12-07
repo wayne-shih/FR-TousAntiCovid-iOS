@@ -34,20 +34,20 @@ final class WalletQuantityWarningViewController: CVTableViewController {
     }
 
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Asset.Colors.error.color
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
     }
-
-    override func createRows() -> [CVRow] {
-        [
-            titleRow(),
-            explanationsRow(),
-            continueRow(),
-            cancelRow()
-        ]
+    
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                titleRow()
+                explanationsRow()
+                continueRow()
+                cancelRow()
+            }
+        }
     }
 
 
@@ -69,8 +69,8 @@ extension WalletQuantityWarningViewController {
     private func titleRow() -> CVRow {
         CVRow(title: "walletQuantityWarningController.title".localized,
               xibName: .textCell,
-              theme: CVRow.Theme(topInset: 40.0,
-                                 bottomInset: 0.0,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
+                                 bottomInset: .zero,
                                  titleFont: { .marianneExtraBold(size: 21.0) },
                                  titleColor: .white))
     }
@@ -78,8 +78,8 @@ extension WalletQuantityWarningViewController {
     private func explanationsRow() -> CVRow {
         CVRow(title: "walletQuantityWarningController.explanation".localized,
               xibName: .textCell,
-              theme: CVRow.Theme(topInset: 30.0,
-                                 bottomInset: 0.0,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
+                                 bottomInset: .zero,
                                  titleFont: { .regular(size: 17.0) },
                                  titleColor: .white))
     }
@@ -87,8 +87,8 @@ extension WalletQuantityWarningViewController {
     private func continueRow() -> CVRow {
         CVRow(title: "walletQuantityWarningController.continue".localized,
               xibName: .buttonCell,
-              theme: CVRow.Theme(topInset: 30.0,
-                                 bottomInset: 0.0,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
+                                 bottomInset: .zero,
                                  buttonStyle: .quinary),
               selectionAction: { [weak self] in
                 self?.showConfirmationAlert()
@@ -98,8 +98,8 @@ extension WalletQuantityWarningViewController {
     private func cancelRow() -> CVRow {
         CVRow(title: "common.cancel".localized,
               xibName: .buttonCell,
-              theme: CVRow.Theme(topInset: 10.0,
-                                 bottomInset: 0.0,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                 bottomInset: .zero,
                                  buttonStyle: .quinary),
               selectionAction: { [weak self] in
                 self?.didCancel()

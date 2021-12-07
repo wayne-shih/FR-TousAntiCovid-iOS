@@ -35,58 +35,38 @@ final class IsolationFormViewController: CVTableViewController {
         deinitBlock()
     }
     
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        
+    override func createSections() -> [CVSection] {
         let headerText: String = "isolationFormController.header.title".localizedOrEmpty
+        let footerText: String = "isolationFormController.footer.title".localizedOrEmpty
         if headerText.isEmpty {
-            rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: false))
-        } else {
-            let headerRow: CVRow = CVRow(title: headerText,
-                                         xibName: .textCell,
-                                         theme:  CVRow.Theme(topInset: 20.0,
-                                                             bottomInset: 20.0,
-                                                             textAlignment: .natural,
-                                                             titleFont: { Appearance.Cell.Text.footerFont },
-                                                             titleColor: Appearance.Cell.Text.captionTitleColor,
-                                                             separatorLeftInset: 0.0,
-                                                             separatorRightInset: 0.0))
-            rows.append(headerRow)
+            addHeaderView(height: Appearance.TableView.Header.largeHeight)
         }
-        
-        rows.append(contentsOf: stateRows())
-        guard let state = IsolationManager.shared.currentState else { return rows }
-        switch state {
-        case .contactCase:
-            rows.append(contentsOf: contactCaseRows())
-        case .positiveCase:
-            rows.append(contentsOf: positiveCaseRows())
-        default:
-            break
-        }
-        if IsolationManager.shared.currentRecommendationState != .indeterminate {
-            rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: false))
-            rows.append(readRecommendationsRow())
-        } else {
-            let footerText: String = "isolationFormController.footer.title".localizedOrEmpty
-            if footerText.isEmpty {
-                rows.append(.emptyFor(topInset: 0.0, bottomInset: 0.0, showSeparator: false))
-            } else {
-                let footerRow: CVRow = CVRow(title: footerText,
-                                             xibName: .textCell,
-                                             theme:  CVRow.Theme(topInset: 20.0,
-                                                                 bottomInset: 0.0,
-                                                                 textAlignment: .natural,
-                                                                 titleFont: { Appearance.Cell.Text.footerFont },
-                                                                 titleColor: Appearance.Cell.Text.captionTitleColor,
-                                                                 separatorLeftInset: 0.0,
-                                                                 separatorRightInset: 0.0))
-                rows.append(footerRow)
+        return makeSections {
+            CVSection {
+                if !headerText.isEmpty {
+                    headerRow(title: headerText)
+                }
+                stateRows()
+                if let state = IsolationManager.shared.currentState {
+                    switch state {
+                    case .contactCase:
+                        contactCaseRows()
+                    case .positiveCase:
+                        positiveCaseRows()
+                    default:
+                        CVRow.Empty()
+                    }
+                    if IsolationManager.shared.currentRecommendationState != .indeterminate {
+                        CVRow.emptyFor(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small, showSeparator: false)
+                        readRecommendationsRow()
+                    } else if !footerText.isEmpty {
+                        footerRow(title: footerText)
+                    }
+                }
             }
         }
-        return rows
     }
-    
+
     override func reloadUI(animated: Bool = false, animatedView: UIView? = nil, completion: (() -> ())? = nil) {
         super.reloadUI(animated: animated) { [weak self] in
             self?.scrollToBottomIfNeeded()
@@ -96,9 +76,6 @@ final class IsolationFormViewController: CVTableViewController {
     
     private func initUI() {
         title = "isolationFormController.title".localized
-        tableView.contentInset.top = 0.0
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.tintColor = Appearance.tintColor
@@ -107,9 +84,10 @@ final class IsolationFormViewController: CVTableViewController {
     }
     
     private func scrollToBottomIfNeeded() {
-        if tableView.contentSize.height > tableView.frame.height {
-            tableView.scrollToRow(at: IndexPath(row: rows.count - 1, section: 0), at: .top, animated: true)
-        }
+        guard tableView.contentSize.height > tableView.frame.height else { return }
+        guard let lastSection = sections.last else { return }
+        let lastIndexPath: IndexPath = IndexPath(row: lastSection.rows.count - 1, section: sections.count - 1)
+        tableView.scrollToRow(at: lastIndexPath, at: .top, animated: true)
     }
     
     @objc private func didTouchCloseButton() {
@@ -126,9 +104,34 @@ final class IsolationFormViewController: CVTableViewController {
     
 }
 
-extension IsolationFormViewController {
+// MARK: - Rows -
+private extension IsolationFormViewController {
+    func headerRow(title: String) -> CVRow {
+        CVRow(title: title,
+              xibName: .textCell,
+              theme:  CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                  bottomInset: Appearance.Cell.Inset.medium,
+                                  textAlignment: .natural,
+                                  titleFont: { Appearance.Cell.Text.footerFont },
+                                  titleColor: Appearance.Cell.Text.captionTitleColor,
+                                  separatorLeftInset: .zero,
+                                  separatorRightInset: .zero))
+    }
+
+    func footerRow(title: String) -> CVRow {
+        CVRow(title: title,
+              xibName: .textCell,
+              theme:  CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                  bottomInset: .zero,
+                                  textAlignment: .natural,
+                                  titleFont: { Appearance.Cell.Text.footerFont },
+                                  titleColor: Appearance.Cell.Text.captionTitleColor,
+                                  separatorLeftInset: .zero,
+                                  separatorRightInset: .zero))
+
+    }
     
-    private func stateRows() -> [CVRow] {
+    func stateRows() -> [CVRow] {
         var rows: [CVRow] = [sectionRow(title: "isolationFormController.state.sectionTitle".localized)]
         rows.append(selectableRow(title: "isolationFormController.state.allGood".localized,
                                   isSelected: IsolationManager.shared.currentState == .allGood,
@@ -164,11 +167,11 @@ extension IsolationFormViewController {
         return rows
     }
     
-    private func contactCaseRows() -> [CVRow] {
+    func contactCaseRows() -> [CVRow] {
         var rows: [CVRow] = []
-        rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: true))
+        rows.append(.emptyFor(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small, showSeparator: true))
         rows.append(lastContactDateRow())
-        rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: false))
+        rows.append(.emptyFor(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small, showSeparator: false))
         
         rows.append(contentsOf: yesNoQuestionRows(title: "isolationFormController.contactCase.index.sectionTitle".localized,
                                                   isAnswerYes: IsolationManager.shared.isolationIsKnownIndexAtHome,
@@ -176,34 +179,34 @@ extension IsolationFormViewController {
         
         guard IsolationManager.shared.isolationIsKnownIndexAtHome == true else { return rows }
         guard IsolationManager.shared.isolationIsTestNegative != nil else { return rows }
-        rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: false))
+        rows.append(.emptyFor(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small, showSeparator: false))
         rows.append(contentsOf: yesNoQuestionRows(title: "isolationFormController.contactCase.haveIndexSymptomsEndDate.sectionTitle".localized,
                                                   isAnswerYes: IsolationManager.shared.isolationKnowsIndexSymptomsEndDate,
                                                   answerBlock: { isAnswerYes in IsolationManager.shared.setKnowsIndexSymptomsEndDate(isAnswerYes) }))
         
         guard IsolationManager.shared.isolationKnowsIndexSymptomsEndDate == true else { return rows }
-        rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: false))
+        rows.append(.emptyFor(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small, showSeparator: false))
         rows.append(sectionRow(title: "isolationFormController.contactCase.symptomsEndDate.sectionTitle".localized))
         rows.append(indexSymptomsEndDateRow())
         return rows
     }
     
-    private func positiveCaseRows() -> [CVRow] {
+    func positiveCaseRows() -> [CVRow] {
         var rows: [CVRow] = []
-        rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: true))
+        rows.append(.emptyFor(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small, showSeparator: true))
         rows.append(positiveTestDateRow())
-        rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: false))
+        rows.append(.emptyFor(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small, showSeparator: false))
         
         rows.append(contentsOf: yesNoQuestionRows(title: "isolationFormController.positiveCase.haveSymptoms.sectionTitle".localized,
                                                   isAnswerYes: IsolationManager.shared.isolationIsHavingSymptoms,
                                                   answerBlock: { isAnswerYes in IsolationManager.shared.setIsHavingSymptoms(isAnswerYes) }))
         
         guard IsolationManager.shared.isolationIsHavingSymptoms == true else { return rows }
-        rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: false))
+        rows.append(.emptyFor(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small, showSeparator: false))
         rows.append(symptomsStartDateRow())
         
         guard IsolationManager.shared.isPositiveCaseIsolationEnded == true else { return rows }
-        rows.append(.emptyFor(topInset: 10.0, bottomInset: 10.0, showSeparator: false))
+        rows.append(.emptyFor(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small, showSeparator: false))
         rows.append(contentsOf: yesNoQuestionRows(title: "isolationFormController.positiveCase.stillHavingFever.sectionTitle".localized,
                                                   isAnswerYes: IsolationManager.shared.isolationIsStillHavingFever,
                                                   answerBlock: { isAnswerYes in IsolationManager.shared.setStillHavingFever(isAnswerYes) }))
@@ -211,7 +214,7 @@ extension IsolationFormViewController {
         return rows
     }
 
-    private func informVoiceOverAboutFormUpdate() {
+    func informVoiceOverAboutFormUpdate() {
         guard UIAccessibility.isVoiceOverRunning else { return }
         UIAccessibility.post(notification: .announcement, argument: "accessibility.isolation.formWasUpdated".localized)
     }
@@ -294,12 +297,12 @@ extension IsolationFormViewController {
               isOn: isSelected,
               xibName: .selectableCell,
               theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                 topInset: Appearance.Cell.leftMargin,
-                                 bottomInset: Appearance.Cell.leftMargin,
+                                 topInset: Appearance.Cell.Inset.normal,
+                                 bottomInset: Appearance.Cell.Inset.normal,
                                  textAlignment: .natural,
                                  titleFont: { Appearance.Cell.Text.standardFont },
-                                 separatorLeftInset: isLastRowInGroup ? 0.0 : Appearance.Cell.leftMargin,
-                                 separatorRightInset: 0.0),
+                                 separatorLeftInset: isLastRowInGroup ? .zero : Appearance.Cell.leftMargin,
+                                 separatorRightInset: .zero),
               selectionAction: {
                 selectionBlock()
               })
@@ -311,15 +314,15 @@ extension IsolationFormViewController {
                                placeholder: "-",
                                xibName: .dateCell,
                                theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                  topInset: 10.0,
-                                                  bottomInset: 10.0,
+                                                  topInset: Appearance.Cell.Inset.small,
+                                                  bottomInset: Appearance.Cell.Inset.small,
                                                   textAlignment: .natural,
                                                   titleFont: { .regular(size: 12.0) },
                                                   titleColor: Appearance.Cell.Text.subtitleColor,
                                                   subtitleFont: { .regular(size: 17.0) },
                                                   subtitleColor: Appearance.Cell.Text.titleColor,
-                                                  separatorLeftInset: 0.0,
-                                                  separatorRightInset: 0.0),
+                                                  separatorLeftInset: .zero,
+                                                  separatorRightInset: .zero),
                                minimumDate: Date().dateByAddingDays(-30),
                                maximumDate: Date(),
                                initialDate: date,
@@ -340,12 +343,12 @@ extension IsolationFormViewController {
     private func sectionRow(title: String) -> CVRow {
         let row: CVRow = CVRow(title: title,
                                xibName: .textCell,
-                               theme: CVRow.Theme(topInset: Appearance.Cell.leftMargin,
-                                                  bottomInset: Appearance.Cell.leftMargin,
+                               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
+                                                  bottomInset: Appearance.Cell.Inset.normal,
                                                   textAlignment: .natural,
                                                   titleColor: Appearance.tintColor,
-                                                  separatorLeftInset: 0.0,
-                                                  separatorRightInset: 0.0))
+                                                  separatorLeftInset: .zero,
+                                                  separatorRightInset: .zero))
         return row
     }
     

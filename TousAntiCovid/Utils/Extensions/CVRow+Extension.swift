@@ -15,8 +15,8 @@ extension CVRow {
     static func titleRow(title: String?, willDisplay: ((_ cell: CVTableViewCell) -> ())?) -> CVRow {
         return CVRow(title: title,
                      xibName: .titleCell,
-                     theme: CVRow.Theme(topInset: 10.0,
-                                        bottomInset: 10.0,
+                     theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                        bottomInset: Appearance.Cell.Inset.small,
                                         textAlignment: .natural,
                                         titleFont: { Appearance.Controller.titleFont },
                                         separatorLeftInset: nil),

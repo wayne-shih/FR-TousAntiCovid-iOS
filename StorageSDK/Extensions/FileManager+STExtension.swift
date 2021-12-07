@@ -13,7 +13,7 @@ import Foundation
 extension FileManager {
     
     class func stLibraryDirectory() -> URL {
-        return try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+        try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
     }
     
 }

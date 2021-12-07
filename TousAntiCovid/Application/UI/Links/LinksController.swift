@@ -44,54 +44,20 @@ final class LinksController: CVTableViewController {
         title = "linksController.title".localized
     }
     
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = [blockSeparatorRow()]
-        let sections: [LinksSection] = LinksManager.shared.linksSections
-        let sectionsRows: [CVRow] = sections.map { section in
-            let sectionRow: CVRow = CVRow(title: section.section,
-                                          subtitle: section.description,
-                                          xibName: .textCell,
-                                          theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                             topInset: Appearance.Cell.leftMargin,
-                                                             bottomInset: Appearance.Cell.leftMargin,
-                                                             textAlignment: .natural,
-                                                             titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
-                                                             separatorLeftInset: Appearance.Cell.leftMargin))
-            let linkRows: [CVRow] = section.links?.map { link in
-                CVRow(title: link.label,
-                      xibName: .standardCell,
-                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                         topInset: Appearance.Cell.leftMargin,
-                                         bottomInset: Appearance.Cell.leftMargin,
-                                         textAlignment: .natural,
-                                         titleFont: { Appearance.Cell.Text.standardFont },
-                                         titleColor: Appearance.tintColor,
-                                         separatorLeftInset: 0.0),
-                      selectionAction: {
-                        URL(string: link.url)?.openInSafari()
-                      }, willDisplay: { cell in
-                        cell.cvTitleLabel?.accessibilityTraits = .button
-                        cell.accessoryType = .none
-                })
-            } ?? []
-            return [sectionRow] + linkRows + [blockSeparatorRow()]
-        }.reduce([], +)
-        rows.append(contentsOf: sectionsRows)
-        rows.removeLast()
-        rows.append(.empty)
-        return rows
-    }
-    
-    private func blockSeparatorRow() -> CVRow {
-        var row: CVRow = .emptyFor(topInset: 15.0, bottomInset: 15.0)
-        row.theme.separatorLeftInset = 0.0
-        row.theme.separatorRightInset = 0.0
-        return row
+    override func createSections() -> [CVSection] {
+        makeSections {
+            LinksManager.shared.linksSections.map { section in
+                CVSection {
+                    sectionRow(section: section)
+                    linkRows(links: section.links ?? [])
+                } header: {
+                    .groupedHeader
+                }
+            }
+        }
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: navigationChildController?.navigationBarHeight ?? 0.0))
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
@@ -114,19 +80,49 @@ final class LinksController: CVTableViewController {
 
 }
 
+private extension LinksController {
+    func sectionRow(section: LinksSection) -> CVRow {
+        CVRow(title: section.section,
+              subtitle: section.description,
+              xibName: .textCell,
+              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                 topInset: Appearance.Cell.Inset.normal,
+                                 bottomInset: Appearance.Cell.Inset.normal,
+                                 textAlignment: .natural,
+                                 titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
+                                 separatorLeftInset: (section.links ?? []).isEmpty ? nil : Appearance.Cell.leftMargin))
+    }
+
+    func linkRows(links: [Link]) -> [CVRow] {
+        links.enumerated().map { index, link in
+            CVRow(title: link.label,
+                  xibName: .standardCell,
+                  theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                     topInset: Appearance.Cell.Inset.normal,
+                                     bottomInset: Appearance.Cell.Inset.normal,
+                                     textAlignment: .natural,
+                                     titleFont: { Appearance.Cell.Text.standardFont },
+                                     titleColor: Appearance.tintColor,
+                                     separatorLeftInset: index + 1 == links.count ? nil : Appearance.Cell.leftMargin,
+                                     accessoryType: UITableViewCell.AccessoryType.none),
+                  selectionAction: {
+                URL(string: link.url)?.openInSafari()
+            }, willDisplay: { cell in
+                cell.cvTitleLabel?.accessibilityTraits = .button
+            })
+        }
+    }
+}
+
 extension LinksController: LocalizationsChangesObserver {
-    
     func localizationsChanged() {
         updateTitle()
         reloadUI()
     }
-    
 }
 
 extension LinksController: LinksChangesObserver {
-    
     func linksChanged() {
         reloadUI()
     }
-    
 }

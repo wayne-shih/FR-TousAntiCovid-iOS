@@ -15,14 +15,17 @@ final class KeyFiguresController: CVTableViewController {
     
     private let didTouchKeyFigure: (_ keyFigure: KeyFigure) -> ()
     private let didTouchReadExplanationsNow: () -> ()
+    private let didTouchCompare: () -> ()
     private let deinitBlock: () -> ()
     private var currentCategory: KeyFigure.Category = .vaccine
     
     init(didTouchReadExplanationsNow: @escaping () -> (),
          didTouchKeyFigure: @escaping(_ keyFigure: KeyFigure) -> (),
+         didTouchCompare: @escaping () -> (),
          deinitBlock: @escaping () -> ()) {
         self.didTouchReadExplanationsNow = didTouchReadExplanationsNow
         self.didTouchKeyFigure = didTouchKeyFigure
+        self.didTouchCompare = didTouchCompare
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
     }
@@ -45,9 +48,8 @@ final class KeyFiguresController: CVTableViewController {
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
+        addHeaderView(height: Appearance.TableView.Header.mediumHeight)
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
@@ -76,107 +78,140 @@ final class KeyFiguresController: CVTableViewController {
         KeyFiguresManager.shared.removeObserver(self)
     }
     
-    override func createRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        if !KeyFiguresManager.shared.canShowCurrentlyNeededFile {
-            rows.append(CVRow(subtitle: "keyFiguresController.fetchError.message".localized,
-                              xibName: .cardCell,
-                              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                 topInset: 30.0,
-                                                 bottomInset: 0.0,
-                                                 textAlignment: .center,
-                                                 maskedCorners: .top),
-                              selectionAction: {
-                                HUD.show(.progress)
-                                KeyFiguresManager.shared.fetchKeyFigures {
-                                    HUD.hide()
-                                }
-                              }))
-            rows.append(CVRow(title: "keyFiguresController.fetchError.button".localized,
-                              xibName: .standardCardCell,
-                              theme:  CVRow.Theme(backgroundColor: Appearance.Button.Secondary.backgroundColor,
-                                                  topInset: 0.0,
-                                                  bottomInset: 0.0,
-                                                  textAlignment: .center,
-                                                  titleFont: { Appearance.Cell.Text.actionTitleFont },
-                                                  titleColor: Appearance.Button.Secondary.titleColor,
-                                                  separatorLeftInset: nil,
-                                                  separatorRightInset: nil,
-                                                  maskedCorners: .bottom),
-                              selectionAction: {
-                                HUD.show(.progress)
-                                KeyFiguresManager.shared.fetchKeyFigures {
-                                    HUD.hide()
-                                }
-                              }))
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                if !KeyFiguresManager.shared.canShowCurrentlyNeededFile {
+                    loadingErrorRows()
+                }
+                compareRow()
+                modeSelectionRow()
+                let explanations: String = "keyFiguresController.explanations.\(currentCategory.rawValue)".localized
+                if !explanations.isEmpty {
+                    explanationRows(explanations)
+                }
+                keyFiguresRows()
+            }
         }
-        rows.append(modeSelectionRow())
-        let explanations: String = "keyFiguresController.explanations.\(currentCategory.rawValue)".localized
-        if !explanations.isEmpty {
-            let explanationsRow: CVRow =  CVRow(subtitle: explanations,
-                                                xibName: .textCell,
-                                                theme: CVRow.Theme(topInset: 20.0,
-                                                                   bottomInset: 0.0,
-                                                                   textAlignment: .natural,
-                                                                   titleFont: { Appearance.Cell.Text.headTitleFont }))
-            rows.append(explanationsRow)
-        }
-        if currentCategory != .app {
-            let readNowRow: CVRow = CVRow(buttonTitle: "common.readMore".localized,
-                                          xibName: .linkButtonCell,
-                                          theme:  CVRow.Theme(topInset: 12.0,
-                                                              bottomInset: 0.0),
-                                          secondarySelectionAction: { [weak self] in
-                                            self?.didTouchReadExplanationsNow()
-                                          })
-            rows.append(readNowRow)
-        }
-        let keyFiguresRows: [CVRow] = KeyFiguresManager.shared.keyFigures.filter { $0.category == currentCategory }.compactMap { keyFigure in
-            guard keyFigure.isLabelReady else { return nil }
+    }
+    
+}
+
+// MARK: - Rows
+private extension KeyFiguresController {
+    func compareRow() -> CVRow {
+        CVRow(title: "keyfigures.comparison.screen.title".localized,
+              image: Asset.Images.compare.image,
+              xibName: .standardCardCell,
+              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                 topInset: .zero,
+                                 bottomInset: .zero,
+                                 textAlignment: .natural,
+                                 titleFont: { Appearance.Cell.Text.standardFont },
+                                 titleColor: Appearance.Cell.Text.headerTitleColor,
+                                 imageTintColor: Appearance.Cell.Text.headerTitleColor),
+              selectionAction: { [weak self] in
+            self?.didTouchCompare()
+        })
+    }
+    
+    func loadingErrorRows() -> [CVRow] {
+        [CVRow(subtitle: "keyFiguresController.fetchError.message".localized,
+              xibName: .cardCell,
+              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                 topInset: Appearance.Cell.Inset.normal,
+                                 bottomInset: .zero,
+                                 textAlignment: .center,
+                                 maskedCorners: .top),
+              selectionAction: {
+            HUD.show(.progress)
+            KeyFiguresManager.shared.fetchKeyFigures {
+                HUD.hide()
+            }
+        }),
+        CVRow(title: "keyFiguresController.fetchError.button".localized,
+              xibName: .standardCardCell,
+              theme:  CVRow.Theme(backgroundColor: Appearance.Button.Secondary.backgroundColor,
+                                  topInset: .zero,
+                                  bottomInset: .zero,
+                                  textAlignment: .center,
+                                  titleFont: { Appearance.Cell.Text.actionTitleFont },
+                                  titleColor: Appearance.Button.Secondary.titleColor,
+                                  separatorLeftInset: nil,
+                                  separatorRightInset: nil,
+                                  maskedCorners: .bottom),
+              selectionAction: {
+            HUD.show(.progress)
+            KeyFiguresManager.shared.fetchKeyFigures {
+                HUD.hide()
+            }
+        })]
+    }
+    
+    func explanationRows(_ explanations: String) -> [CVRow] {
+        [CVRow(subtitle: explanations,
+              xibName: .textCell,
+              theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
+                                 bottomInset: .zero,
+                                 textAlignment: .natural,
+                                 titleFont: { Appearance.Cell.Text.headTitleFont })),
+        CVRow(buttonTitle: "common.readMore".localized,
+              xibName: .linkButtonCell,
+              theme:  CVRow.Theme(topInset: Appearance.Cell.Inset.small,
+                                  bottomInset: .zero),
+              secondarySelectionAction: { [weak self] in
+            self?.didTouchReadExplanationsNow()
+        })]
+    }
+    
+    func keyFiguresRows() -> [CVRow] {
+        KeyFiguresManager.shared.keyFigures.filter { $0.category == currentCategory && $0.isLabelReady }.map { keyFigure in
             return CVRow(title: keyFigure.label,
                          subtitle: keyFigure.description,
                          xibName: .keyFigureCell,
                          theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                            topInset: 20.0,
-                                            bottomInset: 0.0,
+                                            topInset: Appearance.Cell.Inset.medium,
+                                            bottomInset: .zero,
                                             textAlignment: .natural,
                                             subtitleLinesCount: 2),
                          associatedValue: keyFigure,
                          selectionActionWithCell: { [weak self] cell in
-                            self?.didTouchSharingFor(cell: cell, keyFigure: keyFigure)
-                         },
+                self?.didTouchSharingFor(cell: cell, keyFigure: keyFigure)
+            },
                          selectionAction: { [weak self] in
-                            self?.didTouchKeyFigure(keyFigure)
-                         })
+                self?.didTouchKeyFigure(keyFigure)
+            })
         }
-        rows.append(contentsOf: keyFiguresRows)
-        return rows
     }
-
-    private func modeSelectionRow() -> CVRow {
+    
+    func modeSelectionRow() -> CVRow {
         let allCategories: [KeyFigure.Category] = KeyFigure.Category.allCases
         return CVRow(segmentsTitles: allCategories.map { "keyFiguresController.category.\($0.rawValue)".localized },
                      selectedSegmentIndex: allCategories.firstIndex(of: currentCategory) ?? 0,
                      xibName: .segmentedCell,
                      theme:  CVRow.Theme(backgroundColor: .clear,
-                                         topInset: 30.0,
-                                         bottomInset: 4.0,
+                                         topInset: Appearance.Cell.Inset.normal,
+                                         bottomInset: Appearance.Cell.Inset.small / 2,
                                          textAlignment: .natural,
                                          titleFont: { Appearance.SegmentedControl.selectedFont },
                                          subtitleFont: { Appearance.SegmentedControl.normalFont }),
                      segmentsActions: allCategories.map { category in
-                        { [weak self] in
-                            self?.currentCategory = category
-                            self?.reloadUI(animated: true, completion: nil)
-                        }
-                     })
+            { [weak self] in
+                self?.currentCategory = category
+                self?.reloadUI(animated: true, completion: nil)
+            }
+        })
     }
+}
 
-    @objc private func didTouchLocationButton() {
+// MARK: - Actions
+private extension KeyFiguresController {
+    
+    @objc func didTouchLocationButton() {
         KeyFiguresManager.shared.updateLocation(from: self)
     }
 
-    private func didTouchSharingFor(cell: CVTableViewCell, keyFigure: KeyFigure) {
+    func didTouchSharingFor(cell: CVTableViewCell, keyFigure: KeyFigure) {
         let sharingText: String
         if let keyFigureDepartment = keyFigure.currentDepartmentSpecificKeyFigure {
             sharingText = String(format: "keyFigure.sharing.department".localized,

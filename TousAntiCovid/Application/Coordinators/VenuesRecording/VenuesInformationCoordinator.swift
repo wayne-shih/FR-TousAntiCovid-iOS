@@ -17,14 +17,16 @@ final class VenuesInformationCoordinator: Coordinator {
 
     private weak var presentingController: UIViewController?
 
-    init(presentingController: UIViewController?, parent: Coordinator?) {
+    init(presentingController: UIViewController?, parent: Coordinator?, didTouchContinue: (() -> ())?) {
         self.presentingController = presentingController
         self.parent = parent
-        start()
+        start(didTouchContinue: didTouchContinue)
     }
 
-    private func start() {
-        let navigationController: CVNavigationController = CVNavigationController(rootViewController: VenuesInformationController(deinitBlock: { [weak self] in self?.didDeinit() }))
+    private func start(didTouchContinue: (() -> ())?) {
+        let venuesInfoController: VenuesInformationController = VenuesInformationController(didTouchContinue: didTouchContinue, deinitBlock: { [weak self] in self?.didDeinit() })
+        let rootController: UIViewController = didTouchContinue != nil ? BottomButtonContainerController.controller(venuesInfoController) : venuesInfoController
+        let navigationController: CVNavigationController = CVNavigationController(rootViewController: rootController)
         presentingController?.topPresentedController.present(navigationController, animated: true)
     }
 }

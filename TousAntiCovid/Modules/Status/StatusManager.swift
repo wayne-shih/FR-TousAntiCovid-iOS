@@ -76,7 +76,6 @@ final class StatusManager {
     
     private var lastStatusTriggerEventTimestamp: TimeInterval = 0.0
     private var mustNotifyLastRiskLevelChange: Bool = false
-
     private var mustShowAlertAboutLastRiskLevelChange: Bool = false
     private var observers: [StatusObserverWrapper] = []
     private var storageManager: StorageManager!
@@ -433,11 +432,11 @@ extension StatusManager {
         notifyStatusChange()
         AnalyticsManager.shared.processAnalytics()
     }
-
     private func notifyStatusChange() {
         NotificationCenter.default.post(name: .statusDataDidChange, object: nil)
         notifyObservers()
     }
+    
     
 }
 
@@ -452,12 +451,12 @@ extension StatusManager {
         guard !RBManager.shared.isImmune else { return }
         guard mustNotifyLastRiskLevelChange else { return }
         mustNotifyLastRiskLevelChange = false
-        NotificationsManager.shared.cancelNotificationForIdentifier(NotificationsContant.Identifier.atRisk)
+        NotificationsManager.shared.cancelNotificationForIdentifier(NotificationsConstant.Identifier.atRisk)
         NotificationsManager.shared.scheduleNotification(minHour: ParametersManager.shared.minHourContactNotif,
                                                          maxHour: ParametersManager.shared.maxHourContactNotif,
                                                          title: RisksUIManager.shared.currentLevel?.labels.notifTitle?.localized ?? "",
                                                          body: RisksUIManager.shared.currentLevel?.labels.notifBody?.localizedOrEmpty ?? "",
-                                                         identifier: NotificationsContant.Identifier.atRisk,
+                                                         identifier: NotificationsConstant.Identifier.atRisk,
                                                          badge: 1)
     }
     
@@ -465,12 +464,12 @@ extension StatusManager {
         guard !RBManager.shared.isImmune else { return }
         guard mustShowAlertAboutLastRiskLevelChange else { return }
         mustShowAlertAboutLastRiskLevelChange = false
-        NotificationsManager.shared.cancelNotificationForIdentifier(NotificationsContant.Identifier.atRisk)
+        NotificationsManager.shared.cancelNotificationForIdentifier(NotificationsConstant.Identifier.atRisk)
         guard let title = RisksUIManager.shared.currentLevel?.labels.notifTitle else { return }
         guard let message = RisksUIManager.shared.currentLevel?.labels.notifBody else { return }
-        UIApplication.shared.keyWindow?.rootViewController?.topPresentedController.showAlert(title: title.localized,
-                                                                                             message: message.localized,
-                                                                                             okTitle: "common.ok".localized)
+        UIApplication.shared.topPresentedController?.showAlert(title: title.localized,
+                                                               message: message.localized,
+                                                               okTitle: "common.ok".localized)
     }
     
 }

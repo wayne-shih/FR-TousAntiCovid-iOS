@@ -18,15 +18,47 @@ final class AttestationsCoordinator: Coordinator {
     
     private weak var navigationController: UINavigationController?
     private weak var presentingController: UIViewController?
+    private weak var attestationsViewController: AttestationsViewController?
+    private var wasVoiceOverActivated: Bool = UIAccessibility.isVoiceOverRunning
     
     init(presentingController: UIViewController?, parent: Coordinator) {
         self.presentingController = presentingController
         self.parent = parent
+        addObserver()
         start()
     }
     
+    deinit {
+        removeObserver()
+    }
+    
+    private func addObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(voiceOverStatusDidChange), name: UIAccessibility.voiceOverStatusDidChangeNotification, object: nil)
+    }
+
+    private func removeObserver() {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     private func start() {
-        let navigationController: CVNavigationController = CVNavigationController(rootViewController: AttestationsViewController { [weak self] in
+        let attestationController: AttestationsViewController = createAttestationController()
+        attestationsViewController = attestationController
+        let innerController: UIViewController = BottomButtonContainerController.controller(attestationController)
+        let navigationController: CVNavigationController = CVNavigationController(rootViewController: innerController)
+        self.navigationController = navigationController
+        presentingController?.present(navigationController, animated: true)
+    }
+    
+    private func updateCurrentController() {
+        attestationsViewController?.deinitBlock = nil
+        let attestationsViewController: AttestationsViewController = createAttestationController()
+        self.attestationsViewController = attestationsViewController
+        let innerController: UIViewController = UIAccessibility.isVoiceOverRunning ? attestationsViewController : BottomButtonContainerController.controller(attestationsViewController)
+        navigationController?.setViewControllers([innerController], animated: false)
+    }
+    
+    private func createAttestationController() -> AttestationsViewController {
+        AttestationsViewController { [weak self] in
             self?.openNewAttestation()
         } didTouchTermsOfUse: { [weak self] in
             self?.openTermsOfUse()
@@ -36,9 +68,7 @@ final class AttestationsCoordinator: Coordinator {
             self?.showAttestationQRCodeFullscreen(qrCode, text: text)
         } deinitBlock: { [weak self] in
             self?.didDeinit()
-        })
-        self.navigationController = navigationController
-        presentingController?.present(navigationController, animated: true)
+        }
     }
     
     private func openNewAttestation() {
@@ -63,6 +93,12 @@ final class AttestationsCoordinator: Coordinator {
         controller.modalTransitionStyle = .crossDissolve
         controller.modalPresentationStyle = .fullScreen
         navigationController?.present(controller, animated: true)
+    }
+    
+    @objc private func voiceOverStatusDidChange() {
+        guard wasVoiceOverActivated != UIAccessibility.isVoiceOverRunning else { return }
+        wasVoiceOverActivated = UIAccessibility.isVoiceOverRunning
+        updateCurrentController()
     }
     
 }

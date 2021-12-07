@@ -11,13 +11,16 @@
 import Foundation
 import UIKit
 
-class VenuesInformationController:
-    CVTableViewController {
+class VenuesInformationController: CVTableViewController {
 
     private let deinitBlock: (() -> ())?
+    private let didTouchContinue: (() -> ())?
+    
+    private var controller: UIViewController { bottomButtonContainerController ?? self }
 
-    init(deinitBlock: (() -> ())?) {
+    init(didTouchContinue: (() -> ())?, deinitBlock: (() -> ())?) {
         self.deinitBlock = deinitBlock
+        self.didTouchContinue = didTouchContinue
         super.init(style: .plain)
     }
 
@@ -29,6 +32,7 @@ class VenuesInformationController:
         super.viewDidLoad()
         initUI()
         reloadUI()
+        updateBottomBarButton()
     }
 
     deinit {
@@ -36,60 +40,59 @@ class VenuesInformationController:
     }
 
     private func initUI() {
-        title = "venuesRecording.onboardingController.title".localized
+        controller.title = "venuesRecording.onboardingController.title".localized
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
-        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
+        controller.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        controller.navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
     }
 
     @objc private func didTouchCloseButton() {
         dismiss(animated: true, completion: nil)
     }
 
-    override func createRows() -> [CVRow] {
-        infoRows()
+    override func createSections() -> [CVSection] {
+        makeSections { CVSection { infoRows() } }
     }
-
 
     private func infoRows() -> [CVRow] {
         let headerImageRow: CVRow = CVRow(image: Asset.Images.venuesRecording.image,
                                           xibName: .imageCell,
-                                          theme: CVRow.Theme(topInset: 40.0,
-                                                             imageRatio: Appearance.Cell.Image.defaultRatio))
+                                          theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                                             imageRatio: 375.0 / 116.0))
         let explanationsRow: CVRow = CVRow(title: "venuesRecording.onboardingController.mainMessage.title".localized,
                                            subtitle: "venuesRecording.onboardingController.mainMessage.message".localized,
                                            xibName: .standardCardCell,
                                            theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                              topInset: 0.0,
-                                                              bottomInset: 0.0,
-                                                              textAlignment: .center,
+                                                              topInset: .zero,
+                                                              bottomInset: .zero,
+                                                              textAlignment: .natural,
                                                               titleFont: { Appearance.Cell.Text.headTitleFont }))
 
         let whenToUseRow: CVRow = CVRow(title: "venuesRecording.whenToUse.title".localized,
                                         subtitle: "venuesRecording.whenToUse.subtitle".localized,
                                         xibName: .standardCardCell,
                                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                           topInset: 15.0,
-                                                           bottomInset: 0.0,
-                                                           textAlignment: .center,
+                                                           topInset: Appearance.Cell.Inset.normal,
+                                                           bottomInset: .zero,
+                                                           textAlignment: .natural,
                                                            titleFont: { Appearance.Cell.Text.headTitleFont }))
         let alertRow: CVRow = CVRow(title: "venuesRecording.alert.title".localized,
                                         subtitle: "venuesRecording.alert.subtitle".localized,
                                         xibName: .standardCardCell,
                                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                           topInset: 15.0,
-                                                           bottomInset: 0.0,
-                                                           textAlignment: .center,
+                                                           topInset: Appearance.Cell.Inset.normal,
+                                                           bottomInset: .zero,
+                                                           textAlignment: .natural,
                                                            titleFont: { Appearance.Cell.Text.headTitleFont }))
         let phoneRow: CVRow = CVRow(title: "walletController.phone.title".localized,
                                     subtitle: "walletController.phone.subtitle".localized,
                                     image: Asset.Images.walletPhone.image,
                                     xibName: .phoneCell,
                                     theme: CVRow.Theme(backgroundColor: Asset.Colors.secondaryButtonBackground.color,
-                                                       topInset: 15.0,
-                                                       bottomInset: 0.0,
+                                                       topInset: Appearance.Cell.Inset.normal,
+                                                       bottomInset: .zero,
                                                        textAlignment: .natural,
                                                        titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
                                                        subtitleFont: { Appearance.Cell.Text.accessoryFont }),
@@ -102,6 +105,14 @@ class VenuesInformationController:
                 whenToUseRow,
                 alertRow,
                 phoneRow]
+    }
+    
+    private func updateBottomBarButton() {
+        bottomButtonContainerController?.updateButton(title: "venuesRecording.onboardingController.button.participate".localized) { [weak self] in
+            self?.dismiss(animated: true) { [weak self] in
+                self?.didTouchContinue?()
+            }
+        }
     }
 
 }

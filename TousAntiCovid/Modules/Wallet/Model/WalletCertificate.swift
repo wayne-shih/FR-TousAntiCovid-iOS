@@ -28,6 +28,7 @@ class WalletCertificate {
     var isSignatureAlreadyEncoded: Bool { fatalError("Must be overriden") }
 
     var pillTitles: [(text: String, backgroundColor: UIColor)] { fatalError("Must be overriden") }
+    var title: String? { fatalError("Must be overriden") }
     var shortDescription: String? { fatalError("Must be overriden") }
     var fullDescription: String? { fatalError("Must be overriden") }
     var fullDescriptionForFullscreen: String? { fatalError("Must be overriden") }
@@ -61,19 +62,13 @@ class WalletCertificate {
         return Date().timeIntervalSince1970 - timestamp >= Double(oldCertificateThreshold) * 86400.0
     }
 
-    var validityString: String {
-        let walletTestCertificateValidityThresholds: [Int] = ParametersManager.shared.walletTestCertificateValidityThresholds
-        let maxValidityInHours: Int = walletTestCertificateValidityThresholds.max() ?? 0
-        let timeSinceCreation: Double = Date().timeIntervalSince1970 - timestamp
-        let validityThresholdInHours: Int? = walletTestCertificateValidityThresholds.filter { Double($0 * 3600) > timeSinceCreation } .min()
-        return String(format: ( validityThresholdInHours == nil ? "wallet.proof.moreThanSpecificHours" : "wallet.proof.lessThanSpecificHours").localized, validityThresholdInHours ?? maxValidityInHours)
-    }
-
     var publicKey: String? {
         guard let authority = authority else { return nil }
         guard let certificateId = certificateId else { return nil }
         return ParametersManager.shared.walletPublicKey(authority: authority, certificateId: certificateId)
     }
+    
+    var additionalInfo: [AdditionalInfo] { getAdditionalInfo() }
     
     init(id: String = UUID().uuidString, value: String, type: WalletConstant.CertificateType) {
         self.id = id
@@ -84,7 +79,26 @@ class WalletCertificate {
     func toRawCertificate() -> RawWalletCertificate {
         RawWalletCertificate(id: id, value: value, expiryDate: nil, parentId: parentId, didGenerateAllActivityCertificates: false)
     }
+
+    func validityString(forceEnglish: Bool) -> String {
+        let walletTestCertificateValidityThresholds: [Int] = ParametersManager.shared.walletTestCertificateValidityThresholds
+        let maxValidityInHours: Int = walletTestCertificateValidityThresholds.max() ?? 0
+        let timeSinceCreation: Double = Date().timeIntervalSince1970 - timestamp
+        let validityThresholdInHours: Int? = walletTestCertificateValidityThresholds.filter { Double($0 * 3600) > timeSinceCreation } .min()
+        if forceEnglish {
+            return String(format: ( validityThresholdInHours == nil ? "wallet.proof.englishDescription.moreThanSpecificHours" : "wallet.proof.englishDescription.lessThanSpecificHours").localized, validityThresholdInHours ?? maxValidityInHours)
+        } else {
+            return String(format: ( validityThresholdInHours == nil ? "wallet.proof.moreThanSpecificHours" : "wallet.proof.lessThanSpecificHours").localized, validityThresholdInHours ?? maxValidityInHours)
+        }
+    }
     
+    func getAdditionalInfo() -> [AdditionalInfo] {
+        if DccBlacklistManager.shared.isBlacklisted(certificate: self) || Blacklist2dDocManager.shared.isBlacklisted(certificate: self) {
+            return [AdditionalInfo(category: .warning, fullDescription: "wallet.blacklist.warning".localized)]
+        } else {
+            return []
+        }
+    }
 }
 
 extension WalletCertificate {
@@ -130,4 +144,10 @@ extension WalletCertificate {
         }
     }
 
+}
+
+extension Array where Element == AdditionalInfo {
+    var warnings: [Element] { filter { $0.category == .warning } }
+    var info: [Element] { filter { $0.category == .info } }
+    var errors: [Element] { filter { $0.category == .error } }
 }

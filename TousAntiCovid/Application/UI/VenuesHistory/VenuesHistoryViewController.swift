@@ -36,8 +36,6 @@ final class VenuesHistoryViewController: CVTableViewController {
     }
     
     private func initUI() {
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -58,7 +56,7 @@ final class VenuesHistoryViewController: CVTableViewController {
         VenuesManager.shared.removeObserver(self)
     }
     
-    override func createRows() -> [CVRow] {
+    override func createSections() -> [CVSection] {
         let venuesQrCodes: [VenueQrCodeInfo] = VenuesManager.shared.venuesQrCodes.sorted { $0.ntpTimestamp > $1.ntpTimestamp }
         updateEmptyView(areThereQrCodes: !venuesQrCodes.isEmpty, isSick: RBManager.shared.isImmune)
         guard !venuesQrCodes.isEmpty else { return [] }
@@ -67,9 +65,9 @@ final class VenuesHistoryViewController: CVTableViewController {
                   subtitle: venueQrCodeInfo.ltid,
                   xibName: .venueHistoryCell,
                   theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                     topInset: 8.0,
-                                     bottomInset: 8.0,
-                                     rightInset: 8.0,
+                                     topInset: Appearance.Cell.Inset.small,
+                                     bottomInset: Appearance.Cell.Inset.small,
+                                     rightInset: Appearance.Cell.Inset.small,
                                      textAlignment: .natural,
                                      titleFont: { Appearance.Cell.Text.standardFont },
                                      subtitleFont: { Appearance.Cell.Text.subtitleFont },
@@ -79,23 +77,21 @@ final class VenuesHistoryViewController: CVTableViewController {
                     self?.deleteVenueQrCodeInfo(venueQrCodeInfo)
                   })
         }
-        guard rows.count >= 1 else { return rows }
+        guard rows.count >= 1 else { return [CVSection(rows: rows)] }
         let footerText: String = "venuesHistoryController.footer".localizedOrEmpty
-        if footerText.isEmpty {
-            rows.append(.emptyFor(topInset: 0.0, bottomInset: 0.0, showSeparator: false))
-        } else {
+        if !footerText.isEmpty {
             let footerRow: CVRow = CVRow(title: footerText,
                                          xibName: .textCell,
-                                         theme:  CVRow.Theme(topInset: 20.0,
-                                                             bottomInset: 0.0,
+                                         theme:  CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                                             bottomInset: .zero,
                                                              textAlignment: .natural,
                                                              titleFont: { Appearance.Cell.Text.footerFont },
                                                              titleColor: Appearance.Cell.Text.captionTitleColor,
-                                                             separatorLeftInset: 0.0,
-                                                             separatorRightInset: 0.0))
+                                                             separatorLeftInset: .zero,
+                                                             separatorRightInset: .zero))
             rows.append(footerRow)
         }
-        return rows
+        return [CVSection(header: .groupedHeader, rows: rows)]
     }
     
     private func updateEmptyView(areThereQrCodes: Bool, isSick: Bool) {

@@ -28,4 +28,6 @@ extension NSNotification.Name {
     static let openWallet: NSNotification.Name = NSNotification.Name(rawValue: "openWallet")
     static let openCertificateQRCode: Notification.Name = Notification.Name(rawValue: "openCertificateQRCode")
     static let gotRobert430Error: Notification.Name = Notification.Name(rawValue: "gotRobert430Error")
+    static let shouldShowStorageAlert: Notification.Name = Notification.Name(rawValue: "shouldShowStorageAlert")
+    static let openSmartWalletFromNotification: NSNotification.Name = NSNotification.Name(rawValue: "openSmartWalletFromNotification")
 }

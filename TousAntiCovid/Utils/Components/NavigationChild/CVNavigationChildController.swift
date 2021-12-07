@@ -75,19 +75,21 @@ final class CVNavigationChildController: UIViewController {
     private func initNavigationBar() {
         navigationBar.isAccessibilityElement = false
         navigationBar.accessibilityElementsHidden = true
-        navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
         updateNavigationBarAlpha(0.0)
         fakeNavigationBar.tintColor = Asset.Colors.tint.color
         fakeNavigationBar.tintAdjustmentMode = .normal
-        if #available(iOS 15, *) {
-            let appearance: UINavigationBarAppearance = UINavigationBarAppearance()
+        if #available(iOS 13, *) {
+            let appearance: UINavigationBarAppearance = .init()
             appearance.configureWithTransparentBackground()
+            appearance.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
             fakeNavigationBar.scrollEdgeAppearance = appearance
             fakeNavigationBar.standardAppearance = appearance
             navigationBar.scrollEdgeAppearance = appearance
             navigationBar.standardAppearance = appearance
         } else {
+            navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
             navigationBar.setBackgroundImage(UIImage(), for: .default)
+            fakeNavigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont]
             fakeNavigationBar.setBackgroundImage(UIImage(), for: .default)
             fakeNavigationBar.shadowImage = UIImage()
         }

@@ -42,8 +42,6 @@ final class WalletCertificateErrorViewController: CVTableViewController {
     
     private func initUI() {
         title = "walletCertificateErrorController.title".localized
-        tableView.tableHeaderView = UIView(frame: .zero)
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .singleLine
@@ -56,15 +54,44 @@ final class WalletCertificateErrorViewController: CVTableViewController {
         dismiss(animated: true, completion: nil)
     }
 
-    override func createRows() -> [CVRow] {
-        let explanationsRow: CVRow = CVRow(title: "walletCertificateErrorController.explanations.\(error.localizedDescription).\(certificateType.textKey).title".localized,
-                                           subtitle: "walletCertificateErrorController.explanations.\(error.localizedDescription).\(certificateType.textKey).subtitle".localized,
-                                           xibName: .standardCardCell,
-                                           theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                              topInset: 20.0,
-                                                              bottomInset: 0.0,
-                                                              textAlignment: .center,
-                                                              titleFont: { Appearance.Cell.Text.headTitleFont }))
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow(title: "walletCertificateErrorController.explanations.\(error.localizedDescription).\(certificateType.textKey).title".localized,
+                      subtitle: "walletCertificateErrorController.explanations.\(error.localizedDescription).\(certificateType.textKey).subtitle".localized,
+                      xibName: .standardCardCell,
+                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                         topInset: Appearance.Cell.Inset.medium,
+                                         bottomInset: .zero,
+                                         textAlignment: .center,
+                                         titleFont: { Appearance.Cell.Text.headTitleFont }))
+                documentImageRow()
+                CVRow(title: "walletController.phone.title".localized,
+                      subtitle: "walletController.phone.subtitle".localized,
+                      image: Asset.Images.walletPhone.image,
+                      xibName: .phoneCell,
+                      theme: CVRow.Theme(backgroundColor: Asset.Colors.secondaryButtonBackground.color,
+                                         topInset: Appearance.Cell.Inset.normal,
+                                         bottomInset: .zero,
+                                         textAlignment: .natural,
+                                         titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
+                                         subtitleFont: { Appearance.Cell.Text.accessoryFont }),
+                      selectionAction: { [weak self] in
+                    guard let self = self else { return }
+                    "walletController.phone.number".localized.callPhoneNumber(from: self)
+                })
+                CVRow(title: "common.close".localized,
+                      xibName: .buttonCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
+                                         bottomInset: .zero,
+                                         buttonStyle: .primary),
+                      selectionAction: { [weak self] in
+                    self?.didTouchCloseButton()
+                })
+            }
+        }
+    }
+    private func documentImageRow() -> CVRow {
         let documentImage: UIImage
         switch certificateType {
         case .vaccination:
@@ -82,42 +109,21 @@ final class WalletCertificateErrorViewController: CVTableViewController {
         case .exemptionEurope:
             documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
         case .unknown:
-            documentImage = UIImage()
+            documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
         }
-        let checkDocumentRow: CVRow = CVRow(title: "walletCertificateErrorController.checkDocument.\(certificateType.textKey).title".localized,
-                                            subtitle: "walletCertificateErrorController.checkDocument.\(certificateType.textKey).subtitle".localized,
-                                            image: documentImage,
-                                        xibName: .checkDocumentCell,
-                                        theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                           topInset: 15.0,
-                                                           bottomInset: 0.0,
-                                                           textAlignment: .center,
-                                                           titleFont: { Appearance.Cell.Text.headTitleFont }),
-                                        selectionAction: { [weak self] in
-                                            guard let self = self else { return }
-                                            self.didTouchDocument(self.certificateType)
-                                        })
-        let phoneRow: CVRow = CVRow(title: "walletController.phone.title".localized,
-                                    subtitle: "walletController.phone.subtitle".localized,
-                                    image: Asset.Images.walletPhone.image,
-                                    xibName: .phoneCell,
-                                    theme: CVRow.Theme(backgroundColor: Asset.Colors.secondaryButtonBackground.color,
-                                                       topInset: 15.0,
-                                                       bottomInset: 0.0,
-                                                       textAlignment: .natural,
-                                                       titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
-                                                       subtitleFont: { Appearance.Cell.Text.accessoryFont }),
-                                    selectionAction: { [weak self] in
-                                        guard let self = self else { return }
-                                        "walletController.phone.number".localized.callPhoneNumber(from: self)
-                                    })
-        let closeRow: CVRow = CVRow(title: "common.close".localized,
-                                    xibName: .buttonCell,
-                                    theme: CVRow.Theme(topInset: 15.0, bottomInset: 0.0, buttonStyle: .primary),
-                                    selectionAction: { [weak self] in
-                                        self?.didTouchCloseButton()
-                                    })
-        return [explanationsRow, checkDocumentRow, phoneRow, closeRow]
+        return CVRow(title: "walletCertificateErrorController.checkDocument.\(certificateType.textKey).title".localized,
+                     subtitle: "walletCertificateErrorController.checkDocument.\(certificateType.textKey).subtitle".localized,
+                     image: documentImage,
+                     xibName: .checkDocumentCell,
+                     theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                        topInset: Appearance.Cell.Inset.normal,
+                                        bottomInset: .zero,
+                                        textAlignment: .center,
+                                        titleFont: { Appearance.Cell.Text.headTitleFont }),
+                     selectionAction: { [weak self] in
+            guard let self = self else { return }
+            self.didTouchDocument(self.certificateType)
+        })
     }
 
 }

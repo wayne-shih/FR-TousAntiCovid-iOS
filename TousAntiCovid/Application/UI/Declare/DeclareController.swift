@@ -40,6 +40,7 @@ final class DeclareController: CVTableViewController {
         initUI()
         reloadUI()
         addObservers()
+        updateBottomBarButton()
     }
     
     deinit {
@@ -48,67 +49,52 @@ final class DeclareController: CVTableViewController {
     }
     
     private func updateTitle() {
-        title = "declareController.title".localized
+        bottomButtonContainerController?.title = "declareController.title".localized
     }
     
-    override func createRows() -> [CVRow] {
-        let imageRow: CVRow = CVRow(image: Asset.Images.declare.image,
-                                    xibName: .imageCell,
-                                    theme: CVRow.Theme(imageRatio: 375.0 / 248.0))
-        return [imageRow] + commonRows()
-    }
-    
-    private func commonRows() -> [CVRow] {
-        var rows: [CVRow] = []
-        if RBManager.shared.isRegistered {
-            let textRow: CVRow = CVRow(title: "declareController.message.testedPositive.title".localized,
-                                       subtitle: "declareController.message.testedPositive.subtitle".localized,
-                                       xibName: .cardCell,
-                                       theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                          topInset: 0.0,
-                                                          bottomInset: 0.0,
-                                                          titleFont: { Appearance.Cell.Text.smallHeadTitleFont }))
-            rows.append(textRow)
-            let codeNotReceivedButtonRow: CVRow = CVRow(title: "declareController.codeNotReceived.buttonTitle".localized,
-                                                        xibName: .buttonCell,
-                                                        theme: CVRow.Theme(topInset: 0.0, bottomInset: 0.0, buttonStyle: .quaternary),
-                                                        selectionAction: { [weak self] in
-                                                            self?.didTouchCodeNotReceivedButton()
-                                                        })
-            rows.append(codeNotReceivedButtonRow)
-            let flashButtonRow: CVRow = CVRow(title: "declareController.button.flash".localized,
-                                              xibName: .buttonCell,
-                                              theme: CVRow.Theme(topInset: 0.0, bottomInset: 0.0),
-                                              selectionAction: { [weak self] in
-                                                self?.didTouchFlashButton()
-            }, willDisplay: { cell in
-                (cell as? ButtonCell)?.button.accessibilityHint = "accessibility.hint.sick.qrCode.enterCodeOnNextButton".localized
-            })
-            rows.append(flashButtonRow)
-            let tapButtonRow: CVRow = CVRow(title: "declareController.button.tap".localized,
-                                            xibName: .buttonCell,
-                                            theme: CVRow.Theme(topInset: 20.0, bottomInset: 0.0, buttonStyle: .secondary),
-                                            selectionAction: { [weak self] in
-                                                self?.didTouchTapButton()
-            })
-            rows.append(tapButtonRow)
-        } else {
-            let textRow: CVRow = CVRow(title: "declareController.notRegistered.mainMessage.title".localized,
-                                       subtitle: "declareController.notRegistered.mainMessage.subtitle".localized,
-                                       xibName: .textCell,
-                                       theme: CVRow.Theme(topInset: 20.0))
-            rows.append(textRow)
+    override func createSections() -> [CVSection] {
+        makeSections {
+            CVSection {
+                CVRow(image: Asset.Images.declare.image,
+                      xibName: .imageCell,
+                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
+                                         imageRatio: 375.0 / 116.0))
+
+                if RBManager.shared.isRegistered {
+                    CVRow(title: "declareController.message.testedPositive.title".localized,
+                          subtitle: "declareController.message.testedPositive.subtitle".localized,
+                          buttonTitle: "declareController.codeNotReceived.buttonTitle".localized,
+                          xibName: .paragraphCell,
+                          theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                             topInset: .zero,
+                                             bottomInset: .zero,
+                                             textAlignment: .natural,
+                                             titleFont: { Appearance.Cell.Text.headTitleFont }),
+                          selectionAction: { [weak self] in
+                        self?.didTouchCodeNotReceivedButton()
+                    })
+                } else {
+                    CVRow(title: "declareController.notRegistered.mainMessage.title".localized,
+                          subtitle: "declareController.notRegistered.mainMessage.subtitle".localized,
+                          xibName: .textCell,
+                          theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium))
+                }
+            }
         }
-        return rows
     }
     
     private func initUI() {
-        tableView.contentInset.top = navigationChildController?.navigationBarHeight ?? 0.0
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: 20.0))
         tableView.backgroundColor = Appearance.Controller.cardTableViewBackgroundColor
         tableView.showsVerticalScrollIndicator = false
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
-        navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
+        bottomButtonContainerController?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
+        bottomButtonContainerController?.navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
+    }
+    
+    private func updateBottomBarButton() {
+        bottomButtonContainerController?.updateButton(title: "declareController.button.enterCode".localized) { [weak self] in
+            self?.showEnterCodeOptions()
+            self?.bottomButtonContainerController?.unlockButtons()
+        }
     }
     
     @objc private func didTouchCloseButton() {
@@ -125,6 +111,14 @@ final class DeclareController: CVTableViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    private func showEnterCodeOptions() {
+        showActionSheet(title: nil, message: "declareController.enterCodeOptions.title".localized, firstActionTitle: "declareController.button.flash".localized, secondActionTitle: "declareController.button.tap".localized, showCancel: true, firstActionHandler: { [weak self] in
+            self?.didTouchFlashButton()
+        }) { [weak self] in
+            self?.didTouchTapButton()
+        }
+    }
+    
     @objc private func didTouchFlashButton() {
         CameraAuthorizationManager.requestAuthorization { granted, isFirstTimeRequest in
             if granted {
@@ -134,8 +128,8 @@ final class DeclareController: CVTableViewController {
                                message: "scanCodeController.camera.authorizationNeeded.message".localized,
                                okTitle: "common.settings".localized,
                                cancelTitle: "common.cancel".localized, handler:  {
-                                UIApplication.shared.openSettings()
-                               })
+                    UIApplication.shared.openSettings()
+                })
             }
         }
     }

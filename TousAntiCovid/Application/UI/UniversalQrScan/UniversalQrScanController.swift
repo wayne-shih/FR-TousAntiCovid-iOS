@@ -43,16 +43,16 @@ final class UniversalQrScanController: FlashCodeController {
             bottomButton?.titleLabel?.textAlignment = .center
         }
 
-        navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont,
-                                                                   .foregroundColor: UIColor.white]
         navigationController?.navigationBar.tintColor = .white
-        if #available(iOS 15, *) {
+        if #available(iOS 13, *) {
             // navigation bar transparency specified in child controller
             let appearence = UINavigationBarAppearance()
             appearence.configureWithTransparentBackground()
+            appearence.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont, .foregroundColor: UIColor.white]
             navigationItem.scrollEdgeAppearance = appearence
             navigationItem.standardAppearance = appearence
         } else {
+            navigationController?.navigationBar.titleTextAttributes = [.font: Appearance.NavigationBar.titleFont, .foregroundColor: UIColor.white]
             navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
             navigationController?.navigationBar.shadowImage = UIImage()
         }

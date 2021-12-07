@@ -25,7 +25,7 @@ final class DeclareCoordinator: Coordinator {
     }
     
     private func start() {
-        let navigationController: CVNavigationController = CVNavigationController(rootViewController: DeclareController(didTouchFlash: { [weak self] in
+        let declareController: DeclareController = .init(didTouchFlash: { [weak self] in
             self?.showFlash()
         }, didTouchTap: { [weak self] in
             self?.showTap()
@@ -33,7 +33,8 @@ final class DeclareCoordinator: Coordinator {
             self?.showRemoteVideo(url: url)
         }, deinitBlock: { [weak self] in
             self?.didDeinit()
-        }))
+        })
+        let navigationController: CVNavigationController = CVNavigationController(rootViewController: BottomButtonContainerController.controller(declareController))
         self.navigationController = navigationController
         presentingController?.present(navigationController, animated: true)
     }
