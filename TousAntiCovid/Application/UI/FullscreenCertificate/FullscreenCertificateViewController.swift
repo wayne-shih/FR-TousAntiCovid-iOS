@@ -412,7 +412,7 @@ extension FullscreenCertificateViewController {
 
     private func codeImageRow(_ certificate: WalletCertificate) -> CVRow {
         let margin: CGFloat = 80.0
-        return CVRow(image: Asset.Images.logoTac.image,
+        return CVRow(image: Asset.Images.screenshotLogo.image,
                      xibName: .protectedQrCodeCell,
                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
                                         bottomInset: .zero,

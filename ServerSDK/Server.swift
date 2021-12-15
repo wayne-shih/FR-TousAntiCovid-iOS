@@ -60,7 +60,8 @@ public final class Server: NSObject, RBServer {
                 } else {
                     self.processRegister(captcha: captcha, captchaId: captchaId, publicKey: publicKey, completion: completion)
                 }
-            case .failure:
+            case let .failure(error):
+                print(error)
                 self.processRegister(captcha: captcha, captchaId: captchaId, publicKey: publicKey, completion: completion)
             }
         }

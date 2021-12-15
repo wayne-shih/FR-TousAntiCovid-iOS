@@ -22,6 +22,7 @@ final class KeyFiguresComparisonController: CVTableViewController {
     // MARK: - Variables
     @UserDefault(key: .comparedKeyFigures)
     private var comparedKeyFiguresLabels: [String] = KeyFiguresManager.shared.initialSelectionForComparison
+    private var currentChartRange: ChartRange = .year
     private var comparedKeyFiguresIndexes: [Int] {
         get {
             let indexes: [Int] = comparedKeyFiguresLabels.compactMap {
@@ -73,6 +74,7 @@ final class KeyFiguresComparisonController: CVTableViewController {
         makeSections {
             CVSection(title: nil,
                       subtitle: "keyfigures.comparison.evolution.section.subtitle".localized) {
+                if let row = rangeSelectionRow() { row }
                 comparisonChartRow()
                 comparisonButtonRow()
             }
@@ -108,10 +110,10 @@ private extension KeyFiguresComparisonController {
 // MARK: - Rows
 private extension KeyFiguresComparisonController {
     func comparisonChartRow() -> CVRow {
-        let chartData: [KeyFigureChartData] = KeyFiguresManager.shared.generateComparisonChartData(between: selectedKeyFigures[0], and: selectedKeyFigures[1], daysCount: ChartRange.year.rawValue, withFooter: true)
+        let chartData: [KeyFigureChartData] = KeyFiguresManager.shared.generateComparisonChartData(between: selectedKeyFigures[0], and: selectedKeyFigures[1], daysCount: currentChartRange.rawValue, withFooter: true)
         let areComparable: Bool = selectedKeyFigures.haveSameMagnitude
         let chartView: ChartViewBase? = ChartViewBase.create(chartData1: chartData[0], chartData2: chartData[1], sameOrdinate: areComparable, allowInteractions: false)
-        let data: [KeyFigureChartData] = KeyFiguresManager.shared.generateComparisonChartData(between: selectedKeyFigures[0], and: selectedKeyFigures[1], daysCount: ChartRange.year.rawValue, withFooter: false)
+        let data: [KeyFigureChartData] = KeyFiguresManager.shared.generateComparisonChartData(between: selectedKeyFigures[0], and: selectedKeyFigures[1], daysCount: currentChartRange.rawValue, withFooter: false)
         return CVRow(xibName: .keyFigureChartCell,
                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                         topInset: Appearance.Cell.Inset.medium,
@@ -138,6 +140,32 @@ private extension KeyFiguresComparisonController {
                                  buttonStyle: .secondary),
               selectionAction: { [weak self] in
             self?.showSelectionController()
+        })
+    }
+    
+    func rangeSelectionRow() -> CVRow? {
+        let seriesMinCount: Int = selectedKeyFigures.compactMap { $0.ascendingSeries?.count }.min() ?? 0
+        var chartRanges: [ChartRange] = []
+        if seriesMinCount > ChartRange.threeMonth.rawValue {
+            chartRanges = [.year, .threeMonth, .month]
+        } else if seriesMinCount > ChartRange.month.rawValue {
+            chartRanges = [.threeMonth, .month]
+        }
+        guard !chartRanges.isEmpty else { return nil }
+        return CVRow(segmentsTitles: chartRanges.map { "keyFigureDetailController.chartRange.segmentTitle.\($0.rawValue)".localized },
+                     selectedSegmentIndex: chartRanges.firstIndex(of: currentChartRange) ?? 0,
+                     xibName: .segmentedCell,
+                     theme:  CVRow.Theme(backgroundColor: .clear,
+                                         topInset: Appearance.Cell.Inset.small / 2,
+                                         bottomInset: Appearance.Cell.Inset.small / 2,
+                                         textAlignment: .natural,
+                                         titleFont: { Appearance.SegmentedControl.selectedFont },
+                                         subtitleFont: { Appearance.SegmentedControl.normalFont }),
+                     segmentsActions: chartRanges.map { chartRange in
+            { [weak self] in
+                self?.currentChartRange = chartRange
+                self?.reloadUI(animated: true, completion: nil)
+            }
         })
     }
     

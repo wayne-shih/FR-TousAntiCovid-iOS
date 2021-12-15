@@ -56,8 +56,7 @@ final class UrgentDgsDetailController: CVTableViewController {
         makeSections {
             CVSection {
                 // Video row if there is an url defined in strings
-                let videoPath: String = "dgsUrgentController.videoUrl".localized
-                if !videoPath.isEmpty {
+                if let videoPath = "dgsUrgentController.videoUrl".localizedOrNil, !videoPath.isEmpty {
                     videoRow(videoPath: videoPath)
                 }
                 // Information row with details on the reminders

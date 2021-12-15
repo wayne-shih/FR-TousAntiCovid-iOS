@@ -67,13 +67,10 @@ final class CVButton: UIButton {
         }
     }
     
-    override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
-        let ret = super.beginTracking(touch, with: event)
-        if ret {
-            let generator: UIImpactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
-        }
-        return ret
+    override func endTracking(_ touch: UITouch?, with event: UIEvent?) {
+        super.endTracking(touch, with: event)
+        let generator: UIImpactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
     }
     
 }

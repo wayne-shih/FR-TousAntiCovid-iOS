@@ -215,6 +215,18 @@ public final class ParametersManager: NSObject {
         return ["keyfigure." + key1, "keyfigure." + key2]
     }
     
+    public var predefinedKeyFiguresSelection: [KeyfiguresCombination]? {
+        guard let value = valueFor(name: "app.keyfigures.compare") as? [[String: String]] else {
+            return nil
+        }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode([KeyfiguresCombination].self, from: jsonData)
+        } catch {
+            return nil
+        }
+    }
+    
     public var keyFiguresComparisonColors: [UIColor]? {
         guard let value = valueFor(name: "app.keyfigures.compareColors") as? [[String: String]] else {
             return nil

@@ -383,7 +383,9 @@ final class WalletViewController: CVTableViewController {
     private func additionalInfoRowIfNeeded(for certificate: WalletCertificate) -> CVRow? {
         var additionalInfo: [AdditionalInfo] = certificate.additionalInfo
         
-        if let europeanCertificate = certificate as? EuropeanCertificate, WalletManager.shared.isRelevantCertificate(europeanCertificate) {
+        if WalletManager.shared.shouldUseSmartWallet,
+           let europeanCertificate = certificate as? EuropeanCertificate,
+           WalletManager.shared.isRelevantCertificate(europeanCertificate) {
             let expTimestamp: Double = WalletManager.shared.expiryTimestamp(europeanCertificate) ?? 0.0
             let expDate: Date = Date(timeIntervalSince1970: expTimestamp)
             if WalletManager.shared.isPassExpired(for: europeanCertificate) {
@@ -419,6 +421,16 @@ final class WalletViewController: CVTableViewController {
     private func certificateRows(certificate: WalletCertificate) -> [CVRow] {
         var rows: [CVRow] = []
         var subtitle: String = certificate.fullDescription ?? ""
+        if WalletManager.shared.shouldUseSmartWallet,
+           let cert = certificate as? EuropeanCertificate,
+           let expiryTimestamp = WalletManager.shared.expiryTimestamp(cert) {
+            let expiryDate: Date = Date(timeIntervalSince1970: expiryTimestamp)
+            let remainingValidityDuration: Double = expiryTimestamp - Date().timeIntervalSince1970
+            if remainingValidityDuration.secondsToDays() <= ParametersManager.shared.smartWalletConfiguration.exp.displayExpOnAllDcc {
+                subtitle.append("\n")
+                subtitle.append(remainingValidityDuration > 0 ? String(format: "walletController.certificateExpiration".localized, expiryDate.localDateString) : String(format: "walletController.certificateExpired".localized, expiryDate.localDateString))
+            }
+        }
         if let row = additionalInfoRowIfNeeded(for: certificate) {
             rows.append(row)
         }

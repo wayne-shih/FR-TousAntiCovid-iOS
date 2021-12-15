@@ -68,17 +68,22 @@ final class NetworkMonitor: NetworkChangesManager {
     
     private let monitor: NWPathMonitor = NWPathMonitor()
     private var observers: [NetworkMonitorObserverWrapper] = []
-    private var lastKnownStatus: Status = .unreachable
+    private var lastKnownStatus: Status?
     
     private var status: Status {
-        guard monitor.currentPath.status == .satisfied else { return .unreachable }
-        if monitor.currentPath.usesInterfaceType(.wifi) {
-            return .wifi
-        } else if monitor.currentPath.usesInterfaceType(.cellular) {
-            return .cellular
-        } else if monitor.currentPath.usesInterfaceType(.wiredEthernet) {
-            return .wiredEthernet
-        } else {
+        let path: NWPath = monitor.currentPath
+        switch path.status {
+        case .requiresConnection:
+            return .unknown
+        case .unsatisfied:
+            // It happens that the first value given by NWPathMonitor is unsatisfied, but updated after with a right value
+            return lastKnownStatus == nil ? .unknown : .unreachable
+        case .satisfied:
+            if path.usesInterfaceType(.wifi) { return .wifi }
+            else if path.usesInterfaceType(.cellular) { return .cellular }
+            else if path.usesInterfaceType(.wiredEthernet) { return .wiredEthernet }
+            else { return .unknown }
+        @unknown default:
             return .unknown
         }
     }
@@ -114,7 +119,7 @@ final class NetworkMonitor: NetworkChangesManager {
     }
     
     private func notifyObservers() {
-        observers.forEach { $0.observer?.networkStateDidChange(isUnreachable: status == .unreachable, for: unsatisfiedReason) }
+        observers.forEach { $0.observer?.networkStateDidChange(isUnreachable: isUnreachable, for: unsatisfiedReason) }
     }
     
 }

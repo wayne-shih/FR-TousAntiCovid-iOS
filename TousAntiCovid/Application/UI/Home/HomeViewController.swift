@@ -782,14 +782,14 @@ private extension HomeViewController {
         if ParametersManager.shared.shouldDisplayUrgentDgs {
             let urgentDgsRow: CVRow = CVRow(title: "home.healthSection.dgsUrgent.title".localized,
                                             subtitle: "home.healthSection.dgsUrgent.subtitle".localized,
-                                            image: nil,
-                                            xibName: .cardCell,
-                                            theme: CVRow.Theme(backgroundColor: Appearance.Cell.redBackgroundColor,
+                                            image: Asset.Images.dgsurgent.image,
+                                            xibName: .urgentDgsCell,
+                                            theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                                                topInset: .zero,
                                                                bottomInset: Appearance.Cell.Inset.normal,
                                                                textAlignment: .natural,
-                                                               titleColor: UIColor.white,
-                                                               subtitleColor: UIColor.white),
+                                                               titleColor: Appearance.Cell.Text.titleColor,
+                                                               subtitleColor: Appearance.Cell.Text.titleColor),
                                             selectionAction: { [weak self] in
                 self?.didTouchUrgentDgs()
             })
@@ -800,14 +800,13 @@ private extension HomeViewController {
         if displayVaccination {
             let vaccinationRow: CVRow = CVRow(title: "home.vaccinationSection.cellTitle".localized,
                                               subtitle: "home.vaccinationSection.cellSubtitle".localized,
-                                              image: Asset.Images.pharmacy.image,
+                                              image: Asset.Images.centresvaxx.image,
                                               xibName: .vaccinationCell,
                                               theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                                                  topInset: .zero,
                                                                  bottomInset: .zero,
                                                                  textAlignment: .natural,
-                                                                 titleColor: Asset.Colors.gradientEndGreen.color,
-                                                                 imageTintColor: Asset.Colors.gradientEndGreen.color),
+                                                                 titleColor: Asset.Colors.gradientEndGreen.color),
                                               selectionAction: { [weak self] in
                 self?.didTouchVaccination()
             })
@@ -915,16 +914,14 @@ private extension HomeViewController {
     
     func recordVenuesRow() -> CVRow {
         CVRow(title: "home.venuesSection.recordCell.title".localized,
-                                     subtitle: "home.venuesSection.recordCell.subtitle".localized,
-                                     image: Asset.Images.shops.image,
-                                     xibName: .venueRecordCell,
-                                     theme: CVRow.Theme(backgroundColor: Appearance.tintColor,
-                                                        topInset: .zero,
-                                                        bottomInset: .zero,
-                                                        textAlignment: .natural,
-                                                        titleColor: Appearance.Button.Primary.titleColor,
-                                                        subtitleColor: Appearance.Button.Primary.titleColor),
-                                     selectionAction: { [weak self] in
+              subtitle: "home.venuesSection.recordCell.subtitle".localized,
+              image: Asset.Images.shops.image,
+              xibName: .venueRecordCell,
+              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                 topInset: .zero,
+                                 bottomInset: .zero,
+                                 textAlignment: .natural),
+              selectionAction: { [weak self] in
             guard let self = self else { return }
             self.processOnlyRegistrationIfNeeded { error in
                 guard error == nil else { return }
@@ -1268,32 +1265,39 @@ private extension HomeViewController {
         let image: UIImage
         let subtitle: String
         let textColor: UIColor
-        switch WalletManager.shared.walletSmartState {
-        case .normal:
+        if WalletManager.shared.shouldUseSmartWallet {
+            switch WalletManager.shared.walletSmartState {
+            case .normal:
+                backgroundColor = Appearance.tintColor
+                image = Asset.Images.walletCard.image
+                subtitle = "home.attestationSection.sanitaryCertificates.cell.subtitle".localized
+                textColor = Appearance.Button.Primary.titleColor
+            case .eligibleSoon:
+                backgroundColor = Asset.Colors.info.color
+                image = Asset.Images.eligible.image
+                subtitle = "home.attestationSection.sanitaryCertificates.eligibleSoon.cell.subtitle".localized
+                textColor = .white
+            case .eligible:
+                backgroundColor = Asset.Colors.info.color
+                image = Asset.Images.eligible.image
+                subtitle = "home.attestationSection.sanitaryCertificates.eligible.cell.subtitle".localized
+                textColor = .white
+            case .expiredSoon:
+                backgroundColor = Asset.Colors.bottomWarning.color
+                image = Asset.Images.expiredSoon.image
+                subtitle = "home.attestationSection.sanitaryCertificates.expiredSoon.cell.subtitle".localized
+                textColor = .black
+            case .expired:
+                backgroundColor = Asset.Colors.error.color
+                image = Asset.Images.expired.image
+                subtitle = "home.attestationSection.sanitaryCertificates.expired.cell.subtitle".localized
+                textColor = .white
+            }
+        } else {
             backgroundColor = Appearance.tintColor
             image = Asset.Images.walletCard.image
             subtitle = "home.attestationSection.sanitaryCertificates.cell.subtitle".localized
             textColor = Appearance.Button.Primary.titleColor
-        case .eligibleSoon:
-            backgroundColor = Asset.Colors.info.color
-            image = Asset.Images.eligible.image
-            subtitle = "home.attestationSection.sanitaryCertificates.eligibleSoon.cell.subtitle".localized
-            textColor = .white
-        case .eligible:
-            backgroundColor = Asset.Colors.info.color
-            image = Asset.Images.eligible.image
-            subtitle = "home.attestationSection.sanitaryCertificates.eligible.cell.subtitle".localized
-            textColor = .white
-        case .expiredSoon:
-            backgroundColor = Asset.Colors.bottomWarning.color
-            image = Asset.Images.expiredSoon.image
-            subtitle = "home.attestationSection.sanitaryCertificates.expiredSoon.cell.subtitle".localized
-            textColor = .black
-        case .expired:
-            backgroundColor = Asset.Colors.error.color
-            image = Asset.Images.expired.image
-            subtitle = "home.attestationSection.sanitaryCertificates.expired.cell.subtitle".localized
-            textColor = .white
         }
         let sanitaryCertificatesRow: CVRow = CVRow(title: "home.attestationSection.sanitaryCertificates.cell.title".localized,
                                                    subtitle: subtitle,

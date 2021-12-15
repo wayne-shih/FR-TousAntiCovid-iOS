@@ -44,16 +44,13 @@ final class OnboardingGesturesController: OnboardingController {
     }
     
     private func gestures() -> [Gesture] {
-        return [Gesture(title: "onboarding.gesturesController.gesture1".localized, image: Asset.Images.hands.image),
-                Gesture(title: "onboarding.gesturesController.gesture2".localized, image: Asset.Images.cough.image),
-                Gesture(title: "onboarding.gesturesController.gesture3".localized, image: Asset.Images.tissues.image),
-                Gesture(title: "onboarding.gesturesController.gesture5".localized, image: Asset.Images.visage.image),
-                Gesture(title: "onboarding.gesturesController.gesture6".localized, image: Asset.Images.distance.image),
-                Gesture(title: "onboarding.gesturesController.gesture4".localized, image: Asset.Images.airCheck.image),
-                Gesture(title: "onboarding.gesturesController.gesture7".localized, image: Asset.Images.mask.image),
-                Gesture(title: "onboarding.gesturesController.gesture8".localized, image: Asset.Images.sixContacts.image),
+        return [Gesture(title: "onboarding.gesturesController.gesture7".localized, image: Asset.Images.mask.image),
                 Gesture(title: "onboarding.gesturesController.gesture9".localized, image: Asset.Images.airRecycling.image),
-                Gesture(title: "onboarding.gesturesController.gesture10".localized, image: Asset.Images.mobileApp.image)]
+                Gesture(title: "onboarding.gesturesController.gesture1".localized, image: Asset.Images.hands.image),
+                Gesture(title: "onboarding.gesturesController.gesture4".localized, image: Asset.Images.airCheck.image),
+                Gesture(title: "onboarding.gesturesController.gesture6".localized, image: Asset.Images.distance.image),
+                Gesture(title: "onboarding.gesturesController.gesture2".localized, image: Asset.Images.cough.image),
+                Gesture(title: "onboarding.gesturesController.gesture3".localized, image: Asset.Images.tissues.image)]
     }
 
 }

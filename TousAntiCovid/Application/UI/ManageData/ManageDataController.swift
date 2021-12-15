@@ -75,7 +75,7 @@ final class ManageDataController: CVTableViewController {
                 CVSection {
                     sectionHeaderRow(textPrefix: "manageDataController.smartWalletActivation")
                     switchRow(textPrefix: "manageDataController.smartWalletActivation",
-                              isOn: WalletManager.shared.smartWalletActivated, dynamicSwitchLabel: true) { [weak self] isOn in
+                              isOn: WalletManager.shared.smartWalletActivated, dynamicSwitchLabel: true) { isOn in
                         WalletManager.shared.smartWalletActivated = isOn
                     }
                 } header: {

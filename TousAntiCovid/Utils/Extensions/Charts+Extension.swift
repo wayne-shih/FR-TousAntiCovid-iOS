@@ -49,10 +49,9 @@ private extension BarLineChartViewBase {
             dataSet2.axisDependency = .right
         }
         
-        let groupSpace = 0.08
-        let barSpace = 0.03
-        let barWidth = 0.2
-        let groupsCount: Int = min(entries1.count, entries2.count)
+        let groupSpace: Double = 0.3*(24*3600)
+        let barSpace: Double = 0.05*(24*3600)
+        let barWidth: Double = 0.3*(24*3600)
         let xStart: Double = max(entries1.first?.x ?? 0.0, entries2.first?.x ?? 0.0)
         
         let barChartView: BarChartView = BarChartView()
@@ -62,7 +61,6 @@ private extension BarLineChartViewBase {
         barChartView.data = data
         
         barChartView.xAxis.axisMinimum = xStart
-        barChartView.xAxis.axisMaximum = xStart + data.groupWidth(groupSpace: groupSpace, barSpace: barSpace) * Double(groupsCount)
         
         barChartView.setupFor(chartData1: chartData1, chartData2: chartData2, sameOrdinate: sameOrdinate, allowInteractions: allowInteractions)
         barChartView.fitBars = true

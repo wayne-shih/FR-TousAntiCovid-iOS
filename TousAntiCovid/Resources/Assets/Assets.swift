@@ -66,10 +66,7 @@ internal enum Asset {
     internal static let distance = ImageAsset(name: "Distance")
     internal static let hands = ImageAsset(name: "Hands")
     internal static let mask = ImageAsset(name: "Mask")
-    internal static let mobileApp = ImageAsset(name: "MobileApp")
-    internal static let sixContacts = ImageAsset(name: "SixContacts")
     internal static let tissues = ImageAsset(name: "Tissues")
-    internal static let visage = ImageAsset(name: "Visage")
     internal static let compare = ImageAsset(name: "Compare")
     internal static let icon1 = ImageAsset(name: "Icon1")
     internal static let icon2 = ImageAsset(name: "Icon2")
@@ -134,6 +131,7 @@ internal enum Asset {
     internal static let thumbsup = ImageAsset(name: "Thumbsup")
     internal static let venuesRecording = ImageAsset(name: "VenuesRecording")
     internal static let wallet = ImageAsset(name: "Wallet")
+    internal static let screenshotLogo = ImageAsset(name: "ScreenshotLogo")
     internal static let tabBarDeclareNormal = ImageAsset(name: "TabBarDeclare-Normal")
     internal static let tabBarInfoNormal = ImageAsset(name: "TabBarInfo-Normal")
     internal static let tabBarProximityNormal = ImageAsset(name: "TabBarProximity-Normal")
@@ -159,9 +157,11 @@ internal enum Asset {
     internal static let usefulLinks = ImageAsset(name: "UsefulLinks")
     internal static let about = ImageAsset(name: "about")
     internal static let bubble = ImageAsset(name: "bubble")
+    internal static let centresvaxx = ImageAsset(name: "centresvaxx")
     internal static let close = ImageAsset(name: "close")
     internal static let compass = ImageAsset(name: "compass")
     internal static let dataMatrix = ImageAsset(name: "dataMatrix")
+    internal static let dgsurgent = ImageAsset(name: "dgsurgent")
     internal static let flag = ImageAsset(name: "flag")
     internal static let history = ImageAsset(name: "history")
     internal static let homeRing = ImageAsset(name: "homeRing")
@@ -172,7 +172,6 @@ internal enum Asset {
     internal static let qrScanItem = ImageAsset(name: "qrScanItem")
     internal static let search = ImageAsset(name: "search")
     internal static let updateApp = ImageAsset(name: "updateApp")
-    internal static let logoTac = ImageAsset(name: "logo-tac")
   }
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name

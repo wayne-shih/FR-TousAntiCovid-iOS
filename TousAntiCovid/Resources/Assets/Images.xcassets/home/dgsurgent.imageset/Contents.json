@@ -1,17 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "logo-tac.pdf",
-      "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "light"
-        }
-      ],
-      "filename" : "logo-tac-1.pdf",
+      "filename" : "dgsurgent (2).pdf",
       "idiom" : "universal"
     },
     {
@@ -21,7 +11,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "logo-tac-dark.pdf",
+      "filename" : "dgsurgentdark.pdf",
       "idiom" : "universal"
     }
   ],

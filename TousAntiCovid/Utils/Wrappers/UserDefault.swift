@@ -113,6 +113,7 @@ extension UserDefault {
         case smartWalletActivated
         case smartWalletLastNotificationTimestamp
         case smartWalletSentNotificationsIds
+        case smartWalletLastNotificationCalculationTimestamp
         case comparedKeyFigures
         case lastRemoteFileBuildNumber
         

@@ -92,8 +92,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                didStopProximityDueToLackOfEpochsHandler: {
                                     StatusManager.shared.status()
                                     NotificationsManager.shared.triggerRestartNotification()
-                               }, didReceiveProximityHandler: {
+                               }, didReceiveProximityHandler: { [weak self] in
                                     StatusManager.shared.status()
+                                   self?.showSmartNotificationIfNeeded()
                                }, didSaveProximity: { proximity in
                                })
         RatingsManager.shared.start()
@@ -155,7 +156,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         InfoCenterManager.shared.fetchInfo()
         KeyFiguresManager.shared.fetchKeyFigures()
-        WalletManager.shared.showSmartNotificationIfNeeded()
+        showSmartNotificationIfNeeded()
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -174,7 +175,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         InfoCenterManager.shared.fetchInfo()
         KeyFiguresManager.shared.fetchKeyFigures()
-        WalletManager.shared.showSmartNotificationIfNeeded()
+        showSmartNotificationIfNeeded()
         AnalyticsManager.shared.reportAppEvent(.e1)
     }
     
@@ -282,6 +283,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         NSSetUncaughtExceptionHandler { StackLogger.log(exception: $0) }
     }
 
+    private func showSmartNotificationIfNeeded() {
+        guard WalletManager.shared.shouldUseSmartWalletNotifications else { return }
+        WalletManager.shared.showSmartNotificationIfNeeded()
+    }
 }
 
 extension AppDelegate: WalletChangesObserver {

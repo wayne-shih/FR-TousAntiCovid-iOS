@@ -230,8 +230,17 @@ final class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
             return
         }
         let content = UNMutableNotificationContent()
-        content.title = type == .expiry ? "notification.smartWallet.expiry.title".localized : "notification.smartWallet.eligibility.title".localized
-        content.body = type == .expiry ? String(format: "notification.smartWallet.expiry.body".localized, args.first ?? "") : String(format: "notification.smartWallet.eligibility.body".localized, args.first ?? "")
+        switch type {
+        case .expiry:
+            content.title = "notification.smartWallet.expiry.title".localized
+            content.body = String(format: "notification.smartWallet.expiry.body".localized, args.first ?? "")
+        case .eligibility:
+            content.title = "notification.smartWallet.eligibility.title".localized
+            content.body = String(format: "notification.smartWallet.eligibility.body".localized, args.first ?? "")
+        case .eligible:
+            content.title = "notification.smartWallet.eligible.title".localized
+            content.body = String(format: "notification.smartWallet.eligible.body".localized, args.first ?? "")
+        }
         content.sound = .default
         let request: UNNotificationRequest = UNNotificationRequest(identifier: id, content: content, trigger: nil)
         requestAuthorization { granted in

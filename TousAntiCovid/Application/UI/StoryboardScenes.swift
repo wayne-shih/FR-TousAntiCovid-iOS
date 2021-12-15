@@ -57,11 +57,6 @@ internal enum StoryboardScene {
 
     internal static let keyFigureChartController = SceneType<TousAntiCovid.KeyFigureChartController>(storyboard: KeyFigureChart.self, identifier: "KeyFigureChartController")
   }
-  internal enum ModalContainer: StoryboardType {
-    internal static let storyboardName = "ModalContainer"
-
-    internal static let modalContainerViewController = SceneType<TousAntiCovid.ModalContainerViewController>(storyboard: ModalContainer.self, identifier: "ModalContainerViewController")
-  }
   internal enum UniversalQrScan: StoryboardType {
     internal static let storyboardName = "UniversalQrScan"
 

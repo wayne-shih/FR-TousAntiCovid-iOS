@@ -56,7 +56,7 @@ final class WalletManager {
     }
     var areThereCertificatesToLoad: Bool { _walletCertificates.count != storageManager.walletCertificates().count }
     var recentWalletCertificates: [WalletCertificate] { walletCertificates.filter { !$0.isOld } }
-    var oldWalletCertificates: [WalletCertificate] { walletCertificates.filter { $0.isOld || isPassExpired(for: $0 as? EuropeanCertificate) } }
+    var oldWalletCertificates: [WalletCertificate] { walletCertificates.filter { $0.isOld || (shouldUseSmartWallet && isPassExpired(for: $0 as? EuropeanCertificate)) } }
     var areThereCertificatesNeedingAttention: Bool {
         !walletCertificates.first {
             if let europeCertificate = $0 as? EuropeanCertificate {
@@ -98,6 +98,8 @@ final class WalletManager {
     var smartWalletSentNotificationsIds: [String] = []
     @UserDefault(key: .smartWalletLastNotificationTimestamp)
     var smartWalletLastNotificationTimestamp: Double = Date.distantPast.timeIntervalSince1970
+    @UserDefault(key: .smartWalletLastNotificationCalculationTimestamp)
+    var smartWalletLastNotificationCalculationTimestamp: Double = Date.distantPast.timeIntervalSince1970
 
     var favoriteCertificate: WalletCertificate? { _walletCertificates.filter { $0.id == favoriteDccId }.first ?? loadCertificate(for: favoriteDccId) }
     
@@ -554,18 +556,14 @@ extension WalletManager {
 
 }
 
-// MARK: - -
+// MARK: - Smart wallet
 extension WalletManager {
     func getLastRelevantCertificates() -> [EuropeanCertificate]? {
-            // If feature activated
-        guard ParametersManager.shared.smartWalletFeatureActivated else { return nil }
-            // If user wants to use the feature
-        guard smartWalletActivated else { return nil }
-            // user only for EuropeanCertificates
+        // user only for EuropeanCertificates
         let europeanCertificates: [EuropeanCertificate] = _walletCertificates.filter { ($0 as? EuropeanCertificate)?.hasLunarBirthdate == false } as? [EuropeanCertificate] ?? []
-            // group certificates by user (on firstname and birthdate only)
+        // group certificates by user (on firstname and birthdate only)
         let groupedCerts: [String: [EuropeanCertificate]] = Dictionary(grouping: europeanCertificates) { "\($0.firstname.uppercased())\($0.birthdate)" }
-            // keep only the last relevant certificate: completed vaccine or recovery.
+        // keep only the last relevant certificate: completed vaccine or recovery.
         return groupedCerts.compactMap {
             $0.value
                 .filter { ($0.isLastDose == true || $0.type == .recoveryEurope || $0.isTestNegative == false) && !$0.isExpired }

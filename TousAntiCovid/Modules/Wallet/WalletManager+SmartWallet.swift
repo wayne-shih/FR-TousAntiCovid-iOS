@@ -12,7 +12,6 @@ import ServerSDK
 
 // MARK: - ELG and EXP management
 extension WalletManager {
-
     enum WalletState: Int {
         case normal
         case eligibleSoon // At least one certificate associated to a user will be eligible soon
@@ -23,6 +22,8 @@ extension WalletManager {
         var severity: Int { rawValue }
     }
     
+    var shouldUseSmartWallet: Bool { ParametersManager.shared.smartWalletFeatureActivated && smartWalletActivated }
+    var shouldUseSmartWalletNotifications: Bool { shouldUseSmartWallet && ParametersManager.shared.smartWalletNotificationsActivated }
     var smartConfig: SmartWalletConfig { ParametersManager.shared.smartWalletConfiguration }
     
     var walletSmartState: WalletState {
@@ -43,6 +44,8 @@ extension WalletManager {
     
     func expiryTimestamp(_ certificate: EuropeanCertificate?) -> Double? {
         guard let certificate = certificate else { return nil }
+        // Calculate only on completed vaccins, recovery, positive tests
+        guard (certificate.isLastDose == true || certificate.type == .recoveryEurope || certificate.isTestNegative == false) && !certificate.isExpired else { return nil }
         // Calculate only if ageLow+
         guard certificate.userAge >= smartConfig.ages.low else { return nil }
         
@@ -93,6 +96,8 @@ extension WalletManager {
     
     func eligibilityTimestamp(_ certificate: EuropeanCertificate?) -> Double? {
         guard let certificate = certificate else { return nil }
+        // Calculate only on completed vaccins, recovery, positive tests
+        guard (certificate.isLastDose == true || certificate.type == .recoveryEurope || certificate.isTestNegative == false) && !certificate.isExpired else { return nil }
         // Calculate only if ageLow+
         guard certificate.userAge >= smartConfig.ages.low else { return nil }
         
@@ -170,8 +175,12 @@ extension WalletManager {
 
 // MARK: Smart notifications
 extension WalletManager {
-    private var notifDelayThreshold: Double {
+    private var notifyDelayThreshold: Double {
         12*3600
+        
+    } // 12 hours
+    private var calculationDelayThreshold: Double {
+        3600
         
     } // 12 hours
     private var today: Double { Date().roundingToMidnightPastOne().timeIntervalSince1970 }
@@ -183,40 +192,59 @@ extension WalletManager {
     
     enum NotificationType: String {
         case eligibility
+        case eligible
         case expiry
     }
     
     func showSmartNotificationIfNeeded() {
-        // If feature activated
-        guard ParametersManager.shared.smartWalletFeatureActivated else { return }
-        // Do not show notification if smartWallet is not activated
-        guard smartWalletActivated else { return }
-        // Do not show notification if not activated
-        guard ParametersManager.shared.smartWalletNotificationsActivated else { return }
+        // Check last time we made the calculation. If to recent -> skip
+        guard abs(smartWalletLastNotificationCalculationTimestamp - Date().timeIntervalSince1970) >= calculationDelayThreshold else { return }
         let todayTimestamp: Double = Date().roundingToMidnightPastOne().timeIntervalSince1970
         let expiringSoonCertificates: [(certificate: EuropeanCertificate, expiryTimestamp: Double, range: Range<Int>)] = lastRelevantCertificates?.compactMap {
             guard isPassExpiredSoon(for: $0) else { return nil }
             guard let expiryTimestamp = expiryTimestamp($0) else { return nil }
-            let diffDays: Int = expiryTimestamp.distance(to: todayTimestamp).secondsToDays()
+            let diffDays: Int = (todayTimestamp - expiryTimestamp).secondsToDays()
             guard let range = expiringSoonRanges.first(where: { $0.contains(diffDays) }) else { return nil }
             return ($0, expiryTimestamp, range)
         } ?? []
         
-        if expiringSoonCertificates.isEmpty {
-            let eligibleSoonCertificates: [(certificate: EuropeanCertificate, eligibilityTimestamp: Double, range: Range<Int>)] = lastRelevantCertificates?.compactMap {
-                guard isEligibleToVaccinationSoon(for: $0) else { return nil }
-                guard let eligibilityTimestamp = eligibilityTimestamp($0) else { return nil }
-                let diffDays: Int = eligibilityTimestamp.distance(to: todayTimestamp).secondsToDays()
-                guard let range = eligibleSoonRanges.first(where: { $0.contains(diffDays) }) else { return nil }
-                return ($0, eligibilityTimestamp, range)
-            } ?? []
-            guard let eligibleCertificate = eligibleSoonCertificates.sorted(by: { $0.eligibilityTimestamp < $1.eligibilityTimestamp }).first else { return }
-            let id: String = notificationId(type: .eligibility, hash: eligibleCertificate.certificate.uniqueHash, range: eligibleCertificate.range)
-            sendSmartNotificationIfNeeded(for: .eligibility, with: id, args: [eligibleCertificate.certificate.formattedName])
-        } else {
+        if !expiringSoonCertificates.isEmpty {
             guard let expiringCertificate = expiringSoonCertificates.sorted(by: { $0.expiryTimestamp < $1.expiryTimestamp }).first else { return }
             let id: String = notificationId(type: .expiry, hash: expiringCertificate.certificate.uniqueHash, range: expiringCertificate.range)
             sendSmartNotificationIfNeeded(for: .expiry, with: id, args: [expiringCertificate.certificate.formattedName])
+            // Update last calculation timestamp
+            smartWalletLastNotificationCalculationTimestamp = Date().timeIntervalSince1970
+            return
+        }
+        
+        let eligibleSoonCertificates: [(certificate: EuropeanCertificate, eligibilityTimestamp: Double, range: Range<Int>)] = lastRelevantCertificates?.compactMap {
+            guard isEligibleToVaccinationSoon(for: $0) else { return nil }
+            guard let eligibilityTimestamp = eligibilityTimestamp($0) else { return nil }
+            let diffDays: Int = (todayTimestamp - eligibilityTimestamp).secondsToDays()
+            guard let range = eligibleSoonRanges.first(where: { $0.contains(diffDays) }) else { return nil }
+            return ($0, eligibilityTimestamp, range)
+        } ?? []
+        
+        if !eligibleSoonCertificates.isEmpty {
+            guard let expiringCertificate = expiringSoonCertificates.sorted(by: { $0.expiryTimestamp < $1.expiryTimestamp }).first else { return }
+            let id: String = notificationId(type: .expiry, hash: expiringCertificate.certificate.uniqueHash, range: expiringCertificate.range)
+            sendSmartNotificationIfNeeded(for: .expiry, with: id, args: [expiringCertificate.certificate.formattedName])
+            // Update last calculation timestamp
+            smartWalletLastNotificationCalculationTimestamp = Date().timeIntervalSince1970
+            return
+        }
+        
+        let eligibleCertificates: [(certificate: EuropeanCertificate, eligibilityTimestamp: Double)] = lastRelevantCertificates?.compactMap {
+            guard isEligibleToVaccination(for: $0) else { return nil }
+            guard let eligibilityTimestamp = eligibilityTimestamp($0) else { return nil }
+            return ($0, eligibilityTimestamp)
+        } ?? []
+        if !eligibleCertificates.isEmpty {
+            guard let eligibleCertificate = eligibleCertificates.sorted(by: { $0.eligibilityTimestamp < $1.eligibilityTimestamp }).first else { return }
+            let id: String = notificationId(type: .eligible, hash: eligibleCertificate.certificate.uniqueHash, range: nil)
+            sendSmartNotificationIfNeeded(for: .eligible, with: id, args: [eligibleCertificate.certificate.formattedName])
+            // Update last calculation timestamp
+            smartWalletLastNotificationCalculationTimestamp = Date().timeIntervalSince1970
         }
     }
 }
@@ -231,7 +259,7 @@ private extension WalletManager {
     
     func sendSmartNotificationIfNeeded(for type: NotificationType, with id: String, args: [String]) {
         // Check if we have already sent a notification less than notifDelayThreshold seconds ago
-        guard abs(smartWalletLastNotificationTimestamp.distance(to: now)) >= notifDelayThreshold else { return }
+        guard abs(smartWalletLastNotificationTimestamp.distance(to: now)) >= notifyDelayThreshold else { return }
         // Check if we have already sent a notification for this certificate and range period
         guard !smartWalletSentNotificationsIds.contains(id) else { return }
         // trigger notification
@@ -242,8 +270,8 @@ private extension WalletManager {
     }
     
     // Identifier to identify previous notification
-    func notificationId(type: NotificationType, hash: String, range: Range<Int>) -> String {
-        "\(smartNotificationIdPrefix)_\(type.rawValue)_\(hash)_\(abs(range.lowerBound))_\(abs(range.upperBound))"
+    func notificationId(type: NotificationType, hash: String, range: Range<Int>?) -> String {
+        "\(smartNotificationIdPrefix)_\(type.rawValue)_\(hash)_\(abs(range?.lowerBound ?? 0))_\(abs(range?.upperBound ?? 0))"
     }
 }
 

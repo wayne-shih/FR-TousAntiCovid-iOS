@@ -35,7 +35,10 @@ extension String {
     }
     
     var isUuidCode: Bool { self ~> "^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$" }
-    var isShortCode: Bool { self ~> "^[A-Za-z0-9]{6}$" }
+    var isShortCode: Bool {
+        self ~> "^[A-Za-z0-9]{6}$"
+        
+    }
     var isPostalCode: Bool { self ~> "^[0-9]{5}$" }
 
     static func ~> (lhs: String, rhs: String) -> Bool {

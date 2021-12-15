@@ -30,12 +30,13 @@ public struct Ages: Codable {
 
 public struct Expiration: Codable {
     public var pivot1: String = "2021-12-15"
-    public var pivot2: String = "2022-01-15"
-    public var vacc22DosesNbDays: Int = 212
-    public var vacc11DosesNbDays: Int = 219
-    public var recNbDays: Int = 182
-    public var vaccJan11DosesNbDays: Int = 67
-    public var displayExpDays: Int = 16
+    public var pivot2: String = "2033-07-21"
+    public var vacc22DosesNbDays: Int = 214
+    public var vacc11DosesNbDays: Int = 214
+    public var recNbDays: Int = 180
+    public var vaccJan11DosesNbDays: Int = 61
+    public var displayExpDays: Int = 21
+    public var displayExpOnAllDcc: Int = 240
     
     enum CodingKeys: String, CodingKey {
         case pivot1
@@ -44,15 +45,16 @@ public struct Expiration: Codable {
         case vacc11DosesNbDays
         case recNbDays
         case vaccJan11DosesNbDays
+        case displayExpOnAllDcc
         case displayExpDays
     }
 }
 
 public struct Eligibility: Codable {
-    public var vacc22DosesNbDays: Int = 152
-    public var vaccJan11DosesNbDays: Int = 30
-    public var recNbDays: Int = 152
-    public var displayElgDays: Int = 21
+    public var vacc22DosesNbDays: Int = 153
+    public var vaccJan11DosesNbDays: Int = 31
+    public var recNbDays: Int = 153
+    public var displayElgDays: Int = 60
     
     enum CodingKeys: String, CodingKey {
         case vacc22DosesNbDays

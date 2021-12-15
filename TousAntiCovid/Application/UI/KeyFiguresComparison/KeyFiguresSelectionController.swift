@@ -9,6 +9,7 @@
 //
 
 import UIKit
+import ServerSDK
 
 final class KeyFiguresSelectionController: CVTableViewController {
     
@@ -16,10 +17,13 @@ final class KeyFiguresSelectionController: CVTableViewController {
     private let didChose: (_ keyFigures: [KeyFigure]) -> ()
     private let didTouchFirstKeyFigure: (_ selectionDidUpdate: @escaping ([KeyFigure]) -> ()) -> ()
     private let didTouchSecondKeyFigure: (_ selectionDidUpdate: @escaping ([KeyFigure]) -> ()) -> ()
+    private let didTouchPredifinedCombination: (_ selection: [KeyFigure]) -> ()
     private let didTouchClose: () -> ()
     private let deinitBlock: () -> ()
     
     // MARK: - Variables
+    private weak var firstKeyFigureCell: StandardCell?
+    private weak var secondKeyFigureCell: StandardCell?
     private var controller: UIViewController { bottomButtonContainerController ?? self }
     private var keyFiguresToChoose: [KeyFigure] { KeyFiguresManager.shared.keyFigures }
     private var previousKeyFiguresSelection: [KeyFigure]
@@ -32,6 +36,7 @@ final class KeyFiguresSelectionController: CVTableViewController {
     init(selectedKeyFigures: [KeyFigure],
          didTouchFirstKeyFigure: @escaping (_ selectionDidUpdate: @escaping ([KeyFigure]) -> ()) -> (),
          didTouchSecondKeyFigure: @escaping (_ selectionDidUpdate: @escaping ([KeyFigure]) -> ()) -> (),
+         didTouchPredifinedCombination: @escaping (_ selection: [KeyFigure]) -> (),
          didChose: @escaping (_ keyFigures: [KeyFigure]) -> (),
          didTouchClose: @escaping () -> (),
          deinitBlock: @escaping () -> ()) {
@@ -39,6 +44,7 @@ final class KeyFiguresSelectionController: CVTableViewController {
         self.previousKeyFiguresSelection = selectedKeyFigures
         self.didTouchFirstKeyFigure = didTouchFirstKeyFigure
         self.didTouchSecondKeyFigure = didTouchSecondKeyFigure
+        self.didTouchPredifinedCombination = didTouchPredifinedCombination
         self.didChose = didChose
         self.didTouchClose = didTouchClose
         self.deinitBlock = deinitBlock
@@ -64,6 +70,12 @@ final class KeyFiguresSelectionController: CVTableViewController {
         makeSections {
             CVSection {
                 keyFiguresSelectionRows()
+            } header: {
+                .groupedHeader
+            }
+            
+            CVSection {
+                predefinedCombinationsRows()
             } header: {
                 .groupedHeader
             }
@@ -115,6 +127,8 @@ private extension KeyFiguresSelectionController {
                 self?.selectedKeyFigures = $0
                 self?.reloadUI()
             }
+        } willDisplayHandler: { [weak self] cell in
+            self?.firstKeyFigureCell = cell as? StandardCell
         },
         buttonRow(title: selectedKeyFigures[1].label,
                   image: Asset.Images.icon2.image,
@@ -123,39 +137,96 @@ private extension KeyFiguresSelectionController {
                 self?.selectedKeyFigures = $0
                 self?.reloadUI()
             }
+        } willDisplayHandler: { [weak self] cell in
+            self?.secondKeyFigureCell = cell as? StandardCell
         }]
     }
     
-    func sectionHeaderRow(title: String, subtitle: String) -> CVRow {
-        var textRow: CVRow = CVRow(title: title,
-                                   subtitle: subtitle,
-                                   xibName: .textCell,
-                                   theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
-                                                      bottomInset: Appearance.Cell.Inset.normal,
-                                                      textAlignment: .natural,
-                                                      titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
-                                                      separatorLeftInset: Appearance.Cell.leftMargin))
-        textRow.theme.backgroundColor = Appearance.Cell.cardBackgroundColor
-        return textRow
+    func predefinedCombinationsRows() -> [CVRow] {
+        var rows: [CVRow] = []
+        let combinationsRows: [CVRow]? = ParametersManager.shared.predefinedKeyFiguresSelection?.enumerated().compactMap { index, combination in
+            guard let title = combination.titleKey.localizedOrNil else { return nil }
+            guard let k1 = KeyFiguresManager.shared.keyFigure(for: combination.keyFigure1Key) else { return nil }
+            guard let k2 = KeyFiguresManager.shared.keyFigure(for: combination.keyFigure2Key) else { return nil }
+            let isSelected: Bool = selectedKeyFigures == [k1, k2]
+            return CVRow(title: title,
+                         image: nil,
+                         xibName: .standardCell,
+                         theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                            topInset: Appearance.Cell.Inset.normal,
+                                            bottomInset: Appearance.Cell.Inset.normal,
+                                            textAlignment: .natural,
+                                            titleFont: { Appearance.Cell.Text.standardFont },
+                                            titleColor: Asset.Colors.tint.color,
+                                            imageTintColor: Appearance.tintColor,
+                                            imageSize: Appearance.Cell.Image.size,
+                                            separatorLeftInset: (index < ParametersManager.shared.predefinedKeyFiguresSelection?.count ?? 0) ? Appearance.Cell.leftMargin : nil),
+                         selectionAction: { [weak self] in
+                guard !isSelected else { return }
+                self?.selectedKeyFigures = [k1, k2]
+                self?.didTouchPredifinedCombination([k1, k2])
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                self?.reloadUI(animated: true, animatedView: nil, completion: {
+                    self?.firstKeyFigureCell?.bounceImage()
+                    self?.secondKeyFigureCell?.bounceImage()
+                })
+            },
+                         willDisplay: { cell in
+                cell.tintColor = Appearance.tintColor
+                cell.selectionStyle = isSelected ? .none : .default
+                cell.accessoryType = isSelected ? .checkmark : .none
+                cell.cvTitleLabel?.accessibilityTraits = .button
+            })
+        }
+        if let combinationsRows = combinationsRows, !combinationsRows.isEmpty {
+            rows.append(sectionHeaderRow(title: "keyfigures.comparison.keyfiguresCombination.section.title".localized,
+                                         subtitle: "keyfigures.comparison.keyfiguresCombination.section.subtitle".localized))
+            rows.append(contentsOf: combinationsRows)
+        }
+        return rows
     }
     
-    func buttonRow(title: String, image: UIImage, separatorLeftInset: CGFloat? = nil, isDestuctive: Bool = false, handler: @escaping () -> ()) -> CVRow {
-        var buttonRow: CVRow = CVRow(title: title,
-                                     image: image,
-                                     xibName: .standardCell,
-                                     theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
-                                                        bottomInset: Appearance.Cell.Inset.normal,
-                                                        textAlignment: .natural,
-                                                        titleFont: { Appearance.Cell.Text.standardFont },
-                                                        titleColor: isDestuctive ? Asset.Colors.error.color : Asset.Colors.tint.color,
-                                                        imageTintColor: Appearance.tintColor,
-                                                        imageSize: Appearance.Cell.Image.size,
-                                                        separatorLeftInset: separatorLeftInset),
-                                     selectionAction: { handler() },
-                                     willDisplay: { cell in
+    func sectionHeaderRow(title: String, subtitle: String) -> CVRow {
+        CVRow(title: title,
+              subtitle: subtitle,
+              xibName: .textCell,
+              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                 topInset: Appearance.Cell.Inset.normal,
+                                 bottomInset: Appearance.Cell.Inset.normal,
+                                 textAlignment: .natural,
+                                 titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
+                                 separatorLeftInset: Appearance.Cell.leftMargin))
+    }
+    
+    func buttonRow(title: String, image: UIImage, separatorLeftInset: CGFloat? = nil, handler: @escaping () -> (), willDisplayHandler: ((_ cell: CVTableViewCell) -> ())?) -> CVRow {
+        CVRow(title: title,
+              image: image,
+              xibName: .standardCell,
+              theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                 topInset: Appearance.Cell.Inset.normal,
+                                 bottomInset: Appearance.Cell.Inset.normal,
+                                 textAlignment: .natural,
+                                 titleFont: { Appearance.Cell.Text.standardFont },
+                                 titleColor: Asset.Colors.tint.color,
+                                 imageTintColor: Appearance.tintColor,
+                                 imageSize: Appearance.Cell.Image.size,
+                                 separatorLeftInset: separatorLeftInset),
+              selectionAction: { handler() },
+              willDisplay: { cell in
             cell.cvTitleLabel?.accessibilityTraits = .button
+            willDisplayHandler?(cell)
         })
-        buttonRow.theme.backgroundColor = Appearance.Cell.cardBackgroundColor
-        return buttonRow
+    }
+}
+
+private extension StandardCell {
+    func bounceImage() {
+        UIView.animate(withDuration: 0.15, delay: 0.0, options: .curveEaseOut) { [weak self] in
+            self?.cvImageView?.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+        } completion: { _ in
+            UIView.animate(withDuration: 0.15, delay: 0.0, options: .curveEaseIn) { [weak self] in
+                self?.cvImageView?.transform = .identity
+            } completion: { _ in }
+        }
     }
 }

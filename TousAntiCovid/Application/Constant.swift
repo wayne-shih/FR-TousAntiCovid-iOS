@@ -29,7 +29,13 @@ enum Constant {
             KeyFiguresExplanationsManager.shared.reloadLanguage()
         }
     }
-    
+
+    #if targetEnvironment(simulator)
+    static let isSimulator: Bool = true
+    #else
+    static let isSimulator: Bool = false
+    #endif
+
     #if DEBUG
     static let isDebug: Bool = true
     #else

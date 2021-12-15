@@ -84,6 +84,10 @@ final class KeyFiguresManager {
         keyFigures.compactMap { $0.labelKey }.firstIndex(of: keyFigureLabel)
     }
     
+    func keyFigure(for keyFigureLabel: String) -> KeyFigure? {
+        keyFigures.first{ $0.labelKey == keyFigureLabel }
+    }
+    
     func label(for keyFigureIndex: Int) -> String? {
         keyFigures[keyFigureIndex].labelKey
     }

@@ -18,8 +18,6 @@ end
 
 
 
-
-
 target 'StorageSDK' do
   use_frameworks!
   pod 'KeychainSwift'
@@ -30,7 +28,6 @@ target 'RobertSDK' do
   use_frameworks!
   pod 'SwCrypt'
 end
-
 
 
 post_install do |installer|

@@ -89,5 +89,6 @@ enum XibName {
         case animatedHeaderCell = "AnimatedHeaderCell"
         case standardCardSwitchCell = "StandardCardSwitchCell"
         case keyFigureSelectionCell = "KeyFigureSelectionCell"
+        case urgentDgsCell = "UrgentDgsCell"
     }
 }

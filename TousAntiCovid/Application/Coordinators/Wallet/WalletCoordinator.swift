@@ -319,9 +319,14 @@ final class WalletCoordinator: Coordinator {
         guard certificate.isLastDose == true else { return }
         guard !DccBlacklistManager.shared.isBlacklisted(certificate: certificate) else { return }
         guard !certificate.isExpired else { return }
-        guard !WalletManager.shared.isPassExpired(for: certificate) else { return }
+        guard !isPassExpired(for: certificate) else { return }
         let completedVaccinationController: CompletedVaccinationController = CompletedVaccinationController(certificate: certificate)
         let navigationController: UIViewController = CVNavigationController(rootViewController: completedVaccinationController)
         self.navigationController?.topPresentedController.present(navigationController, animated: true)
+    }
+    
+    private func isPassExpired(for certificate: EuropeanCertificate) -> Bool {
+        guard WalletManager.shared.shouldUseSmartWallet else { return false }
+        return WalletManager.shared.isPassExpired(for: certificate)
     }
 }

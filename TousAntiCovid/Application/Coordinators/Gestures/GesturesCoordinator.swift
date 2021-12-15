@@ -26,8 +26,7 @@ final class GesturesCoordinator: Coordinator {
     private func start() {
         if #available(iOS 13.0, *) {
             let navController: UINavigationController = UINavigationController(rootViewController: OnboardingGesturesController(isOpenedFromOnboarding: false))
-            let modalContainer: UIViewController = ModalContainerViewController.controller(navController, isFullScreen: true)
-            presentingController?.present(modalContainer, animated: true, completion: nil)
+            presentingController?.present(navController, animated: true, completion: nil)
         } else {
             let navigationController: UIViewController = UINavigationController(rootViewController: OnboardingGesturesController(isOpenedFromOnboarding: false))
             presentingController?.present(navigationController, animated: true, completion: nil)

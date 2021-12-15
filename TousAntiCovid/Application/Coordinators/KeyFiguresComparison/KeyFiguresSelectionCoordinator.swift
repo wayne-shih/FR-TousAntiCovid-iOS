@@ -45,6 +45,8 @@ private extension KeyFiguresSelectionCoordinator {
                 self.selection[1] = $0
                 selectionDidUpdate(self.selection)
             }
+        } didTouchPredifinedCombination: { [weak self] in
+            self?.selection = $0
         } didChose: { [weak self] keyFigures in
             self?.didChangeSelection(keyFigures)
         } didTouchClose: { [weak self] in

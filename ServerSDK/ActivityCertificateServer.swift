@@ -32,6 +32,7 @@ public final class ActivityCertificateServer {
             return
         }
         let body: GenerateLightDccBody = GenerateLightDccBody(key: publicKey, originalCertificate: encodedCertificate)
+        
         let bodyData: Data? = try? body.toData()
         var urlRequest: URLRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
