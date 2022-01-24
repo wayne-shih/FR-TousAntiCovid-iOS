@@ -110,7 +110,7 @@ private extension KeyFiguresController {
                                  titleFont: { Appearance.Cell.Text.standardFont },
                                  titleColor: Appearance.Cell.Text.headerTitleColor,
                                  imageTintColor: Appearance.Cell.Text.headerTitleColor),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             self?.didTouchCompare()
         })
     }
@@ -123,7 +123,7 @@ private extension KeyFiguresController {
                                  bottomInset: .zero,
                                  textAlignment: .center,
                                  maskedCorners: .top),
-              selectionAction: {
+              selectionAction: { _ in
             HUD.show(.progress)
             KeyFiguresManager.shared.fetchKeyFigures {
                 HUD.hide()
@@ -140,7 +140,7 @@ private extension KeyFiguresController {
                                   separatorLeftInset: nil,
                                   separatorRightInset: nil,
                                   maskedCorners: .bottom),
-              selectionAction: {
+              selectionAction: { _ in
             HUD.show(.progress)
             KeyFiguresManager.shared.fetchKeyFigures {
                 HUD.hide()
@@ -178,7 +178,7 @@ private extension KeyFiguresController {
                          selectionActionWithCell: { [weak self] cell in
                 self?.didTouchSharingFor(cell: cell, keyFigure: keyFigure)
             },
-                         selectionAction: { [weak self] in
+                         selectionAction: { [weak self] _ in
                 self?.didTouchKeyFigure(keyFigure)
             })
         }

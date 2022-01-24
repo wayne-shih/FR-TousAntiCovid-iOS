@@ -67,7 +67,7 @@ final class SymptomsOriginController: CVTableViewController {
                                                           textAlignment: .natural,
                                                           titleFont: { Appearance.Cell.Text.standardFont },
                                                           separatorLeftInset: Appearance.Cell.leftMargin),
-                                       selectionAction: { [weak self] in
+                                       selectionAction: { [weak self] _ in
             self?.didSelectOrigin(date: nil)
         })
         rows.append(noSymptomsRow)
@@ -92,7 +92,7 @@ final class SymptomsOriginController: CVTableViewController {
                                             textAlignment: .natural,
                                             titleFont: { Appearance.Cell.Text.standardFont },
                                             separatorLeftInset: Appearance.Cell.leftMargin),
-                         selectionAction: { [weak self] in
+                         selectionAction: { [weak self] _ in
                             self?.didSelectOrigin(date: date)
                          })
         }
@@ -103,7 +103,7 @@ final class SymptomsOriginController: CVTableViewController {
                                                           textAlignment: .natural,
                                                           titleFont: { Appearance.Cell.Text.standardFont },
                                                           separatorLeftInset: Appearance.Cell.leftMargin),
-                                       selectionAction: { [weak self] in
+                                       selectionAction: { [weak self] _ in
                                         self?.didSelectOrigin(date: nil)
                                        })
         rows.append(contentsOf: originRows)

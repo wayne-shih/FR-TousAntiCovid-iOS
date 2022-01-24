@@ -30,7 +30,7 @@ class CVTableViewController: UITableViewController {
             UITableView.appearance().sectionHeaderTopPadding = 0
         }
     }
-    
+
     func createSections() -> [CVSection] { [] }
     func makeSections(@CVSectionsBuilder _ content: () -> [CVSection]) -> [CVSection] { content() }
 
@@ -54,11 +54,11 @@ class CVTableViewController: UITableViewController {
         }
     }
     
-    private func rowObject(at indexPath: IndexPath) -> CVRow {
+    func rowObject(at indexPath: IndexPath) -> CVRow {
         sections[indexPath.section].rows[indexPath.row]
     }
     
-    private func registerXibs() {
+    func registerXibs() {
         var cellXibNames: Set<String> = Set<String>()
         var sectionXibNames: Set<String> = Set<String>()
         sections.forEach { section in
@@ -102,7 +102,8 @@ class CVTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let row: CVRow = rowObject(at: indexPath)
-        row.selectionAction?()
+        guard let cell = tableView.cellForRow(at: indexPath) as? CVTableViewCell else { return }
+        row.selectionAction?(cell)
     }
 
     override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {

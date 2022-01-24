@@ -13,8 +13,9 @@ import PKHUD
 import RobertSDK
 import StorageSDK
 import ServerSDK
+import Charts
 
-final class HomeViewController: CVTableViewController {
+final class HomeViewController: CVTableViewWithCollectionViewsController {
 
     var canActivateProximity: Bool { areNotificationsAuthorized == true && BluetoothStateManager.shared.isAuthorized && BluetoothStateManager.shared.isActivated }
     private let showCaptchaChallenge: (_ captcha: Captcha, _ didEnterCaptcha: @escaping (_ id: String, _ answer: String) -> (), _ didCancelCaptcha: @escaping () -> ()) -> ()
@@ -26,9 +27,11 @@ final class HomeViewController: CVTableViewController {
     private var didFinishLoad: (() -> ())?
     private var didTouchSupport: (() -> ())?
     private let didTouchHealth: () -> ()
-    private let didTouchInfo: () -> ()
+    private let didTouchInfo: (_ info: Info?) -> ()
     private let didTouchKeyFigure: (_ keyFigure: KeyFigure) -> ()
     private let didTouchKeyFigures: () -> ()
+    private let didTouchComparisonChart: () -> ()
+    private let didTouchComparisonChartSharing: (_ shareImage: UIImage?) -> ()
     private let didTouchDeclare: () -> ()
     private let didTouchUsefulLinks: () -> ()
     private let didTouchRecordVenues: () -> ()
@@ -53,7 +56,7 @@ final class HomeViewController: CVTableViewController {
     private var wasActivated: Bool = false
     private var isChangingState: Bool = false
     private var didShowRobertErrorAlertOnce: Bool = false
-    
+
     private var areNotificationsAuthorized: Bool?
     private weak var stateCell: StateAnimationCell?
     private var isWaitingForNeededInfo: Bool = true
@@ -74,6 +77,8 @@ final class HomeViewController: CVTableViewController {
     @UserDefault(key: .didAlreadyShowUserLanguage)
     private var didAlreadyShowUserLanguage: Bool = false
     
+    private let numberOfDisplayedNews: Int = 4
+    
     init(didTouchAbout: @escaping () -> (),
          showCaptchaChallenge: @escaping (_ captcha: Captcha, _ didEnterCaptcha: @escaping (_ id: String, _ answer: String) -> (), _ didCancelCaptcha: @escaping () -> ()) -> (),
          didTouchAppUpdate: @escaping () -> (),
@@ -83,9 +88,11 @@ final class HomeViewController: CVTableViewController {
          didFinishLoad: (() -> ())?,
          didTouchSupport: (() -> ())? = nil,
          didTouchHealth: @escaping () -> (),
-         didTouchInfo: @escaping () -> (),
+         didTouchInfo: @escaping (_ info: Info?) -> (),
          didTouchKeyFigure: @escaping (_ keyFigure: KeyFigure) -> (),
          didTouchKeyFigures: @escaping () -> (),
+         didTouchComparisonChart: @escaping () -> (),
+         didTouchComparisonChartSharing: @escaping (_ shareImage: UIImage?) -> (),
          didTouchDeclare: @escaping () -> (),
          didTouchUsefulLinks: @escaping () -> (),
          didTouchRecordVenues: @escaping () -> (),
@@ -115,6 +122,8 @@ final class HomeViewController: CVTableViewController {
         self.didTouchInfo = didTouchInfo
         self.didTouchKeyFigure = didTouchKeyFigure
         self.didTouchKeyFigures = didTouchKeyFigures
+        self.didTouchComparisonChart = didTouchComparisonChart
+        self.didTouchComparisonChartSharing = didTouchComparisonChartSharing
         self.didTouchDeclare = didTouchDeclare
         self.didTouchUsefulLinks = didTouchUsefulLinks
         self.didTouchRecordVenues = didTouchRecordVenues
@@ -193,8 +202,12 @@ final class HomeViewController: CVTableViewController {
             if ParametersManager.shared.displayAttestation {
                 attestationSection()
             }
-
-            infoSection()
+            if !KeyFiguresManager.shared.keyFigures.isEmpty {
+                keyFiguresSection()
+            }
+            if let info = InfoCenterManager.shared.info.sorted(by: { $0.timestamp > $1.timestamp }), !info.isEmpty {
+                infoSection(info)
+            }
             moreSection()
         }
     }
@@ -697,7 +710,7 @@ private extension HomeViewController {
                                topInset: Appearance.Cell.leftMargin / 2,
                                bottomInset: Appearance.Cell.leftMargin / 2,
                                textAlignment: .natural),
-            selectionAction: {
+            selectionAction: { _ in
                 notif.url?.openInSafari()
             }, secondarySelectionAction: { [weak self] in
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
@@ -714,7 +727,7 @@ private extension HomeViewController {
                                                    xibName: .buttonCell,
                                                    theme: CVRow.Theme(topInset: 0.0, bottomInset: 0.0, buttonStyle: isActivated ? .secondary : .primary),
                                                    enabled: canActivateProximity,
-                                                   selectionAction: { [weak self] in
+                                                   selectionAction: { [weak self] _ in
                 guard let self = self else { return }
                 if RBManager.shared.isImmune {
                     self.didTouchIsSickReadMore()
@@ -736,7 +749,7 @@ private extension HomeViewController {
                                                                       textAlignment: .natural,
                                                                       buttonStyle: isActivated ? .secondary : .primary),
                                                    enabled: canActivateProximity,
-                                                   selectionAction: { [weak self] in
+                                                   selectionAction: { [weak self] _ in
                 guard let self = self else { return }
                 self.didChangeSwitchValue(isOn: !self.isActivated)
             }, willDisplay: { cell in
@@ -751,7 +764,7 @@ private extension HomeViewController {
         CVRow(title: "home.qrScan.button.title".localized,
               xibName: .buttonCell,
               theme: CVRow.Theme(topInset: Appearance.Cell.leftMargin, bottomInset: 0.0, buttonStyle: .secondary),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             AnalyticsManager.shared.reportAppEvent(.e19)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 self?.openQrScan()
@@ -768,7 +781,7 @@ private extension HomeViewController {
                                  topInset: Appearance.Cell.Inset.normal,
                                  bottomInset: .zero,
                                  textAlignment: .natural),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             self?.didTouchAppUpdate()
         })
     }
@@ -790,7 +803,7 @@ private extension HomeViewController {
                                                                textAlignment: .natural,
                                                                titleColor: Appearance.Cell.Text.titleColor,
                                                                subtitleColor: Appearance.Cell.Text.titleColor),
-                                            selectionAction: { [weak self] in
+                                            selectionAction: { [weak self] _ in
                 self?.didTouchUrgentDgs()
             })
             
@@ -807,7 +820,7 @@ private extension HomeViewController {
                                                                  bottomInset: .zero,
                                                                  textAlignment: .natural,
                                                                  titleColor: Asset.Colors.gradientEndGreen.color),
-                                              selectionAction: { [weak self] in
+                                              selectionAction: { [weak self] _ in
                 self?.didTouchVaccination()
             })
             
@@ -869,7 +882,7 @@ private extension HomeViewController {
                                                              topInset: Appearance.Cell.Inset.normal,
                                                              bottomInset: .zero,
                                                              textAlignment: .natural),
-                                          selectionAction: { [weak self] in
+                                          selectionAction: { [weak self] _ in
                 self?.didTouchDeclare()
             })
             
@@ -892,7 +905,7 @@ private extension HomeViewController {
                                                                subtitleColor: .white,
                                                                maskedCorners: isStatusOnGoing ? .top : .all),
                                             associatedValue: (startColor, endColor, effectAlpha),
-                                            selectionAction: { [weak self] in
+                                            selectionAction: { [weak self] _ in
             self?.didTouchHealth()
         })
         return contactStatusRow
@@ -906,7 +919,7 @@ private extension HomeViewController {
                                  textAlignment: .natural,
                                  maskedCorners: .bottom),
               associatedValue: currentRiskLevel,
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             self?.didTouchHealth()
         })
         
@@ -921,7 +934,7 @@ private extension HomeViewController {
                                  topInset: .zero,
                                  bottomInset: .zero,
                                  textAlignment: .natural),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             guard let self = self else { return }
             self.processOnlyRegistrationIfNeeded { error in
                 guard error == nil else { return }
@@ -1041,51 +1054,51 @@ private extension HomeViewController {
     }
 }
 
-// MARK: - Info Section
+// MARK: - Key Figures Section
 private extension HomeViewController {
-    func infoSection() -> CVSection {
+    func keyFiguresSection() -> CVSection {
         var rows: [CVRow] = []
         let isHavingFeaturedKeyFigures: Bool = !KeyFiguresManager.shared.featuredKeyFigures.isEmpty
         if isHavingFeaturedKeyFigures && !KeyFiguresManager.shared.canShowCurrentlyNeededFile {
             rows.append(contentsOf: keyFiguresWarningRows())
         }
-        let highlightedKeyFigure: KeyFigure? = KeyFiguresManager.shared.highlightedKeyFigure
-        if let highlightedKeyFigure = highlightedKeyFigure, highlightedKeyFigure.isLabelReady {
-            let highlightedKeyFigureRow: CVRow = CVRow(title: ["home.infoSection.newCases".localized, "(\("common.country.france".localized))"].joined(separator: " "),
-                                                       subtitle: highlightedKeyFigure.valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible(),
-                                                       accessoryText: "keyfigure.dailyUpdates".localized,
-                                                       image: Asset.Images.flag.image,
-                                                       xibName: .highlightedKeyFigureCell,
-                                                       theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                                          topInset: .zero,
-                                                                          bottomInset: Appearance.Cell.Inset.normal,
-                                                                          textAlignment: .natural,
-                                                                          titleColor: highlightedKeyFigure.color,
-                                                                          subtitleFont: { Appearance.Cell.Text.headTitleFont3 },
-                                                                          subtitleColor: Appearance.Cell.Text.titleColor,
-                                                                          accessoryTextFont: { Appearance.Cell.Text.captionTitleFont },
-                                                                          accessoryTextColor: Appearance.Cell.Text.captionTitleColor,
-                                                                          imageTintColor: highlightedKeyFigure.color),
-                                                       selectionAction: { [weak self] in
-                self?.didTouchKeyFigure(highlightedKeyFigure)
+        
+        var keyFiguresToDisplay: [KeyFigure?] = [KeyFiguresManager.shared.highlightedKeyFigure]
+        keyFiguresToDisplay.append(contentsOf: KeyFiguresManager.shared.featuredKeyFigures)
+        let collectionRows: [CVRow] = keyFiguresToDisplay.compactMap{ $0 }.filter { $0.isLabelReady }.compactMap { keyFigure in
+            CVRow(title: (keyFigure.currentDepartmentSpecificKeyFigure?.valueToDisplay ?? keyFigure.valueGlobalToDisplay).formattingValueWithThousandsSeparatorIfPossible(),
+                  subtitle: keyFigure.label,
+                  xibName: .keyFigureCollectionViewCell,
+                  theme: .init(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                               textAlignment: .center,
+                               titleFont: { Appearance.Cell.Text.headTitleFont3 },
+                               titleColor: .white,
+                               titleLinesCount: 1,
+                               subtitleColor: .white),
+                  associatedValue: keyFigure,
+                  selectionAction: { [weak self] _ in
+                self?.didTouchKeyFigure(keyFigure)
             })
-            rows.append(highlightedKeyFigureRow)
         }
-        if isHavingFeaturedKeyFigures {
-            let keyFiguresRow: CVRow = CVRow(title: highlightedKeyFigure?.isLabelReady == true ? "home.infoSection.otherKeyFigures".localized : "home.infoSection.keyFigures".localized,
-                                             accessoryText: highlightedKeyFigure?.isLabelReady == true ? nil :  "keyfigure.dailyUpdates".localized,
-                                             buttonTitle: "home.infoSection.seeAll".localized,
-                                             xibName: .keyFiguresCell,
-                                             theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                                topInset: .zero,
-                                                                bottomInset: Appearance.Cell.Inset.normal,
-                                                                textAlignment: .natural),
-                                             associatedValue: KeyFiguresManager.shared.featuredKeyFigures.filter { $0.isLabelReady },
-                                             selectionAction: { [weak self] in
-                self?.didTouchKeyFigures()
-            })
-            rows.append(keyFiguresRow)
-        }
+        
+        rows.append(CVRow(xibName: .collectionTableViewCell,
+                          contentDesc: "keyFigures",
+                          theme: .init(topInset: .zero,
+                                       bottomInset: Appearance.Cell.Inset.normal,
+                                       textAlignment: .natural,
+                                       requiredWidth: UIScreen.main.bounds.width / 2),
+                          associatedValue: collectionRows,
+                          collectionViewDidReload: { [weak self] cell in
+            if self?.tableView.visibleCells.contains(cell) == true {
+                self?.tableView?.beginUpdates()
+                cell.layoutIfNeeded()
+                self?.tableView?.endUpdates()
+            } else {
+                // No need to animate layout change if cell isn't visible
+                cell.layoutIfNeeded()
+            }
+        }))
+        
         if KeyFiguresManager.shared.displayDepartmentLevel {
             if let currentPostalCode = KeyFiguresManager.shared.currentPostalCode {
                 let title: String = String(format: "common.updatePostalCode".localized, currentPostalCode)
@@ -1100,7 +1113,7 @@ private extension HomeViewController {
                                                                            subtitleFont: { Appearance.Cell.Text.standardFont },
                                                                            subtitleColor: Appearance.Cell.Text.headerTitleColor,
                                                                            imageTintColor: Appearance.Cell.Text.headerTitleColor),
-                                                       selectionAction: { [weak self] in
+                                                       selectionAction: { [weak self] _ in
                     self?.didTouchUpdateLocation()
                 }, willDisplay: { [weak self] cell in
                     guard let self = self else { return }
@@ -1127,7 +1140,7 @@ private extension HomeViewController {
                                                                         separatorLeftInset: Appearance.Cell.leftMargin,
                                                                         separatorRightInset: Appearance.Cell.leftMargin,
                                                                         maskedCorners: UIAccessibility.isVoiceOverRunning ? .all : .top),
-                                                    selectionAction: { [weak self] in
+                                                    selectionAction: { [weak self] _ in
                     self?.didTouchUpdateLocation()
                 })
                 rows.append(newPostalCodeRow)
@@ -1144,25 +1157,44 @@ private extension HomeViewController {
                 }
             }
         }
-        if let info = InfoCenterManager.shared.info.sorted(by: { $0.timestamp > $1.timestamp }).first {
-            let lastInfoRow: CVRow = CVRow(title: info.title,
-                                           subtitle: info.description,
-                                           accessoryText: info.formattedDate,
-                                           buttonTitle: "home.infoSection.readAll".localized,
-                                           xibName: .lastInfoCell,
-                                           theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
-                                                              topInset: UIAccessibility.isVoiceOverRunning ? Appearance.Cell.Inset.normal : .zero,
-                                                              bottomInset: .zero,
-                                                              textAlignment: .natural),
-                                           associatedValue: InfoCenterManager.shared.didReceiveNewInfo,
-                                           selectionAction: { [weak self] in
-                InfoCenterManager.shared.didReceiveNewInfo = false
-                self?.didTouchInfo()
-            })
-            rows.append(lastInfoRow)
-        }
         
-        return CVSection(title: "home.infoSection.title".localized, rows: rows)
+        // Comparison chart
+        rows.append(comparisonChartRow())
+        
+        let header: CVFooterHeaderSection = .init(title: "home.infoSection.keyFigures".localized,
+                                                  subtitle: "home.figuresSection.all".localized,
+                                                  xibName: .actionSectionHeader) { [weak self] in
+            self?.didTouchKeyFigures()
+        }
+        return CVSection(header: header, rows: rows)
+    }
+    
+    func comparisonChartRow() -> CVRow {
+        guard KeyFiguresManager.shared.comparedKeyFigures.count > 1 else {
+            return CVRow(title: "common.error.unknown".localized, xibName: .standardCell)
+        }
+        let chartData: [KeyFigureChartData] = KeyFiguresManager.shared.generateComparisonChartData(
+            between: KeyFiguresManager.shared.comparedKeyFigures[0],
+            and: KeyFiguresManager.shared.comparedKeyFigures[1],
+            daysCount: ChartRange.year.rawValue,
+            withFooter: "home.figuresSection.keyFigures.chart.footer".localized)
+        let areComparable: Bool = KeyFiguresManager.shared.comparedKeyFigures.haveSameMagnitude
+        let chartView: ChartViewBase? = ChartViewBase.create(chartData1: chartData[0],
+                                                             chartData2: chartData[1],
+                                                             sameOrdinate: areComparable,
+                                                             allowInteractions: false)
+        return CVRow(xibName: .keyFigureChartCell,
+                     theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                        topInset: .zero,
+                                        bottomInset: .zero,
+                                        textAlignment: .natural),
+                     associatedValue: (chartData, chartView),
+                     selectionActionWithCell: { [weak self] cell in
+            self?.didTouchComparisonChartSharing((cell as? KeyFigureChartCell)?.captureWithoutFooter())
+        },
+                     selectionAction: { [weak self] _ in
+            self?.didTouchComparisonChart()
+        })
     }
     
     func keyFiguresWarningRows() -> [CVRow] {
@@ -1173,7 +1205,7 @@ private extension HomeViewController {
                                                          bottomInset: .zero,
                                                          textAlignment: .center,
                                                          maskedCorners: .top),
-                                      selectionAction: {
+                                      selectionAction: { _ in
             HUD.show(.progress)
             KeyFiguresManager.shared.fetchKeyFigures {
                 HUD.hide()
@@ -1190,7 +1222,7 @@ private extension HomeViewController {
                                                         separatorLeftInset: nil,
                                                         separatorRightInset: nil,
                                                         maskedCorners: .bottom),
-                                    selectionAction: {
+                                    selectionAction: { _ in
             HUD.show(.progress)
             KeyFiguresManager.shared.fetchKeyFigures {
                 HUD.hide()
@@ -1209,6 +1241,53 @@ private extension HomeViewController {
     
     @objc func accessibilityDidActivateDeleteLocation() {
         KeyFiguresManager.shared.deletePostalCode()
+    }
+}
+
+// MARK: - Info Section
+private extension HomeViewController {
+    func infoSection(_ info: [Info]) -> CVSection {
+        let collectionRows: [CVRow] = info.prefix(numberOfDisplayedNews).compactMap { element in
+            CVRow(title: element.title,
+                  subtitle: element.description,
+                  accessoryText: element.formattedDate,
+                  xibName: .newsCollectionViewCell,
+                  theme: .init(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                               textAlignment: .natural,
+                               titleFont: { Appearance.Cell.Text.titleFont },
+                               titleLinesCount: 2,
+                               subtitleLinesCount: 3,
+                               accessoryTextFont: { Appearance.Cell.Text.accessoryFont },
+                               accessoryTextColor: Appearance.Cell.Text.accessoryColor),
+                  selectionAction: { [weak self] _ in
+                self?.didTouchInfo(element)
+            })
+        }
+        
+        let lastInfoRow: CVRow = CVRow(xibName: .collectionTableViewCell,
+                                       contentDesc: "info",
+                                       theme: .init(topInset: .zero,
+                                                    bottomInset: .zero,
+                                                    textAlignment: .natural,
+                                                    requiredWidth: UIScreen.main.bounds.width / 2,
+                                                    maxRequiredWidth: 0.75*UIScreen.main.bounds.width),
+                                       associatedValue: collectionRows,
+                                       collectionViewDidReload: { [weak self] cell in
+            if self?.tableView.visibleCells.contains(cell) == true {
+                self?.tableView?.beginUpdates()
+                cell.layoutIfNeeded()
+                self?.tableView?.endUpdates()
+            } else {
+                // No need to animate layout change if cell isn't visible
+                cell.layoutIfNeeded()
+            }
+        })
+        let header: CVFooterHeaderSection = .init(title: "home.infoSection.news".localized,
+                                                  subtitle: "home.infoSection.all".localized,
+                                                  xibName: .actionSectionHeader) { [weak self] in
+            self?.didTouchInfo(nil)
+        }
+        return CVSection(header: header, rows: [lastInfoRow])
     }
 }
 
@@ -1234,7 +1313,7 @@ private extension HomeViewController {
                                                              topInset: .zero,
                                                              bottomInset: .zero,
                                                              textAlignment: .natural),
-                                          selectionAction: { [weak self] in
+                                          selectionAction: { [weak self] _ in
             self?.didTouchDocument()
         })
         
@@ -1255,7 +1334,7 @@ private extension HomeViewController {
                                                                          topInset: .zero,
                                                                          bottomInset: Appearance.Cell.Inset.normal,
                                                                          textAlignment: .natural),
-                                                      selectionAction: { [weak self] in
+                                                      selectionAction: { [weak self] _ in
                 self?.didTouchCertificate(certificate)
             })
             rows.append(favoriteCertificateRow)
@@ -1273,12 +1352,12 @@ private extension HomeViewController {
                 subtitle = "home.attestationSection.sanitaryCertificates.cell.subtitle".localized
                 textColor = Appearance.Button.Primary.titleColor
             case .eligibleSoon:
-                backgroundColor = Asset.Colors.info.color
+                backgroundColor = Asset.Colors.smartWalletInfo.color
                 image = Asset.Images.eligible.image
                 subtitle = "home.attestationSection.sanitaryCertificates.eligibleSoon.cell.subtitle".localized
                 textColor = .white
             case .eligible:
-                backgroundColor = Asset.Colors.info.color
+                backgroundColor = Asset.Colors.smartWalletInfo.color
                 image = Asset.Images.eligible.image
                 subtitle = "home.attestationSection.sanitaryCertificates.eligible.cell.subtitle".localized
                 textColor = .white
@@ -1309,7 +1388,7 @@ private extension HomeViewController {
                                                                       textAlignment: .natural,
                                                                       titleColor: textColor,
                                                                       subtitleColor: textColor),
-                                                   selectionAction: { [weak self] in
+                                                   selectionAction: { [weak self] _ in
             self?.didTouchSanitaryCertificates(nil)
         })
         rows.append(sanitaryCertificatesRow)

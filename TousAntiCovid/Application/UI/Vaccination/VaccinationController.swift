@@ -116,7 +116,7 @@ final class VaccinationController: CVTableViewController {
                                  topInset: Appearance.Cell.Inset.small,
                                  bottomInset: Appearance.Cell.Inset.small,
                                  textAlignment: .left),
-              selectionAction: {
+              selectionAction: { _ in
                 URL(string: "vaccinationController.eligibility.url".localized)?.openInSafari()
               })
     }
@@ -151,7 +151,7 @@ final class VaccinationController: CVTableViewController {
                                          subtitleFont: { Appearance.Cell.Text.standardFont },
                                          subtitleColor: Appearance.Cell.Text.headerTitleColor,
                                          imageTintColor: Appearance.Cell.Text.headerTitleColor),
-                     selectionAction: { [weak self] in
+                     selectionAction: { [weak self] _ in
                         self?.didTouchUpdateLocation()
                      })
     }
@@ -167,7 +167,7 @@ final class VaccinationController: CVTableViewController {
                                                              titleFont: { Appearance.Cell.Text.standardFont },
                                                              titleColor: Appearance.Cell.Text.headerTitleColor,
                                                              imageTintColor: Appearance.Cell.Text.headerTitleColor),
-                                         selectionAction: { [weak self] in
+                                         selectionAction: { [weak self] _ in
                                             self?.didTouchRefresh()
                                          })
         return postalCodeRow
@@ -183,7 +183,7 @@ final class VaccinationController: CVTableViewController {
                                  textAlignment: .natural,
                                  subtitleColor: Appearance.Cell.Text.headerTitleColor),
               associatedValue: vaccinationCenter,
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
                 self?.didTouchVaccinationCenter(vaccinationCenter: vaccinationCenter)
               })
     }

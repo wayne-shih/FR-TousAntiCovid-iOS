@@ -40,21 +40,23 @@ struct KeyFigure: Codable {
     let chartType: ChartKind?
     var isLabelReady: Bool { "\(labelKey).label".localizedOrNil != nil }
     var label: String { "\(labelKey).label".localized.trimmingCharacters(in: .whitespaces) }
+    private var unit: String? { "\(labelKey).unit".localizedOrNil?.trimmingCharacters(in: .whitespaces) }
+    var isPercent: Bool { unit?.contains("%") ?? false }
     var labelWithUnit: String {
-        if let unit = "\(labelKey).unit".localizedOrNil?.trimmingCharacters(in: .whitespaces) {
+        if let unit = unit {
             return "\(labelKey).label".localized.trimmingCharacters(in: .whitespaces) + " (\(unit))"
         } else {
             return label
         }
     }
+    var lastChartValue: Double? { series?.last?.value }
     var shortLabel: String { "\(labelKey).shortLabel".localized.trimmingCharacters(in: .whitespaces) }
     var description: String { "\(labelKey).description".localized.trimmingCharacters(in: .whitespaces) }
     var learnMore: String { "\(labelKey).learnMore".localizedOrEmpty.trimmingCharacters(in: .whitespaces) }
     var limitLineLabel: String { "\(labelKey).limitLine".localizedOrEmpty.trimmingCharacters(in: .whitespaces) }
-    var color: UIColor {
-        let colorCode: String = UIColor.isDarkMode ? "\(labelKey).colorCode.dark".localized : "\(labelKey).colorCode.light".localized
-        return UIColor(hexString: colorCode)
-    }
+    var color: UIColor { UIColor.isDarkMode ? darkColor : lightColor }
+    var lightColor: UIColor { UIColor(hexString: "\(labelKey).colorCode.light".localized) }
+    var darkColor: UIColor { UIColor(hexString: "\(labelKey).colorCode.dark".localized ) }
     var ascendingSeries: [KeyFigureSeriesItem]? { series?.sorted { $0.date < $1.date } }
     var chartKind: ChartKind { chartType ?? .line }
     

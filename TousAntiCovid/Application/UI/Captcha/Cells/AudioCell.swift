@@ -23,7 +23,7 @@ final class AudioCell: CVTableViewCell {
     }
     
     @IBAction func didTouchButton(_ sender: Any) {
-        currentAssociatedRow?.selectionAction?()
+        currentAssociatedRow?.selectionAction?(self)
     }
     
 }

@@ -299,7 +299,7 @@ final class NewAttestationViewController: CVTableViewController {
                                 subtitle: selectedListItem?.shortLabel ?? "-",
                                 xibName: .textCell,
                                 theme: self.listRowTheme(fieldDataKey: field.dataKeyValue),
-                                selectionAction: { [weak self] in
+                                selectionAction: { [weak self] _ in
                         self?.didTouchSelectFieldItem(field.items ?? [], self?.fieldSelectedItems[field.dataKeyValue]?[field.key], field.key) { selectedItem in
                             self?.fieldSelectedItems[field.dataKeyValue] = [field.key: selectedItem]
                             self?.fieldValues[field.dataKeyValue] = ["\(field.key)": selectedItem.code,

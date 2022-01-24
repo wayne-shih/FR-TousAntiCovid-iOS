@@ -11,7 +11,7 @@
 import UIKit
 
 class CardCell: CVTableViewCell {
-
+    
     @IBOutlet var containerView: UIView!
     
     override func setup(with row: CVRow) {

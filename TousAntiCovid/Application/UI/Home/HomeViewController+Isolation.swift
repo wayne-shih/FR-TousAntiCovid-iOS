@@ -40,7 +40,7 @@ extension HomeViewController {
                                                   topInset: .zero,
                                                   bottomInset: Appearance.Cell.Inset.medium,
                                                   textAlignment: .natural),
-                               selectionAction: { [weak self] in
+                               selectionAction: { [weak self] _ in
                                 self?.didTouchOpenIsolationForm()
                                })
         
@@ -75,7 +75,7 @@ extension HomeViewController {
                                                    separatorLeftInset: followedByActions ? Appearance.Cell.leftMargin : nil,
                                                    separatorRightInset: followedByActions ? Appearance.Cell.leftMargin : nil,
                                                    maskedCorners: followedByActions ? .top : .all),
-                               selectionAction: { [weak self] in
+                               selectionAction: { [weak self] _ in
                                     self?.didTouchOpenIsolationForm()
                                })
         return row
@@ -230,7 +230,7 @@ extension HomeViewController {
                                                    separatorLeftInset: isLastAction ? nil : Appearance.Cell.leftMargin,
                                                    separatorRightInset: isLastAction ? nil : Appearance.Cell.leftMargin,
                                                    maskedCorners: isLastAction ? .bottom : .none),
-                               selectionAction: {
+                               selectionAction: { _ in
                                 actionBlock()
                                })
         return row

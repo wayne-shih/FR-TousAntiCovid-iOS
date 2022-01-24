@@ -27,6 +27,7 @@ final class KeyFiguresCell: CardCell {
     @IBOutlet weak var titleHeaderSecondaryLabel: UILabel!
     @IBOutlet private var titleSecondaryLabels: [UILabel] = []
     @IBOutlet private var valueSecondaryLabels: [UILabel] = []
+    
     override func setup(with row: CVRow) {
         super.setup(with: row)
         setupUI()
@@ -145,7 +146,7 @@ final class KeyFiguresCell: CardCell {
     }
     
     @IBAction private func buttonPressed(_ sender: Any) {
-        currentAssociatedRow?.selectionAction?()
+        currentAssociatedRow?.selectionAction?(self)
     }
     
 }

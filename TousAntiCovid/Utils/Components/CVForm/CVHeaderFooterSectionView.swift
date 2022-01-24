@@ -10,11 +10,11 @@
 
 import UIKit
 
-final class CVHeaderFooterSectionView: UITableViewHeaderFooterView {
+class CVHeaderFooterSectionView: UITableViewHeaderFooterView {
 
     var currentAssociatedHeaderSection: CVFooterHeaderSection?
-    @IBOutlet private var cvTitleLabel: UILabel?
-    @IBOutlet private var cvSubtitleLabel: UILabel?
+    @IBOutlet var cvTitleLabel: UILabel?
+    @IBOutlet var cvSubtitleLabel: UILabel?
     @IBOutlet private var leadingConstraint: NSLayoutConstraint?
     @IBOutlet private var trailingConstraint: NSLayoutConstraint?
     @IBOutlet private var topConstraint: NSLayoutConstraint?
@@ -29,7 +29,13 @@ final class CVHeaderFooterSectionView: UITableViewHeaderFooterView {
     }
 
     func capture() -> UIImage? {
-        return screenshot()
+        return cvScreenshot()
+    }
+    
+    func setupAccessibility() {
+        accessibilityTraits = currentAssociatedHeaderSection?.selectionAction != nil ? .button : .staticText
+        accessibilityLabel = [cvTitleLabel?.text, cvSubtitleLabel?.text].compactMap { $0 }.joined(separator: "\n").removingEmojis()
+        accessibilityElements = []
     }
 
     private func setupTheme(with headerSection: CVFooterHeaderSection) {
@@ -50,11 +56,6 @@ final class CVHeaderFooterSectionView: UITableViewHeaderFooterView {
         trailingConstraint?.constant = headerSection.theme.rightInset
         topConstraint?.constant = headerSection.theme.topInset
         bottomConstraint?.constant = headerSection.theme.bottomInset
-    }
-
-    private func setupAccessibility() {
-        accessibilityLabel = [cvTitleLabel?.text, cvSubtitleLabel?.text].compactMap { $0 }.joined(separator: "\n").removingEmojis()
-        accessibilityElements = []
     }
 
 }

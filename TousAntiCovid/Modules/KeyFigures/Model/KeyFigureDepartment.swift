@@ -24,6 +24,7 @@ struct KeyFigureDepartment: Codable {
     var formattedDate: String {
         Date(timeIntervalSince1970: Double(extractDate)).relativelyFormattedDay(prefixStringKey: "keyFigures.update", todayPrefixStringKey: "keyFigures.update.today", yesterdayPrefixStringKey: "keyFigures.update.today")
     }
+    var lastChartValue: Double? { series?.last?.value }
     
     enum CodingKeys: String, CodingKey {
         case number = "dptNb"

@@ -60,7 +60,8 @@ private extension BlacklistManager {
     }
 
     func fetchCertList(completion: ((_ success: Bool) -> ())?) {
-        let dataTask: URLSessionDataTask = UrlSessionManager.shared.session.dataTask(with: certListUrl) { [weak self] data, response, error in
+        let dataTask: URLSessionDataTask = URLSessionDataTaskFactory.shared.dataTask(with: URLRequest(url: certListUrl),
+                                                                                     session: UrlSessionManager.shared.session) { [weak self] data, response, error in
             guard response?.responseStatusCode == 200 else {
                 completion?(false)
                 return

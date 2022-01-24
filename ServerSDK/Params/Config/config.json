@@ -2,11 +2,11 @@
     "config":[
         {
             "name":"lastUpdate",
-            "value":"14 Dec 2021"
+            "value":"19 Jan 2022"
         },
         {
             "name":"version",
-            "value":112
+            "value":124
         },
         {
             "name":"versionCalibrationBle",
@@ -60,17 +60,27 @@
                 {
                     "t":"keyfigure.compare.vacsirea",
                     "k1":"sivicsidepvacsireanonvax",
-                    "k2":"sivicsidepvacsireavax"
+                    "k2":"sivicsidepvacsireavax6plusrappel"
+                },
+                {
+                    "t":"keyfigure.compare.5",
+                    "k1":"nombrecas",
+                    "k2":"deces"
+                },
+                {
+                    "t":"keyfigure.compare.6",
+                    "k1":"omicron",
+                    "k2":"delta"
                 },
                 {
                     "t":"keyfigure.compare.vacsipcrplus",
                     "k1":"sivicsidepvacsipcrplusnonvax",
-                    "k2":"sivicsidepvacsipcrplusvax"
+                    "k2":"sivicsidepvacsipcrplusvax6plusrappel"
                 },
                 {
                     "t":"keyfigure.compare.3",
                     "k1":"couvcompletvaccination",
-                    "k2":"tauxoccupation"
+                    "k2":"patientsrea"
                 },
                 {
                     "t":"keyfigure.compare.4",
@@ -149,6 +159,13 @@
             ]
         },
         {
+	      "name":"app.wallet.dccKids",
+	      "value":{
+                "age":11,
+                "s":["🐼","🐰","🐻","🦁","🐱","🐯","🐨"]
+            }
+        },
+        {
             "name":"app.walletPubKeys",
             "value":[
                 {
@@ -175,7 +192,7 @@
             "name":"app.smartwallet.ages",
             "value":{
                 "low":18,
-                "lowExpDays":152,
+                "lowExpDays":31,
                 "high":65
             }
         },
@@ -184,8 +201,11 @@
             "value":{
                 "pivot1":"2021-12-15",
                 "pivot2":"2022-01-15",
+                "pivot3":"2022-02-15",
                 "vacc22DosesNbDays":214,
                 "vacc11DosesNbDays":214,
+                "vacc22DosesNbNewDays":122,
+                "vacc11DosesNbNewDays":122,
                 "recNbDays":180,
                 "vaccJan11DosesNbDays":61,
                 "displayExpOnAllDcc":240,
@@ -195,10 +215,10 @@
         {
             "name":"app.smartwallet.elg",
             "value":{
-                "vacc22DosesNbDays":153,
+                "vacc22DosesNbDays":92,
                 "vaccJan11DosesNbDays":31,
-                "recNbDays":153,
-                "displayElgDays":60
+                "recNbDays":92,
+                "displayElgDays":26
             }
         },
         {
@@ -242,7 +262,7 @@
         },
         {
             "name":"app.activityPass.generationServerPublicKey",
-            "value":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbW1CsREnlCkmZIzpX/D3jBB5ok5shbIYSHCpE/1Q0QqY2JmfpS2qlPLYJcu7Ouc7YNRXT+c3uTtv1Drokzf+oA=="
+            "value":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEpuWWSr7/9EgjNxg4a7HuvjKtPuV9+M2kXHwLH5GOwRZK5dB6WcvTynfqDagTdCAkQoi6xSojQPsk5LpswjgyXQ=="
         },
         {
             "name":"app.activityPass.renewThreshold",
@@ -372,7 +392,7 @@
         },
         {
             "name":"app.checkStatusFrequency",
-            "value":12.0
+            "value":8.0
         },
         {
             "name":"app.minStatusRetryDuration",
@@ -432,7 +452,7 @@
         },
         {
             "name":"app.wallet.vaccin.noWaitDosesPivotDate",
-            "value": "2032-01-22"
+            "value": "2021-12-22"
         },
         {
             "name":"app.wallet.confettiBirthRate",

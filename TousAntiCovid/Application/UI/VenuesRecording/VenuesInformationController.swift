@@ -96,7 +96,7 @@ class VenuesInformationController: CVTableViewController {
                                                        textAlignment: .natural,
                                                        titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
                                                        subtitleFont: { Appearance.Cell.Text.accessoryFont }),
-                                    selectionAction: { [weak self] in
+                                    selectionAction: { [weak self] _ in
                                         guard let self = self else { return }
                                         "walletController.phone.number".localized.callPhoneNumber(from: self)
                                     })

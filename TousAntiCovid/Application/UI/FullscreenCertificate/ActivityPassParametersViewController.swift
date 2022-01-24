@@ -116,7 +116,7 @@ extension ActivityPassParametersViewController {
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
                                  bottomInset: .zero,
                                  buttonStyle: .primary),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
                 self?.didTouchConfirm()
               })
     }
@@ -127,7 +127,7 @@ extension ActivityPassParametersViewController {
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
                                  bottomInset: .zero,
                                  buttonStyle: .tertiary),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
                 self?.didTouchReadCGU()
               })
     }

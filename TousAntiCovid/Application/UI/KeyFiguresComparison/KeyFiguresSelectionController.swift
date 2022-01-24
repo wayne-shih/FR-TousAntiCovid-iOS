@@ -118,9 +118,11 @@ private extension KeyFiguresSelectionController {
 // MARK: - Rows
 private extension KeyFiguresSelectionController {
     func keyFiguresSelectionRows() -> [CVRow] {
-        [sectionHeaderRow(title: "keyfigures.comparison.keyfiguresChoice.section.title".localized,
+        let firstButtonTitle: String = selectedKeyFigures.first?.label ?? "???"
+        let secondButtonTitle: String = selectedKeyFigures.last?.label ?? "???"
+        return [sectionHeaderRow(title: "keyfigures.comparison.keyfiguresChoice.section.title".localized,
                           subtitle: "keyfigures.comparison.keyfiguresChoice.section.subtitle".localized),
-        buttonRow(title: selectedKeyFigures[0].label,
+        buttonRow(title: firstButtonTitle,
                   image: Asset.Images.icon1.image,
                   separatorLeftInset: Appearance.Cell.leftMargin) { [weak self] in
             self?.didTouchFirstKeyFigure { [weak self] in
@@ -130,7 +132,7 @@ private extension KeyFiguresSelectionController {
         } willDisplayHandler: { [weak self] cell in
             self?.firstKeyFigureCell = cell as? StandardCell
         },
-        buttonRow(title: selectedKeyFigures[1].label,
+        buttonRow(title: secondButtonTitle,
                   image: Asset.Images.icon2.image,
                   separatorLeftInset: .zero) { [weak self] in
             self?.didTouchSecondKeyFigure { [weak self] in
@@ -161,7 +163,7 @@ private extension KeyFiguresSelectionController {
                                             imageTintColor: Appearance.tintColor,
                                             imageSize: Appearance.Cell.Image.size,
                                             separatorLeftInset: (index < ParametersManager.shared.predefinedKeyFiguresSelection?.count ?? 0) ? Appearance.Cell.leftMargin : nil),
-                         selectionAction: { [weak self] in
+                         selectionAction: { [weak self] _ in
                 guard !isSelected else { return }
                 self?.selectedKeyFigures = [k1, k2]
                 self?.didTouchPredifinedCombination([k1, k2])
@@ -211,7 +213,7 @@ private extension KeyFiguresSelectionController {
                                  imageTintColor: Appearance.tintColor,
                                  imageSize: Appearance.Cell.Image.size,
                                  separatorLeftInset: separatorLeftInset),
-              selectionAction: { handler() },
+              selectionAction: { _ in handler() },
               willDisplay: { cell in
             cell.cvTitleLabel?.accessibilityTraits = .button
             willDisplayHandler?(cell)

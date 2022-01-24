@@ -260,7 +260,7 @@ extension IsolationFormViewController {
                                theme: CVRow.Theme(topInset: 20.0,
                                                   bottomInset: 0.0,
                                                   buttonStyle: .secondary),
-                               selectionAction: { [weak self] in
+                               selectionAction: { [weak self] _ in
                                     self?.didTouchCloseButton()
                                })
         return row
@@ -303,7 +303,7 @@ extension IsolationFormViewController {
                                  titleFont: { Appearance.Cell.Text.standardFont },
                                  separatorLeftInset: isLastRowInGroup ? .zero : Appearance.Cell.leftMargin,
                                  separatorRightInset: .zero),
-              selectionAction: {
+              selectionAction: { _ in
                 selectionBlock()
               })
     }

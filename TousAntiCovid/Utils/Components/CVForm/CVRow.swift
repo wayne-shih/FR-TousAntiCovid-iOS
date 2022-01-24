@@ -35,6 +35,8 @@ struct CVRow {
         var imageSize: CGSize?
         var imageRatio: CGFloat?
         var interLabelSpacing: CGFloat?
+        var requiredWidth: CGFloat = 300.0
+        var maxRequiredWidth: CGFloat?
         var separatorLeftInset: CGFloat?
         var separatorRightInset: CGFloat?
         var buttonStyle: CVButton.Style = .primary
@@ -43,6 +45,7 @@ struct CVRow {
         var accessoryType: UITableViewCell.AccessoryType? = nil
     }
     
+    let id: String = UUID().uuidString
     var title: String?
     var subtitle: String?
     var placeholder: String?
@@ -57,6 +60,7 @@ struct CVRow {
     var segmentsTitles: [String]?
     var selectedSegmentIndex: Int?
     var xibName: XibName.Row
+    var contentDesc: String = ""
     var theme: Theme = Theme()
     var enabled: Bool = true
     var associatedValue: Any? = nil
@@ -70,7 +74,7 @@ struct CVRow {
     var datePickerMode: UIDatePicker.Mode?
     var accessibilityDidFocusCell: ((_ cell: CVTableViewCell) -> ())?
     var selectionActionWithCell: ((_ cell: CVTableViewCell) -> ())?
-    var selectionAction: (() -> ())?
+    var selectionAction: ((_ cell: CVTableViewCell?) -> ())?
     var secondarySelectionAction: (() -> ())?
     var tertiarySelectionAction: (() -> ())?
     var quaternarySelectionAction: (() -> ())?
@@ -81,6 +85,7 @@ struct CVRow {
     var valueChanged: ((_ value: Any?) -> ())?
     var didValidateValue: ((_ value: Any?, _ cell: CVTableViewCell) -> ())?
     var displayValueForValue: ((_ value: Any?) -> String?)?
+    var collectionViewDidReload: ((_ cell: CVCollectionTableViewCell) -> ())?
     
     static func emptyFor(topInset: CGFloat, bottomInset: CGFloat, showSeparator: Bool = false) -> CVRow {
         CVRow(xibName: .emptyCell,

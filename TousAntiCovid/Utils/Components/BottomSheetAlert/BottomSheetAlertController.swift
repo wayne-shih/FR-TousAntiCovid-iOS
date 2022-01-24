@@ -118,7 +118,7 @@ private extension BottomSheetAlertController {
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
                                  bottomInset: .zero,
                                  buttonStyle: .primary),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             self?.dismiss(animated: true) {
                 self?.didTouchConfirm?()
             }
@@ -131,7 +131,7 @@ private extension BottomSheetAlertController {
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
                                  bottomInset: .zero,
                                  buttonStyle: .tertiary),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             self?.dismiss(animated: true)
         })
     }

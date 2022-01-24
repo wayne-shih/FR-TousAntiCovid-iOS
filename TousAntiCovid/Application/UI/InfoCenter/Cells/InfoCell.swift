@@ -56,7 +56,7 @@ final class InfoCell: CardCell {
 
     override func capture() -> UIImage? {
         sharingImageView.isHidden = true
-        let image: UIImage? = containerView.screenshot()
+        let image: UIImage? = containerView.cvScreenshot()
         sharingImageView.isHidden = false
         return image
     }

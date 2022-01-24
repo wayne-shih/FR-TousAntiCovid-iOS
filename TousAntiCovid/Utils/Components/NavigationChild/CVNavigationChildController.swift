@@ -20,7 +20,7 @@ final class CVNavigationChildController: UIViewController {
     @IBOutlet private(set) var navigationBar: UINavigationBar!
     @IBOutlet private var containerView: UIView!
     
-    @IBOutlet private var fakeNavigationBar: UINavigationBar!
+    @IBOutlet private(set) var fakeNavigationBar: UINavigationBar!
     @IBOutlet private var fakeNavigationItem: UINavigationItem!
     
     weak var titleLabel: UILabel?

@@ -109,7 +109,7 @@ private extension KeyFiguresExplanationsController {
                                      titleColor: Appearance.tintColor,
                                      separatorLeftInset: index + 1 == links.count ? nil : Appearance.Cell.leftMargin,
                                      accessoryType: UITableViewCell.AccessoryType.none),
-                  selectionAction: {
+                  selectionAction: { _ in
                 URL(string: link.url)?.openInSafari()
             }, willDisplay: { cell in
                 cell.cvTitleLabel?.accessibilityTraits = .button

@@ -174,7 +174,22 @@ public final class ParametersManager: NSObject {
             return []
         }
     }
+    public var noWaitDosesPivotDate: String? {
+        valueFor(name: "app.wallet.vaccin.noWaitDosesPivotDate") as? String
+    }
 
+    public var dccKids: DccKids? {
+        guard let value = valueFor(name: "app.wallet.dccKids") as? [String: Any] else {
+            return nil
+        }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode(DccKids.self, from: jsonData)
+        } catch {
+            return nil
+        }
+    }
+    
     public var confettiBirthRate: Double { valueFor(name: "app.wallet.confettiBirthRate") as? Double ?? 10.0 }
 
     var dataRetentionPeriod: Int {

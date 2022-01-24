@@ -37,7 +37,7 @@ class CVTableViewCell: UITableViewCell {
     }
 
     func capture() -> UIImage? {
-       return screenshot()
+       return cvScreenshot()
     }
 
     override func accessibilityElementDidBecomeFocused() {

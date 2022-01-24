@@ -21,7 +21,7 @@ extension URLSession {
         if let url = request.url, let eTag = ETagManager.shared.eTag(for: url.absoluteString) {
             request.addValue(eTag, forHTTPHeaderField: ETagConstant.requestHeaderField)
         }
-        return dataTask(with: request) { data, response, error in
+        return URLSessionDataTaskFactory.shared.dataTask(with: request, session: self) { data, response, error in
             if let url = request.url, let eTag = response?.eTag {
                 ETagManager.shared.save(eTag: eTag, for: url.absoluteString)
             }

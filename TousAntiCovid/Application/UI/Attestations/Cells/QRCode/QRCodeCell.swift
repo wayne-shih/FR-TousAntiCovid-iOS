@@ -22,7 +22,7 @@ final class QRCodeCell: CardCell {
     
     override func capture() -> UIImage? {
         topRightButton.isHidden = true
-        let image: UIImage? = containerView.screenshot()
+        let image: UIImage? = containerView.cvScreenshot()
         topRightButton.isHidden = false
         return image
     }

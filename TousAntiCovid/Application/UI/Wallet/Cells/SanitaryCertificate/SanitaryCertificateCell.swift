@@ -28,14 +28,14 @@ final class SanitaryCertificateCell: CardCell {
     
     override func capture() -> UIImage? {
         topRightButton.isHidden = true
-        let cellImage: UIImage? = containerView.screenshot()
+        let cellImage: UIImage? = containerView.cvScreenshot()
         topRightButton.isHidden = false
         guard let image = cellImage else { return nil }
         let imageView: UIImageView = UIImageView(image: image)
         imageView.frame.size = image.size
         imageView.contentMode = .scaleAspectFit
         imageView.backgroundColor = containerView.backgroundColor
-        return imageView.screenshot()
+        return imageView.cvScreenshot()
     }
     
     private func setupUI(with row: CVRow) {

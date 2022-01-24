@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="AqH-ax-0sh" customClass="HeaderWithActionView" customModule="TAC_Prod_Plus" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="441"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="oml-Bc-NWh">
+                    <rect key="frame" x="20" y="64" width="374" height="357"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="1000" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c82-Y8-DSM">
+                            <rect key="frame" x="0.0" y="168.5" width="323" height="20.5"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dzY-lI-2Yp">
+                            <rect key="frame" x="331" y="170" width="43" height="17"/>
+                            <state key="normal" title="Button"/>
+                            <buttonConfiguration key="configuration" style="plain" title="Button">
+                                <directionalEdgeInsets key="contentInsets" top="0.0" leading="0.0" bottom="0.0" trailing="0.0"/>
+                            </buttonConfiguration>
+                            <connections>
+                                <action selector="buttonPressed" destination="AqH-ax-0sh" eventType="touchUpInside" id="WJu-UV-qIg"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="NrJ-zR-A8q"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="NrJ-zR-A8q" firstAttribute="bottom" secondItem="oml-Bc-NWh" secondAttribute="bottom" constant="20" id="7zm-uA-LY0"/>
+                <constraint firstItem="oml-Bc-NWh" firstAttribute="top" secondItem="NrJ-zR-A8q" secondAttribute="top" constant="20" id="9i1-fV-gNG"/>
+                <constraint firstItem="NrJ-zR-A8q" firstAttribute="trailing" secondItem="oml-Bc-NWh" secondAttribute="trailing" constant="20" id="BCo-RT-z40"/>
+                <constraint firstItem="oml-Bc-NWh" firstAttribute="leading" secondItem="NrJ-zR-A8q" secondAttribute="leading" constant="20" id="Hq1-SN-omW"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="actionButton" destination="dzY-lI-2Yp" id="rQA-UC-xxn"/>
+                <outlet property="bottomConstraint" destination="7zm-uA-LY0" id="62Q-5v-iLv"/>
+                <outlet property="cvTitleLabel" destination="c82-Y8-DSM" id="AlZ-rs-HsW"/>
+                <outlet property="leadingConstraint" destination="Hq1-SN-omW" id="xKx-Zh-gNh"/>
+                <outlet property="topConstraint" destination="9i1-fV-gNG" id="5ts-CN-M8C"/>
+                <outlet property="trailingConstraint" destination="BCo-RT-z40" id="50w-Z2-oBb"/>
+            </connections>
+            <point key="canvasLocation" x="-1712" y="118"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

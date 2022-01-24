@@ -74,7 +74,7 @@ final class WalletScanAuthorizationController: CVTableViewController {
                 CVRow(title: "confirmWalletQrCodeController.confirm".localized,
                       xibName: .buttonCell,
                       theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium, bottomInset: Appearance.Cell.Inset.small),
-                      selectionAction: { [weak self] in
+                      selectionAction: { [weak self] _ in
                     self?.didAnswer(true)
                 })
                 CVRow(title: "common.cancel".localized,
@@ -82,7 +82,7 @@ final class WalletScanAuthorizationController: CVTableViewController {
                       theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
                                          bottomInset: .zero,
                                          buttonStyle: .destructive),
-                      selectionAction: { [weak self] in
+                      selectionAction: { [weak self] _ in
                     self?.didAnswer(false)
                 })
             }

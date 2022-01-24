@@ -13,8 +13,10 @@ import UIKit
 final class InfoCenterController: CVTableViewController {
     
     private let deinitBlock: () -> ()
+    private var indexToScrollTo: Int?
     
-    init(deinitBlock: @escaping () -> ()) {
+    init(scrollToIndex: Int?, deinitBlock: @escaping () -> ()) {
+        self.indexToScrollTo = scrollToIndex
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
     }
@@ -30,6 +32,11 @@ final class InfoCenterController: CVTableViewController {
         reloadUI()
         addObservers()
         InfoCenterManager.shared.fetchInfo(force: true)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        scrollToSelectedIndex()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -49,6 +56,22 @@ final class InfoCenterController: CVTableViewController {
         tableView.separatorStyle = .singleLine
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "common.close".localized, style: .plain, target: self, action: #selector(didTouchCloseButton))
         navigationItem.leftBarButtonItem?.accessibilityHint = "accessibility.closeModal.zGesture".localized
+    }
+    
+    private func scrollToSelectedIndex() {
+        guard let index = indexToScrollTo else { return }
+        let indexPath: IndexPath = .init(row: index, section: 0)
+        tableView.scrollToRow(at: indexPath, at: .top, animated: false)
+        if index > 0 {
+            let previousIndexPath: IndexPath = .init(row: index - 1, section: 0)
+            if let cell = tableView.cellForRow(at: indexPath),
+               let previousCell = tableView.cellForRow(at: previousIndexPath),
+               cell.frame.origin.y >= previousCell.frame.origin.y + previousCell.frame.height {
+                indexToScrollTo = nil
+            }
+        } else {
+            indexToScrollTo = nil
+        }
     }
     
     @objc private func didTouchCloseButton() {
@@ -73,8 +96,7 @@ final class InfoCenterController: CVTableViewController {
     }
     
     override func createSections() -> [CVSection] {
-        updateEmptyView()
-        return makeSections {
+        makeSections {
             if InfoCenterManager.shared.info.isEmpty {
                 CVSection.Empty()
             } else {

@@ -55,6 +55,7 @@ extension WalletManager {
         // Pivot dates
         let datePivot1: Double = (smartConfig.exp.pivot1Date ?? Date()).timeIntervalSince1970
         let datePivot2: Double = (smartConfig.exp.pivot2Date ?? Date()).timeIntervalSince1970
+        let datePivot3: Double = (smartConfig.exp.pivot3Date ?? Date()).timeIntervalSince1970
         let agePivotLow: Double = certificate.userBirthdayTimestamp(for: smartConfig.ages.low) + smartConfig.ages.lowExpDays.daysToSeconds() // 18 years + 5 months
         
         // Cutoffs
@@ -71,9 +72,13 @@ extension WalletManager {
                 expDcc = max(cutoffJanssen, certificate.alignedTimestamp + smartConfig.exp.vaccJan11DosesNbDays.daysToSeconds())
             default:
                 if certificate.dosesTotal == 1 {
-                    expDcc = max(cutoff, certificate.alignedTimestamp + smartConfig.exp.vacc11DosesNbDays.daysToSeconds())
+                    expDcc = [cutoff,
+                              min(datePivot3, certificate.alignedTimestamp + smartConfig.exp.vacc11DosesNbDays.daysToSeconds()),
+                              certificate.alignedTimestamp + smartConfig.exp.vacc11DosesNbNewDays.daysToSeconds()].max()
                 } else if certificate.dosesTotal == 2 {
-                    expDcc = max(cutoff, certificate.alignedTimestamp + smartConfig.exp.vacc22DosesNbDays.daysToSeconds())
+                    expDcc = [cutoff,
+                              min(datePivot3, certificate.alignedTimestamp + smartConfig.exp.vacc22DosesNbDays.daysToSeconds()),
+                              certificate.alignedTimestamp + smartConfig.exp.vacc22DosesNbNewDays.daysToSeconds()].max()
                 } else {
                     expDcc = nil
                 }
@@ -139,37 +144,85 @@ extension WalletManager {
         lastRelevantCertificates?.contains(certificate) == true
     }
     
-    func isPassExpired(for certificate: EuropeanCertificate?) -> Bool {
-        guard let cert = certificate else { return false }
-        guard let timestamp = expiryTimestamp(cert) else { return false }
-        return timestamp <= Date().timeIntervalSince1970
+    func isCertificateOld(_ certificate: WalletCertificate) -> Bool {
+        certificate.isOld || (shouldUseSmartWallet && isPassExpired(for: certificate as? EuropeanCertificate))
     }
     
-    func isPassExpiredSoon(for certificate: EuropeanCertificate) -> Bool {
-        guard let expiryTimestamp = expiryTimestamp(certificate) else { return false }
+    func passExpirationTimestamp(for certificate: EuropeanCertificate?) -> Double? {
+        guard let cert = certificate else { return nil }
+        guard let timestamp = expiryTimestamp(cert) else { return nil }
+        return timestamp <= Date().timeIntervalSince1970 ? timestamp : nil
+    }
+    
+    func isPassExpired(for certificate: EuropeanCertificate?) -> Bool {
+        passExpirationTimestamp(for: certificate) != nil
+    }
+    
+    func passExpirationSoonTimestamp(for certificate: EuropeanCertificate) -> Double? {
+        guard let expiryTimestamp = expiryTimestamp(certificate) else { return nil }
         let now: Date = Date()
         let expiryDate: Date = Date(timeIntervalSince1970: expiryTimestamp)
         if let dateWithThreshold = Calendar.utc.date(byAdding: .day, value: -smartConfig.exp.displayExpDays, to: expiryDate) {
-            return dateWithThreshold <= now && now < expiryDate
+            return dateWithThreshold <= now && now < expiryDate ? expiryTimestamp : nil
         } else {
-            return false
+            return nil
         }
+    }
+    
+    func isPassExpiredSoon(for certificate: EuropeanCertificate) -> Bool {
+        passExpirationSoonTimestamp(for: certificate) != nil
+    }
+    
+    func passEligibilityTimestamp(for certificate: EuropeanCertificate) -> Double? {
+        guard let timestamp = eligibilityTimestamp(certificate) else { return nil }
+        return timestamp <= Date().timeIntervalSince1970 ? timestamp : nil
     }
     
     func isEligibleToVaccination(for certificate: EuropeanCertificate) -> Bool {
-        guard let timestamp = eligibilityTimestamp(certificate) else { return false }
-        return timestamp <= Date().timeIntervalSince1970
+        passEligibilityTimestamp(for: certificate) != nil
     }
     
-    func isEligibleToVaccinationSoon(for certificate: EuropeanCertificate) -> Bool {
-        guard let eligibilityTimestamp = eligibilityTimestamp(certificate) else { return false }
+    func passEligibleSoonTimestamp(for certificate: EuropeanCertificate) -> Double? {
+        guard let eligibilityTimestamp = eligibilityTimestamp(certificate) else { return nil }
         let now: Date = Date()
         let eligibilityDate: Date = Date(timeIntervalSince1970: eligibilityTimestamp)
         if let dateWithThreshold = Calendar.utc.date(byAdding: .day, value: -smartConfig.elg.displayElgDays, to: eligibilityDate) {
-            return dateWithThreshold <= now && now < eligibilityDate
+            return dateWithThreshold <= now && now < eligibilityDate ? eligibilityTimestamp : nil
         } else {
-            return false
+            return nil
         }
+    }
+    
+    func isEligibleToVaccinationSoon(for certificate: EuropeanCertificate) -> Bool {
+        passEligibleSoonTimestamp(for: certificate) != nil
+    }
+    
+    func eligibleSoonDescription(for certificate: EuropeanCertificate) -> String? {
+        guard let timestamp = passEligibleSoonTimestamp(for: certificate) else { return nil }
+        let date: Date = Date(timeIntervalSince1970: timestamp)
+        return description(for: localizationKey(for: "smartWallet.elegibility.soon.info", and: certificate), and: date)
+        
+    }
+    
+    func eligibilityDescription(for certificate: EuropeanCertificate) -> String? {
+        guard let timestamp = passEligibilityTimestamp(for: certificate) else { return nil }
+        let date: Date = Date(timeIntervalSince1970: timestamp)
+        return description(for: localizationKey(for: "smartWallet.elegibility.info", and: certificate), and: date)
+        
+    }
+    
+    func expirationSoonDescription(for certificate: EuropeanCertificate) -> String? {
+        guard let timestamp = passExpirationSoonTimestamp(for: certificate) else { return nil }
+        let date: Date = Date(timeIntervalSince1970: timestamp)
+        return description(for: localizationKey(for: "smartWallet.expiration.soon.warning", and: certificate), and: date)
+        
+    }
+    
+    func expirationDescription(for certificate: EuropeanCertificate) -> String? {
+        guard let timestamp = passExpirationTimestamp(for: certificate) else { return nil }
+        let date: Date = Date(timeIntervalSince1970: timestamp)
+        return description(for: localizationKey(for: "smartWallet.expiration.error", and: certificate), and: date)
+        
     }
 }
 
@@ -273,12 +326,35 @@ private extension WalletManager {
     func notificationId(type: NotificationType, hash: String, range: Range<Int>?) -> String {
         "\(smartNotificationIdPrefix)_\(type.rawValue)_\(hash)_\(abs(range?.lowerBound ?? 0))_\(abs(range?.upperBound ?? 0))"
     }
+    
+    func localizationKey(for prefix: String, and certificate: EuropeanCertificate) -> String? {
+        let localizationKey: String
+        switch certificate.type {
+        case .vaccinationEurope:
+            if let medicalProductCode = certificate.medicalProductCode,
+                [prefix, certificate.type.rawValue, medicalProductCode].joined(separator: ".").localizedOrNil != nil {
+                localizationKey = [prefix, certificate.type.rawValue, medicalProductCode].joined(separator: ".")
+            } else {
+                localizationKey = [prefix, certificate.type.rawValue].joined(separator: ".")
+            }
+        case .recoveryEurope, .sanitaryEurope:
+            localizationKey = [prefix, certificate.type.rawValue].joined(separator: ".")
+        default: return nil
+        }
+        return localizationKey
+    }
+    
+    func description(for localizationKey: String?, and date: Date) -> String? {
+        guard let localizationKey = localizationKey else { return nil }
+        return String(format: localizationKey.localized, date.dayShortMonthYearFormatted(timeZoneIndependant: true))
+    }
 }
 
 // MARK: - Format date
 extension Expiration {
     var pivot1Date: Date? { Date(dateString: pivot1) }
     var pivot2Date: Date? { Date(dateString: pivot2) }
+    var pivot3Date: Date? { Date(dateString: pivot3) }
 }
 
 // MARK: - Util

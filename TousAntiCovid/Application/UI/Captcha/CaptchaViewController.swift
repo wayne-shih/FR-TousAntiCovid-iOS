@@ -214,7 +214,7 @@ private extension CaptchaViewController {
                                theme: CVRow.Theme(topInset: playButtonTopMargin,
                                                   bottomInset: playButtonTopMargin,
                                                   imageSize: CGSize(width: playButtonHeight, height: playButtonHeight)),
-                               selectionAction: { [weak self] in
+                               selectionAction: { [weak self] _ in
                 guard let self = self else { return }
                 if self.player?.isPlaying == true {
                     self.stopPlayingCaptcha()
@@ -236,7 +236,7 @@ private extension CaptchaViewController {
               xibName: .textFieldCell,
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
                                  bottomInset: Appearance.Cell.Inset.medium,
-                                 placeholderColor: .lightGray,
+                                 placeholderColor: Appearance.Cell.Text.placeholderColor,
                                  separatorLeftInset: .zero),
               textFieldKeyboardType: .default,
               textFieldReturnKeyType: .done,
@@ -267,7 +267,7 @@ private extension CaptchaViewController {
                                  imageRatio: nil,
                                  separatorLeftInset: Appearance.Cell.leftMargin,
                                  accessoryType: UITableViewCell.AccessoryType.none),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             self?.reloadCaptcha()
         }, willDisplay: { cell in
             cell.cvTitleLabel?.accessibilityTraits = .button
@@ -288,7 +288,7 @@ private extension CaptchaViewController {
                                  imageRatio: nil,
                                  separatorLeftInset: .zero,
                                  accessoryType: UITableViewCell.AccessoryType.none),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             guard let self = self else { return }
             if self.captcha.isImage {
                 self.reloadAudioCaptcha()

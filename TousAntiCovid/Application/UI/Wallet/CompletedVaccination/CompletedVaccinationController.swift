@@ -20,16 +20,20 @@ final class CompletedVaccinationController: CVTableViewController {
     private lazy var daysAfterCompletion: Int = { ParametersManager.shared.daysAfterCompletion.first(where: { $0.code.trimLowercased() == certificate.medicalProductCode?.trimLowercased() ?? "" })?.value ?? ParametersManager.shared.daysAfterCompletion.first(where: { $0.code.trimLowercased() == "default" })?.value ?? 0 }()
     
     private lazy var noWaitDoses: Int = { ParametersManager.shared.noWaitDoses.first(where: { $0.code.trimLowercased() == certificate.medicalProductCode?.trimLowercased() ?? "" })?.value ?? ParametersManager.shared.noWaitDoses.first(where: { $0.code.trimLowercased() == "default" })?.value ?? 0 }()
-    private lazy var shouldShowNoWaitWarning: Bool = { noWaitDoses > 0 && certificate.dosesNumber ?? 0 >= noWaitDoses }()
+    private lazy var noWaitDosesPivotDate: Date = {
+        guard let dateStr = ParametersManager.shared.noWaitDosesPivotDate else { return .distantFuture }
+        return Date(dateString: dateStr) ?? .distantFuture
+    }()
+    private lazy var shouldShowNoWaitWarning: Bool = { noWaitDoses > 0 && certificate.dosesNumber ?? 0 >= noWaitDoses && certificate.timestamp < noWaitDosesPivotDate.timeIntervalSince1970 }()
     
     private lazy var completedDate: Date = {
-        if (certificate.dosesTotal ?? 0) > 2 {
+        if shouldShowNoWaitWarning {
             return Date(timeIntervalSince1970: certificate.timestamp)
         } else {
             return Date(timeIntervalSince1970: certificate.timestamp + Double((daysAfterCompletion * 24 * 3600)))
         }
     }()
-    private lazy var isVaccineCompleted = { completedDate <= Date() || shouldShowNoWaitWarning }()
+    private lazy var isVaccineCompleted = { completedDate <= Date() }()
 
     init(certificate: EuropeanCertificate) {
         self.certificate = certificate
@@ -114,7 +118,7 @@ private extension CompletedVaccinationController {
                                        xibName: .buttonCell,
                                        theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
                                                           bottomInset: .zero),
-                                       selectionAction: { [weak self] in
+                                       selectionAction: { [weak self] _ in
             self?.notifyMe()
             self?.dismiss(animated: true, completion: nil)
         },
@@ -131,7 +135,7 @@ private extension CompletedVaccinationController {
                                            xibName: .buttonCell,
                                            theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
                                                               bottomInset: .zero),
-                                           selectionAction: { [weak self] in
+                                           selectionAction: { [weak self] _ in
             self?.addToFavorite()
             self?.dismiss(animated: true, completion: nil)
         },
@@ -148,7 +152,7 @@ private extension CompletedVaccinationController {
                                                   xibName: .buttonCell,
                                                   theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
                                                                      bottomInset: .zero),
-                                                  selectionAction: { [weak self] in
+                                                  selectionAction: { [weak self] _ in
             self?.notifyMe()
             self?.addToFavorite()
             self?.dismiss(animated: true, completion: nil)

@@ -101,13 +101,13 @@ private extension KeyFiguresChoiceController {
                                                    bottomInset: Appearance.Cell.Inset.normal,
                                                    textAlignment: .natural,
                                                    titleFont: { Appearance.Cell.Text.standardFont },
-                                                   titleColor: isDisabled ? .gray : Appearance.Cell.Text.headerTitleColor,
-                                                   subtitleColor: isDisabled ? .lightGray : Appearance.Cell.Text.subtitleColor ,
+                                                   titleColor: isDisabled ? Appearance.Cell.Text.accessoryColor : Appearance.Cell.Text.headerTitleColor,
+                                                   subtitleColor: isDisabled ? Appearance.Cell.Text.placeholderColor : Appearance.Cell.Text.subtitleColor ,
                                                    subtitleLinesCount: 3,
-                                                   imageTintColor: isDisabled ? .gray : Appearance.Cell.Text.headerTitleColor,
+                                                   imageTintColor: isDisabled ? Appearance.Cell.Text.accessoryColor : Appearance.Cell.Text.headerTitleColor,
                                                    imageSize: Appearance.Cell.Image.size,
                                                    separatorLeftInset: Appearance.Cell.leftMargin),
-                               selectionAction: isDisabled ? nil : {
+                               selectionAction: isDisabled ? nil : { _ in
             actionBlock()
         })
         return row

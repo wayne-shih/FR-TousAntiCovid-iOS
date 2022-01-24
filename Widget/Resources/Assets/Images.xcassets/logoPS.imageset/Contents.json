@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "Logo PS.pdf",
+      "filename" : "pass-light.pdf",
       "idiom" : "universal"
     },
     {
@@ -11,7 +11,7 @@
           "value" : "light"
         }
       ],
-      "filename" : "Logo PS-1.pdf",
+      "filename" : "pass-light-1.pdf",
       "idiom" : "universal"
     },
     {
@@ -21,7 +21,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "Logo PS2.pdf",
+      "filename" : "Group.pdf",
       "idiom" : "universal"
     }
   ],

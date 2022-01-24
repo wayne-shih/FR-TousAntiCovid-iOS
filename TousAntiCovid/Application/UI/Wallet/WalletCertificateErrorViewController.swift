@@ -76,7 +76,7 @@ final class WalletCertificateErrorViewController: CVTableViewController {
                                          textAlignment: .natural,
                                          titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
                                          subtitleFont: { Appearance.Cell.Text.accessoryFont }),
-                      selectionAction: { [weak self] in
+                      selectionAction: { [weak self] _ in
                     guard let self = self else { return }
                     "walletController.phone.number".localized.callPhoneNumber(from: self)
                 })
@@ -85,7 +85,7 @@ final class WalletCertificateErrorViewController: CVTableViewController {
                       theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
                                          bottomInset: .zero,
                                          buttonStyle: .primary),
-                      selectionAction: { [weak self] in
+                      selectionAction: { [weak self] _ in
                     self?.didTouchCloseButton()
                 })
             }
@@ -120,7 +120,7 @@ final class WalletCertificateErrorViewController: CVTableViewController {
                                         bottomInset: .zero,
                                         textAlignment: .center,
                                         titleFont: { Appearance.Cell.Text.headTitleFont }),
-                     selectionAction: { [weak self] in
+                     selectionAction: { [weak self] _ in
             guard let self = self else { return }
             self.didTouchDocument(self.certificateType)
         })

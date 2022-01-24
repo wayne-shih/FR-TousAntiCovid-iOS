@@ -20,28 +20,32 @@ extension Calendar {
 
 extension Date {
 
-    func dateFormatted() -> String {
+    func dateFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateStyle = .short
         formatter.timeStyle = .none
         return formatter.string(from: self)
     }
     
-    func timeFormatted() -> String {
+    func timeFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateStyle = .none
         formatter.timeStyle = .short
         return formatter.string(from: self)
     }
 
-    func shortDateTimeFormatted() -> String {
+    func shortDateTimeFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateFormat = "dd/MM/yyyy, HH:mm"
         return formatter.string(from: self).uppercased()
     }
     
-    func shortDateFormatted(timeZoneIndependant: Bool) -> String {
+    func shortDateFormatted(timeZoneIndependant: Bool, with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateFormat = "dd/MM/yyyy"
         if timeZoneIndependant {
             formatter.calendar = Calendar(identifier: .iso8601)
@@ -50,26 +54,30 @@ extension Date {
         return formatter.string(from: self).uppercased()
     }
     
-    func shortTimeFormatted() -> String {
+    func shortTimeFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: self).uppercased()
     }
     
-    func dayMonthFormatted() -> String {
+    func dayMonthFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.setLocalizedDateFormatFromTemplate("dMMMM")
         return formatter.string(from: self)
     }
     
-    func dayShortMonthFormatted() -> String {
+    func dayShortMonthFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.setLocalizedDateFormatFromTemplate("dMMM")
         return formatter.string(from: self)
     }
     
-    func dayShortMonthYearFormatted(timeZoneIndependant: Bool, forceEnglishFormat: Bool = false) -> String {
+    func dayShortMonthYearFormatted(timeZoneIndependant: Bool, forceEnglishFormat: Bool = false, with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         if timeZoneIndependant {
             formatter.calendar = Calendar(identifier: .iso8601)
             formatter.timeZone = TimeZone(secondsFromGMT: 0)
@@ -81,8 +89,9 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    func dayShortMonthYearTimeFormatted(forceEnglishFormat: Bool = false) -> String {
+    func dayShortMonthYearTimeFormatted(forceEnglishFormat: Bool = false, with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         if forceEnglishFormat {
             formatter.locale = Locale(identifier: "en-GB")
         }
@@ -90,8 +99,9 @@ extension Date {
         return formatter.string(from: self)
     }
 
-    func dayMonthYearTimeFormatted(forceEnglishFormat: Bool = false) -> String {
+    func dayMonthYearTimeFormatted(forceEnglishFormat: Bool = false, with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         if forceEnglishFormat {
             formatter.locale = Locale(identifier: "en-GB")
         }
@@ -99,39 +109,45 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    func fullDayMonthFormatted() -> String {
+    func fullDayMonthFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateFormat = "EEEE d MMMM"
         return formatter.string(from: self)
     }
 
-    func dayNameShortDayMonthFormatted() -> String {
+    func dayNameShortDayMonthFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateFormat = "EEEE dd/MM"
         return formatter.string(from: self)
     }
 
-    func shortDayMonthFormatted() -> String {
+    func shortDayMonthFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.setLocalizedDateFormatFromTemplate("ddMM")
         return formatter.string(from: self)
     }
     
-    func dayMonthYearFormatted() -> String {
+    func dayMonthYearFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.setLocalizedDateFormatFromTemplate("dMMMMyyyy")
         return formatter.string(from: self)
     }
     
-    func fullTextFormatted() -> String {
+    func fullTextFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateStyle = .short
         formatter.timeStyle = .short
         return formatter.string(from: self)
     }
     
-    func fullDateTimeFormatted(withSeconds: Bool = true) -> String {
+    func fullDateTimeFormatted(withSeconds: Bool = true, with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateStyle = .short
         formatter.timeStyle = withSeconds ? .medium : .short
         return formatter.string(from: self)
@@ -147,20 +163,23 @@ extension Date {
         return Calendar.current.date(byAdding: dateComponent, to: self)!
     }
     
-    func fullDateFormatted() -> String {
+    func fullDateFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         return formatter.string(from: self)
     }
     
-    func testCodeFormatted() -> String {
+    func testCodeFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateFormat = "dMMMyyyy"
         return formatter.string(from: self).uppercased()
     }
     
-    func underscoreDateFormatted() -> String {
+    func underscoreDateFormatted(with locale: Locale = Locale.appLocale) -> String {
         let formatter: DateFormatter = .init()
+        formatter.locale = locale
         formatter.dateFormat = "dd_MM_yyyy"
         return formatter.string(from: self).uppercased()
     }

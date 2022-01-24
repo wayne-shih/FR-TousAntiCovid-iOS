@@ -104,7 +104,7 @@ private extension AppMaintenanceController {
               xibName: .buttonCell,
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
                                  bottomInset: .zero),
-              selectionAction: {
+              selectionAction: { _ in
             URL(string: url)?.openInSafari()
         })
     }
@@ -114,7 +114,7 @@ private extension AppMaintenanceController {
               xibName: .buttonCell,
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
                                  bottomInset: .zero),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             self?.didTouchButton()
         })
     }
@@ -124,7 +124,7 @@ private extension AppMaintenanceController {
               xibName: .buttonCell,
               theme: CVRow.Theme(topInset: .zero,
                                  buttonStyle: .quaternary),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             self?.didTouchLater()
         })
     }

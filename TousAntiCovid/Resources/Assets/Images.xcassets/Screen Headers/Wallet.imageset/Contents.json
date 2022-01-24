@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "PassSanitaire.pdf",
+      "filename" : "PassVaccinal-1.pdf",
       "idiom" : "universal"
     },
     {
@@ -11,7 +11,7 @@
           "value" : "light"
         }
       ],
-      "filename" : "PassSanitaire-1.pdf",
+      "filename" : "PassVaccinal.pdf",
       "idiom" : "universal"
     },
     {
@@ -21,7 +21,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "PassSanitaire-2.pdf",
+      "filename" : "PassVaccinalDark.pdf",
       "idiom" : "universal"
     }
   ],

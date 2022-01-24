@@ -83,7 +83,7 @@ final class EnterCodeController: CVTableViewController {
                 CVRow(placeholder: "enterCodeController.textField.placeholder".localized,
                       xibName: .textFieldCell,
                       theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
-                                         placeholderColor: .lightGray,
+                                         placeholderColor: Appearance.Cell.Text.placeholderColor,
                                          separatorLeftInset: Appearance.Cell.leftMargin,
                                          separatorRightInset: Appearance.Cell.leftMargin),
                       textFieldKeyboardType: .default,
@@ -101,7 +101,7 @@ final class EnterCodeController: CVTableViewController {
                 CVRow(title: "enterCodeController.button.validate".localized,
                       xibName: .buttonCell,
                       theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge),
-                      selectionAction: { [weak self] in
+                      selectionAction: { [weak self] _ in
                     self?.didTouchValidate()
                 })
             }

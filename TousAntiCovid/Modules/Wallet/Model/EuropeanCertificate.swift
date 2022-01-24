@@ -25,9 +25,7 @@ final class EuropeanCertificate: WalletCertificate, Equatable {
     var didAlreadyGenerateActivityCertificates: Bool
     
     var fullName: String {
-        let first: String? = hCert.get(.firstName).string
-        let last: String? = hCert.get(.lastName).string
-        return [first, last].compactMap { $0?.trimmingCharacters(in: .whitespaces) } .joined(separator: " ")
+        [firstname, lastname].compactMap { $0?.trimmingCharacters(in: .whitespaces) }.joined(separator: " ")
     }
     
     static func == (lhs: EuropeanCertificate, rhs: EuropeanCertificate) -> Bool {
@@ -78,7 +76,19 @@ final class EuropeanCertificate: WalletCertificate, Equatable {
         }
     }
     
+    override var shortDescriptionForList: String? {
+        return [smiley, fullName].compactMap { $0 }.joined(separator: " ")
+    }
+    
     override var shortDescription: String? { fullName }
+    
+    lazy var smiley: String? = {
+        guard let dccKids = ParametersManager.shared.dccKids, userAge <= dccKids.age else { return nil }
+        let emojiIdx: Int = (hCert.dateOfBirth + fullName).androidCommonHash() % dccKids.smileys.count
+        return dccKids.smileys[emojiIdx]
+    }()
+    
+    var profileId: String { (firstname ?? lastname ?? "").uppercased() + hCert.dateOfBirth }
 
     override var fullDescription: String? {
         var strings: [String?] = []
@@ -135,13 +145,11 @@ final class EuropeanCertificate: WalletCertificate, Equatable {
         return vaccinationEntry.medicalProduct.trimmingCharacters(in: .whitespaces)
     }
         
-    var firstname: String { hCert.get(.firstName).string ?? "" }
-    var lastname: String { hCert.get(.lastName).string ?? "" }
+    var firstname: String? { hCert.get(.firstName).string ?? hCert.get(.firstNameStandardized).string }
+    var lastname: String? { hCert.get(.lastName).string ?? hCert.get(.lastNameStandardized).string }
     var birthdate: Double { Date(dateString: hCert.dateOfBirth)?.timeIntervalSince1970 ?? Date().timeIntervalSince1970 }
     var hasLunarBirthdate: Bool { hCert.dateOfBirth.isLunarDate }
-    
-    var europeanType: HCertType { hCert.type }
-    
+        
     var isLastDose: Bool? {
         guard let vaccinationEntry = hCert.vaccineStatements.first else { return nil }
         return vaccinationEntry.doseNumber == vaccinationEntry.dosesTotal

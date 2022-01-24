@@ -36,8 +36,15 @@ extension ChartViewBase {
 
 // MARK: - Combined chart -
 private extension BarLineChartViewBase {
+    // Get the duration between two items in a serie of data
+    private static func dataSeriesGrouping(for data: KeyFigureChartData) -> Double {
+        data.series.prefix(2).compactMap { $0.date }.reduce(0) { $1 - $0 }
+    }
     
     static func createBarsChart(chartData1: KeyFigureChartData, chartData2: KeyFigureChartData, sameOrdinate: Bool, allowInteractions: Bool) -> BarChartView {
+        // We assume that series of charData1 and 2 are grouped in the same way
+        let seriesGrouping: Double = dataSeriesGrouping(for: chartData1)
+        
         let entries1: [ChartDataEntry] = chartData1.series.map { BarChartDataEntry(x: $0.date, y: $0.value, data: $0.date) }
         let dataSet1: BarChartDataSet = BarChartDataSet(entries: entries1)
         dataSet1.setupStyle(color: chartData1.legend.color, entriesCount: entries1.count)
@@ -49,9 +56,9 @@ private extension BarLineChartViewBase {
             dataSet2.axisDependency = .right
         }
         
-        let groupSpace: Double = 0.3*(24*3600)
-        let barSpace: Double = 0.05*(24*3600)
-        let barWidth: Double = 0.3*(24*3600)
+        let groupSpace: Double = 0.3*seriesGrouping
+        let barSpace: Double = 0.05*seriesGrouping
+        let barWidth: Double = 0.3*seriesGrouping
         let xStart: Double = max(entries1.first?.x ?? 0.0, entries2.first?.x ?? 0.0)
         
         let barChartView: BarChartView = BarChartView()
@@ -69,6 +76,9 @@ private extension BarLineChartViewBase {
     }
     
     static func createCombinedChart(chartData1: KeyFigureChartData, chartData2: KeyFigureChartData, sameOrdinate: Bool, allowInteractions: Bool) -> CombinedChartView {
+        // We assume that series of charData1 and 2 are grouped in the same way
+        let seriesGrouping: Double = dataSeriesGrouping(for: chartData1)
+        
         let entries1: [ChartDataEntry] = chartData1.chartKind == .line ? chartData1.series.map { ChartDataEntry(x: $0.date, y: $0.value, data: $0.date) } : chartData1.series.map { BarChartDataEntry(x: $0.date, y: $0.value, data: $0.date) }
         let dataSet1: ChartDataSet = chartData1.chartKind == .line ? LineChartDataSet(entries: entries1) : BarChartDataSet(entries: entries1)
         dataSet1.setupStyle(color: chartData1.legend.color, entriesCount: entries1.count)
@@ -93,8 +103,8 @@ private extension BarLineChartViewBase {
             let barData: BarChartData = BarChartData(dataSets: barDataSets)
             barData.setupStyle(entriesCount: barDataSets.first?.entries.count ?? 0)
             data.barData = barData
-            chartView.xAxis.spaceMin = 12*3600
-            chartView.xAxis.spaceMax = 12*3600
+            chartView.xAxis.spaceMin = seriesGrouping/2
+            chartView.xAxis.spaceMax = seriesGrouping/2
         }
         
         chartView.setupFor(chartData1: chartData1, chartData2: chartData2, sameOrdinate: sameOrdinate, allowInteractions: allowInteractions)
@@ -119,7 +129,7 @@ private extension BarLineChartViewBase {
         rightAxis.valueFormatter = ChartsValueFormatter()
         
         if sameOrdinate {
-            leftAxis.setupStyle(color: .gray)
+            leftAxis.setupStyle(color: Appearance.Cell.Text.accessoryColor)
             leftAxis.axisMinimum = min(minValue1, minValue2)
             leftAxis.axisMaximum = max(0.0, max(maxValue1 + (maxValue1 - minValue1) * 0.1, maxValue2 + (maxValue2 - minValue2) * 0.1))
         } else {
@@ -326,7 +336,7 @@ private extension YAxis {
         gridColor = .lightGray
         setLabelCount(3, force: true)
         labelFont = Appearance.Cell.Text.subtitleFont
-        labelTextColor = color ?? .gray
+        labelTextColor = color ?? Appearance.Cell.Text.accessoryColor
         drawTopYLabelEntryEnabled = true
         drawZeroLineEnabled = true
     }
@@ -343,7 +353,7 @@ private extension XAxis {
         avoidFirstLastClippingEnabled = true
         setLabelCount(2, force: true)
         labelFont = Appearance.Cell.Text.subtitleFont
-        labelTextColor = .gray
+        labelTextColor = Appearance.Cell.Text.accessoryColor
     }
 
 }

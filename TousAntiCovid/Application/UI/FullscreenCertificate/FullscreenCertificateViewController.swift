@@ -314,7 +314,7 @@ final class FullscreenCertificateViewController: CVTableViewController {
     }
 
     private func shareCertificate() {
-        guard let screenshot = navigationController?.view.screenshot() else { return }
+        guard let screenshot = navigationController?.view.cvScreenshot() else { return }
         ScreenshotAnimator.shared.generateScreenshotAnimation(for: screenshot) { [weak self] in
             guard let self = self else { return }
             screenshot.share(from: self)
@@ -472,7 +472,7 @@ extension FullscreenCertificateViewController {
                                  titleFont: { .regular(size: 11.0) },
                                  titleColor: .darkGray,
                                  accessoryType: UITableViewCell.AccessoryType.none),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
                 guard let hash = self?.certificate.uniqueHash else { return }
                 UIPasteboard.general.string = hash
                 HUD.flash(.labeledSuccess(title: "common.copied".localized, subtitle: nil))
@@ -489,7 +489,7 @@ extension FullscreenCertificateViewController {
                                  titleFont: { .regular(size: 11.0) },
                                  titleColor: .darkGray,
                                  accessoryType: UITableViewCell.AccessoryType.none),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             guard let kid = (self?.certificate as? EuropeanCertificate)?.kid else { return }
             UIPasteboard.general.string = kid
             HUD.flash(.labeledSuccess(title: "common.copied".localized, subtitle: nil))
@@ -509,7 +509,7 @@ extension FullscreenCertificateViewController {
                                         bottomInset: .zero,
                                         textAlignment: .center,
                                         titleFont: { Appearance.Cell.Text.headTitleFont }),
-                     selectionAction: url == nil ? nil : {
+                     selectionAction: url == nil ? nil : { _ in
                         url?.openInSafari()
                      })
     }
@@ -552,7 +552,7 @@ extension FullscreenCertificateViewController {
               xibName: .buttonCell,
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.extraLarge,
                                  bottomInset: .zero),
-              selectionAction: {
+              selectionAction: { _ in
             NotificationsManager.shared.scheduleActivityPassAvailable(triggerDate: availabilityDate)
             HUD.flash(.success)
         })

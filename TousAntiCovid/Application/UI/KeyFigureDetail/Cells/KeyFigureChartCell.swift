@@ -38,7 +38,7 @@ final class KeyFigureChartCell: CardCell {
 
     private func setupUI(with row: CVRow) {
         footerLabel.font = Appearance.Cell.Text.captionTitleFont
-        footerLabel.textColor = Appearance.Cell.Text.captionTitleColor
+        footerLabel.textColor = Appearance.Cell.Text.accessoryColor
         sharingImageView.image = Asset.Images.shareIcon.image
         sharingImageView.tintColor = Appearance.tintColor
         legendStackView?.isUserInteractionEnabled = false
@@ -46,10 +46,12 @@ final class KeyFigureChartCell: CardCell {
 
     private func setupContent(with row: CVRow) {
         legendStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        guard let chartDatas = row.associatedValue as? [KeyFigureChartData] else { return }
-        let legendViews: [UIView] = chartDatas.map { LegendView.view(legend: $0.legend) }
+        guard let chartDatas = row.associatedValue as? ([KeyFigureChartData], ChartViewBase?) else { return }
+        let legendViews: [UIView] = chartDatas.0.map { LegendView.view(legend: $0.legend) }
         legendViews.forEach { legendStackView.addArrangedSubview($0) }
-        footerLabel.text = chartDatas.first?.footer
+        footerLabel.text = chartDatas.0.first?.footer
+        guard let view = chartDatas.1 else { return }
+        setupChartView(view)
     }
         
     func captureWithoutFooter() -> UIImage? {
@@ -61,12 +63,12 @@ final class KeyFigureChartCell: CardCell {
     
     override func capture() -> UIImage? {
         sharingImageView.isHidden = true
-        let image: UIImage = containerView.screenshot()!
+        let image: UIImage = containerView.cvScreenshot()!
         sharingImageView.isHidden = false
         let captureImageView: UIImageView = UIImageView(image: image)
         captureImageView.frame.size = CGSize(width: image.size.width / UIScreen.main.scale, height: image.size.height / UIScreen.main.scale)
         captureImageView.backgroundColor = Appearance.Cell.cardBackgroundColor
-        return captureImageView.screenshot()
+        return captureImageView.cvScreenshot()
     }
     
     @IBAction private func didTouchSharingButton(_ sender: Any) {

@@ -70,7 +70,7 @@ final class UserLanguageController: CVTableViewController {
                       theme: CVRow.Theme(topInset: .zero,
                                          bottomInset: .zero,
                                          buttonStyle: .primary),
-                      selectionAction: {
+                      selectionAction: { _ in
                     if Constant.appLanguage.isNil { Constant.appLanguage = Constant.Language.english }
                     self.dismiss(animated: true, completion: nil)
                 })
@@ -89,7 +89,7 @@ final class UserLanguageController: CVTableViewController {
                                  titleFont: { Appearance.Cell.Text.standardFont },
                                  separatorLeftInset: Appearance.Cell.leftMargin,
                                  separatorRightInset: .zero),
-              selectionAction: {
+              selectionAction: { _ in
                 selectionBlock()
               })
     }

@@ -60,12 +60,12 @@ final class ManageDataController: CVTableViewController {
                 selectableRow(title: "manageDataController.languageFR".localized,
                               isSelected: Locale.currentAppLanguageCode == Constant.Language.french, separatorLeftInset: Appearance.Cell.leftMargin,
                               selectionBlock: {
-                    Constant.appLanguage =  Constant.Language.french
+                    Constant.appLanguage = Constant.Language.french
                 })
                 selectableRow(title: "manageDataController.languageEN".localized,
                               isSelected: Locale.currentAppLanguageCode == Constant.Language.english,
                               selectionBlock: {
-                    Constant.appLanguage =  Constant.Language.english
+                    Constant.appLanguage = Constant.Language.english
                 })
             } header: {
                 .groupedHeader
@@ -268,7 +268,7 @@ final class ManageDataController: CVTableViewController {
                                  textAlignment: .natural,
                                  titleFont: { Appearance.Cell.Text.standardFont },
                                  separatorLeftInset: separatorLeftInset),
-              selectionAction: {
+              selectionAction: { _ in
             selectionBlock()
         })
     }
@@ -300,7 +300,7 @@ final class ManageDataController: CVTableViewController {
                                                         titleColor: isDestuctive ? Asset.Colors.error.color : Asset.Colors.tint.color,
                                                         separatorLeftInset: separatorLeftInset,
                                                         accessoryType: UITableViewCell.AccessoryType.none),
-                                     selectionAction: { handler() },
+                                     selectionAction: { _ in handler() },
                                      willDisplay: { cell in
             cell.cvTitleLabel?.accessibilityTraits = .button
         })
@@ -485,7 +485,7 @@ final class ManageDataController: CVTableViewController {
             WalletManager.shared.clearAllData()
             ETagManager.shared.clearAllData()
             SVETagManager.shared.clearAllData()
-
+            
             AnalyticsManager.shared.reset()
             AnalyticsManager.shared.setOptIn(to: true)
             NotificationCenter.default.post(name: .changeAppState, object: RootCoordinator.State.onboarding, userInfo: nil)

@@ -64,7 +64,7 @@ final class PositiveTestController: CVTableViewController {
                                                           textAlignment: .natural,
                                                           titleFont: { Appearance.Cell.Text.standardFont },
                                                           separatorLeftInset: Appearance.Cell.leftMargin),
-                                       selectionAction: { [weak self] in
+                                       selectionAction: { [weak self] _ in
             self?.didSelectPositiveTestDate(date: nil)
         })
         rows.append(noDateRow)
@@ -89,7 +89,7 @@ final class PositiveTestController: CVTableViewController {
                                             textAlignment: .natural,
                                             titleFont: { Appearance.Cell.Text.standardFont },
                                             separatorLeftInset: Appearance.Cell.leftMargin),
-                         selectionAction: { [weak self] in
+                         selectionAction: { [weak self] _ in
                 self?.didSelectPositiveTestDate(date: date)
             })
         }

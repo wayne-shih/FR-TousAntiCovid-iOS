@@ -107,7 +107,7 @@ final class AttestationsViewController: CVTableViewController {
                                                      theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
                                                                         bottomInset: .zero,
                                                                         buttonStyle: .primary),
-                                                     selectionAction: { [weak self] in
+                                                     selectionAction: { [weak self] _ in
                     self?.didTouchNewAttestation()
                 })
             }
@@ -145,7 +145,7 @@ final class AttestationsViewController: CVTableViewController {
                       selectionActionWithCell: { [weak self] cell in
                     self?.didTouchAttestionMenuButton(attestation: attestation, cell: cell)
                 },
-                      selectionAction: { [weak self] in
+                      selectionAction: { [weak self] _ in
                     guard let qrCode = UIImage(data: attestation.qrCode) else { return }
                     self?.didTouchAttestationQrCode(qrCode, attestation.qrCodeString.isEmpty ? attestation.footer : attestation.qrCodeString)
                 })
@@ -205,7 +205,7 @@ final class AttestationsViewController: CVTableViewController {
                                                    titleFont: { Appearance.Cell.Text.standardFont },
                                                    titleColor: Appearance.Cell.Text.headerTitleColor,
                                                    imageTintColor: Appearance.Cell.Text.headerTitleColor),
-                               selectionAction: {
+                               selectionAction: { _ in
             actionBlock()
         })
         return row

@@ -34,7 +34,7 @@ final class DateCell: TextFieldCell {
         datePicker.maximumDate = row.maximumDate
         datePicker.date = row.initialDate ?? Date()
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
-        datePicker.locale = Locale.current
+        datePicker.locale = Locale.appLocale
         datePicker.accessibilityLanguage = Locale.currentAppLanguageCode
         cvTextField.inputView = datePicker
         toolbar.frame = CGRect(x: 0.0, y: 0.0, width: bounds.width, height: 44.0)

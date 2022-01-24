@@ -65,7 +65,7 @@ private extension CVRow {
                                                    titleColor: Appearance.Cell.Text.headerTitleColor,
                                                    imageTintColor: Appearance.Cell.Text.headerTitleColor,
                                                    imageSize: CGSize(width: 24.0, height: 24.0)),
-                               selectionAction: {
+                               selectionAction: { _ in
             actionBlock()
         })
         return row

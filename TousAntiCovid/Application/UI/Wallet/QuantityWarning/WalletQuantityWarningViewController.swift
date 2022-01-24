@@ -90,7 +90,7 @@ extension WalletQuantityWarningViewController {
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
                                  bottomInset: .zero,
                                  buttonStyle: .quinary),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
                 self?.showConfirmationAlert()
               })
     }
@@ -101,7 +101,7 @@ extension WalletQuantityWarningViewController {
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small,
                                  bottomInset: .zero,
                                  buttonStyle: .quinary),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
                 self?.didCancel()
               })
     }

@@ -133,14 +133,14 @@ final class MyHealthController: CVTableViewController {
         let recommendationsButton: CVRow = CVRow(title: "myHealthController.button.recommendations".localized,
                                         xibName: .buttonCell,
                                         theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small),
-                                        selectionAction: {
+                                        selectionAction: { _ in
             URL(string: "myHealthController.button.recommendations.url".localized)?.openInSafari()
         })
         rows.append(recommendationsButton)
         let phoneButton: CVRow = CVRow(title: "myHealthController.step.appointment.buttonTitle".localized,
                                             xibName: .buttonCell,
                                             theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small),
-                                            selectionAction: { [weak self] in
+                                            selectionAction: { [weak self] _ in
             guard let self = self else { return }
             "callCenter.phoneNumber".localized.callPhoneNumber(from: self)
         })
@@ -148,7 +148,7 @@ final class MyHealthController: CVTableViewController {
         let measuresButton: CVRow = CVRow(title: "myHealthController.button.cautionMeasures".localized,
                                             xibName: .buttonCell,
                                             theme: CVRow.Theme(topInset: Appearance.Cell.Inset.small, bottomInset: Appearance.Cell.Inset.small),
-                                            selectionAction: { [weak self] in
+                                            selectionAction: { [weak self] _ in
                                                 self?.didTouchCautionMeasures()
         })
         rows.append(measuresButton)
@@ -196,7 +196,7 @@ final class MyHealthController: CVTableViewController {
                                      bottomInset: Appearance.Cell.Inset.medium,
                                      textAlignment: .left,
                                      titleFont: { Appearance.Cell.Text.headTitleFont }),
-                  selectionAction: section.link == nil ? nil : { [weak self] in
+                  selectionAction: section.link == nil ? nil : { [weak self] _ in
                     self?.didTouchRisksUILevelSectionLink(section.link)
                   })
         }
@@ -247,7 +247,7 @@ final class MyHealthController: CVTableViewController {
                                                    separatorLeftInset: isLastAction ? nil : Appearance.Cell.leftMargin,
                                                    separatorRightInset: isLastAction ? nil : Appearance.Cell.leftMargin,
                                                    maskedCorners: isLastAction ? .bottom : .none),
-                               selectionAction: {
+                               selectionAction: { _ in
                                 actionBlock()
                                })
         return row

@@ -119,7 +119,7 @@ private extension UrgentDgsDetailController {
                                  bottomInset: .zero,
                                  textAlignment: .natural,
                                  titleFont: { Appearance.Cell.Text.headTitleFont }),
-              selectionAction: "dgsUrgentController.section.url".localized.isEmpty ? nil : { [weak self] in
+              selectionAction: "dgsUrgentController.section.url".localized.isEmpty ? nil : { [weak self] _ in
             guard let moreInfoUrl: URL = URL(string: "dgsUrgentController.section.url".localized) else { return }
             self?.didTouchMoreInfo(moreInfoUrl)
         })
@@ -136,7 +136,7 @@ private extension UrgentDgsDetailController {
                                  textAlignment: .natural,
                                  titleFont: { Appearance.Cell.Text.smallHeadTitleFont },
                                  subtitleFont: { Appearance.Cell.Text.accessoryFont }),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             guard let self = self else { return }
             phoneNumber.callPhoneNumber(from: self)
         })

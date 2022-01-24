@@ -9,12 +9,21 @@
 //
 
 import Foundation
+import UIKit
 
 struct AdditionalInfo {
     enum Category {
         case error
         case warning
         case info
+        
+        var backgroundColor: UIColor {
+            switch self {
+            case .info: return Asset.Colors.smartWalletInfo.color
+            case .warning: return Asset.Colors.bottomWarning.color
+            case .error: return Asset.Colors.error.color
+            }
+        }
     }
     
     var category: Category

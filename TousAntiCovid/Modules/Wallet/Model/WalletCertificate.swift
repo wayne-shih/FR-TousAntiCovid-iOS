@@ -30,6 +30,7 @@ class WalletCertificate {
     var pillTitles: [(text: String, backgroundColor: UIColor)] { fatalError("Must be overriden") }
     var title: String? { fatalError("Must be overriden") }
     var shortDescription: String? { fatalError("Must be overriden") }
+    var shortDescriptionForList: String? { shortDescription }
     var fullDescription: String? { fatalError("Must be overriden") }
     var fullDescriptionForFullscreen: String? { fatalError("Must be overriden") }
     

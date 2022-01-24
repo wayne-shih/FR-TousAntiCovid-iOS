@@ -56,12 +56,16 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
             self?.didFinishLoadingController()
         }, didTouchHealth: { [weak self] in
             self?.showMyHealth()
-        }, didTouchInfo: { [weak self] in
-            self?.showInfo()
+        }, didTouchInfo: { [weak self] info in
+            self?.showInfo(info)
         }, didTouchKeyFigure: { [weak self] keyFigure in
             self?.showKeyFigureDetailFor(keyFigure: keyFigure)
         }, didTouchKeyFigures: { [weak self] in
             self?.showKeyFigures()
+        }, didTouchComparisonChart: { [weak self] in
+            self?.showKeyFiguresComparison()
+        }, didTouchComparisonChartSharing: { [weak self] image in
+            self?.showSharingScreen(for: image)
         }, didTouchDeclare: { [weak self] in
             self?.showDeclare()
         }, didTouchUsefulLinks: { [weak self] in
@@ -223,7 +227,18 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
         AnalyticsManager.shared.reportAppEvent(.e5)
     }
     
-    private func showInfo() {
+    private func showInfo(_ info: Info?) {
+        if let info = info {
+            let controller: HomeInfoBottomSheetController = .init(content: info) { [weak self] in
+                self?.showAllInfo()
+            }
+            navigationController?.presentAsBottomSheet(controller, theme: controller.bottomSheetTheme, behavior: controller.bottomSheetBehavior)
+        } else {
+            showAllInfo()
+        }
+    }
+    
+    func showAllInfo() {
         let infoCenterCoordinator: InfoCenterCoordinator = InfoCenterCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
         addChild(coordinator: infoCenterCoordinator)
         AnalyticsManager.shared.reportAppEvent(.e10)
@@ -276,6 +291,11 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
         let keyFiguresCoordinator: KeyFiguresCoordinator = KeyFiguresCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
         addChild(coordinator: keyFiguresCoordinator)
         AnalyticsManager.shared.reportAppEvent(.e8)
+    }
+    
+    private func showKeyFiguresComparison() {
+        let comparisonCoordinator: KeyFiguresComparisonCoordinator = .init(presentingController: navigationController, parent: self)
+        addChild(coordinator: comparisonCoordinator)
     }
     
     private func showKeyFigureDetailFor(keyFigure: KeyFigure) {
@@ -419,4 +439,14 @@ extension HomeCoordinator: SKStoreProductViewControllerDelegate {
         navigationController?.dismiss(animated: true)
     }
     
+}
+
+// MARK: - sharing related functions
+private extension HomeCoordinator {
+    func showSharingScreen(for chartImage: UIImage?) {
+        let activityItems: [Any?] = [chartImage]
+        let controller: UIActivityViewController = UIActivityViewController(activityItems: activityItems.compactMap { $0 }, applicationActivities: nil)
+        controller.excludedActivityTypes = [.saveToCameraRoll, .print]
+        navigationController?.present(controller, animated: true, completion: nil)
+    }
 }

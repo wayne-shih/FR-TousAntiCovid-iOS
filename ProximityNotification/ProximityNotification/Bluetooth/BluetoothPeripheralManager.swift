@@ -47,10 +47,8 @@ class BluetoothPeripheralManager: NSObject, BluetoothPeripheralManagerProtocol {
         
         if let peripheralManager = peripheralManager {
             if peripheralManager.state == .poweredOn {
-                dispatchQueue.sync {
-                    stopPeripheralManager()
-                    addService()
-                }
+                stopPeripheralManager()
+                addService()
             }
         } else {
             let options = [CBPeripheralManagerOptionRestoreIdentifierKey: "proximitynotification-bluetoothperipheralmanager"]

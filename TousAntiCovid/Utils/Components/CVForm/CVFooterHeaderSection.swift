@@ -26,7 +26,7 @@ struct CVFooterHeaderSection {
         footer.theme.rightInset = Appearance.Cell.Inset.medium
         footer.theme.leftInset = Appearance.Cell.Inset.medium
         footer.theme.titleFont = { Appearance.Cell.Text.footerFont }
-        footer.theme.titleColor = .darkGray
+        footer.theme.titleColor = Appearance.Cell.Text.accessoryColor
         return footer
     }
 
@@ -47,6 +47,7 @@ struct CVFooterHeaderSection {
     var subtitle: String?
     var xibName: XibName.Section = .standardSectionHeader
     var theme: Theme = Theme()
+    var selectionAction: (() -> ())?
     var willDisplay: ((_ view: CVHeaderFooterSectionView) -> ())?
 
 }

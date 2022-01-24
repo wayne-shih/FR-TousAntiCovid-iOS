@@ -32,7 +32,7 @@ extension UIView {
         }
     }
     
-    func screenshot() -> UIImage? {
+    func cvScreenshot() -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(frame.size, false, 0)
         layer.render(in: UIGraphicsGetCurrentContext()!)
         let image: UIImage? = UIGraphicsGetImageFromCurrentImageContext()

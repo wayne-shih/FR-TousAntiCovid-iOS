@@ -35,7 +35,8 @@ final class MaintenanceManager {
     func checkMaintenanceState(_ completion: (() -> ())? = nil) {
         var request: URLRequest = URLRequest(url: MaintenanceConstant.fileUrl)
         request.httpMethod = "GET"
-        let task: URLSessionDataTask = UrlSessionManager.shared.session.dataTask(with: request) { data, response, error in
+        let task: URLSessionDataTask = URLSessionDataTaskFactory.shared.dataTask(with: request,
+                                                                                 session: UrlSessionManager.shared.session) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
                     self.processCheckError(error: error, completion: completion)

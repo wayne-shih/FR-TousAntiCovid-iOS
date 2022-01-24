@@ -154,10 +154,10 @@ public final class RBManager {
                         completion(nil)
                     }
                 } else {
+                    completion(nil)
                     self.isProximityActivated = false
                     self.stopProximityDetection()
                     self.didStopProximityDueToLackOfEpochsHandler?()
-                    completion(nil)
                 }
             }
         }, ebidExtractionHandler: { helloMessage -> Data in

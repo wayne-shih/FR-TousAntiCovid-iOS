@@ -42,6 +42,6 @@ final class NewPostalCodeCell: CardCell {
     }
 
     @IBAction private func buttonPressed(_ sender: Any) {
-        currentAssociatedRow?.selectionAction?()
+        currentAssociatedRow?.selectionAction?(self)
     }
 }

@@ -89,7 +89,7 @@ private extension FullscreenOptionsController {
                            titleFont: { Appearance.Cell.Text.standardFont },
                            titleColor: Appearance.Cell.Text.headerTitleColor,
                            imageTintColor: Appearance.Cell.Text.headerTitleColor),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             self?.dismiss(animated: true) {
                 self?.didTouchShareCertificateButton()
             }

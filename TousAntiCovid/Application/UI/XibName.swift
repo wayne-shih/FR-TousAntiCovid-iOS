@@ -14,6 +14,7 @@ enum XibName {
 
     enum Section: String {
         case standardSectionHeader = "StandardSectionHeader"
+        case actionSectionHeader = "HeaderWithActionView"
     }
     
     enum Row: String {
@@ -90,5 +91,11 @@ enum XibName {
         case standardCardSwitchCell = "StandardCardSwitchCell"
         case keyFigureSelectionCell = "KeyFigureSelectionCell"
         case urgentDgsCell = "UrgentDgsCell"
+        case collectionTableViewCell = "CVCollectionTableViewCell"
+        case additionalInfoCell = "AdditionalInfoCell"
+        
+        // MARK: - CollectionViewCell
+        case keyFigureCollectionViewCell = "KeyFigureCollectionViewCell"
+        case newsCollectionViewCell = "NewsCollectionViewCell"
     }
 }

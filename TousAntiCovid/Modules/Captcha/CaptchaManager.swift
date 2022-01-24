@@ -116,7 +116,7 @@ final class CaptchaManager {
                 let bodyData: Data = try body.toData()
                 request.httpBody = bodyData
             }
-            let task: URLSessionDataTask = UrlSessionManager.shared.session.dataTask(with: request) { data, response, error in
+            let task: URLSessionDataTask = URLSessionDataTaskFactory.shared.dataTask(with: request, session: UrlSessionManager.shared.session) { data, response, error in
                 DispatchQueue.main.async {
                     if let error = error {
                         completion(.failure(error))

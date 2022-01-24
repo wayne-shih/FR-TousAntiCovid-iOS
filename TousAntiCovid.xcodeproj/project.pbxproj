@@ -6,6 +6,20 @@
 	objectVersion = 52;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		377B84A72796F9A100B02628 /* UpdateJsons */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 377B84AB2796F9A100B02628 /* Build configuration list for PBXAggregateTarget "UpdateJsons" */;
+			buildPhases = (
+				377B84AC2796F9A600B02628 /* Update jsons */,
+			);
+			dependencies = (
+			);
+			name = UpdateJsons;
+			productName = UpdateJsons;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		09D83221249CC08100064733 /* RBFiltering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D8321C249CC08100064733 /* RBFiltering.swift */; };
 		09D83225249CC0D800064733 /* FilteringManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D83224249CC0D800064733 /* FilteringManager.swift */; };
@@ -105,8 +119,6 @@
 		37014D1424460CD000CE0BF1 /* OnboardingGestureCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 373A3474243E7BAA00148FCF /* OnboardingGestureCell.xib */; };
 		3702286926C12A52008483C6 /* Blacklist2dDocManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3702286726C12A52008483C6 /* Blacklist2dDocManager.swift */; };
 		3702286B26C12A52008483C6 /* Blacklist2dDocConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3702286826C12A52008483C6 /* Blacklist2dDocConstant.swift */; };
-		3702287126C14B78008483C6 /* 2ddoc_list.json in Resources */ = {isa = PBXBuildFile; fileRef = 3702286F26C14B78008483C6 /* 2ddoc_list.json */; };
-		3702287326C14B78008483C6 /* certlist.json in Resources */ = {isa = PBXBuildFile; fileRef = 3702287026C14B78008483C6 /* certlist.json */; };
 		3704067A24E14F49000C7C1B /* RBServerRegisterBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3704067824E14F49000C7C1B /* RBServerRegisterBody.swift */; };
 		3704067C24E15006000C7C1B /* RBServerPushInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3704067B24E15006000C7C1B /* RBServerPushInfo.swift */; };
 		3704067E24E1517B000C7C1B /* RBServerStatusBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3704067D24E1517B000C7C1B /* RBServerStatusBody.swift */; };
@@ -211,7 +223,6 @@
 		374ED21426848443005E01FB /* UniversalScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374ED21226848442005E01FB /* UniversalScannerView.swift */; };
 		37509963251256AC003CDAFC /* WidgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CECAAC250A291F00F13739 /* WidgetManager.swift */; };
 		3750996A251256AD003CDAFC /* WidgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CECAAC250A291F00F13739 /* WidgetManager.swift */; };
-		3750997A2512574B003CDAFC /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376928082460242800310876 /* Date+Extension.swift */; };
 		3750998025125760003CDAFC /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37663D07243DBBC4009F1D98 /* Fonts.swift */; };
 		3750998725125977003CDAFC /* WidgetUserDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37960EB02510AE0100BAE41B /* WidgetUserDefault.swift */; };
 		375099942512598C003CDAFC /* UserDefaults+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CECAA9250A28F100F13739 /* UserDefaults+Extension.swift */; };
@@ -432,6 +443,7 @@
 		37BBA3FC264ADC99002A01AA /* CardWithButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BBA3F8264ADC99002A01AA /* CardWithButtonCell.swift */; };
 		37BBA402264ADFEA002A01AA /* PhoneCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37BBA400264ADFEA002A01AA /* PhoneCell.xib */; };
 		37BC85B4256BA37800054931 /* VenueRecordCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37BC85B1256BA37800054931 /* VenueRecordCell.xib */; };
+		37BE49F727884A4D00A90673 /* URLSessionDataTaskFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE49F627884A4D00A90673 /* URLSessionDataTaskFactory.swift */; };
 		37BED07027019ED300FD6ADA /* ExemptionDccSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BED06E27019ED200FD6ADA /* ExemptionDccSchema.swift */; };
 		37BF688F252D9989006D00AD /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF688E252D9989006D00AD /* HomeViewController.swift */; };
 		37BF689E252DA38D006D00AD /* HomeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF689D252DA38D006D00AD /* HomeCoordinator.swift */; };
@@ -698,6 +710,8 @@
 		C80609E42756773100581618 /* WalletAdditionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80609E32756773100581618 /* WalletAdditionalInfo.swift */; };
 		C817EE6D270B27C6003ABF84 /* UrgentDgsDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C817EE6C270B27C6003ABF84 /* UrgentDgsDetailController.swift */; };
 		C817EE71270B3007003ABF84 /* UrgentDgsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C817EE70270B3007003ABF84 /* UrgentDgsCoordinator.swift */; };
+		C836E9792775ABE3004C2C6E /* DccKids.swift in Sources */ = {isa = PBXBuildFile; fileRef = C836E9782775ABE3004C2C6E /* DccKids.swift */; };
+		C836E98B2785D665004C2C6E /* CVTableViewWithCollectionViewsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C836E98A2785D665004C2C6E /* CVTableViewWithCollectionViewsController.swift */; };
 		C8419E8B275F46DA00A3DCB4 /* VaccinationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8419E8A275F46DA00A3DCB4 /* VaccinationCell.swift */; };
 		C8419E90275F525100A3DCB4 /* UrgentDgsCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8419E8F275F525100A3DCB4 /* UrgentDgsCell.xib */; };
 		C850B0E02722C11E00F23122 /* AlwaysOnDccWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C850B0DF2722C11E00F23122 /* AlwaysOnDccWidget.swift */; };
@@ -707,18 +721,35 @@
 		C85858CD2754BF49005DF1E5 /* SmartWalletConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85858CC2754BF49005DF1E5 /* SmartWalletConfig.swift */; };
 		C8618DAA273E596500D16A8F /* StandardCardSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A966725DC1A7600ACC737 /* StandardCardSwitchCell.swift */; };
 		C8618DAC273E596C00D16A8F /* StandardCardSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 373A965825DC182C00ACC737 /* StandardCardSwitchCell.xib */; };
+		C864563B2770816600683C39 /* CollectionViewFixedWidthFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C864563A2770816600683C39 /* CollectionViewFixedWidthFlowLayout.swift */; };
 		C8720EF6274BBE240041B5FF /* KeyFiguresSelectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8720EF5274BBE240041B5FF /* KeyFiguresSelectionController.swift */; };
 		C8720F03274CDF550041B5FF /* KeyFiguresComparisonCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8720F02274CDF550041B5FF /* KeyFiguresComparisonCoordinator.swift */; };
 		C8720F06274CE2310041B5FF /* KeyFiguresSelectionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8720F05274CE2310041B5FF /* KeyFiguresSelectionCoordinator.swift */; };
 		C8721723273BD24E00841201 /* FullscreenOptionsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8721722273BD24E00841201 /* FullscreenOptionsController.swift */; };
 		C8721727273C033800841201 /* BottomSheetedTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8721726273C033800841201 /* BottomSheetedTableViewController.swift */; };
+		C875D79227732D0B0021ED49 /* KeyFigureCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C875D79127732D0B0021ED49 /* KeyFigureCollectionViewCell.swift */; };
+		C875D79527732D4E0021ED49 /* CVCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C875D79427732D4E0021ED49 /* CVCollectionViewCell.swift */; };
+		C875D79827732E330021ED49 /* FixedWidthCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C875D79727732E330021ED49 /* FixedWidthCollectionView.swift */; };
+		C875D7A627738E590021ED49 /* NewsCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C875D7A527738E590021ED49 /* NewsCollectionViewCell.xib */; };
+		C875D7AA27738E680021ED49 /* NewsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C875D7A927738E680021ED49 /* NewsCollectionViewCell.swift */; };
 		C8809444275F752100E15E27 /* KeyfiguresCombination.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8809442275F752100E15E27 /* KeyfiguresCombination.swift */; };
+		C8835DC927748A3800AA2C28 /* HeaderWithActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8835DC827748A3800AA2C28 /* HeaderWithActionView.swift */; };
+		C8835DCD27748BC400AA2C28 /* HeaderWithActionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8835DCC27748BC400AA2C28 /* HeaderWithActionView.xib */; };
+		C896873227635C1A000532FA /* CVCollectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C896873127635C1A000532FA /* CVCollectionTableViewCell.swift */; };
+		C896873527635C33000532FA /* CardCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C896873427635C33000532FA /* CardCollectionViewCell.swift */; };
+		C896873827635C4D000532FA /* KeyFigureCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C896873727635C4D000532FA /* KeyFigureCollectionViewCell.xib */; };
+		C896873B27635D2F000532FA /* CVCollectionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C896873A27635D2F000532FA /* CVCollectionTableViewCell.xib */; };
 		C8B166A026F4CD39003B6369 /* UserDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37663CB3243D91B3009F1D98 /* UserDefault.swift */; };
 		C8B4B92C272AF2450076A461 /* AlwaysOnDccWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B4B92B272AF2450076A461 /* AlwaysOnDccWidgetView.swift */; };
 		C8B4B931272AF2930076A461 /* Blacklist.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B4B92F272AF2930076A461 /* Blacklist.pb.swift */; };
 		C8B4B933272AF2930076A461 /* Blacklist.pb+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B4B930272AF2930076A461 /* Blacklist.pb+Extension.swift */; };
+		C8BF933D2795B33800C61A7A /* HomeInfoBottomSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BF933C2795B33800C61A7A /* HomeInfoBottomSheetController.swift */; };
 		C8C051822733E57400B8FF37 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C051812733E57400B8FF37 /* NetworkMonitor.swift */; };
 		C8C05189273416BB00B8FF37 /* NetworkAlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C05188273416BB00B8FF37 /* NetworkAlertManager.swift */; };
+		C8DC062F278DAD6300F16535 /* WalletInfoBottomSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DC062E278DAD6300F16535 /* WalletInfoBottomSheetController.swift */; };
+		C8DC0633278DB6C900F16535 /* UILabel+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DC0632278DB6C900F16535 /* UILabel+Extension.swift */; };
+		C8DC0637278DBB8500F16535 /* AdditionalInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DC0636278DBB8500F16535 /* AdditionalInfoCell.swift */; };
+		C8DC063A278DBB9100F16535 /* AdditionalInfoCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8DC0639278DBB9100F16535 /* AdditionalInfoCell.xib */; };
 		C8DDF02E2742693F00AD6767 /* PKHUD in Frameworks */ = {isa = PBXBuildFile; productRef = C8DDF02D2742693F00AD6767 /* PKHUD */; };
 		C8E3F34E271D69F90052FCE8 /* RealmBlacklistedDcc.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E3F34D271D69F90052FCE8 /* RealmBlacklistedDcc.swift */; };
 		C8E3F365271F15AE0052FCE8 /* RealmBlacklisted2dDoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E3F364271F15AE0052FCE8 /* RealmBlacklisted2dDoc.swift */; };
@@ -898,8 +929,6 @@
 		37014D1A24460D7100CE0BF1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3702286726C12A52008483C6 /* Blacklist2dDocManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Blacklist2dDocManager.swift; sourceTree = "<group>"; };
 		3702286826C12A52008483C6 /* Blacklist2dDocConstant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Blacklist2dDocConstant.swift; sourceTree = "<group>"; };
-		3702286F26C14B78008483C6 /* 2ddoc_list.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 2ddoc_list.json; sourceTree = "<group>"; };
-		3702287026C14B78008483C6 /* certlist.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = certlist.json; sourceTree = "<group>"; };
 		3704067824E14F49000C7C1B /* RBServerRegisterBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RBServerRegisterBody.swift; sourceTree = "<group>"; };
 		3704067B24E15006000C7C1B /* RBServerPushInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RBServerPushInfo.swift; sourceTree = "<group>"; };
 		3704067D24E1517B000C7C1B /* RBServerStatusBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RBServerStatusBody.swift; sourceTree = "<group>"; };
@@ -1256,6 +1285,7 @@
 		37BBA3F8264ADC99002A01AA /* CardWithButtonCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardWithButtonCell.swift; sourceTree = "<group>"; };
 		37BBA400264ADFEA002A01AA /* PhoneCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PhoneCell.xib; sourceTree = "<group>"; };
 		37BC85B1256BA37800054931 /* VenueRecordCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VenueRecordCell.xib; sourceTree = "<group>"; };
+		37BE49F627884A4D00A90673 /* URLSessionDataTaskFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionDataTaskFactory.swift; sourceTree = "<group>"; };
 		37BED06E27019ED200FD6ADA /* ExemptionDccSchema.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExemptionDccSchema.swift; sourceTree = "<group>"; };
 		37BF688E252D9989006D00AD /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		37BF689D252DA38D006D00AD /* HomeCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeCoordinator.swift; sourceTree = "<group>"; };
@@ -1551,6 +1581,8 @@
 		C80609E32756773100581618 /* WalletAdditionalInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletAdditionalInfo.swift; sourceTree = "<group>"; };
 		C817EE6C270B27C6003ABF84 /* UrgentDgsDetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrgentDgsDetailController.swift; sourceTree = "<group>"; };
 		C817EE70270B3007003ABF84 /* UrgentDgsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrgentDgsCoordinator.swift; sourceTree = "<group>"; };
+		C836E9782775ABE3004C2C6E /* DccKids.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DccKids.swift; sourceTree = "<group>"; };
+		C836E98A2785D665004C2C6E /* CVTableViewWithCollectionViewsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVTableViewWithCollectionViewsController.swift; sourceTree = "<group>"; };
 		C8419E8A275F46DA00A3DCB4 /* VaccinationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccinationCell.swift; sourceTree = "<group>"; };
 		C8419E8F275F525100A3DCB4 /* UrgentDgsCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UrgentDgsCell.xib; sourceTree = "<group>"; };
 		C850B0DF2722C11E00F23122 /* AlwaysOnDccWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlwaysOnDccWidget.swift; sourceTree = "<group>"; };
@@ -1558,17 +1590,34 @@
 		C850B0F02723036D00F23122 /* StorageAlertType+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StorageAlertType+Extension.swift"; sourceTree = "<group>"; };
 		C85858C52750E5E0005DF1E5 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		C85858CC2754BF49005DF1E5 /* SmartWalletConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartWalletConfig.swift; sourceTree = "<group>"; };
+		C864563A2770816600683C39 /* CollectionViewFixedWidthFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewFixedWidthFlowLayout.swift; sourceTree = "<group>"; };
 		C8720EF5274BBE240041B5FF /* KeyFiguresSelectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyFiguresSelectionController.swift; sourceTree = "<group>"; };
 		C8720F02274CDF550041B5FF /* KeyFiguresComparisonCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyFiguresComparisonCoordinator.swift; sourceTree = "<group>"; };
 		C8720F05274CE2310041B5FF /* KeyFiguresSelectionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyFiguresSelectionCoordinator.swift; sourceTree = "<group>"; };
 		C8721722273BD24E00841201 /* FullscreenOptionsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenOptionsController.swift; sourceTree = "<group>"; };
 		C8721726273C033800841201 /* BottomSheetedTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetedTableViewController.swift; sourceTree = "<group>"; };
+		C875D79127732D0B0021ED49 /* KeyFigureCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyFigureCollectionViewCell.swift; sourceTree = "<group>"; };
+		C875D79427732D4E0021ED49 /* CVCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVCollectionViewCell.swift; sourceTree = "<group>"; };
+		C875D79727732E330021ED49 /* FixedWidthCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedWidthCollectionView.swift; sourceTree = "<group>"; };
+		C875D7A527738E590021ED49 /* NewsCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewsCollectionViewCell.xib; sourceTree = "<group>"; };
+		C875D7A927738E680021ED49 /* NewsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCollectionViewCell.swift; sourceTree = "<group>"; };
 		C8809442275F752100E15E27 /* KeyfiguresCombination.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyfiguresCombination.swift; sourceTree = "<group>"; };
+		C8835DC827748A3800AA2C28 /* HeaderWithActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderWithActionView.swift; sourceTree = "<group>"; };
+		C8835DCC27748BC400AA2C28 /* HeaderWithActionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HeaderWithActionView.xib; sourceTree = "<group>"; };
+		C896873127635C1A000532FA /* CVCollectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVCollectionTableViewCell.swift; sourceTree = "<group>"; };
+		C896873427635C33000532FA /* CardCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCollectionViewCell.swift; sourceTree = "<group>"; };
+		C896873727635C4D000532FA /* KeyFigureCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = KeyFigureCollectionViewCell.xib; sourceTree = "<group>"; };
+		C896873A27635D2F000532FA /* CVCollectionTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CVCollectionTableViewCell.xib; sourceTree = "<group>"; };
 		C8B4B92B272AF2450076A461 /* AlwaysOnDccWidgetView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlwaysOnDccWidgetView.swift; sourceTree = "<group>"; };
 		C8B4B92F272AF2930076A461 /* Blacklist.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Blacklist.pb.swift; sourceTree = "<group>"; };
 		C8B4B930272AF2930076A461 /* Blacklist.pb+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Blacklist.pb+Extension.swift"; sourceTree = "<group>"; };
+		C8BF933C2795B33800C61A7A /* HomeInfoBottomSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeInfoBottomSheetController.swift; sourceTree = "<group>"; };
 		C8C051812733E57400B8FF37 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		C8C05188273416BB00B8FF37 /* NetworkAlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkAlertManager.swift; sourceTree = "<group>"; };
+		C8DC062E278DAD6300F16535 /* WalletInfoBottomSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletInfoBottomSheetController.swift; sourceTree = "<group>"; };
+		C8DC0632278DB6C900F16535 /* UILabel+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Extension.swift"; sourceTree = "<group>"; };
+		C8DC0636278DBB8500F16535 /* AdditionalInfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdditionalInfoCell.swift; sourceTree = "<group>"; };
+		C8DC0639278DBB9100F16535 /* AdditionalInfoCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AdditionalInfoCell.xib; sourceTree = "<group>"; };
 		C8E3F34D271D69F90052FCE8 /* RealmBlacklistedDcc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmBlacklistedDcc.swift; sourceTree = "<group>"; };
 		C8E3F364271F15AE0052FCE8 /* RealmBlacklisted2dDoc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmBlacklisted2dDoc.swift; sourceTree = "<group>"; };
 		C8E3F367271FE6490052FCE8 /* BlacklistManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlacklistManager.swift; sourceTree = "<group>"; };
@@ -1746,15 +1795,6 @@
 				3702286726C12A52008483C6 /* Blacklist2dDocManager.swift */,
 			);
 			path = Blacklist2dDoc;
-			sourceTree = "<group>";
-		};
-		3702286D26C14B33008483C6 /* CertList */ = {
-			isa = PBXGroup;
-			children = (
-				3702286F26C14B78008483C6 /* 2ddoc_list.json */,
-				3702287026C14B78008483C6 /* certlist.json */,
-			);
-			path = CertList;
 			sourceTree = "<group>";
 		};
 		37045666249356340042B7E6 /* Cells */ = {
@@ -2022,7 +2062,6 @@
 			isa = PBXGroup;
 			children = (
 				375318C2254A990B006DD736 /* Attestations */,
-				3702286D26C14B33008483C6 /* CertList */,
 				3716B53C2673993700632FA8 /* Certs */,
 				375807F42566C9FD00CCB59F /* KeyFiguresExplanations */,
 				370CF0AB255AD1C90019B735 /* Links */,
@@ -2030,7 +2069,6 @@
 				373A344A243E235500148FCF /* Privacy */,
 				377B0B3C25E50FF800459BCE /* Risks */,
 				37013DEF243F5DFD00FCB360 /* Strings */,
-				37F1F3AB264C1DB200015DCE /* Wallet */,
 			);
 			path = Jsons;
 			sourceTree = "<group>";
@@ -2213,6 +2251,7 @@
 		373DD791251533870062CB4D /* InfoCenter */ = {
 			isa = PBXGroup;
 			children = (
+				C8BF933C2795B33800C61A7A /* HomeInfoBottomSheetController.swift */,
 				373DD792251533B20062CB4D /* InfoCenterController.swift */,
 				37B6BFEA2515DB02008E4558 /* Cells */,
 				37DEA2A4251A0C7B002ABD50 /* EmptyView */,
@@ -2553,6 +2592,7 @@
 				37CD2DFF26C2B9A0004AD7AC /* StackLogger */,
 				37FBB03A25E7A98B00377A52 /* Status */,
 				C850B0E82722E33B00F23122 /* StorageAlert */,
+				37BE49F427884A0700A90673 /* URLSessionDataTaskFactory */,
 				37ED0B5E26DE1A76009DDA54 /* UrlSessionManager */,
 				3710A67625C179CD001CB839 /* VaccinationCenters */,
 				37BC85F7256C231F00054931 /* Venues */,
@@ -2702,6 +2742,7 @@
 				3792BA3F250A3CB10075A0E4 /* Entitlements */,
 				37663D00243DBB89009F1D98 /* Fonts */,
 				373A3449243E234C00148FCF /* Jsons */,
+				3787F20F2769DF270032C0AE /* LocalizedImages */,
 				37B4A2AD24CFF8E300018320 /* Lottie */,
 			);
 			path = Resources;
@@ -2831,6 +2872,7 @@
 				0FF6A37926257F49009D1CA4 /* URLSession+Extension.swift */,
 				47CECAA9250A28F100F13739 /* UserDefaults+Extension.swift */,
 				C850B0F02723036D00F23122 /* StorageAlertType+Extension.swift */,
+				C8DC0632278DB6C900F16535 /* UILabel+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -3050,6 +3092,14 @@
 				379CADE826B454330094473B /* Assets.xcassets */,
 			);
 			path = Assets;
+			sourceTree = "<group>";
+		};
+		3787F20F2769DF270032C0AE /* LocalizedImages */ = {
+			isa = PBXGroup;
+			children = (
+				37F1F3AB264C1DB200015DCE /* Wallet */,
+			);
+			path = LocalizedImages;
 			sourceTree = "<group>";
 		};
 		378A262C2460490D000F2FD8 /* Gestures */ = {
@@ -3689,12 +3739,23 @@
 			path = Venues;
 			sourceTree = "<group>";
 		};
+		37BE49F427884A0700A90673 /* URLSessionDataTaskFactory */ = {
+			isa = PBXGroup;
+			children = (
+				37BE49F627884A4D00A90673 /* URLSessionDataTaskFactory.swift */,
+			);
+			path = URLSessionDataTaskFactory;
+			sourceTree = "<group>";
+		};
 		37BF688C252D9975006D00AD /* Home */ = {
 			isa = PBXGroup;
 			children = (
+				C836E98A2785D665004C2C6E /* CVTableViewWithCollectionViewsController.swift */,
+				3765B79D255559FF00AA5659 /* GroupedMenuEntry.swift */,
+				C8835DC827748A3800AA2C28 /* HeaderWithActionView.swift */,
 				37BF688E252D9989006D00AD /* HomeViewController.swift */,
 				3714EDC62581190800D6736F /* HomeViewController+Isolation.swift */,
-				3765B79D255559FF00AA5659 /* GroupedMenuEntry.swift */,
+				C8835DCC27748BC400AA2C28 /* HeaderWithActionView.xib */,
 				37BF68A6252DB3B1006D00AD /* Cells */,
 			);
 			path = Home;
@@ -3711,6 +3772,7 @@
 		37BF68A6252DB3B1006D00AD /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				C896872F27635BEA000532FA /* CollectionViewCell */,
 				C8419E8E275F523F00A3DCB4 /* UrgentDgs */,
 				37BF68B4252DBA54006D00AD /* ActivationButton */,
 				3765B73425553EE800AA5659 /* Attestation */,
@@ -4013,6 +4075,7 @@
 				66F34FC0262F15E40002A2B9 /* CleaServerStatusClusterIndex.swift */,
 				37E06D8F256EB3EB003DAA68 /* CleaServerVisit.swift */,
 				66D18198268B6A4800F708D4 /* DaysAfterCompletionEntry.swift */,
+				C836E9782775ABE3004C2C6E /* DccKids.swift */,
 				C8F867692710412E0061E600 /* HomeNotification.swift */,
 				C8809442275F752100E15E27 /* KeyfiguresCombination.swift */,
 				37EDBE4026E75C4E009063C3 /* NoWaitDosesEntry.swift */,
@@ -4059,16 +4122,17 @@
 		37E582F526020318007106F8 /* Wallet */ = {
 			isa = PBXGroup;
 			children = (
-				37E583042602039A007106F8 /* WalletViewController.swift */,
-				37F1F34F264BACCC00015DCE /* WalletCertificateErrorViewController.swift */,
-				373AED48260CA91800F5BCBD /* WalletScanAuthorizationController.swift */,
-				37F0BE9B260DBD2800CBF4B2 /* WalletCertificateVerifiedController.swift */,
 				37F0BEA5260DDE0E00CBF4B2 /* WalletCertificateVerified.storyboard */,
+				37F1F34F264BACCC00015DCE /* WalletCertificateErrorViewController.swift */,
+				37F0BE9B260DBD2800CBF4B2 /* WalletCertificateVerifiedController.swift */,
+				C8DC062E278DAD6300F16535 /* WalletInfoBottomSheetController.swift */,
+				373AED48260CA91800F5BCBD /* WalletScanAuthorizationController.swift */,
+				37E583042602039A007106F8 /* WalletViewController.swift */,
 				37E582F626020351007106F8 /* Cells */,
 				37ABB75A268CCE460042C791 /* CompletedVaccination */,
 				37BBA3F0264AD61E002A01AA /* DocumentExplanation */,
-				372DEA062603BF2900A44E1A /* FlashWalletCode */,
 				373AED52260CC30100F5BCBD /* FlashWallet2DDoc */,
+				372DEA062603BF2900A44E1A /* FlashWalletCode */,
 				379CEF0226CFDE360050D25F /* QuantityWarning */,
 			);
 			path = Wallet;
@@ -4077,6 +4141,7 @@
 		37E582F626020351007106F8 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				C8DC0635278DBB6E00F16535 /* AdditionalInfo */,
 				37F1F357264BB00A00015DCE /* CheckDocument */,
 				37BBA3FF264ADFB7002A01AA /* Phone */,
 				37BBA3F5264ADC2B002A01AA /* SanitaryCertificate */,
@@ -4397,7 +4462,7 @@
 				37C4811A267761C500766A36 /* vaccin-europe-certificate-full-fr.png */,
 			);
 			name = Wallet;
-			path = TousAntiCovid/Resources/Wallet;
+			path = TousAntiCovid/Resources/LocalizedImages/Wallet;
 			sourceTree = SOURCE_ROOT;
 		};
 		37F1F3F3264CF0DC00015DCE /* ZoomableImage */ = {
@@ -4887,6 +4952,23 @@
 			path = KeyFiguresComparison;
 			sourceTree = "<group>";
 		};
+		C896872F27635BEA000532FA /* CollectionViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				C896873427635C33000532FA /* CardCollectionViewCell.swift */,
+				C864563A2770816600683C39 /* CollectionViewFixedWidthFlowLayout.swift */,
+				C896873127635C1A000532FA /* CVCollectionTableViewCell.swift */,
+				C875D79427732D4E0021ED49 /* CVCollectionViewCell.swift */,
+				C875D79727732E330021ED49 /* FixedWidthCollectionView.swift */,
+				C875D79127732D0B0021ED49 /* KeyFigureCollectionViewCell.swift */,
+				C875D7A927738E680021ED49 /* NewsCollectionViewCell.swift */,
+				C896873A27635D2F000532FA /* CVCollectionTableViewCell.xib */,
+				C896873727635C4D000532FA /* KeyFigureCollectionViewCell.xib */,
+				C875D7A527738E590021ED49 /* NewsCollectionViewCell.xib */,
+			);
+			path = CollectionViewCell;
+			sourceTree = "<group>";
+		};
 		C8B4B92A272AF2450076A461 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -4902,6 +4984,15 @@
 				C8B4B930272AF2930076A461 /* Blacklist.pb+Extension.swift */,
 			);
 			path = Protobuf;
+			sourceTree = "<group>";
+		};
+		C8DC0635278DBB6E00F16535 /* AdditionalInfo */ = {
+			isa = PBXGroup;
+			children = (
+				C8DC0636278DBB8500F16535 /* AdditionalInfoCell.swift */,
+				C8DC0639278DBB9100F16535 /* AdditionalInfoCell.xib */,
+			);
+			path = AdditionalInfo;
 			sourceTree = "<group>";
 		};
 		C8E51FEA274D3FAC00ECCA9D /* Cell */ = {
@@ -5131,6 +5222,9 @@
 					376C031825125486007E87F1 = {
 						CreatedOnToolsVersion = 12.0;
 					};
+					377B84A72796F9A100B02628 = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
 					379CADCE26B454310094473B = {
 						CreatedOnToolsVersion = 12.5.1;
 					};
@@ -5185,6 +5279,7 @@
 				37EB2E89248646CD003D999A /* ServerSDK */,
 				37EB2E4A24855B0B003D999A /* StorageSDK */,
 				37B0231524595ADF002281E9 /* RobertSDK */,
+				377B84A72796F9A100B02628 /* UpdateJsons */,
 			);
 		};
 /* End PBXProject section */
@@ -5219,6 +5314,7 @@
 				37692807246010B200310876 /* MyHealthStateHeaderCell.xib in Resources */,
 				37C48125267761C700766A36 /* vaccin-europe-certificate-full-en.png in Resources */,
 				37F1F3CC264C1DB200015DCE /* test-certificate-full-en.png in Resources */,
+				C896873B27635D2F000532FA /* CVCollectionTableViewCell.xib in Resources */,
 				379B2A2D2726C41D0066EA0D /* DoctorAlert.json in Resources */,
 				379B2A342726C9440066EA0D /* AnimatedHeaderCell.xib in Resources */,
 				37C4812D267761C700766A36 /* test-europe-certificate-full-en.png in Resources */,
@@ -5280,9 +5376,9 @@
 				37812EB425BAC96D00FDACA1 /* KeyFigureCaptureView.xib in Resources */,
 				604946F426A726AA0000B3F4 /* SelectableCell.xib in Resources */,
 				37DAA38825486A5D00ADE007 /* StandardSwitchCell.xib in Resources */,
+				C8DC063A278DBB9100F16535 /* AdditionalInfoCell.xib in Resources */,
 				3700110E268B13EF008C547E /* R3.pem in Resources */,
 				37F1F35A264BB04600015DCE /* CheckDocumentCell.xib in Resources */,
-				3702287326C14B78008483C6 /* certlist.json in Resources */,
 				37E8D29F254AA30800686377 /* StandardTextFieldCell.xib in Resources */,
 				37F1F3BD264C1DB200015DCE /* vaccin-certificate-fr.png in Resources */,
 				37C48123267761C700766A36 /* test-europe-certificate-fr.png in Resources */,
@@ -5297,9 +5393,9 @@
 				37B4A2BD24D00EF300018320 /* OffToOn-Dark.json in Resources */,
 				C8618DAC273E596C00D16A8F /* StandardCardSwitchCell.xib in Resources */,
 				37577FE625ADD13D000ADB0A /* VaccinationCell.xib in Resources */,
+				C896873827635C4D000532FA /* KeyFigureCollectionViewCell.xib in Resources */,
 				3714EDD12581231700D6736F /* IsolationTopCell.xib in Resources */,
 				37C4812A267761C700766A36 /* recovery-europe-certificate-full-fr.png in Resources */,
-				3702287126C14B78008483C6 /* 2ddoc_list.json in Resources */,
 				37014D0524460CD000CE0BF1 /* LaunchScreen.storyboard in Resources */,
 				373A966125DC183400ACC737 /* CenteredImageCardCell.xib in Resources */,
 				37014D0624460CD000CE0BF1 /* Images.xcassets in Resources */,
@@ -5312,6 +5408,7 @@
 				37B4A2BF24D00EF300018320 /* OnWaving-Dark.json in Resources */,
 				37B4A2B124CFF90500018320 /* OffToOn.json in Resources */,
 				37CAEFF3256D60CA00AB8540 /* VenuesHistoryEmptyView.xib in Resources */,
+				C875D7A627738E590021ED49 /* NewsCollectionViewCell.xib in Resources */,
 				37045668249356540042B7E6 /* AudioCell.xib in Resources */,
 				37014D0824460CD000CE0BF1 /* AppVersionCell.xib in Resources */,
 				372F446B25B988F600607F0B /* LegendView.xib in Resources */,
@@ -5339,6 +5436,7 @@
 				37F1F3C6264C1DB200015DCE /* vaccin-certificate-en.png in Resources */,
 				37014D1224460CD000CE0BF1 /* ButtonCell.xib in Resources */,
 				663D48A0254726AF00FC0BF2 /* NewPostalCodeCell.xib in Resources */,
+				C8835DCD27748BC400AA2C28 /* HeaderWithActionView.xib in Resources */,
 				37F1F3C9264C1DB200015DCE /* test-certificate-en.png in Resources */,
 				6694C1A025C2BA5700D8F424 /* LoadingCardCell.xib in Resources */,
 				379698E5260254F2008A188E /* SanitaryCertificatesWalletCell.xib in Resources */,
@@ -5430,6 +5528,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "$PODS_ROOT/SwiftGen/bin/swiftgen config run --config swiftgen.yml\n";
+		};
+		377B84AC2796F9A600B02628 /* Update jsons */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Update jsons";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh ./scripts/JsonUpdate/updateJsons.sh\n";
 		};
 		38668F438E71230F621DEA5E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -5538,6 +5654,7 @@
 				378A263F24605ABA000F2FD8 /* SymptomsOriginController.swift in Sources */,
 				37C10C8D265BE093008BDAA8 /* HCertEntry.swift in Sources */,
 				6037BF2526A5B40900B799EE /* UserLanguageCoordinator.swift in Sources */,
+				C8BF933D2795B33800C61A7A /* HomeInfoBottomSheetController.swift in Sources */,
 				372F447425B989B800607F0B /* KeyFigureChartLegend.swift in Sources */,
 				37380024261F637300232DCA /* AnalyticsManager+Event.swift in Sources */,
 				375318502549BD0B006DD736 /* DynamicContentStackView.swift in Sources */,
@@ -5554,13 +5671,17 @@
 				371C43B824BC61AE007B5A73 /* NSRegularExpression+Extension.swift in Sources */,
 				37014CA324460CD000CE0BF1 /* UIViewController+Extension.swift in Sources */,
 				C8F8678E2715DAF10061E600 /* PlayerView.swift in Sources */,
+				C875D79527732D4E0021ED49 /* CVCollectionViewCell.swift in Sources */,
 				37F1F34C264BA93900015DCE /* WalletAddCertificateCell.swift in Sources */,
 				6667AAE0256BC0C00082601E /* VenuesRecordingOnboardingController.swift in Sources */,
 				37F1F3EF264CF03400015DCE /* PanZoomImageView.swift in Sources */,
 				377B0B2125E50F7800459BCE /* RisksUIManager.swift in Sources */,
 				37014CA424460CD000CE0BF1 /* LocalizationsManager.swift in Sources */,
+				C864563B2770816600683C39 /* CollectionViewFixedWidthFlowLayout.swift in Sources */,
 				37EB2FF12488CB08003D999A /* CaptchaManager.swift in Sources */,
 				37CD2E0226C2B9BE004AD7AC /* StackLogger.swift in Sources */,
+				C8DC0633278DB6C900F16535 /* UILabel+Extension.swift in Sources */,
+				C8DC0637278DBB8500F16535 /* AdditionalInfoCell.swift in Sources */,
 				379892ED24851CA700C68AD9 /* EmptyCell.swift in Sources */,
 				3714ECBE257FE01300D6736F /* IsolationManager.swift in Sources */,
 				37DAA39725486B6000ADE007 /* StandardSwitchCell.swift in Sources */,
@@ -5597,6 +5718,7 @@
 				37C10CBA265BE093008BDAA8 /* X509.swift in Sources */,
 				37014CA924460CD000CE0BF1 /* PrivacyManager.swift in Sources */,
 				37C10C99265BE093008BDAA8 /* Data+Base45.swift in Sources */,
+				37BE49F727884A4D00A90673 /* URLSessionDataTaskFactory.swift in Sources */,
 				377B0B5625E511BA00459BCE /* RisksUILevel.swift in Sources */,
 				37014CAA24460CD000CE0BF1 /* UITableViewCell+Extension.swift in Sources */,
 				3758A9B1256CEFF30072433B /* FlashReportCodeController.swift in Sources */,
@@ -5609,6 +5731,7 @@
 				37594BC526C422D5000C945D /* CVTextField.swift in Sources */,
 				377EF1942530942A000F6175 /* ImageCell.swift in Sources */,
 				37014CAF24460CD000CE0BF1 /* ButtonCell.swift in Sources */,
+				C896873527635C33000532FA /* CardCollectionViewCell.swift in Sources */,
 				37F95BB825489606001DA26C /* ComponentHighlightButton.swift in Sources */,
 				37812E3825BA355E00FDACA1 /* YAxisCustomRenderer.swift in Sources */,
 				37CAEFF0256D60CA00AB8540 /* VenuesHistoryEmptyView.swift in Sources */,
@@ -5617,10 +5740,12 @@
 				373DD7AE25153E3D0062CB4D /* UIColor+Extension.swift in Sources */,
 				3718A115248A6F9C007EAC4F /* CaptchaValidationBody.swift in Sources */,
 				37014CB024460CD000CE0BF1 /* Array+Extension.swift in Sources */,
+				C875D79227732D0B0021ED49 /* KeyFigureCollectionViewCell.swift in Sources */,
 				37C10CD2265BE093008BDAA8 /* Signature.swift in Sources */,
 				C80609D12754E1E400581618 /* WalletManager+SmartWallet.swift in Sources */,
 				371C28D62476C34D00D46DD2 /* MaintenanceSupportingCoordinator.swift in Sources */,
 				37014CB224460CD000CE0BF1 /* UIView+Extension.swift in Sources */,
+				C836E98B2785D665004C2C6E /* CVTableViewWithCollectionViewsController.swift in Sources */,
 				37014CB324460CD000CE0BF1 /* OnboardingExplanationsController.swift in Sources */,
 				37014CB424460CD000CE0BF1 /* UIImage+Extension.swift in Sources */,
 				37C10CD8265BE093008BDAA8 /* Base45.swift in Sources */,
@@ -5663,7 +5788,9 @@
 				37014CC224460CD000CE0BF1 /* Coordinator.swift in Sources */,
 				37C10C90265BE093008BDAA8 /* PublicKeyStorageDelegate.swift in Sources */,
 				37014CC324460CD000CE0BF1 /* FileManager+Extension.swift in Sources */,
+				C8835DC927748A3800AA2C28 /* HeaderWithActionView.swift in Sources */,
 				6607F381270CA0CC00E0D830 /* CVFooterHeaderSection.swift in Sources */,
+				C896873227635C1A000532FA /* CVCollectionTableViewCell.swift in Sources */,
 				C8720EF6274BBE240041B5FF /* KeyFiguresSelectionController.swift in Sources */,
 				377B0B7A25E5122100459BCE /* RisksUILevelSectionLink.swift in Sources */,
 				C8E51FED274D3FC400ECCA9D /* KeyFigureSelectionCell.swift in Sources */,
@@ -5716,6 +5843,7 @@
 				37014CC824460CD000CE0BF1 /* UIApplication+Extension.swift in Sources */,
 				375807D42566C31000CCB59F /* KeyFiguresExplanationsManager.swift in Sources */,
 				C817EE71270B3007003ABF84 /* UrgentDgsCoordinator.swift in Sources */,
+				C875D79827732E330021ED49 /* FixedWidthCollectionView.swift in Sources */,
 				37014CC924460CD000CE0BF1 /* CVTableViewCell.swift in Sources */,
 				379698DA26024E8D008A188E /* WalletCoordinator.swift in Sources */,
 				37BF68A9252DB3DC006D00AD /* ActivationButtonCell.swift in Sources */,
@@ -5895,6 +6023,7 @@
 				C8720F06274CE2310041B5FF /* KeyFiguresSelectionCoordinator.swift in Sources */,
 				C8F8677E271469BF0061E600 /* HomeNotification+Extension.swift in Sources */,
 				3725DED8250BC79E00531570 /* DeepLinkingManager.swift in Sources */,
+				C8DC062F278DAD6300F16535 /* WalletInfoBottomSheetController.swift in Sources */,
 				66E311A226BD26EE001D3BE1 /* TextCell.swift in Sources */,
 				6667AAD1256BBED60082601E /* VenuesRecordingCoordinator.swift in Sources */,
 				37F1F350264BACCC00015DCE /* WalletCertificateErrorViewController.swift in Sources */,
@@ -5909,6 +6038,7 @@
 				37014CF424460CD000CE0BF1 /* NSNotification+Extension.swift in Sources */,
 				37014CF524460CD000CE0BF1 /* OnboardingCoordinator.swift in Sources */,
 				3718A0FF248A27D6007EAC4F /* CaptchaCoordinator.swift in Sources */,
+				C875D7AA27738E680021ED49 /* NewsCollectionViewCell.swift in Sources */,
 				37EAEED225357C4600DC33EE /* KeyFiguresConstant.swift in Sources */,
 				37EB2FEC2488C976003D999A /* CaptchaViewController.swift in Sources */,
 				371CA6DA260C7456001E1B50 /* SanitaryCertificate.swift in Sources */,
@@ -5961,7 +6091,6 @@
 				376C0338251254DF007E87F1 /* InformationsContentView.swift in Sources */,
 				3750998025125760003CDAFC /* Fonts.swift in Sources */,
 				37AE93BE26C6411C0088ED2A /* TousAntiCovidWidgets.swift in Sources */,
-				3750997A2512574B003CDAFC /* Date+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6060,6 +6189,7 @@
 				C85858CD2754BF49005DF1E5 /* SmartWalletConfig.swift in Sources */,
 				3704068024E15C13000C7C1B /* RBServerUnregisterBody.swift in Sources */,
 				37EB2EA42486480D003D999A /* Server.swift in Sources */,
+				C836E9792775ABE3004C2C6E /* DccKids.swift in Sources */,
 				37EDBE4126E75C4E009063C3 /* NoWaitDosesEntry.swift in Sources */,
 				37045651249123FD0042B7E6 /* URLResponse+SVExtension.swift in Sources */,
 				37EB2EC124864AA3003D999A /* NSError+SVExtension.swift in Sources */,
@@ -6219,7 +6349,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = 4.1.1;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios;
 				PRODUCT_NAME = TousAntiCovid;
@@ -6246,7 +6376,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = 4.1.1;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios;
 				PRODUCT_NAME = TousAntiCovid;
@@ -6390,7 +6520,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = 4.1.1;
 				OTHER_SWIFT_FLAGS = "-DDEBUG -DWIDGET -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6417,13 +6547,33 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = 4.1.1;
 				OTHER_SWIFT_FLAGS = "-DWIDGET -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		377B84A82796F9A100B02628 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = VH79XGK7M2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		377B84A92796F9A100B02628 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = VH79XGK7M2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -6441,7 +6591,7 @@
 				DEVELOPMENT_TEAM = PR958DC548;
 				IBSC_MODULE = Watch_Extension;
 				INFOPLIST_FILE = Watch/Resources/Info.plist;
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = 4.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -6465,7 +6615,7 @@
 				DEVELOPMENT_TEAM = PR958DC548;
 				IBSC_MODULE = Watch_Extension;
 				INFOPLIST_FILE = Watch/Resources/Info.plist;
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = 4.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -6491,7 +6641,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = 4.1.1;
 				OTHER_SWIFT_FLAGS = "-DDEBUG -DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
@@ -6518,7 +6668,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = 4.1.1;
 				OTHER_SWIFT_FLAGS = "-DPROD";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.gouv.stopcovid.ios.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
@@ -6746,6 +6896,15 @@
 			buildConfigurations = (
 				376C032925125489007E87F1 /* Debug */,
 				376C032A25125489007E87F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		377B84AB2796F9A100B02628 /* Build configuration list for PBXAggregateTarget "UpdateJsons" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				377B84A82796F9A100B02628 /* Debug */,
+				377B84A92796F9A100B02628 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

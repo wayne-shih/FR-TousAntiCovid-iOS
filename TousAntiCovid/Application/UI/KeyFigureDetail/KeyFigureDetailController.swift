@@ -150,16 +150,12 @@ final class KeyFigureDetailController: CVTableViewController {
                                                             topInset: Appearance.Cell.Inset.medium,
                                                             bottomInset: .zero,
                                                             textAlignment: .natural),
-                                         associatedValue: data,
+                                         associatedValue: (data, chartViews["bothCharts"]),
                                          selectionActionWithCell: { [weak self] cell in
                 self?.didTouchSharingFor(cell: cell)
             },
-                                         selectionAction: { [weak self] in
+                                         selectionAction: { [weak self] _ in
                 self?.didTouchChart(data)
-            },
-                                         willDisplay: { [weak self] cell in
-                guard let view = self?.chartViews["bothCharts"] else { return }
-                (cell as? KeyFigureChartCell)?.setupChartView(view)
             })
             rows.append(chartsRow)
         } else {
@@ -171,16 +167,12 @@ final class KeyFigureDetailController: CVTableViewController {
                                                 topInset: Appearance.Cell.Inset.medium,
                                                 bottomInset: .zero,
                                                 textAlignment: .natural),
-                             associatedValue: [chartData],
+                             associatedValue: ([chartData], chartViews[chartData.id]),
                              selectionActionWithCell: { [weak self] cell in
                     self?.didTouchSharingFor(cell: cell)
                 },
-                             selectionAction: { [weak self] in
+                             selectionAction: { [weak self] _ in
                     self?.didTouchChart([chartData])
-                },
-                             willDisplay: { [weak self] cell in
-                    guard let view = self?.chartViews[chartData.id] else { return }
-                    (cell as? KeyFigureChartCell)?.setupChartView(view)
                 })
             }
             rows.append(contentsOf: chartRows)
@@ -193,16 +185,12 @@ final class KeyFigureDetailController: CVTableViewController {
                                                            topInset: Appearance.Cell.Inset.medium,
                                                            bottomInset: .zero,
                                                            textAlignment: .natural),
-                                        associatedValue: [chartData],
+                                        associatedValue: ([chartData], chartViews[chartData.id]),
                                         selectionActionWithCell: { [weak self] cell in
                 self?.didTouchSharingFor(cell: cell)
             },
-                                        selectionAction: { [weak self] in
+                                        selectionAction: { [weak self] _ in
                 self?.didTouchChart([chartData])
-            },
-                                        willDisplay: { [weak self] cell in
-                guard let view = self?.chartViews[chartData.id] else { return }
-                (cell as? KeyFigureChartCell)?.setupChartView(view)
             })
             rows.append(chartRow)
         }

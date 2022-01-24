@@ -55,8 +55,8 @@ final class WalletManager {
         }
     }
     var areThereCertificatesToLoad: Bool { _walletCertificates.count != storageManager.walletCertificates().count }
-    var recentWalletCertificates: [WalletCertificate] { walletCertificates.filter { !$0.isOld } }
-    var oldWalletCertificates: [WalletCertificate] { walletCertificates.filter { $0.isOld || (shouldUseSmartWallet && isPassExpired(for: $0 as? EuropeanCertificate)) } }
+    var recentWalletCertificates: [WalletCertificate] { walletCertificates.filter { !isCertificateOld($0) } }
+    var oldWalletCertificates: [WalletCertificate] { walletCertificates.filter { isCertificateOld($0) } }
     var areThereCertificatesNeedingAttention: Bool {
         !walletCertificates.first {
             if let europeCertificate = $0 as? EuropeanCertificate {
@@ -562,7 +562,7 @@ extension WalletManager {
         // user only for EuropeanCertificates
         let europeanCertificates: [EuropeanCertificate] = _walletCertificates.filter { ($0 as? EuropeanCertificate)?.hasLunarBirthdate == false } as? [EuropeanCertificate] ?? []
         // group certificates by user (on firstname and birthdate only)
-        let groupedCerts: [String: [EuropeanCertificate]] = Dictionary(grouping: europeanCertificates) { "\($0.firstname.uppercased())\($0.birthdate)" }
+        let groupedCerts: [String: [EuropeanCertificate]] = Dictionary(grouping: europeanCertificates) { $0.profileId }
         // keep only the last relevant certificate: completed vaccine or recovery.
         return groupedCerts.compactMap {
             $0.value

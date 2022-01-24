@@ -34,7 +34,7 @@ final class KeyFigureCaptureView: UIView, Xibbed {
         containerView.setNeedsLayout()
         containerView.layoutIfNeeded()
         containerView.frame.size.height = view.frame.height
-        let capture: UIImage = containerView.screenshot()!
+        let capture: UIImage = containerView.cvScreenshot()!
         return capture
     }
     

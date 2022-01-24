@@ -20,23 +20,7 @@ final class KeyFiguresComparisonController: CVTableViewController {
     private let didTouchSelection: (_ currentSelection: [KeyFigure], _ selectionDidChange: @escaping ([KeyFigure]) -> ()) -> ()
     
     // MARK: - Variables
-    @UserDefault(key: .comparedKeyFigures)
-    private var comparedKeyFiguresLabels: [String] = KeyFiguresManager.shared.initialSelectionForComparison
     private var currentChartRange: ChartRange = .year
-    private var comparedKeyFiguresIndexes: [Int] {
-        get {
-            let indexes: [Int] = comparedKeyFiguresLabels.compactMap {
-                KeyFiguresManager.shared.index(for: $0)
-            }
-            return indexes.isEmpty ? [0,1] : [Int](indexes.prefix(2))
-        }
-        set {
-            guard newValue.count == 2 else { return }
-            comparedKeyFiguresLabels = newValue.compactMap {
-                KeyFiguresManager.shared.label(for: $0)
-            }
-        }
-    }
     private var selectedKeyFigures: [KeyFigure] = [] {
         didSet {
             saveSelection()
@@ -53,7 +37,7 @@ final class KeyFiguresComparisonController: CVTableViewController {
         self.didTouchChart = didTouchChart
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
-        selectedKeyFigures = [KeyFiguresManager.shared.keyFigures[comparedKeyFiguresIndexes[0]], KeyFiguresManager.shared.keyFigures[comparedKeyFiguresIndexes[1]]]
+        selectedKeyFigures = KeyFiguresManager.shared.comparedKeyFigures
     }
     
     required init?(coder: NSCoder) {
@@ -110,25 +94,22 @@ private extension KeyFiguresComparisonController {
 // MARK: - Rows
 private extension KeyFiguresComparisonController {
     func comparisonChartRow() -> CVRow {
-        let chartData: [KeyFigureChartData] = KeyFiguresManager.shared.generateComparisonChartData(between: selectedKeyFigures[0], and: selectedKeyFigures[1], daysCount: currentChartRange.rawValue, withFooter: true)
+        guard selectedKeyFigures.count > 1 else { return CVRow(title: "common.error.unknown".localized, xibName: .standardCell) }
+        let chartData: [KeyFigureChartData] = KeyFiguresManager.shared.generateComparisonChartData(between: selectedKeyFigures[0], and: selectedKeyFigures[1], daysCount: currentChartRange.rawValue, withFooter: "keyfigures.comparison.chart.footer".localized)
         let areComparable: Bool = selectedKeyFigures.haveSameMagnitude
         let chartView: ChartViewBase? = ChartViewBase.create(chartData1: chartData[0], chartData2: chartData[1], sameOrdinate: areComparable, allowInteractions: false)
-        let data: [KeyFigureChartData] = KeyFiguresManager.shared.generateComparisonChartData(between: selectedKeyFigures[0], and: selectedKeyFigures[1], daysCount: currentChartRange.rawValue, withFooter: false)
+        let data: [KeyFigureChartData] = KeyFiguresManager.shared.generateComparisonChartData(between: selectedKeyFigures[0], and: selectedKeyFigures[1], daysCount: currentChartRange.rawValue, withFooter: nil)
         return CVRow(xibName: .keyFigureChartCell,
                      theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
                                         topInset: Appearance.Cell.Inset.medium,
                                         bottomInset: .zero,
                                         textAlignment: .natural),
-                     associatedValue: chartData,
+                     associatedValue: (chartData, chartView),
                      selectionActionWithCell: { [weak self] cell in
             self?.didTouchSharing((cell as? KeyFigureChartCell)?.captureWithoutFooter())
         },
-                     selectionAction: { [weak self] in
+                     selectionAction: { [weak self] _ in
             self?.didTouchChart(data)
-        },
-                     willDisplay: { cell in
-            guard let view = chartView else { return }
-            (cell as? KeyFigureChartCell)?.setupChartView(view)
         })
     }
     
@@ -138,7 +119,7 @@ private extension KeyFiguresComparisonController {
               theme: CVRow.Theme(topInset: Appearance.Cell.Inset.normal,
                                  bottomInset: .zero,
                                  buttonStyle: .secondary),
-              selectionAction: { [weak self] in
+              selectionAction: { [weak self] _ in
             self?.showSelectionController()
         })
     }
@@ -181,7 +162,7 @@ private extension KeyFiguresComparisonController {
                                                         imageSize: Appearance.Cell.Image.size,
                                                         separatorLeftInset: separatorLeftInset,
                                                         accessoryType: UITableViewCell.AccessoryType.none),
-                                     selectionAction: { handler() },
+                                     selectionAction: { _ in handler() },
                                      willDisplay: { cell in
             cell.cvTitleLabel?.accessibilityTraits = .button
         })
@@ -193,7 +174,7 @@ private extension KeyFiguresComparisonController {
 // MARK: - Utils
 private extension KeyFiguresComparisonController {
     func saveSelection() {
-        comparedKeyFiguresIndexes = selectedKeyFigures.compactMap { keyFigure in
+        KeyFiguresManager.shared.comparedKeyFiguresIndexes = selectedKeyFigures.compactMap { keyFigure in
             KeyFiguresManager.shared.keyFigures.firstIndex(of: keyFigure) ?? 0
         }
     }

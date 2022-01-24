@@ -31,8 +31,11 @@ public struct Ages: Codable {
 public struct Expiration: Codable {
     public var pivot1: String = "2021-12-15"
     public var pivot2: String = "2033-07-21"
+    public var pivot3: String = "2022-02-15"
     public var vacc22DosesNbDays: Int = 214
     public var vacc11DosesNbDays: Int = 214
+    public var vacc22DosesNbNewDays: Int = 122
+    public var vacc11DosesNbNewDays: Int = 122
     public var recNbDays: Int = 180
     public var vaccJan11DosesNbDays: Int = 61
     public var displayExpDays: Int = 21
@@ -43,6 +46,8 @@ public struct Expiration: Codable {
         case pivot2
         case vacc22DosesNbDays
         case vacc11DosesNbDays
+        case vacc22DosesNbNewDays
+        case vacc11DosesNbNewDays
         case recNbDays
         case vaccJan11DosesNbDays
         case displayExpOnAllDcc

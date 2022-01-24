@@ -11,6 +11,8 @@
 import UIKit
 
 extension Locale {
+    
+    static var appLocale: Locale { .init(identifier: Locale.currentAppLanguageCode) }
 
     static var currentAppLanguageCode: String {
         Constant.supportedLanguageCodes.first { $0 == Constant.appLanguage } ?? Constant.supportedLanguageCodes.first { $0 == Locale.current.languageCode } ?? Constant.defaultLanguageCode

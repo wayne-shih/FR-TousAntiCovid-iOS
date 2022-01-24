@@ -13,7 +13,14 @@ import LBBottomSheet
 
 class BottomSheetedTableViewController: CVTableViewController {
     
-    @objc var preferredHeightInBottomSheet: CGFloat { tableView.contentSize.height + (UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0) }
+    enum Mode {
+        case fitContent
+        case twoPositions
+    }
+    
+    private let minHeight: CGFloat = UIScreen.main.bounds.height / 2
+    
+    var preferredHeight: CGFloat { tableView.contentSize.height + tableView.contentInset.top + tableView.contentInset.bottom }
     
     lazy var bottomSheetTheme: BottomSheetController.Theme = {
         let grabberBackground: BottomSheetController.Theme.Grabber.Background = .color(isTranslucent: false)
@@ -23,11 +30,29 @@ class BottomSheetedTableViewController: CVTableViewController {
         theme.dimmingBackgroundColor = Asset.Colors.bottomSheetDimmingBackground.color
         return theme
     }()
+    
+    lazy var bottomSheetBehavior: BottomSheetController.Behavior = {
+        let minHeightValue: BottomSheetController.Behavior.HeightValue = .custom { [weak self] in
+            guard let self = self else { return 0.0 }
+            return min(self.preferredHeight, self.minHeight)
+        }
+        let maxHeightValue: BottomSheetController.Behavior.HeightValue = .fitContent
+        var behavior: BottomSheetController.Behavior = .init()
+        behavior.heightMode = mode == .fitContent ? .fitContent(heightLimit: .statusBar) : .specific(values: [minHeightValue, maxHeightValue])
+        return behavior
+    }()
+    
+    var mode: Mode { .fitContent }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        bottomSheetController?.bottomSheetPositionDelegate = self
+    }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         reloadUI { [weak self] in
-            self?.bottomSheetController?.preferredHeightInBottomSheetDidUpdate()
+            if self?.mode == .fitContent { self?.bottomSheetController?.preferredHeightInBottomSheetDidUpdate() }
         }
     }
     
@@ -38,5 +63,12 @@ class BottomSheetedTableViewController: CVTableViewController {
     
     override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
         bottomSheetController?.dismiss(completion)
+    }
+}
+
+extension BottomSheetedTableViewController: BottomSheetPositionDelegate {
+    func bottomSheetPositionDidUpdate(y: CGFloat) {
+        guard mode == .twoPositions else { return }
+        tableView.isScrollEnabled = y < minHeight
     }
 }

@@ -27,7 +27,7 @@ final class ActivationButtonCell: CardCell {
     }
     
     @IBAction func didTouchButton(_ sender: Any) {
-        currentAssociatedRow?.selectionAction?()
+        currentAssociatedRow?.selectionAction?(self)
     }
 
     override func setupAccessibility() {

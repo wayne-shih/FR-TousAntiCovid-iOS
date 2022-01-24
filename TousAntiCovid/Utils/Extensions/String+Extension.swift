@@ -35,10 +35,9 @@ extension String {
     }
     
     var isUuidCode: Bool { self ~> "^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$" }
-    var isShortCode: Bool {
-        self ~> "^[A-Za-z0-9]{6}$"
-        
-    }
+    var isShortCode: Bool { self ~> "^[A-Za-z0-9]{6}$" }
+    
+
     var isPostalCode: Bool { self ~> "^[0-9]{5}$" }
 
     static func ~> (lhs: String, rhs: String) -> Bool {
@@ -197,6 +196,33 @@ extension String {
     
     func trimLowercased() -> String {
         trimmingCharacters(in: .whitespaces).lowercased()
+    }
+    
+    func androidCommonHash() -> Int {
+        var h: Int = 1125899906842597
+        // prime
+        let len: Int = self.count
+        do {
+            var i: Int = 0
+            while (i < len) {
+                h = 31.multipliedReportingOverflow(by: h).partialValue + Int(UnicodeScalar(self[i])!.value)
+                i += 1
+            }
+        }
+        return abs(h)
+    }
+    
+    func lastRangeOf(_ substring : String) -> Range<String.Index>? {
+        var occurrence: Int = 0
+        var start: String.Index = startIndex
+        var rangeToReturn: Range<String.Index>?
+        while start < endIndex {
+            guard let range = self[start..<endIndex].range(of: substring, options: .caseInsensitive) else { return nil }
+            occurrence += 1
+            rangeToReturn = range
+            start = range.upperBound
+        }
+        return rangeToReturn
     }
     
 }

@@ -48,9 +48,6 @@ final class KeyFiguresManager {
     var displayDepartmentLevel: Bool { ParametersManager.shared.displayDepartmentLevel }
     var canShowCurrentlyNeededFile: Bool { localFileExists() }
     
-    var initialSelectionForComparison: [String] {
-        ParametersManager.shared.defaultInitialKeyFiguresSelectionKeys ?? []
-    }
 
     @UserDefault(key: .currentPostalCode)
     var currentPostalCode: String? {
@@ -58,6 +55,30 @@ final class KeyFiguresManager {
             currentDepartmentName = departmentNameForPostalCode(currentPostalCode)
             notifyPostalCodeUpdate(currentPostalCode)
         }
+    }
+    
+    // Comparison
+    @UserDefault(key: .comparedKeyFigures)
+    var comparedKeyFiguresLabels: [String] = ParametersManager.shared.defaultInitialKeyFiguresSelectionKeys ?? [] {
+        didSet {
+            notifyKeyFiguresUpdate()
+        }
+    }
+    var comparedKeyFiguresIndexes: [Int] {
+        get {
+            let indexes: [Int] = comparedKeyFiguresLabels.compactMap { index(for: $0) }
+            return indexes.isEmpty ? [0,1] : [Int](indexes.prefix(2))
+        }
+        set {
+            guard newValue.count == 2 else { return }
+            comparedKeyFiguresLabels = newValue.compactMap { label(for: $0) }
+        }
+    }
+    var comparedKeyFigures: [KeyFigure] {
+        let indexes: [Int] = Array(comparedKeyFiguresIndexes.prefix(2))
+        guard let highestIndex = indexes.max() else { return [] }
+        guard keyFigures.count > highestIndex else { return [] }
+        return indexes.compactMap { keyFigures[$0] }
     }
     
     @UserDefault(key: .currentDepartmentName)
@@ -115,7 +136,7 @@ final class KeyFiguresManager {
         }
     }
     
-    func generateComparisonChartData(between keyfigure1: KeyFigure, and keyfigure2: KeyFigure, daysCount: Int, withFooter: Bool) -> [KeyFigureChartData] {
+    func generateComparisonChartData(between keyfigure1: KeyFigure, and keyfigure2: KeyFigure, daysCount: Int, withFooter: String?) -> [KeyFigureChartData] {
         let dateMin: Double = max(keyfigure1.ascendingSeries?.first?.date ?? 0.0, keyfigure2.ascendingSeries?.first?.date ?? 0.0)
         let dateMax: Double = min(keyfigure1.ascendingSeries?.last?.date ?? 0.0, keyfigure2.ascendingSeries?.last?.date ?? 0.0)
         return [generateDefaultChartData(from: keyfigure1,
@@ -132,7 +153,7 @@ final class KeyFiguresManager {
                                          withFooter: withFooter)].compactMap { $0 }
     }
     
-    func generateDefaultChartData(from keyFigure: KeyFigure, color: UIColor, daysCount: Int, dateMin: Double, dateMax: Double, withFooter: Bool) -> KeyFigureChartData? {
+    func generateDefaultChartData(from keyFigure: KeyFigure, color: UIColor, daysCount: Int, dateMin: Double, dateMax: Double, withFooter: String?) -> KeyFigureChartData? {
         if let series = keyFigure.ascendingSeries, !series.isEmpty {
             // reduce series between dateMin and dateMax
             let reducedSeries: [KeyFigureSeriesItem] = series.filter { $0.date >= dateMin && $0.date <= dateMax }
@@ -142,7 +163,7 @@ final class KeyFiguresManager {
             return KeyFigureChartData(legend: legend,
                                       series: reducedSeries.suffix(daysCount),
                                       currentValueToDisplay: keyFigure.valueGlobalToDisplay,
-                                      footer: withFooter ? "keyfigures.comparison.chart.footer".localized : nil,
+                                      footer: withFooter,
                                       limitLineValue: keyFigure.limitLine,
                                       limitLineLabel: keyFigure.limitLineLabel,
                                       chartKind: keyFigure.chartKind,
@@ -163,7 +184,7 @@ final class KeyFiguresManager {
                                                                     image: Asset.Images.chartLegend.image,
                                                                     color: color)
             let lastDate: Date = Date(timeIntervalSince1970: series.last!.date)
-            let globalFigureToDisplay: String = keyFigure.valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible()
+            let globalFigureToDisplay: String = keyFigure.lastChartValue?.toString(isPercent: keyFigure.isPercent)?.formattingValueWithThousandsSeparatorIfPossible() ?? keyFigure.valueGlobalToDisplay
             chartDatas.append(KeyFigureChartData(legend: legend,
                                                  series: series.suffix(daysCount),
                                                  currentValueToDisplay: keyFigure.valueGlobalToDisplay,
@@ -178,12 +199,12 @@ final class KeyFiguresManager {
                                                                               image: Asset.Images.chartLegend.image,
                                                                               color: keyFigure.color)
             let lastDate: Date = Date(timeIntervalSince1970: departmentSeries.last?.date ?? 0.0)
-            let departmentKeyFigureToDisplay: String = departmentKeyFigure.valueToDisplay.formattingValueWithThousandsSeparatorIfPossible()
+            let departmentKeyFigureToDisplay: String = departmentKeyFigure.lastChartValue?.toString(isPercent: keyFigure.isPercent)?.formattingValueWithThousandsSeparatorIfPossible() ?? departmentKeyFigure.valueToDisplay
             let footer: String
             if chartDatas.isEmpty {
                 footer = String(format: "keyFigureDetailController.section.evolution.subtitle".localized, keyFigure.label, departmentKeyFigureToDisplay, lastDate.dayShortMonthFormatted())
             } else {
-                let globalFigureToDisplay: String = keyFigure.valueGlobalToDisplay.formattingValueWithThousandsSeparatorIfPossible()
+                let globalFigureToDisplay: String = keyFigure.lastChartValue?.toString(isPercent: keyFigure.isPercent)?.formattingValueWithThousandsSeparatorIfPossible() ?? keyFigure.valueGlobalToDisplay
                 footer = String(format: "keyFigureDetailController.section.evolution.subtitle2Charts".localized, keyFigure.label, lastDate.dayMonthFormatted(), departmentKeyFigureToDisplay, globalFigureToDisplay)
             }
             chartDatas.insert(KeyFigureChartData(legend: departmentLegend,

@@ -71,7 +71,7 @@ final class UniversalQrCodeExplanationsController: CVTableViewController {
                       theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
                                          bottomInset: .zero,
                                          buttonStyle: .primary),
-                      selectionAction: { [weak self] in
+                      selectionAction: { [weak self] _ in
                     self?.didTouchCloseButton()
                 })
             }

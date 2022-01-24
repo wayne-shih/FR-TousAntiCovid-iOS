@@ -148,7 +148,7 @@ enum Appearance {
         
         enum Wallet {
             static let separatorColor: UIColor = Asset.Colors.lightSeparator.color
-            static let headerTextColor: UIColor = Asset.Colors.walletCellHeader.color
+            static var headerTextColor: UIColor { Text.accessoryColor }
         }
         
         enum Isolation {
@@ -195,6 +195,7 @@ enum Appearance {
                     return .lightGray
                 }
             }
+            static let accessoryColor: UIColor = Asset.Colors.walletCellHeader.color
             static var captionTitleColor: UIColor { Asset.Colors.captionTitle.color }
             static var accessoryFont: UIFont { UIFontMetrics(forTextStyle: .body).scaledFont(for: .regular(size: 12.0)) }
             static var subtitleBoldFont: UIFont { UIFontMetrics(forTextStyle: .caption1).scaledFont(for: .bold(size: 15.0)) }

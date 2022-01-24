@@ -90,7 +90,7 @@ final class AttestationFieldValueChoiceViewController: CVTableViewController {
                   subtitle: item.longLabel,
                   xibName: .textWithoutStackCell,
                   theme: theme,
-                  selectionAction: { [weak self] in
+                  selectionAction: { [weak self] _ in
                 self?.didSelectFieldItem(item)
             }, willDisplay: { [weak self] cell in
                 cell.accessoryType = item.code == self?.selectedItem?.code ? .checkmark : .none

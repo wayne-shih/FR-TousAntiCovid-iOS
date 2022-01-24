@@ -18,18 +18,18 @@ final class InfoCenterCoordinator: Coordinator {
     private weak var navigationController: UINavigationController?
     private weak var presentingController: UIViewController?
     
-    init(presentingController: UIViewController?, parent: Coordinator) {
+    init(presentingController: UIViewController?, parent: Coordinator, showInfoAtIndex: Int? = nil) {
         self.presentingController = presentingController
         self.parent = parent
-        start()
+        start(scrollToIndex: showInfoAtIndex)
     }
     
     deinit {
         InfoCenterManager.shared.removeObserver(self)
     }
     
-    private func start() {
-        let navigationController: CVNavigationController = CVNavigationController(rootViewController: InfoCenterController(deinitBlock: { [weak self] in
+    private func start(scrollToIndex: Int?) {
+        let navigationController: CVNavigationController = CVNavigationController(rootViewController: InfoCenterController(scrollToIndex: scrollToIndex, deinitBlock: { [weak self] in
             self?.didDeinit()
         }))
         self.navigationController = navigationController

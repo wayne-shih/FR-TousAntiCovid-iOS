@@ -9,6 +9,7 @@
 //
 
 import UIKit
+import LBBottomSheet
 import PKHUD
 import RobertSDK
 import ServerSDK
@@ -22,6 +23,7 @@ final class WalletCoordinator: Coordinator {
     private weak var presentingController: UIViewController?
     private weak var flashCodeController: FlashWalletCodeController?
     private weak var walletViewController: WalletViewController?
+    private weak var bottomSheetController: BottomSheetController?
 
     private var initialUrlToProcess: URL?
 
@@ -86,6 +88,8 @@ final class WalletCoordinator: Coordinator {
             self?.openFraudHelp()
         } didTouchConvertToEuropeTermsOfUse: { [weak self] in
             self?.openConvertToEuropeTermsOfUse()
+        } didTouchCertificateAdditionalInfo: { [weak self] info in
+            self?.showDetailsBottomSheet(with: info)
         } deinitBlock: { [weak self] in
             self?.didDeinit()
         }
@@ -142,6 +146,20 @@ final class WalletCoordinator: Coordinator {
     private func showCertificateError(certificateType: WalletConstant.CertificateType, error: Error) {
         let coordinator: WalletCertificateErrorCoordinator = WalletCertificateErrorCoordinator(presentingController: presentingController?.topPresentedController, parent: self, certificateType: certificateType, error: error)
         addChild(coordinator: coordinator)
+    }
+    
+    private func showDetailsBottomSheet(with content: AdditionalInfo) {
+        let controller: WalletInfoBottomSheetController = .init(content: content)
+        var theme: BottomSheetController.Theme = controller.bottomSheetTheme
+        switch content.category {
+        case .warning:
+            theme.grabber?.color = .black.withAlphaComponent(0.25)
+        case .info:
+            theme.grabber?.color = .white.withAlphaComponent(0.35)
+        default:
+            break
+        }
+        navigationController?.presentAsBottomSheet(controller, theme: theme)
     }
     
     private func startFlashCode() {

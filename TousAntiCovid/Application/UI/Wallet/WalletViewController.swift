@@ -20,7 +20,7 @@ final class WalletViewController: CVTableViewController {
         case certificates
         case info
     }
-
+    
     var deinitBlock: (() -> ())?
     private let didTouchFlashCertificate: () -> ()
     private let didTouchCertificate: (_ certificate: WalletCertificate) -> ()
@@ -29,6 +29,7 @@ final class WalletViewController: CVTableViewController {
     private let didTouchWhenToUse: () -> ()
     private let didTouchContinueOnFraud: () -> ()
     private let didTouchConvertToEuropeTermsOfUse: () -> ()
+    private let didTouchCertificateAdditionalInfo: (_ info: AdditionalInfo) -> ()
     private var mode: Mode = .empty
     private var mustScrollToTopAfterRefresh: Bool = false
     private var shouldHideCellImage: Bool {
@@ -51,6 +52,7 @@ final class WalletViewController: CVTableViewController {
          didTouchWhenToUse: @escaping () -> (),
          didTouchContinueOnFraud: @escaping () -> (),
          didTouchConvertToEuropeTermsOfUse: @escaping () -> (),
+         didTouchCertificateAdditionalInfo: @escaping (_ info: AdditionalInfo) -> (),
          deinitBlock: @escaping () -> ()) {
         self.didTouchFlashCertificate = didTouchFlashCertificate
         self.didTouchCertificate = didTouchCertificate
@@ -59,6 +61,7 @@ final class WalletViewController: CVTableViewController {
         self.didTouchWhenToUse = didTouchWhenToUse
         self.didTouchContinueOnFraud = didTouchContinueOnFraud
         self.didTouchConvertToEuropeTermsOfUse = didTouchConvertToEuropeTermsOfUse
+        self.didTouchCertificateAdditionalInfo = didTouchCertificateAdditionalInfo
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
     }
@@ -183,7 +186,7 @@ final class WalletViewController: CVTableViewController {
                                         accessibilityDidFocusCell: { [weak self] _ in
                                             self?.clearCurrentlyFocusedCellObjects()
                                         },
-                                        selectionAction: { [weak self] in
+                                        selectionAction: { [weak self] _ in
                                             self?.didTouchWhenToUse()
         })
         let fraudRow: CVRow = CVRow(title: "walletController.info.fraud.title".localized,
@@ -198,7 +201,7 @@ final class WalletViewController: CVTableViewController {
                                         accessibilityDidFocusCell: { [weak self] _ in
             self?.clearCurrentlyFocusedCellObjects()
         },
-                                        selectionAction: { [weak self] in
+                                        selectionAction: { [weak self] _ in
             self?.didTouchContinueOnFraud()
         })
         let phoneRow: CVRow = CVRow(title: "walletController.phone.title".localized,
@@ -214,7 +217,7 @@ final class WalletViewController: CVTableViewController {
                                     accessibilityDidFocusCell: { [weak self] _ in
                                         self?.clearCurrentlyFocusedCellObjects()
                                     },
-                                    selectionAction: { [weak self] in
+                                    selectionAction: { [weak self] _ in
                                         guard let self = self else { return }
                                         "walletController.phone.number".localized.callPhoneNumber(from: self)
                                     })
@@ -234,7 +237,7 @@ final class WalletViewController: CVTableViewController {
                                                  theme: CVRow.Theme(topInset: Appearance.Cell.Inset.large,
                                                                     bottomInset: .zero,
                                                                     buttonStyle: .primary),
-                                                 selectionAction: { [weak self] in
+                                                 selectionAction: { [weak self] _ in
                 self?.openQRScan()
             })
             rows.append(addCertificateRow)
@@ -310,7 +313,7 @@ final class WalletViewController: CVTableViewController {
             }
         }
         
-        let recentCertificates: [WalletCertificate] = WalletManager.shared.recentWalletCertificates
+        let recentCertificates: [WalletCertificate] = WalletManager.shared.recentWalletCertificates.filter { $0.uniqueHash != favoriteCertificate?.uniqueHash }
         if !recentCertificates.isEmpty {
             let recentCertificatesSectionRow: CVRow = CVRow(title: "walletController.recentCertificatesSection.title".localized,
                                                             subtitle: "walletController.recentCertificatesSection.subtitle".localized,
@@ -326,7 +329,7 @@ final class WalletViewController: CVTableViewController {
             rows.append(contentsOf: recentCertificates.sorted { $0.timestamp > $1.timestamp }.map { certificateRows(certificate: $0) }.reduce([], +))
         }
         
-        let oldCertificates: [WalletCertificate] = WalletManager.shared.oldWalletCertificates
+        let oldCertificates: [WalletCertificate] = WalletManager.shared.oldWalletCertificates.filter { $0.uniqueHash != favoriteCertificate?.uniqueHash }
         if !oldCertificates.isEmpty {
             let oldCertificatesSectionRow: CVRow = CVRow(title: "walletController.oldCertificatesSection.title".localized,
                                                          subtitle: "walletController.oldCertificatesSection.subtitle".localized,
@@ -345,38 +348,48 @@ final class WalletViewController: CVTableViewController {
     }
     
     private func row(for additionalInfoDesc: String, additionalInfoCategory: AdditionalInfo.Category) -> CVRow {
-        let backgroundColor: UIColor
+        let backgroundColor: UIColor = additionalInfoCategory.backgroundColor
         let image: UIImage
         let titleColor: UIColor
         switch additionalInfoCategory {
         case .error:
-            backgroundColor = Asset.Colors.error.color
             image = Asset.Images.passWarning.image
             titleColor = .white.withAlphaComponent(0.85)
         case .warning:
-            backgroundColor = Asset.Colors.bottomWarning.color
             image = Asset.Images.passWarning.image
             titleColor = .black.withAlphaComponent(0.55)
         case .info:
-            backgroundColor = Asset.Colors.info.color
             image = Asset.Images.passInfo.image
             titleColor = .white.withAlphaComponent(0.85)
         }
         
         return CVRow(title: additionalInfoDesc,
-              image: shouldHideCellImage ? nil : image,
-              xibName: .standardCardCell,
-              theme: CVRow.Theme(backgroundColor: backgroundColor,
-                                 topInset: Appearance.Cell.Inset.medium,
-                                 bottomInset: .zero,
-                                 textAlignment: .natural,
-                                 titleFont: { Appearance.Cell.Text.subtitleFont },
-                                 titleColor: titleColor,
-                                 imageSize: Appearance.Cell.Image.size,
-                                 interLabelSpacing: Appearance.Cell.Inset.normal,
-                                 maskedCorners: .top), willDisplay: { cell in
-            (cell as? StandardCardCell)?.cvImageView?.alpha = 0.55
-            (cell as? StandardCardCell)?.titleStackView?.alignment = .top
+                     subtitle: "Lire la suite",
+                     image: shouldHideCellImage ? nil : image,
+                     xibName: .additionalInfoCell,
+                     theme: CVRow.Theme(backgroundColor: backgroundColor,
+                                        topInset: Appearance.Cell.Inset.medium,
+                                        bottomInset: .zero,
+                                        textAlignment: .natural,
+                                        titleFont: { Appearance.Cell.Text.subtitleFont },
+                                        titleColor: titleColor,
+                                        titleLinesCount: 2,
+                                        subtitleFont: { Appearance.Cell.Text.accessoryFont },
+                                        subtitleColor: titleColor,
+                                        imageSize: Appearance.Cell.Image.size,
+                                        interLabelSpacing: Appearance.Cell.Inset.normal,
+                                        maskedCorners: .top),
+                     selectionAction: { [weak self] cell in
+            if cell?.cvSubtitleLabel?.isHidden == false {
+                let additionalInfo: AdditionalInfo = .init(category: additionalInfoCategory, fullDescription: additionalInfoDesc)
+                self?.didTouchCertificateAdditionalInfo(additionalInfo)
+            }
+        }, willDisplay: { cell in
+            (cell as? AdditionalInfoCell)?.cvImageView?.alpha = additionalInfoCategory == .warning ? 0.55 : 0.85
+        }, didValidateValue: { [weak self] _, cell in
+            self?.tableView.beginUpdates()
+            cell.layoutSubviews()
+            self?.tableView.endUpdates()
         })
     }
     
@@ -386,22 +399,14 @@ final class WalletViewController: CVTableViewController {
         if WalletManager.shared.shouldUseSmartWallet,
            let europeanCertificate = certificate as? EuropeanCertificate,
            WalletManager.shared.isRelevantCertificate(europeanCertificate) {
-            let expTimestamp: Double = WalletManager.shared.expiryTimestamp(europeanCertificate) ?? 0.0
-            let expDate: Date = Date(timeIntervalSince1970: expTimestamp)
-            if WalletManager.shared.isPassExpired(for: europeanCertificate) {
-                additionalInfo.append(AdditionalInfo(category: .error, fullDescription: String(format: "smartWallet.expiration.error".localized, expDate.localDateString)))
-                
-            } else if WalletManager.shared.isPassExpiredSoon(for: europeanCertificate) {
-                additionalInfo.append(AdditionalInfo(category: .warning, fullDescription: String(format: "smartWallet.expiration.soon.warning".localized, expDate.localDateString)))
-                
-            } else if WalletManager.shared.isEligibleToVaccination(for: europeanCertificate) {
-                additionalInfo.append(AdditionalInfo(category: .info, fullDescription: "smartWallet.elegibility.info".localized))
-                
-            } else if WalletManager.shared.isEligibleToVaccinationSoon(for: europeanCertificate) {
-                let elgTimestamp: Double = WalletManager.shared.eligibilityTimestamp(europeanCertificate) ?? 0.0
-                let elgDate: Date = Date(timeIntervalSince1970: elgTimestamp)
-                additionalInfo.append(AdditionalInfo(category: .info, fullDescription: String(format: "smartWallet.elegibility.soon.info".localized, elgDate.localDateString)))
-                
+            if let desc = WalletManager.shared.expirationDescription(for: europeanCertificate) {
+                additionalInfo.append(AdditionalInfo(category: .error, fullDescription: desc))
+            } else if let desc = WalletManager.shared.expirationSoonDescription(for: europeanCertificate) {
+                additionalInfo.append(AdditionalInfo(category: .warning, fullDescription: desc))
+            } else if let desc = WalletManager.shared.eligibilityDescription(for: europeanCertificate) {
+                additionalInfo.append(AdditionalInfo(category: .info, fullDescription: desc))
+            } else if let desc = WalletManager.shared.eligibleSoonDescription(for: europeanCertificate) {
+                additionalInfo.append(AdditionalInfo(category: .info, fullDescription: desc))
             }
         }
         
@@ -428,13 +433,13 @@ final class WalletViewController: CVTableViewController {
             let remainingValidityDuration: Double = expiryTimestamp - Date().timeIntervalSince1970
             if remainingValidityDuration.secondsToDays() <= ParametersManager.shared.smartWalletConfiguration.exp.displayExpOnAllDcc {
                 subtitle.append("\n")
-                subtitle.append(remainingValidityDuration > 0 ? String(format: "walletController.certificateExpiration".localized, expiryDate.localDateString) : String(format: "walletController.certificateExpired".localized, expiryDate.localDateString))
+                subtitle.append(remainingValidityDuration > 0 ? String(format: "walletController.certificateExpiration".localized, expiryDate.dayShortMonthYearFormatted(timeZoneIndependant: true)) : String(format: "walletController.certificateExpired".localized, expiryDate.dayShortMonthYearFormatted(timeZoneIndependant: true)))
             }
         }
         if let row = additionalInfoRowIfNeeded(for: certificate) {
             rows.append(row)
         }
-        let certificateRow: CVRow = CVRow(title: certificate.shortDescription?.uppercased(),
+        let certificateRow: CVRow = CVRow(title: certificate.shortDescriptionForList?.uppercased(),
                                           subtitle: subtitle,
                                           image: shouldHideCellImage ? nil : certificate.codeImage,
                                           isOn: certificate.id == WalletManager.shared.favoriteDccId,
@@ -457,7 +462,7 @@ final class WalletViewController: CVTableViewController {
                                           selectionActionWithCell: { [weak self] cell in
                                             self?.didTouchCertificateMenuButton(certificate: certificate, cell: cell)
                                           },
-                                          selectionAction: { [weak self] in
+                                          selectionAction: { [weak self] _ in
                                             self?.didTouchCertificate(certificate)
                                           },
                                           secondarySelectionAction: certificate.type.format == .walletDCC ? { [weak self] in
@@ -499,7 +504,7 @@ final class WalletViewController: CVTableViewController {
                                          accessibilityDidFocusCell: { [weak self] _ in
                                             self?.clearCurrentlyFocusedCellObjects()
                                          },
-                                         selectionAction: { [weak self] in
+                                         selectionAction: { [weak self] _ in
                                             self?.didTouchCertificate(certificate)
                                          })
             rows.append(actionRow)

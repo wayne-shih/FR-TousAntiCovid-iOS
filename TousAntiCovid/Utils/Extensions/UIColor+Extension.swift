@@ -11,7 +11,7 @@
 import UIKit
 
 extension UIColor {
-    #if !WIDGET
+#if !WIDGET
     static var isDarkMode: Bool {
         if #available(iOS 12.0, *) {
             return UIApplication.shared.keyWindow?.traitCollection.userInterfaceStyle == .dark
@@ -19,7 +19,7 @@ extension UIColor {
             return false
         }
     }
-    #endif
+#endif
     
     convenience init(red: Int, green: Int, blue: Int) {
         assert(red >= 0 && red <= 255, "Invalid red component")
@@ -70,5 +70,4 @@ extension UIColor {
         
         return UIColor(red: r, green: g, blue: b, alpha: 1.0)
     }
-    
 }

@@ -36,6 +36,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         NotificationsManager.shared.start()
         LocalizationsManager.shared.start()
         InfoCenterManager.shared.start()
+        ParametersManager.shared.start(configUrl: Constant.Server.configUrl,
+                                       configCertificateFiles: Constant.Server.certificates)
         KeyFiguresManager.shared.start()
         VaccinationCenterManager.shared.start()
         RisksUIManager.shared.start()
@@ -59,8 +61,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         if isOnboardingDone {
             BluetoothStateManager.shared.start()
         }
-        ParametersManager.shared.start(configUrl: Constant.Server.configUrl,
-                                       configCertificateFiles: Constant.Server.certificates)
         ConversionServer.shared.start(session: UrlSessionManager.shared.session,
                                       convertUrl: { Constant.Server.convertUrl },
                                       requestLoggingHandler: { request, response, responseData, error in
@@ -68,13 +68,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         ActivityCertificateServer.shared.start(session: URLSession.shared,
                                                serverUrl: { Constant.Server.activityCertificateGenerationUrl },
                                                requestLoggingHandler: { request, response, responseData, error in
-                                               })
+        })
         CleaServer.shared.start(certificateFiles: Constant.Server.certificates,
                                 reportBaseUrl: { Constant.Server.cleaReportBaseUrl },
                                 statusBaseUrl: { Constant.Server.cleaStatusBaseUrl() },
                                 statusBaseFallbackUrl: { Constant.Server.cleaStatusBaseUrl(fallbackUrl: true) },
                                 taskLoggingHandler: { task, responseData, error in
-                                   })
+        })
         
         RBManager.shared.start(isFirstInstall: !isAppAlreadyInstalled,
                                server: Server(baseUrl: { Constant.Server.baseUrl },
@@ -141,7 +141,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        RBManager.shared.stopProximityDetection()
         AnalyticsManager.shared.proximityDidStop()
     }
     

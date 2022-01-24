@@ -37,15 +37,7 @@ final class AnalyticsManager: NSObject {
     private var deleteAnalyticsAfterNextStatus: Bool = false
 
     private typealias ProcessRequestCompletion = (_ result: Result<Data, Error>) -> ()
-    private lazy var session: URLSession = {
-        let backgroundConfiguration: URLSessionConfiguration = URLSessionConfiguration.background(withIdentifier: "fr.gouv.tousanticovid.ios.Analytics")
-        backgroundConfiguration.timeoutIntervalForRequest = 30.0
-        backgroundConfiguration.timeoutIntervalForResource = 30.0
-        backgroundConfiguration.sessionSendsLaunchEvents = true
-        backgroundConfiguration.shouldUseExtendedBackgroundIdleMode = true
-        backgroundConfiguration.httpShouldUsePipelining = true
-        return URLSession(configuration: backgroundConfiguration, delegate: self, delegateQueue: .main)
-    }()
+    private lazy var session: URLSession = { URLSessionDataTaskFactory.shared.backgroundSession(identifier: "fr.gouv.tousanticovid.ios.Analytics", delegate: self) }()
     private var receivedData: [String: Data] = [:]
     private var completions: [String: ProcessRequestCompletion] = [:]
     
@@ -71,7 +63,7 @@ final class AnalyticsManager: NSObject {
     }
 
     private func sendAnalytics() {
-        guard ParametersManager.shared.isAnalyticsOn && isOptIn && !Constant.isDebug else {
+        guard ParametersManager.shared.isAnalyticsOn && isOptIn else { //&& !Constant.isDebug else {
             resetAppEvents()
             resetHealthEvents()
             resetErrors()
@@ -201,7 +193,7 @@ extension AnalyticsManager {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
             }
             request.httpBody = bodyData
-            let task: URLSessionDataTask = session.dataTask(with: request)
+            let task: URLSessionDataTask = URLSessionDataTaskFactory.shared.dataTask(with: request, session: session)
             task.taskDescription = requestId
             task.resume()
         } catch {

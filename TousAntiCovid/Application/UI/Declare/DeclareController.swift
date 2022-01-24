@@ -70,7 +70,7 @@ final class DeclareController: CVTableViewController {
                                              bottomInset: .zero,
                                              textAlignment: .natural,
                                              titleFont: { Appearance.Cell.Text.headTitleFont }),
-                          selectionAction: { [weak self] in
+                          selectionAction: { [weak self] _ in
                         self?.didTouchCodeNotReceivedButton()
                     })
                 } else {

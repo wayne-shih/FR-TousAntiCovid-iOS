@@ -20,6 +20,7 @@ final class MarkerView: MarkerImage {
     private var labelSize: CGSize = CGSize()
     private let paragraphStyle: NSMutableParagraphStyle?
     private var drawAttributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key: Any]()
+    private var fillColor: UIColor = Appearance.tintColor
 
     init(chartView: ChartViewBase) {
         self.insets = UIEdgeInsets(top: 7.0, left: 7.0, bottom: 18.0, right: 7.0)
@@ -62,7 +63,7 @@ final class MarkerView: MarkerImage {
         rect.origin.y -= size.height
         
         context.saveGState()
-        context.setFillColor(Appearance.tintColor.withAlphaComponent(1.0).cgColor)
+        context.setFillColor(fillColor.cgColor)
         context.beginPath()
         if offset.y > 0 {
             context.addPath(UIBezierPath(roundedRect: CGRect(x: rect.origin.x,
@@ -104,6 +105,9 @@ final class MarkerView: MarkerImage {
     
     override func refreshContent(entry: ChartDataEntry, highlight: Highlight) {
         var string: String = ChartsValueFormatter().stringForValue(entry.y, axis: nil)
+        if let color = chartView?.data?.getDataSetForEntry(entry)?.colors.first {
+            fillColor = color
+        }
         if let timestamp = entry.data as? Double {
             string += "\n\(ChartsDateFormatter().stringForValue(timestamp, axis: nil))"
         }
