@@ -54,8 +54,6 @@ struct KeyFigureChartData {
 
 extension Array where Element == KeyFigureChartData {
     var haveSameMagnitude: Bool {
-        Dictionary(grouping: self) { keyFigure in
-            keyFigure.magnitude
-        }.keys.count == 1
+        Dictionary(grouping: self) { $0.magnitude }.keys.count == 1
     }
 }

@@ -12,7 +12,7 @@ import UIKit
 import ServerSDK
 import StorageSDK
 
-final class EuropeanCertificate: WalletCertificate, Equatable {
+final class EuropeanCertificate: WalletCertificate, Equatable, Hashable {
 
     override var message: Data? { nil }
     override var signature: Data? { nil }
@@ -30,6 +30,10 @@ final class EuropeanCertificate: WalletCertificate, Equatable {
     
     static func == (lhs: EuropeanCertificate, rhs: EuropeanCertificate) -> Bool {
         lhs.uniqueHash == rhs.uniqueHash
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(uniqueHash)
     }
     
     override var isOld: Bool {
@@ -88,7 +92,15 @@ final class EuropeanCertificate: WalletCertificate, Equatable {
         return dccKids.smileys[emojiIdx]
     }()
     
-    var profileId: String { (firstname ?? lastname ?? "").uppercased() + hCert.dateOfBirth }
+    var smartWalletProfileId: String { (firstname ?? lastname ?? "").uppercased() + hCert.dateOfBirth }
+    
+    var multiPassProfileId: String {
+        (hCert.get(.firstNameStandardized).string.orEmpty + hCert.get(.lastNameStandardized).string.orEmpty)
+        .replacingOccurrences(of: "[^a-zA-Z]*", with: "", options: [.regularExpression])
+        .trimmingCharacters(in: .whitespaces)
+        .uppercased() +
+        hCert.dateOfBirth
+    }
 
     override var fullDescription: String? {
         var strings: [String?] = []
@@ -113,8 +125,16 @@ final class EuropeanCertificate: WalletCertificate, Equatable {
     var dosesTotal: Int? { hCert.vaccineStatements.first?.dosesTotal }
 
     var isForeignCertificate: Bool { countryCode != "FR" }
-    var isExpired: Bool { hCert.exp.timeIntervalSince1970 < Date().timeIntervalSince1970 }
+    var isExpired: Bool {
+        switch hCert.type {
+        case .exemption:
+            return (hCert.exemptionStatement?.validUntil ?? .distantPast).timeIntervalSince1970 < Date().timeIntervalSince1970
+        default:
+            return hCert.exp.timeIntervalSince1970 < Date().timeIntervalSince1970
+        }
+    }
     var kid: String { hCert.kidStr }
+    var isEphemere: Bool { parentId != nil }
 
     override var fullDescriptionForFullscreen: String? {
         switch hCert.type {
@@ -149,7 +169,7 @@ final class EuropeanCertificate: WalletCertificate, Equatable {
     var lastname: String? { hCert.get(.lastName).string ?? hCert.get(.lastNameStandardized).string }
     var birthdate: Double { Date(dateString: hCert.dateOfBirth)?.timeIntervalSince1970 ?? Date().timeIntervalSince1970 }
     var hasLunarBirthdate: Bool { hCert.dateOfBirth.isLunarDate }
-        
+
     var isLastDose: Bool? {
         guard let vaccinationEntry = hCert.vaccineStatements.first else { return nil }
         return vaccinationEntry.doseNumber == vaccinationEntry.dosesTotal
@@ -162,8 +182,8 @@ final class EuropeanCertificate: WalletCertificate, Equatable {
     var isAutoTest: Bool {
         hCert.testStatements.first?.manufacturer?.lowercased() == "autotest"
     }
-
     private let hCert: HCert
+    
 
     private var countryCode: String? {
         let countryCode: String?
@@ -239,22 +259,33 @@ final class EuropeanCertificate: WalletCertificate, Equatable {
     }
     
     private func fullDescriptionTest(forceEnglishFormat: Bool) -> String? {
-        // Still waiting for string format confirmation.
         guard let testEntry = hCert.testStatements.first else { return nil }
         let testResultKey: String = isTestNegative == true ? "negative" : "positive"
         let flag: String? = isForeignCertificate && forceEnglishFormat ? countryCode?.flag() : nil
         let info: String = forceEnglishFormat ? "europeanCertificate.fullscreen.englishDescription.test" : "wallet.proof.europe.test.infos"
-        let fromDate: String = testEntry.sampleTime.dayShortMonthYearTimeFormatted(forceEnglishFormat: forceEnglishFormat)
+        let sampleTimeDate: Date = testEntry.sampleTime
+        let date: String = sampleTimeDate.dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
         let result: String = forceEnglishFormat ? "wallet.proof.europe.test.englishDescription.\(testResultKey)".localized : "wallet.proof.europe.test.\(testResultKey)".localized
         let analysisCode: String = forceEnglishFormat ? l10n("test.man.englishDescription.\(testEntry.type)", or: testEntry.type) : l10n("test.man.\(testEntry.type)", or: testEntry.type)
+        let timestamp: Double = sampleTimeDate.timeIntervalSince1970
+        let fromDate: String = Date(timeIntervalSince1970: timestamp + ParametersManager.shared.walletRecoveryValidityThresholdInDays.minSec).dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
+        let toDate: String = Date(timeIntervalSince1970: timestamp + ParametersManager.shared.walletRecoveryValidityThresholdInDays.maxSec).dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
         
-        return [flag, info.localized].compactMap { $0 } .joined(separator: " ")
-            .replacingOccurrences(of: "<FULL_NAME>", with: fullName)
-            .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
-            .replacingOccurrences(of: "<ANALYSIS_CODE>", with: analysisCode)
-            .replacingOccurrences(of: "<ANALYSIS_RESULT>", with: result)
-            .replacingOccurrences(of: "<FROM_DATE>", with: fromDate)
-            .appending("\n\(validityString(forceEnglish: forceEnglishFormat))")
+        if isTestNegative == false, !forceEnglishFormat {
+            return [flag, "wallet.proof.europe.testPositive.infos".localized].compactMap { $0 } .joined(separator: " ")
+                .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
+                .replacingOccurrences(of: "<DATE>", with: date)
+                .replacingOccurrences(of: "<FROM_DATE>", with: fromDate)
+                .replacingOccurrences(of: "<TO_DATE>", with: toDate)
+        } else {
+            return [flag, info.localized].compactMap { $0 } .joined(separator: " ")
+                .replacingOccurrences(of: "<FULL_NAME>", with: fullName)
+                .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
+                .replacingOccurrences(of: "<ANALYSIS_CODE>", with: analysisCode)
+                .replacingOccurrences(of: "<ANALYSIS_RESULT>", with: result)
+                .replacingOccurrences(of: "<FROM_DATE>", with: date)
+                .appending("\n\(validityString(forceEnglish: forceEnglishFormat))")
+        }
     }
     
     private func fullDescriptionRecovery(forceEnglishFormat: Bool) -> String? {
@@ -263,11 +294,22 @@ final class EuropeanCertificate: WalletCertificate, Equatable {
         let flag: String? = isForeignCertificate && forceEnglishFormat ? countryCode?.flag() : nil
         let info: String = forceEnglishFormat ? "europeanCertificate.fullscreen.englishDescription.recovery" : "wallet.proof.europe.recovery.infos"
         let date: String = firstPositiveDate?.dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat) ?? ""
+        let timestamp: Double = firstPositiveDate?.timeIntervalSince1970 ?? 0.0
+        let fromDate: String = Date(timeIntervalSince1970: timestamp + ParametersManager.shared.walletRecoveryValidityThresholdInDays.minSec).dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
+        let toDate: String = Date(timeIntervalSince1970: timestamp + ParametersManager.shared.walletRecoveryValidityThresholdInDays.maxSec).dayShortMonthYearFormatted(timeZoneIndependant: true, forceEnglishFormat: forceEnglishFormat)
         
-        return [flag, info.localized].compactMap { $0 } .joined(separator: " ")
-            .replacingOccurrences(of: "<FULL_NAME>", with: fullName)
-            .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
-            .replacingOccurrences(of: "<DATE>", with: date)
+        if forceEnglishFormat {
+            return [flag, info.localized].compactMap { $0 } .joined(separator: " ")
+                        .replacingOccurrences(of: "<FULL_NAME>", with: fullName)
+                        .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
+                        .replacingOccurrences(of: "<DATE>", with: date)
+        } else {
+            return [flag, info.localized].compactMap { $0 } .joined(separator: " ")
+                .replacingOccurrences(of: "<BIRTHDATE>", with: birthDateString(forceEnglishFormat: forceEnglishFormat) ?? "")
+                .replacingOccurrences(of: "<DATE>", with: date)
+                .replacingOccurrences(of: "<FROM_DATE>", with: fromDate)
+                .replacingOccurrences(of: "<TO_DATE>", with: toDate)
+        }
     }
 
     private func fullDescriptionExemption(forceEnglishFormat: Bool) -> String? {

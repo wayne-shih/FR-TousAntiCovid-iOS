@@ -58,6 +58,15 @@ public final class ParametersManager: NSObject {
     public var displaySanitaryCertificatesValidation: Bool { valueFor(name: "app.displaySanitaryCertificatesValidation") as? Bool ?? false }
     public var isAnalyticsOn: Bool { valueFor(name: "app.isAnalyticsOn") as? Bool ?? false }
     public var walletTestCertificateValidityThresholds: [Int] { valueFor(name: "app.wallet.testCertificateValidityThresholds") as? [Int] ?? [48, 72] }
+    public var walletRecoveryValidityThresholdInDays: RecoveryValidityThreshold {
+        guard let value = valueFor(name: "app.wallet.recoveryValidityThresholdInDays") as? [String: Any] else { return RecoveryValidityThreshold() }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode(RecoveryValidityThreshold.self, from: jsonData)
+        } catch {
+            return RecoveryValidityThreshold()
+        }
+    }
     public var walletConversionApiVersion: Int { valueFor(name: "app.wallet.conversionApiVersion") as? Int ?? 1 }
     public var walletConversionPublicKey: (key: String, value: String)? {
         (valueFor(name: "app.wallet.conversionPublicKey") as? [String: String])?.first
@@ -319,6 +328,17 @@ public final class ParametersManager: NSObject {
     
     private var config: [[String: Any]] = [] {
         didSet { distributeUpdatedConfig() }
+    }
+    
+    public var isMultiPassActivated: Bool { valueFor(name: "app.displayMultipass") as? Bool ?? true }
+    public var multiPassConfiguration: MultiPassConfiguration {
+        guard let value = valueFor(name: "app.multipass.list") as? [String: Any] else { return MultiPassConfiguration() }
+        do {
+            let jsonData: Data = try JSONSerialization.data(withJSONObject: value)
+            return try JSONDecoder().decode(MultiPassConfiguration.self, from: jsonData)
+        } catch {
+            return MultiPassConfiguration()
+        }
     }
 
     private var receivedData: [String: Data] = [:]

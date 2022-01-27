@@ -146,7 +146,11 @@ final class FullscreenCertificateViewController: CVTableViewController {
     }
 
     private func initMode() {
-        mode = [.sanitary, .vaccination].contains(certificate.type) || !WalletManager.shared.isActivityPassActivated ? .standard : .activityPass
+        if certificate.type == .multiPass {
+            mode = .border
+        } else {
+            mode = [.sanitary, .vaccination].contains(certificate.type) || !WalletManager.shared.isActivityPassActivated ? .standard : .activityPass
+        }
     }
 
     private func updateActivityCertificate() {
@@ -204,7 +208,7 @@ final class FullscreenCertificateViewController: CVTableViewController {
 
     private func standardSection() -> CVSection {
         CVSection {
-            if !certificate.is2dDoc {
+            if !certificate.is2dDoc && certificate.type != .multiPass {
                 modeSelectionRow()
                 logosRow()
             }
@@ -219,7 +223,7 @@ final class FullscreenCertificateViewController: CVTableViewController {
         if let activityCertificate = currentActivityCertificate {
             if activityCertificate.isValid {
                 return CVSection {
-                    modeSelectionRow()
+                    if certificate.type != .multiPass { modeSelectionRow() }
                     logosRow()
                     codeImageRow(activityCertificate)
                     codeShortDescriptionRow(activityCertificate)
@@ -228,7 +232,7 @@ final class FullscreenCertificateViewController: CVTableViewController {
                 }
             } else {
                 return CVSection {
-                    modeSelectionRow()
+                    if certificate.type != .multiPass { modeSelectionRow() }
                     activityPassAvailableSoonRow(availabilityDate: activityCertificate.startDate)
                     notifyMeButtonRow(availabilityDate: activityCertificate.startDate)
                     notifyMeFooterRow(for: activityCertificate.startDate)
@@ -236,7 +240,7 @@ final class FullscreenCertificateViewController: CVTableViewController {
             }
         } else {
             return CVSection {
-                modeSelectionRow()
+                if certificate.type != .multiPass { modeSelectionRow() }
                 if isEligibleToActivityCertificateGeneration {
                     if (certificate as? EuropeanCertificate)?.didAlreadyGenerateActivityCertificates == true {
                         activityPassServerNotAvailableRow()
@@ -252,12 +256,12 @@ final class FullscreenCertificateViewController: CVTableViewController {
 
     private func borderSection() -> CVSection {
         CVSection {
-            modeSelectionRow()
+            if certificate.type != .multiPass { modeSelectionRow() }
             if (certificate as? EuropeanCertificate)?.type == .exemptionEurope { exemptionWarningRow() }
             if (certificate as? EuropeanCertificate)?.isForeignCertificate == false { logosRow() }
             codeImageRow(certificate)
             codeFullDescriptionRow()
-            codeHashRow()
+            if certificate.type != .multiPass { codeHashRow() }
         }
     }
 
@@ -642,14 +646,14 @@ extension FullscreenCertificateViewController {
             wasCertificateValid = currentActivityCertificate?.isValid == true
             if !isHavingActivityCertificate { stopTimer() }
             if mode == .activityPass {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 reloadUI(animated: true)
             }
         } else if !wasCertificateValid && currentActivityCertificate?.isValid == true {
             // In this case, it means that the current certificate was valid in the future and it just becomes valid now.
             wasCertificateValid = true
             if mode == .activityPass {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 reloadUI(animated: true)
             }
         } else if mode == .activityPass {

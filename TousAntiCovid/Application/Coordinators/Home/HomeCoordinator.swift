@@ -84,8 +84,6 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
             self?.showVaccination()
         }, didTouchSanitaryCertificates: { [weak self] url in
             self?.showSanitaryCertificates(url)
-        }, didTouchVerifyWalletCertificate: { [weak self] in
-            self?.showWalletCertificateVerification()
         }, didTouchUniversalQrScan: { [weak self] in
             self?.showUniversalQrScan()
         }, didTouchCertificate: { [weak self] certificate in
@@ -193,11 +191,6 @@ final class HomeCoordinator: NSObject, WindowedCoordinator {
     private func showVenueRecordingConfirmation(url: URL) {
         let venuesRecordingCoordinator: VenuesRecordingCoordinator = VenuesRecordingCoordinator(presentingController: navigationController?.topPresentedController, parent: self, showOnlyConfirmation: true, openingUrl: url)
         addChild(coordinator: venuesRecordingCoordinator)
-    }
-    
-    private func showWalletCertificateVerification() {
-        let verificationCoordinator: WalletCertificateVerificationCoordinator = WalletCertificateVerificationCoordinator(presentingController: navigationController?.topPresentedController, parent: self)
-        addChild(coordinator: verificationCoordinator)
     }
     
     private func requestVenueScanAuthorization(_ completion: @escaping (_ granted: Bool) -> ()) {

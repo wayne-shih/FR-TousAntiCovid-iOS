@@ -80,7 +80,7 @@ final class DocumentExplanationViewController: CVTableViewController {
             documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
         case .recoveryEurope:
             documentImage = WalletImagesManager.shared.image(named: .recoveryEuropeCertificateFull)!
-        case .activityEurope:
+        case .activityEurope, .multiPass:
             documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!
         case .exemptionEurope:
             documentImage = WalletImagesManager.shared.image(named: .vaccinEuropeCertificateFull)!

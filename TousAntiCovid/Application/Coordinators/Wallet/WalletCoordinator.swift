@@ -82,14 +82,20 @@ final class WalletCoordinator: Coordinator {
             self?.showCompletedVaccinationControllerIfNeeded(certificate: certificate)
         } didTouchDocumentExplanation: { [weak self] certificateType in
             self?.showDocumentExplanation(certificateType: certificateType)
-        } didTouchWhenToUse: { [weak self]  in
+        } didTouchWhenToUse: { [weak self] in
             self?.showWhenToUseExplanations()
+        } didTouchMultiPassMoreInfo: { [weak self] in
+            self?.showMultiPassMoreInfo()
+        } didTouchMultiPassInstructions: { [weak self] in
+            self?.showMultiPassInstructions()
         } didTouchContinueOnFraud: { [weak self] in
             self?.openFraudHelp()
         } didTouchConvertToEuropeTermsOfUse: { [weak self] in
             self?.openConvertToEuropeTermsOfUse()
         } didTouchCertificateAdditionalInfo: { [weak self] info in
             self?.showDetailsBottomSheet(with: info)
+        } didSelectProfileForMultiPass: { [weak self] certificates in
+            self?.showMultiPassCertificateSelection(with: certificates)
         } deinitBlock: { [weak self] in
             self?.didDeinit()
         }
@@ -142,6 +148,14 @@ final class WalletCoordinator: Coordinator {
     private func showWhenToUseExplanations() {
         URL(string: "walletController.whenToUse.url".localized)?.openInSafari()
     }
+    
+    private func showMultiPassMoreInfo() {
+        URL(string: "multiPass.tab.explanation.url".localized)?.openInSafari()
+    }
+    
+    private func showMultiPassInstructions() {
+        URL(string: "multiPass.tab.similarProfile.url".localized)?.openInSafari()
+    }
 
     private func showCertificateError(certificateType: WalletConstant.CertificateType, error: Error) {
         let coordinator: WalletCertificateErrorCoordinator = WalletCertificateErrorCoordinator(presentingController: presentingController?.topPresentedController, parent: self, certificateType: certificateType, error: error)
@@ -160,6 +174,58 @@ final class WalletCoordinator: Coordinator {
             break
         }
         navigationController?.presentAsBottomSheet(controller, theme: theme)
+    }
+    
+    private func showMultiPassCertificateSelection(with certificates: [EuropeanCertificate]) {
+        let selectionController: MultiPassCertificateSelectionViewController = .init(availableCertificates: certificates) { [weak self] certificates in
+            self?.navigationController?.topPresentedController.showLinkAlert(title: "multiPass.CGU.alert.title".localized, message: "multiPass.CGU.alert.subtitle".localized, okTitle: "common.ok".localized, okHandler: {
+                self?.generateMultiPass(for: certificates)
+            }, linkTitle: "multiPass.CGU.alert.linkButton.title".localized, linkHandler: { [weak self] in
+                self?.showMultiPassCGU()
+            }, cancelTitle: "common.cancel".localized, cancelHandler: { [weak self] in
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            })
+        } didTouchClose: { [weak self] in
+            self?.navigationController?.dismiss(animated: true, completion: nil)
+        } deinitBlock: { }
+        let bottomButtonContainer: UIViewController = BottomButtonContainerController.controller(selectionController)
+        navigationController?.present(CVNavigationController(rootViewController: bottomButtonContainer), animated: true, completion: nil)
+    }
+    
+    private func showMultiPassCGU() {
+        URL(string: "multiPass.CGU.alert.url".localized)?.openInSafari()
+    }
+    
+    private func generateMultiPass(for certificates: [EuropeanCertificate]) {
+        HUD.show(.progress)
+        WalletManager.shared.generateMultiPassDccFrom(certificates: certificates) { [weak self] result in
+            DispatchQueue.main.async {
+                HUD.hide()
+                switch result {
+                case .success(let generatedCertificate):
+                    self?.showGenerationSuccessAlert(generatedCertificate: generatedCertificate)
+                case .failure(let error):
+                    self?.showGenerationError(for: (error as NSError).userInfo["codes"] as? [String])
+                }
+            }
+        }
+    }
+    
+    private func showGenerationError(for errorsCodes: [String]?) {
+        let controller: MultiPassGenerationErrorViewController = .init(errorsCodes: errorsCodes) { [weak self] in
+            self?.navigationController?.topPresentedController.dismiss(animated: true, completion: nil)
+        } deinitBlock: {}
+        navigationController?.topPresentedController.present(CVNavigationController(rootViewController: controller), animated: true, completion: nil)
+    }
+    
+    private func showGenerationSuccessAlert(generatedCertificate: WalletCertificate) {
+        navigationController?.showAlert(title: "multiPass.generation.successAlert.title".localized,
+                                        message: "multiPass.generation.successAlert.subtitle".localized,
+                                        okTitle: "multiPass.generation.successAlert.buttonTitle".localized,
+                                        handler: { [weak self] in
+            self?.walletViewController?.scrollTo(generatedCertificate, animated: false)
+            self?.navigationController?.dismiss(animated: true, completion: nil)
+        })
     }
     
     private func startFlashCode() {

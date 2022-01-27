@@ -80,8 +80,10 @@ enum Constant {
         
         static var activityCertificateGenerationUrl: URL? { nil }
         
+        static var multiPassAggregateUrl: URL? { URL(string: "https://dcclight.tousanticovid.gouv.fr/api/v1/aggregate")! }
+        
 
-        static let jsonVersion: Int = 36
+        static let jsonVersion: Int = 37
         static let baseJsonUrl: String = "https://\(resourcesRootDomain)/json/version-\(jsonVersion)/Config"
         static let configUrl: URL = URL(string: "\(baseJsonUrl)/config.json")!
         

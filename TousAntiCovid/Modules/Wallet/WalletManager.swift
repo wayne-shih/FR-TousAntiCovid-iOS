@@ -79,6 +79,11 @@ final class WalletManager {
         
     }
     
+    var isMultiPassActivated: Bool {
+        return ParametersManager.shared.isMultiPassActivated
+        
+    }
+    
     @UserDefault(key: .activityPassAutoRenewalActivated)
     var activityPassAutoRenewalActivated: Bool = false
     
@@ -339,6 +344,13 @@ extension WalletManager {
         return certificate
     }
 
+    func extractMultipassCertificateFrom(id: String = UUID().uuidString, doc: String) throws -> ActivityCertificate {
+        let errors: HCert.ParseErrors = HCert.ParseErrors()
+        guard let hCert = HCert(from: doc, errors: errors) else { throw WalletError.parsing.error }
+        let certificate: ActivityCertificate = ActivityCertificate(id: id, value: doc, hCert: hCert, parentId: nil)
+        guard hCert.cryptographicallyValid else { throw WalletError.signature.error }
+        return certificate
+    }
 }
 
 extension WalletManager: PublicKeyStorageDelegate {
@@ -556,20 +568,109 @@ extension WalletManager {
 
 }
 
+// MARK: - MultiPass -
+extension WalletManager {
+
+    func generateMultiPassDccFrom(certificates: [WalletCertificate], completion: ((_ result: Result<WalletCertificate, Error>) -> ())?) {
+        do {
+            guard let remotePublicKey = ParametersManager.shared.activityPassGenerationServerPublicKey else {
+                completion?(.failure(NSError.localizedError(message: "Server public key not found", code: 0)))
+                return
+            }
+            guard let remotePublicKeyData = Data(base64Encoded: remotePublicKey) else {
+                completion?(.failure(NSError.localizedError(message: "Server public key not properly formatted", code: 0)))
+                return
+            }
+            let keyPair: CryptoKeyPair = try Crypto.generateKeys()
+            let sharedSecret: Data = try Crypto.generateSecret(localPrivateKey: keyPair.privateKey, remotePublicKey: remotePublicKeyData)
+            let encryptionKey: Data = try Crypto.generateConversionEncryptionKey(sharedSecret: sharedSecret)
+            let encodedCertificates: [String] = try certificates.map { try Crypto.encrypt($0.value, key: encryptionKey).base64EncodedString() }
+            MultiPassServer.shared.generateMultiPassDcc(encodedCertificates: encodedCertificates, publicKey: keyPair.publicKeyData.base64EncodedString()) { result in
+                switch result {
+                case let .success(base64EncryptedResponse):
+                    do {
+                        let responseJson: String = try Crypto.decrypt(base64EncryptedResponse, key: encryptionKey)
+                        guard let responseData = responseJson.data(using: .utf8) else {
+                            completion?(.failure(NSError.localizedError(message: "Unable to parse server response", code: 0)))
+                            return
+                        }
+                        let response: MultiPassAggregateResponseContent = try JSONDecoder().decode(MultiPassAggregateResponseContent.self, from: responseData)
+                        let certificate: WalletCertificate
+                        if response.certificate.hasPrefix(WalletConstant.DccPrefix.activityCertificate.rawValue) {
+                            certificate = try self.extractMultipassCertificateFrom(doc: response.certificate)
+                        } else {
+                            certificate = try self.extractEuropeanCertificateFrom(doc: response.certificate)
+                        }
+                        let rawCertificate: RawWalletCertificate = RawWalletCertificate(value: response.certificate, expiryDate: nil, parentId: nil)
+                        self.storageManager.saveWalletCertificate(rawCertificate)
+                        self.reloadCertificates()
+                        self.notify()
+                        AnalyticsManager.shared.reportAppEvent(.e24)
+                        completion?(.success(certificate))
+                    } catch {
+                        completion?(.failure(error))
+                    }
+                case let .failure(error):
+                    AnalyticsManager.shared.reportError(serviceName: "dcclight-aggregate", code: (error as NSError).code)
+                    AnalyticsManager.shared.reportAppEvent(.e25, description: ((error as NSError).userInfo["codes"] as? [String])?.compactMap { $0 }.joined(separator: ", "))
+                    completion?(.failure(error))
+                }
+            }
+        } catch {
+            completion?(.failure(error))
+        }
+    }
+}
+
 // MARK: - Smart wallet
 extension WalletManager {
     func getLastRelevantCertificates() -> [EuropeanCertificate]? {
-        // user only for EuropeanCertificates
-        let europeanCertificates: [EuropeanCertificate] = _walletCertificates.filter { ($0 as? EuropeanCertificate)?.hasLunarBirthdate == false } as? [EuropeanCertificate] ?? []
-        // group certificates by user (on firstname and birthdate only)
-        let groupedCerts: [String: [EuropeanCertificate]] = Dictionary(grouping: europeanCertificates) { $0.profileId }
         // keep only the last relevant certificate: completed vaccine or recovery.
-        return groupedCerts.compactMap {
+        return getSmartWalletProfiles().compactMap {
             $0.value
                 .filter { ($0.isLastDose == true || $0.type == .recoveryEurope || $0.isTestNegative == false) && !$0.isExpired }
                 .sorted(by: { $0.alignedTimestamp > $1.alignedTimestamp })
                 .first
         }
+    }
+    
+    func getSmartWalletProfiles() -> [String: [EuropeanCertificate]] {
+        let europeanCertificates: [EuropeanCertificate] = _walletCertificates.filter { ($0 as? EuropeanCertificate)?.hasLunarBirthdate == false } as? [EuropeanCertificate] ?? []
+        return Dictionary(grouping: europeanCertificates) { $0.smartWalletProfileId }
+    }
+}
+
+// MARK: - Multipass
+extension WalletManager {
+    func getMultiPassProfiles() -> [String: [EuropeanCertificate]] {
+        let europeanCertificates: [EuropeanCertificate] = _walletCertificates.filter { ($0 as? EuropeanCertificate)?.hasLunarBirthdate == false } as? [EuropeanCertificate] ?? []
+        return Dictionary(grouping: europeanCertificates) { $0.multiPassProfileId }
+    }
+    
+    func getSimilarProfilesForMultiPass() -> Set<EuropeanCertificate> {
+        let europeanCertificates: [EuropeanCertificate] = getMultiPassProfiles().compactMap { $0.value.first }
+        var similarSet: Set<EuropeanCertificate> = .init()
+        europeanCertificates.forEach { cert in
+            europeanCertificates.forEach { otherCert in
+                guard otherCert !== cert && cert.isProfileSimilar(to: otherCert) else { return }
+                similarSet.insert(otherCert)
+            }
+        }
+        return similarSet
+    }
+    
+    func getSimilarProfileNames() -> [String] {
+        getSimilarProfilesForMultiPass().compactMap { $0.fullName }.sorted(by: <)
+    }
+    
+    func relevantCertificateForMultiPass(in certificates: [EuropeanCertificate]) -> [EuropeanCertificate] {
+        let nowTimestamp: Double = Date().timeIntervalSince1970
+        let filteredCertificates: [EuropeanCertificate] = certificates.filter { certificate in
+            let isCertificateAllowed: Bool = !certificate.isEphemere && !DccBlacklistManager.shared.isBlacklisted(certificate: certificate)
+            let isCertificateStillValid: Bool = certificate.timestamp + Double(ParametersManager.shared.multiPassConfiguration.testMaxHours) * 3600.0 >= nowTimestamp
+            return certificate.isTestNegative == true ? isCertificateStillValid && isCertificateAllowed : isCertificateAllowed
+        }
+        return Array(Set<EuropeanCertificate>(filteredCertificates))
     }
 }
 
@@ -603,5 +704,11 @@ extension WalletManager {
     
     private func notifyWalletSmartState() {
         observers.forEach { $0.observer?.walletSmartStateDidUpdate() }
+    }
+}
+
+private extension EuropeanCertificate {
+    func isProfileSimilar(to other: EuropeanCertificate) -> Bool {
+        return birthdate == other.birthdate && (lastname != other.lastname || firstname != other.firstname)
     }
 }

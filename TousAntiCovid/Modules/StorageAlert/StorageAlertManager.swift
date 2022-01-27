@@ -23,6 +23,8 @@ final class StorageAlertManager {
     
     func start(with storageManager: StorageManager, storageLimitMo: Int64 = 300) {
         self.storageManager = storageManager
+        self.storageLimit = storageLimitMo * 1_000_000
+        
         addNotification()
     }
 }

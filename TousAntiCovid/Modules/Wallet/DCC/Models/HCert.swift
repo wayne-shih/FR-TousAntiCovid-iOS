@@ -139,6 +139,7 @@ public struct HCert {
       payloadString = payload
     }
     let prefix: String = fullPayloadString.replacingOccurrences(of: payloadString, with: "")
+    self.prefix = prefix
     guard
       let compressed = try? payloadString.fromBase45()
     else {
@@ -227,6 +228,7 @@ public struct HCert {
   
   public var fullPayloadString: String
   public var payloadString: String
+  public var prefix: String
   public var cborData: Data
   public var kidStr: String
   public var issCode: String

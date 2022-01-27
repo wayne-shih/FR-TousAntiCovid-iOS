@@ -150,6 +150,8 @@ internal enum Asset {
     internal static let brightnessOff = ImageAsset(name: "BrightnessOff")
     internal static let brightnessOn = ImageAsset(name: "BrightnessOn")
     internal static let logosPasseport = ImageAsset(name: "LogosPasseport")
+    internal static let selectorListOFF = ImageAsset(name: "SelectorListOFF")
+    internal static let selectorListON = ImageAsset(name: "SelectorListON")
     internal static let shareItem = ImageAsset(name: "ShareItem")
     internal static let walletPhone = ImageAsset(name: "WalletPhone")
     internal static let eligible = ImageAsset(name: "eligible")

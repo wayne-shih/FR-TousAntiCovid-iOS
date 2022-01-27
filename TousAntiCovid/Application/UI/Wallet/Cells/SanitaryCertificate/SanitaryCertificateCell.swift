@@ -71,8 +71,8 @@ final class SanitaryCertificateCell: CardCell {
             tagListView.accessibilityTraits = .staticText
             tagListView.accessibilityLabel = row.accessoryText
             tagListView.tagViews.forEach { $0.isAccessibilityElement = false }
-            favoriteButton.setImage(row.isOn == true ? Asset.Images.filledHeart.image : Asset.Images.emptyHeart.image, for: .normal)
         }
+        favoriteButton.setImage(row.isOn == true ? Asset.Images.filledHeart.image : Asset.Images.emptyHeart.image, for: .normal)
         layoutSubviews()
     }
 

@@ -13,11 +13,15 @@ import ServerSDK
 import LBBottomSheet
 
 final class FullscreenCertificateCoordinator: Coordinator {
-
+    
     weak var parent: Coordinator?
     var childCoordinators: [Coordinator] = []
-
-    private var certificate: WalletCertificate
+    
+    private var certificate: WalletCertificate {
+        didSet {
+            AnalyticsManager.shared.reportAppEvent(certificate.is2dDoc ? .e27 : .e26)
+        }
+    }
     private weak var presentingController: UIViewController?
     private weak var navigationController: UINavigationController?
     private weak var fullscreenController: FullscreenCertificateViewController?

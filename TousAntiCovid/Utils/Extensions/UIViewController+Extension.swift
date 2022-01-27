@@ -49,6 +49,15 @@ extension UIViewController {
         topPresentedController.present(alertController, animated: true, completion: nil)
     }
     
+    func showActionSheet(title: String? = nil, message: String? = nil, actions: [UIAlertAction], showCancel: Bool = false) {
+        let alertController: UIAlertController = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+        for action in actions { alertController.addAction(action) }
+        if showCancel {
+            alertController.addAction(UIAlertAction(title: "common.cancel".localized, style: .cancel, handler: { _ in alertController.dismiss(animated: true) }))
+        }
+        topPresentedController.present(alertController, animated: true, completion: nil)
+    }
+    
     func showLeftAlignedAlert(title: String? = nil, message: String? = nil, okTitle: String, isOkDestructive: Bool = false, cancelTitle: String? = nil, handler: (() -> ())? = nil) {
         let paragraphStyle: NSMutableParagraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .left
@@ -68,6 +77,14 @@ extension UIViewController {
     func showRetryAlert(title: String? = nil, message: String? = nil, retryTitle: String, retryHandler: @escaping () -> (), cancelTitle: String, isCancelDestructive: Bool = false, cancelHandler: @escaping () -> ()) {
         let alertController: UIAlertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: retryTitle, style: .default, handler: { _ in retryHandler() }))
+        alertController.addAction(UIAlertAction(title: cancelTitle, style: isCancelDestructive ? .destructive : .default, handler: { _ in cancelHandler() }))
+        topPresentedController.present(alertController, animated: true, completion: nil)
+    }
+    
+    func showLinkAlert(title: String? = nil, message: String? = nil, okTitle: String, okHandler: @escaping () -> (), linkTitle: String, linkHandler: @escaping () -> (), cancelTitle: String, isCancelDestructive: Bool = false, cancelHandler: @escaping () -> ()) {
+        let alertController: UIAlertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: okTitle, style: .default, handler: { _ in okHandler() }))
+        alertController.addAction(UIAlertAction(title: linkTitle, style: .default, handler: { _ in linkHandler() }))
         alertController.addAction(UIAlertAction(title: cancelTitle, style: isCancelDestructive ? .destructive : .default, handler: { _ in cancelHandler() }))
         topPresentedController.present(alertController, animated: true, completion: nil)
     }

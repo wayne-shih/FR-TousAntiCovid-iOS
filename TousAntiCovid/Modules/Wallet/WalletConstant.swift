@@ -49,6 +49,7 @@ enum WalletConstant {
         case vaccinationEurope = "vaccine"
         case recoveryEurope = "recovery"
         case activityEurope = "activity"
+        case multiPass = "multiPass"
         case exemptionEurope = "exemption"
         case unknown = "unknown"
 
@@ -72,6 +73,8 @@ enum WalletConstant {
                 return "recoveryEurope"
             case .activityEurope:
                 return "activityEurope"
+            case .multiPass:
+                return "multiPass"
             case .exemptionEurope:
                 return "exemptionEurope"
             case .unknown:
@@ -119,7 +122,7 @@ enum WalletConstant {
                     "LA(?<LA>[A-Z\\d]{2})" + // We capture the field LA. It can only contain 2 uppercased letters or digits.
                     "\\x1F{1}" + // This character is separating the message from its signature.
                     "[A-Z\\d\\=]+$" // This is the message signature.
-            case .activityEurope, .recoveryEurope, .sanitaryEurope, .vaccinationEurope, .exemptionEurope, .unknown:
+            case .activityEurope, .multiPass, .recoveryEurope, .sanitaryEurope, .vaccinationEurope, .exemptionEurope, .unknown:
                 return ""
             }
         }
@@ -140,7 +143,7 @@ enum WalletConstant {
                     "(?<certificateId>[A-Z\\d]{4})" + // Charatcers 8 to 11 represent the id of the certificate used to sign the document.
                     "[A-Z\\d]{8}" + // Characters 12 to 19 are ignored.
                     "L1" // Characters 20 and 21 represent the wallet certificate type (sanitary, ...)
-            case .activityEurope, .recoveryEurope, .sanitaryEurope, .vaccinationEurope, .exemptionEurope, .unknown:
+            case .activityEurope, .multiPass, .recoveryEurope, .sanitaryEurope, .vaccinationEurope, .exemptionEurope, .unknown:
                 return ""
             }
         }
@@ -151,7 +154,7 @@ enum WalletConstant {
                 return .wallet2DDoc
             case .sanitaryEurope, .vaccinationEurope, .recoveryEurope, .exemptionEurope, .unknown:
                 return .walletDCC
-            case .activityEurope:
+            case .activityEurope, .multiPass:
                 return .walletDCCACT
             }
         }

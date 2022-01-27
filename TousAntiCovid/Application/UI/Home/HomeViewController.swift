@@ -41,7 +41,7 @@ final class HomeViewController: CVTableViewWithCollectionViewsController {
     private(set) var didTouchOpenIsolationForm: () -> ()
     private let didTouchVaccination: () -> ()
     private let didTouchSanitaryCertificates: (_ url: URL?) -> ()
-    private let didTouchVerifyWalletCertificate: () -> ()
+    private let didTouchVerifyWalletCertificate: (() -> ())?
     private let didTouchUniversalQrScan: () -> ()
     private let didTouchCertificate: (_ certificate: WalletCertificate) -> ()
     private let didEnterCodeFromDeeplink: (_ code: String) -> ()
@@ -102,7 +102,7 @@ final class HomeViewController: CVTableViewWithCollectionViewsController {
          didTouchOpenIsolationForm: @escaping () -> (),
          didTouchVaccination: @escaping () -> (),
          didTouchSanitaryCertificates: @escaping (_ url: URL?) -> (),
-         didTouchVerifyWalletCertificate: @escaping () -> (),
+         didTouchVerifyWalletCertificate: (() -> ())? = nil,
          didTouchUniversalQrScan: @escaping () -> (),
          didTouchCertificate: @escaping (_ certificate: WalletCertificate) -> (),
          showUniversalQrScanExplanation: @escaping (_ initialButtonFrame: CGRect?, _ animationDidEnd: @escaping (_ animated: Bool) -> ()) -> (),
@@ -713,7 +713,7 @@ private extension HomeViewController {
             selectionAction: { _ in
                 notif.url?.openInSafari()
             }, secondarySelectionAction: { [weak self] in
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 HomeNotificationManager.shared.close(notification: notif)
                 self?.reloadUI(animated: true)
             })
@@ -1425,14 +1425,6 @@ private extension HomeViewController {
                                             actionBlock: { [weak self] in
             self?.didTouchManageData()
         }))
-        
-        if ParametersManager.shared.displaySanitaryCertificatesValidation {
-            menuEntries.append(GroupedMenuEntry(image: Asset.Images.dataMatrix.image,
-                                                title: "home.moreSection.verifySanitaryCertificate".localized,
-                                                actionBlock: { [weak self] in
-                self?.didTouchVerifyWalletCertificate()
-            }))
-        }
         
         menuEntries.append(contentsOf: [GroupedMenuEntry(image: Asset.Images.privacy.image,
                                                          title: "home.moreSection.privacy".localized,

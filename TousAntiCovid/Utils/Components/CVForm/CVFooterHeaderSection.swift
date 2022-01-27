@@ -29,6 +29,17 @@ struct CVFooterHeaderSection {
         footer.theme.titleColor = Appearance.Cell.Text.accessoryColor
         return footer
     }
+    
+    static func header(title: String?, font: UIFont = Appearance.Cell.Text.footerFont, fontColor: UIColor = Appearance.Cell.Text.titleColor) -> CVFooterHeaderSection {
+        var footer: CVFooterHeaderSection = CVFooterHeaderSection(title: title)
+        footer.theme.topInset = Appearance.Header.topMargin
+        footer.theme.bottomInset = Appearance.Header.bottomMargin
+        footer.theme.rightInset = Appearance.Cell.Inset.medium
+        footer.theme.leftInset = Appearance.Cell.Inset.medium
+        footer.theme.titleFont = { font }
+        footer.theme.titleColor = fontColor
+        return footer
+    }
 
     struct Theme {
         var backgroundColor: UIColor = Appearance.Controller.cardTableViewBackgroundColor

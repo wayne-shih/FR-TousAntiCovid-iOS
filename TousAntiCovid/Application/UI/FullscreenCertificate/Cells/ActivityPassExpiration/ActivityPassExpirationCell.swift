@@ -63,7 +63,7 @@ final class ActivityPassExpirationCell: CVTableViewCell {
         UIView.animate(withDuration: 0.15, delay: 0.0, options: .curveEaseOut) { [weak self] in
             self?.titleContainerView?.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
         } completion: { _ in
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
             UIView.animate(withDuration: 0.15, delay: 0.0, options: .curveEaseIn) { [weak self] in
                 self?.titleContainerView?.transform = .identity
             } completion: { _ in }

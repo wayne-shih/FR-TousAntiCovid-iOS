@@ -64,10 +64,14 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         ConversionServer.shared.start(session: UrlSessionManager.shared.session,
                                       convertUrl: { Constant.Server.convertUrl },
                                       requestLoggingHandler: { request, response, responseData, error in
-                                      })
+        })
         ActivityCertificateServer.shared.start(session: URLSession.shared,
                                                serverUrl: { Constant.Server.activityCertificateGenerationUrl },
                                                requestLoggingHandler: { request, response, responseData, error in
+        })
+        MultiPassServer.shared.start(session: URLSession.shared,
+                                     serverUrl: { Constant.Server.multiPassAggregateUrl },
+                                     requestLoggingHandler: { request, response, responseData, error in
         })
         CleaServer.shared.start(certificateFiles: Constant.Server.certificates,
                                 reportBaseUrl: { Constant.Server.cleaReportBaseUrl },

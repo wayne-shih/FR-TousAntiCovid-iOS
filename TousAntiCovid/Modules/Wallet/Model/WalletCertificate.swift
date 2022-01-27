@@ -115,11 +115,11 @@ extension WalletCertificate {
                 return nil
             }
         } else if let hCert = HCert(from: rawCertificate.value) {
-            if let parentId = rawCertificate.parentId {
+            if hCert.prefix == WalletConstant.DccPrefix.activityCertificate.rawValue {
                 return ActivityCertificate(id: rawCertificate.id,
                                            value: rawCertificate.value,
                                            hCert: hCert,
-                                           parentId: parentId)
+                                           parentId: rawCertificate.parentId)
             } else {
                 return EuropeanCertificate(id: rawCertificate.id,
                                            value: rawCertificate.value,

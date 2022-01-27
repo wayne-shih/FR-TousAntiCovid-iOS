@@ -18,7 +18,16 @@ final class WalletViewController: CVTableViewController {
     private enum Mode {
         case empty
         case certificates
+        case multiPass
         case info
+        
+        var selectedIndex: Int {
+            switch self {
+            case .empty, .certificates: return 0
+            case .multiPass: return 1
+            case .info: return 2
+            }
+        }
     }
     
     var deinitBlock: (() -> ())?
@@ -27,10 +36,17 @@ final class WalletViewController: CVTableViewController {
     private let didConvertToEuropeanCertifcate: (_ certificate: EuropeanCertificate) -> ()
     private let didTouchDocumentExplanation: (_ certificateType: WalletConstant.CertificateType) -> ()
     private let didTouchWhenToUse: () -> ()
+    private let didTouchMultiPassMoreInfo: () -> ()
+    private let didTouchMultiPassInstructions: () -> ()
     private let didTouchContinueOnFraud: () -> ()
     private let didTouchConvertToEuropeTermsOfUse: () -> ()
     private let didTouchCertificateAdditionalInfo: (_ info: AdditionalInfo) -> ()
-    private var mode: Mode = .empty
+    private let didSelectProfileForMultiPass: (_ certificates: [EuropeanCertificate]) -> ()
+    private var mode: Mode = .empty {
+        didSet {
+            updateBottomBarButton()
+        }
+    }
     private var mustScrollToTopAfterRefresh: Bool = false
     private var shouldHideCellImage: Bool {
         UIScreen.main.bounds.width < 375.0 ||
@@ -50,18 +66,24 @@ final class WalletViewController: CVTableViewController {
          didConvertToEuropeanCertifcate: @escaping (_ certificate: EuropeanCertificate) -> (),
          didTouchDocumentExplanation: @escaping (_ certificateType: WalletConstant.CertificateType) -> (),
          didTouchWhenToUse: @escaping () -> (),
+         didTouchMultiPassMoreInfo: @escaping () -> (),
+         didTouchMultiPassInstructions: @escaping () -> (),
          didTouchContinueOnFraud: @escaping () -> (),
          didTouchConvertToEuropeTermsOfUse: @escaping () -> (),
          didTouchCertificateAdditionalInfo: @escaping (_ info: AdditionalInfo) -> (),
+         didSelectProfileForMultiPass: @escaping (_ certificates: [EuropeanCertificate]) -> (),
          deinitBlock: @escaping () -> ()) {
         self.didTouchFlashCertificate = didTouchFlashCertificate
         self.didTouchCertificate = didTouchCertificate
         self.didConvertToEuropeanCertifcate = didConvertToEuropeanCertifcate
         self.didTouchDocumentExplanation = didTouchDocumentExplanation
         self.didTouchWhenToUse = didTouchWhenToUse
+        self.didTouchMultiPassMoreInfo = didTouchMultiPassMoreInfo
+        self.didTouchMultiPassInstructions = didTouchMultiPassInstructions
         self.didTouchContinueOnFraud = didTouchContinueOnFraud
         self.didTouchConvertToEuropeTermsOfUse = didTouchConvertToEuropeTermsOfUse
         self.didTouchCertificateAdditionalInfo = didTouchCertificateAdditionalInfo
+        self.didSelectProfileForMultiPass = didSelectProfileForMultiPass
         self.deinitBlock = deinitBlock
         super.init(style: .plain)
     }
@@ -109,9 +131,18 @@ final class WalletViewController: CVTableViewController {
     }
     
     private func updateBottomBarButton() {
-        bottomButtonContainerController?.updateButton(title: "walletController.addCertificate".localized) { [weak self] in
-            self?.openQRScan()
-            self?.bottomButtonContainerController?.unlockButtons()
+        bottomButtonContainerController?.setBottomBarHidden(mode == .info, animated: true)
+        switch mode {
+        case .multiPass:
+            bottomButtonContainerController?.updateButton(title: "multiPass.tab.generation.button.title".localized) { [weak self] in
+                self?.openProfilesAlert()
+                self?.bottomButtonContainerController?.unlockButtons()
+            }
+        default:
+            bottomButtonContainerController?.updateButton(title: "walletController.addCertificate".localized) { [weak self] in
+                self?.openQRScan()
+                self?.bottomButtonContainerController?.unlockButtons()
+            }
         }
     }
     
@@ -123,6 +154,9 @@ final class WalletViewController: CVTableViewController {
                 case .certificates:
                     headerRows()
                     certificatesRows()
+                case .multiPass:
+                    headerRows()
+                    multiPassInfoRows()
                 case .info:
                     headerRows()
                     infoRows()
@@ -137,12 +171,49 @@ final class WalletViewController: CVTableViewController {
         WalletManager.shared.walletCertificates.isEmpty ? .empty : (mode == .empty ? .certificates : mode)
     }
     
+    private func multiPassInfoRows() -> [CVRow] {
+        let url: URL? = URL(string: "multiPass.tab.explanation.url".localized)
+        let explanationsRow: CVRow = .init(title: "multiPass.tab.explanation.title".localized,
+                                           subtitle: "multiPass.tab.explanation.subtitle".localized,
+                                           buttonTitle: url == nil ? nil : "multiPass.tab.explanation.linkButton.title".localized,
+                                           xibName: .paragraphCell,
+                                           theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                                              topInset: Appearance.Cell.Inset.normal,
+                                                              bottomInset: .zero,
+                                                              textAlignment: .natural,
+                                                              titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                           accessibilityDidFocusCell: { [weak self] _ in
+                                            self?.clearCurrentlyFocusedCellObjects()
+                                            },
+                                           selectionAction: { [weak self] _ in
+                                            self?.didTouchMultiPassMoreInfo()
+                                        })
+        let similarProfilesNames: [String] = WalletManager.shared.getSimilarProfileNames()
+        let instructionUrl: URL? = URL(string: "multiPass.tab.similarProfile.url".localized)
+        let warningRow: CVRow? = similarProfilesNames.isEmpty ? nil : .init(title: "multiPass.tab.similarProfile.title".localized,
+                                                                            subtitle: String(format: "multiPass.tab.similarProfile.subtitle".localized, similarProfilesNames.joined(separator: ", ")),
+                                                                     buttonTitle: instructionUrl == nil ? nil : "multiPass.tab.similarProfile.linkButton.title".localized,
+                                                                     xibName: .paragraphCell,
+                                                                     theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
+                                                                                        topInset: Appearance.Cell.Inset.normal,
+                                                                                        bottomInset: .zero,
+                                                                                        textAlignment: .natural,
+                                                                                        titleFont: { Appearance.Cell.Text.headTitleFont }),
+                                                                     accessibilityDidFocusCell: { [weak self] _ in
+                                                                        self?.clearCurrentlyFocusedCellObjects()
+                                                                        },
+                                                                     selectionAction: { [weak self] _ in
+                                                                        self?.didTouchMultiPassInstructions()
+                                                                })
+        return [explanationsRow, warningRow].compactMap { $0 }
+    }
+    
     private func infoRows() -> [CVRow] {
-        let headerImageRow: CVRow = CVRow(image: Asset.Images.wallet.image,
+        let headerImageRow: CVRow = .init(image: Asset.Images.wallet.image,
                                           xibName: .imageCell,
                                           theme: CVRow.Theme(topInset: Appearance.Cell.Inset.medium,
                                                              imageRatio: 375.0 / 116.0))
-        let explanationsRow: CVRow = CVRow(title: "walletController.howDoesItWork.title".localized,
+        let explanationsRow: CVRow = .init(title: "walletController.howDoesItWork.title".localized,
                                            subtitle: "walletController.howDoesItWork.subtitle".localized,
                                            xibName: .standardCardCell,
                                            theme: CVRow.Theme(backgroundColor: Appearance.Cell.cardBackgroundColor,
@@ -153,7 +224,7 @@ final class WalletViewController: CVTableViewController {
                                            accessibilityDidFocusCell: { [weak self] _ in
                                             self?.clearCurrentlyFocusedCellObjects()
                                            })
-        let documentsRow: CVRow = CVRow(title: "walletController.documents.title".localized,
+        let documentsRow: CVRow = .init(title: "walletController.documents.title".localized,
                                         subtitle: "walletController.documents.subtitle".localized,
                                         accessoryText: "walletController.documents.vaccin".localized,
                                         footerText: "walletController.documents.test".localized,
@@ -174,7 +245,7 @@ final class WalletViewController: CVTableViewController {
                                         tertiarySelectionAction: { [weak self] in
                                             self?.didTouchDocumentExplanation(.sanitaryEurope)
                                         })
-        let whenToUseRow: CVRow = CVRow(title: "walletController.whenToUse.title".localized,
+        let whenToUseRow: CVRow = .init(title: "walletController.whenToUse.title".localized,
                                         subtitle: "walletController.whenToUse.subtitle".localized,
                                         buttonTitle: "walletController.whenToUse.button".localized,
                                         xibName: .paragraphCell,
@@ -189,7 +260,7 @@ final class WalletViewController: CVTableViewController {
                                         selectionAction: { [weak self] _ in
                                             self?.didTouchWhenToUse()
         })
-        let fraudRow: CVRow = CVRow(title: "walletController.info.fraud.title".localized,
+        let fraudRow: CVRow = .init(title: "walletController.info.fraud.title".localized,
                                         subtitle: "walletController.info.fraud.explanation".localized,
                                         buttonTitle: "walletController.info.fraud.button".localized,
                                         xibName: .paragraphCell,
@@ -204,7 +275,7 @@ final class WalletViewController: CVTableViewController {
                                         selectionAction: { [weak self] _ in
             self?.didTouchContinueOnFraud()
         })
-        let phoneRow: CVRow = CVRow(title: "walletController.phone.title".localized,
+        let phoneRow: CVRow = .init(title: "walletController.phone.title".localized,
                                     subtitle: "walletController.phone.subtitle".localized,
                                     image: Asset.Images.walletPhone.image,
                                     xibName: .phoneCell,
@@ -246,13 +317,19 @@ final class WalletViewController: CVTableViewController {
             self?.mode = .certificates
             self?.reloadUI(animated: true, completion: nil)
         }
+        let multiPassModeSelectionAction: (() -> ())? = WalletManager.shared.isMultiPassActivated ? { [weak self] in
+            AnalyticsManager.shared.reportAppEvent(.e23)
+            self?.mode = .multiPass
+            self?.reloadUI(animated: true, completion: nil)
+        } : nil
         let infoModeSelectionAction: () -> () = { [weak self] in
             self?.mode = .info
             self?.reloadUI(animated: true, completion: nil)
         }
-        let modeSelectionRow: CVRow = CVRow(segmentsTitles: [String(format: "walletController.mode.myCertificates".localized, WalletManager.shared.walletCertificates.count),
-                                                             "walletController.mode.info".localized],
-                                            selectedSegmentIndex: mode == .certificates ? 0 : 1,
+        let modeSelectionRow: CVRow = CVRow(segmentsTitles: ["walletController.mode.myCertificates".localized,
+                                                             WalletManager.shared.isMultiPassActivated ? "multiPass.tab.title".localized : nil,
+                                                             "walletController.mode.info".localized].compactMap { $0 },
+                                            selectedSegmentIndex: mode.selectedIndex,
                                             xibName: .segmentedCell,
                                             theme:  CVRow.Theme(backgroundColor: .clear,
                                                                 topInset: Appearance.Cell.Inset.large,
@@ -263,7 +340,7 @@ final class WalletViewController: CVTableViewController {
                                             accessibilityDidFocusCell: { [weak self] _ in
                                                 self?.clearCurrentlyFocusedCellObjects()
                                             },
-                                            segmentsActions: [certificatesModeSelectionAction, infoModeSelectionAction])
+                                            segmentsActions: [certificatesModeSelectionAction, multiPassModeSelectionAction, infoModeSelectionAction].compactMap { $0 })
         rows.append(modeSelectionRow)
         return rows
     }
@@ -439,6 +516,7 @@ final class WalletViewController: CVTableViewController {
         if let row = additionalInfoRowIfNeeded(for: certificate) {
             rows.append(row)
         }
+        let canBeAddedToFavorite: Bool = certificate.type.format == .walletDCC || certificate.type == .multiPass
         let certificateRow: CVRow = CVRow(title: certificate.shortDescriptionForList?.uppercased(),
                                           subtitle: subtitle,
                                           image: shouldHideCellImage ? nil : certificate.codeImage,
@@ -465,7 +543,7 @@ final class WalletViewController: CVTableViewController {
                                           selectionAction: { [weak self] _ in
                                             self?.didTouchCertificate(certificate)
                                           },
-                                          secondarySelectionAction: certificate.type.format == .walletDCC ? { [weak self] in
+                                          secondarySelectionAction: canBeAddedToFavorite ? { [weak self] in
                                             guard let self = self else { return }
                                             if certificate.id == WalletManager.shared.favoriteDccId {
                                                 WalletManager.shared.removeFavorite()
@@ -627,15 +705,19 @@ final class WalletViewController: CVTableViewController {
         present(alertController, animated: true, completion: nil)
     }
 
-    func scrollTo(_ certificate: WalletCertificate) {
+    func scrollTo(_ certificate: WalletCertificate, animated: Bool = true) {
+        if mode != .certificates {
+            mode = .certificates
+            reloadUI()
+        }
         guard let indexPath = getIndexPath(for: certificate) else { return }
-        tableView.scrollToRow(at: indexPath, at: .middle, animated: true)
+        tableView.scrollToRow(at: indexPath, at: .middle, animated: animated)
     }
 
     private func getIndexPath(for certificate: WalletCertificate) -> IndexPath? {
         var indexPath: IndexPath? = nil
         for (index, section) in sections.enumerated() {
-            let rowIndex: Int? = section.rows.firstIndex { ($0.associatedValue as? WalletCertificate)?.id == certificate.id }
+            let rowIndex: Int? = section.rows.firstIndex { ($0.associatedValue as? WalletCertificate)?.uniqueHash == certificate.uniqueHash }
             guard let row = rowIndex else { continue }
             indexPath = IndexPath(row: row, section: index)
             break
@@ -655,6 +737,23 @@ final class WalletViewController: CVTableViewController {
                                 UIApplication.shared.openSettings()
                                })
             }
+        }
+    }
+    
+    private func openProfilesAlert() {
+        let profiles: [String: [EuropeanCertificate]] = WalletManager.shared.getMultiPassProfiles()
+        if profiles.count > 1 {
+            let actions: [UIAlertAction] = profiles.compactMap { profile in
+                guard let fullName = profile.value.first?.fullName.capitalized else { return nil }
+                return UIAlertAction(title: fullName, style: .default) { [weak self] _ in
+                    self?.didSelectProfileForMultiPass(profile.value)
+                }
+            }.sorted { ($0.title ?? "") < ($1.title ?? "")}
+            showActionSheet(title: nil, message: "multiPass.tab.generation.profileList.title".localized, actions: actions, showCancel: true)
+        } else if let certificates = profiles.first?.value, profiles.count == 1 {
+            didSelectProfileForMultiPass(certificates)
+        } else {
+            showAlert(title: "multiPass.noProfile.alert.title".localized, message: "multiPass.noProfile.alert.subtitle".localized, okTitle: "common.ok".localized, isOkDestructive: false)
         }
     }
 

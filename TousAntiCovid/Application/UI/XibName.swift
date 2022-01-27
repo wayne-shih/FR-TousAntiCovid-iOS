@@ -93,6 +93,7 @@ enum XibName {
         case urgentDgsCell = "UrgentDgsCell"
         case collectionTableViewCell = "CVCollectionTableViewCell"
         case additionalInfoCell = "AdditionalInfoCell"
+        case certificateSelectionCell = "CertificateSelectionCell"
         
         // MARK: - CollectionViewCell
         case keyFigureCollectionViewCell = "KeyFigureCollectionViewCell"
